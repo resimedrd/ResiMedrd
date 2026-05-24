@@ -160,7 +160,8 @@ const quiz = {
           quiz.actualizarRelojVisual();
           if (state.tiempoRestanteSegundos <= 0) {
             clearInterval(state.intervaloTemporizador);
-            alert("Tiempo límite de simulacro alcanzado.");
+            quiz.congelarControles();
+            alert("Tiempo límite de simulacro alcanzado. Guardando tus respuestas...");
             quiz.finalizarSesion();
           }
         }, 1000);
@@ -397,6 +398,11 @@ const quiz = {
 
   siguientePregunta() {
     clearInterval(guardiaTimerInterval);
+    if (state.indiceActual >= state.preguntasCargadas.length - 1) {
+      alert("Has llegado al final del examen.");
+      quiz.finalizarSesion();
+      return;
+    }
     state.indiceActual++;
     
     if (state.modoActual === "guardia") {
@@ -621,6 +627,32 @@ const quiz = {
 
     ui.filtrarRevision("todas");
     ui.mostrarPantalla("resultados");
+  },
+
+  congelarControles() {
+    const opciones = document.querySelectorAll(".option-btn");
+    opciones.forEach(btn => btn.disabled = true);
+
+    const marcadores = document.querySelectorAll(".btn-marcar-respuesta");
+    marcadores.forEach(bm => bm.classList.add("hidden"));
+
+    const btnFlag = document.getElementById("btn-flag-pregunta");
+    if (btnFlag) btnFlag.disabled = true;
+
+    const navBtns = document.querySelectorAll(".nav-map-btn");
+    navBtns.forEach(btn => {
+      btn.disabled = true;
+      btn.style.pointerEvents = "none";
+      btn.style.opacity = "0.5";
+    });
+
+    const btnSiguiente = document.getElementById("btn-siguiente");
+    const btnFinalizar = document.getElementById("btn-finalizar");
+    if (btnSiguiente) btnSiguiente.classList.add("hidden");
+    if (btnFinalizar) {
+      btnFinalizar.textContent = "Procesando...";
+      btnFinalizar.disabled = true;
+    }
   }
 };
 

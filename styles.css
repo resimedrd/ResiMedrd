@@ -1323,7 +1323,10 @@ select.input option {
 }
 
 .nav-map-btn.flagged {
-  border-color: var(--warning) !important;
+  border: 2px solid var(--warning) !important;
+  background: var(--warning-soft) !important;
+  color: var(--warning) !important;
+  box-shadow: 0 0 8px rgba(202, 138, 4, 0.25) !important;
 }
 
 /* 2. Sistema de Marcado de Preguntas (Flagging) */
