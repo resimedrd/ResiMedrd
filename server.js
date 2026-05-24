@@ -642,8 +642,9 @@ app.post("/api/auth/registro", async (req, res) => {
       usuario: { id, nombre, email, rol, xp: 0, streak: 0, nivel: 1, meta_semanal: 50, especialidad_aspirada: "Ninguna" } 
     });
   } catch (error) {
+    console.error("❌ ERROR DETALLADO EN REGISTRO EN EL SERVIDOR:", error);
     if (error.message && error.message.includes("UNIQUE")) return res.status(400).json({ error: "El correo ya existe." });
-    res.status(500).json({ error: "Error en el registro." });
+    res.status(500).json({ error: `Error en el registro: ${error.message || error}` });
   }
 });
 
@@ -676,7 +677,8 @@ app.post("/api/auth/login", async (req, res) => {
       } 
     });
   } catch (error) {
-    res.status(500).json({ error: "Error en el servidor." });
+    console.error("❌ ERROR DETALLADO EN LOGIN EN EL SERVIDOR:", error);
+    res.status(500).json({ error: `Error en el servidor: ${error.message || error}` });
   }
 });
 
