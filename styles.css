@@ -1,17 +1,17 @@
 :root {
-  --bg: #f8fafc;
-  --bg-2: #f1f5f9;
+  --bg: #e2e8f0;
+  --bg-2: #cbd5e1;
   --panel: #ffffff;
   --panel-strong: #ffffff;
-  --panel-soft: #f8fafc;
+  --panel-soft: #f1f5f9;
   --bg-card: #ffffff;
 
-  --border: #e2e8f0;
-  --border-strong: #cbd5e1;
+  --border: #cbd5e1;
+  --border-strong: #94a3b8;
 
-  --text: #0f172a;
-  --text-soft: #334155;
-  --text-dim: #64748b;
+  --text: #020617;
+  --text-soft: #0f172a;
+  --text-dim: #475569;
 
   --primary: #0A66C2;
   --primary-2: #00509d;
@@ -53,7 +53,7 @@ h1, h2, h3, h4, h5, h6, .brand-mark, .flashcard-q, .mode-title, .quiz-timer, .re
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: radial-gradient(circle at 50% -20%, #e0f2fe 0%, var(--bg) 70%);
+  background: linear-gradient(135deg, #f1f5f9 0%, #cbd5e1 100%);
   z-index: -1;
 }
 
@@ -483,10 +483,11 @@ select.input option {
 .question-text {
   font-size: 20px;
   font-weight: 700;
-  line-height: 1.5;
+  line-height: 1.6;
   margin-top: 6px;
   margin-bottom: 28px;
   letter-spacing: -0.3px;
+  color: var(--text) !important;
 }
 
 .options-grid {
@@ -496,27 +497,28 @@ select.input option {
 }
 
 .option-btn {
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid var(--border);
+  background: #ffffff !important;
+  border: 1px solid var(--border) !important;
   padding: 16px 20px;
   border-radius: 16px;
   text-align: left;
-  color: var(--text-soft);
-  font-size: 15px;
-  font-weight: 500;
+  color: var(--text-soft) !important;
+  font-size: 15.5px;
+  font-weight: 550;
   cursor: pointer;
   outline: none;
   transition: all 0.2s;
-  line-height: 1.4;
+  line-height: 1.5;
   display: flex;
   align-items: flex-start;
   gap: 12px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
 }
 
 .option-btn:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: var(--border-strong);
-  color: var(--text);
+  background: var(--primary-soft) !important;
+  border-color: var(--primary) !important;
+  color: var(--primary) !important;
 }
 
 .option-btn.selected {
