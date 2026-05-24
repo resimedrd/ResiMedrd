@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ResiMed | Simulacros Premium ENURM</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-bg"></div>
+
+  <div class="layout">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark">R</div>
+        <div class="brand-copy">
+          <h1>ResiMed</h1>
+          <p id="saludo-usuario">Cargando entorno médico...</p>
+        </div>
+      </div>
+      <div class="topbar-actions">
+        <button id="btn-ir-inicio" class="btn btn-ghost hidden" type="button">Inicio</button>
+        <button id="btn-ver-perfil" class="btn btn-ghost hidden" type="button">👤 Mi Perfil</button>
+        <button id="btn-cerrar-sesion" class="btn btn-ghost hidden" style="border-color: var(--danger); color: var(--danger);" type="button">Cerrar Sesión</button>
+      </div>
+    </header>
+
+    <main class="main-shell">
+      
+      <section id="pantalla-auth" class="screen active">
+        <article class="auth-shell">
+          <div class="auth-tabs">
+            <button id="tab-login" class="auth-tab active" type="button">Iniciar Sesión</button>
+            <button id="tab-registro" class="auth-tab" type="button">Crear Cuenta</button>
+          </div>
+
+          <form id="form-login" class="auth-form">
+            <div class="form-block">
+              <label>Correo Electrónico</label>
+              <input type="email" id="login-email" class="input" placeholder="ejemplo@correo.com" required />
+            </div>
+            <div class="form-block">
+              <label>Contraseña</label>
+              <input type="password" id="login-password" class="input" placeholder="••••••••" required />
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%;">Ingresar al Sistema</button>
+          </form>
+
+          <form id="form-registro" class="auth-form hidden">
+            <div class="form-block">
+              <label>Nombre Completo</label>
+              <input type="text" id="reg-nombre" class="input" placeholder="Dr. / Dra. Apellido" required />
+            </div>
+            <div class="form-block">
+              <label>Correo Electrónico</label>
+              <input type="email" id="reg-email" class="input" placeholder="medico@correo.com" required />
+            </div>
+            <div class="form-block">
+              <label>Contraseña de Estudio</label>
+              <input type="password" id="reg-password" class="input" placeholder="Mínimo 6 caracteres" required />
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%;">Registrar nueva cuenta</button>
+          </form>
+
+          <p id="auth-mensaje" class="auth-msg"></p>
+        </article>
+      </section>
+
+      <section id="pantalla-home" class="screen">
+        <section class="hero-card">
+          <div class="hero-copy">
+            <span class="eyebrow">Preparación ENURM Profesional</span>
+            <h2>Entrena con el rigor del examen real.</h2>
+            <p>Monitorea tu evolución, domina especialidades específicas y pon a prueba tu agilidad con el simulador de tiempo integrado.</p>
+            <div class="hero-badges" style="margin-bottom: 20px;">
+              <span class="badge">Análisis Estadístico</span>
+              <span class="badge">Separación de Roles</span>
+            </div>
+            <button id="btn-ir-flashcards" class="btn btn-primary" style="background: linear-gradient(135deg, var(--warning) 0%, #d97706 100%); color: #000; font-weight: bold; border: none; box-shadow: 0 4px 14px rgba(245, 158, 11, 0.35); gap: 8px;" type="button">
+              ⚡ Estudiar Flashcards ENURM
+            </button>
+          </div>
+          <div class="hero-stats">
+            <div class="stat-card">
+              <span class="stat-label">Simulacros hechos</span>
+              <span id="resumen-total-sesiones" class="stat-value">0</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-label">Puntaje Promedio</span>
+              <span id="resumen-promedio-general" class="stat-value">0%</span>
+            </div>
+          </div>
+        </section>
+
+        <div class="home-grid">
+          <article class="panel">
+            <div class="panel-head">
+              <h3>Configurar Entrenamiento</h3>
+              <p>Escoge tus parámetros de simulación médica.</p>
+            </div>
+            <div class="form-block">
+              <label for="especialidad">Bloque de Estudio</label>
+              <select id="especialidad" class="input"></select>
+            </div>
+            <div class="form-block">
+              <label for="cantidad">Número de Preguntas</label>
+              <select id="cantidad" class="input">
+                <option value="10">10 Preguntas</option>
+                <option value="20" selected>20 Preguntas</option>
+                <option value="30">30 Preguntas</option>
+                <option value="40">40 Preguntas</option>
+                <option value="50">50 Preguntas</option>
+                <option value="60">60 Preguntas</option>
+                <option value="70">70 Preguntas</option>
+                <option value="80">80 Preguntas</option>
+                <option value="90">90 Preguntas</option>
+                <option value="100">100 Preguntas</option>
+              </select>
+            </div>
+            <div class="form-block">
+              <label>Seleccionar Modalidad</label>
+              <div class="mode-grid">
+                <button id="btn-modo-estudio" class="mode-card" type="button">
+                  <span class="mode-icon">📘</span>
+                  <span class="mode-title">Modo Estudio</span>
+                  <span class="mode-desc">Retroalimentación analítica y justificación inmediata por reactivo.</span>
+                </button>
+                <button id="btn-modo-simulacro" class="mode-card" type="button">
+                  <span class="mode-icon">⏱️</span>
+                  <span class="mode-title">Modo Simulacro</span>
+                  <span class="mode-desc">Sin ayudas visuales. Evaluación global con cronómetro estricto.</span>
+                </button>
+              </div>
+            </div>
+          </article>
+
+          <div class="side-panel-container">
+            
+            <article id="panel-administrador" class="panel hidden" style="border-color: var(--warning); margin-bottom: 24px;">
+              <div class="panel-head">
+                <h3 style="color: var(--warning);">⚡ Panel de Gestión del Banco</h3>
+                <p>Módulo administrativo exclusivo para inyección de casos clínicos.</p>
+              </div>
+              <form id="form-nueva-pregunta" style="display: flex; flex-direction: column; gap: 12px;">
+                <div>
+                  <label class="admin-label">Enunciado o Caso Clínico</label>
+                  <textarea id="admin-texto" class="input" style="min-height: 70px; font-family: inherit;" required></textarea>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                  <input type="text" id="admin-opc0" class="input" placeholder="Opción A" required />
+                  <input type="text" id="admin-opc1" class="input" placeholder="Opción B" required />
+                  <input type="text" id="admin-opc2" class="input" placeholder="Opción C" required />
+                  <input type="text" id="admin-opc3" class="input" placeholder="Opción D" required />
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                  <div>
+                    <label class="admin-label">Respuesta Correcta</label>
+                    <select id="admin-correcta" class="input">
+                      <option value="0">Opción A</option>
+                      <option value="1">Opción B</option>
+                      <option value="2">Opción C</option>
+                      <option value="3">Opción D</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="admin-label">Especialidad Temática</label>
+                    <input type="text" id="admin-tema" class="input" placeholder="Ej: Cardiología" required />
+                  </div>
+                </div>
+                <div>
+                  <label class="admin-label">Explicación Clínica / Desglose Docente</label>
+                  <textarea id="admin-explicacion" class="input" style="min-height: 50px; font-family: inherit;" placeholder="Usa 🔬 JUSTIFICACIÓN (Por qué SÍ): y 🚫 DESCARTE (Por qué NO): para visual premium" required></textarea>
+                </div>
+                <div>
+                  <label class="admin-label">Fuente Bibliográfica de Información (Fase 4)</label>
+                  <input type="text" id="admin-fuente" class="input" placeholder="Ej: Nelson Tratado de Pediatría, 21.ª Edición - Cap. 385" required />
+                </div>
+                <button type="submit" class="btn btn-primary" style="background: var(--warning); color: #000; font-weight: bold; width: 100%;">Agregar al Banco Oficial</button>
+                <p id="admin-mensaje" style="font-size: 13px; text-align: center; margin: 0; font-weight: bold;"></p>
+              </form>
+<div class="admin-box" style="margin-top: 24px; padding: 20px; border: 2px dashed var(--border-strong); border-radius: 8px; background: var(--panel-soft);">
+            <h3 style="color: var(--warning); margin-bottom: 8px;">Carga Masiva de Preguntas (Formato JSON)</h3>
+            <p style="font-size: 13px; color: var(--text-soft); margin-bottom: 16px;">Selecciona tu archivo de texto con las preguntas ordenadas en bloque para indexarlas al instante.</p>
+            
+            <input type="file" id="input-archivo-masivo" accept=".txt,.json" style="margin-bottom: 16px; display: block; color: var(--text);" />
+            <button id="btn-subir-masivo" class="btn btn-primary" type="button" style="background: var(--warning); color: #000;">⚡ Procesar e Inyectar Banco</button>
+            
+            <p id="mensaje-carga-masiva" style="margin-top: 12px; font-size: 14px; font-weight: 600;"></p>
+          </div>
+
+          <!-- FASE 6: BANCO DE REPORTES DE ERROR DE LA COMUNIDAD -->
+          <div class="admin-box" style="margin-top: 24px; padding: 20px; border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 12px; background: rgba(239, 68, 68, 0.02);">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 8px;">
+              <h3 style="color: var(--danger); margin: 0; display: flex; align-items: center; gap: 8px; font-size: 15px;">
+                🚨 Reportes de Error de la Comunidad
+                <span id="admin-reportes-badge" class="admin-badge-count hidden">0</span>
+              </h3>
+              <button id="btn-admin-refrescar-reportes" class="btn btn-ghost" style="padding: 4px 8px; font-size: 11px; border-color: rgba(239,68,68,0.2); color: var(--danger); min-width: auto;" type="button">🔄 Refrescar</button>
+            </div>
+            <p style="font-size: 12.5px; color: var(--text-soft); margin-bottom: 16px;">Revisa y resuelve las fallas en reactivos reportadas por los estudiantes en tiempo real.</p>
+            
+            <div id="admin-reportes-lista" style="display: flex; flex-direction: column; gap: 12px; max-height: 400px; overflow-y: auto; padding-right: 4px;">
+              <!-- Inyectado dinámicamente -->
+            </div>
+            <div id="admin-reportes-vacio" class="history-empty" style="padding: 20px; border-color: rgba(255,255,255,0.05); font-size: 12.5px; color: var(--text-dim);">
+              ✓ No hay reportes de error pendientes en la plataforma.
+            </div>
+          </div>
+            </article>
+
+            <article class="panel">
+              <div class="panel-head">
+                <h3>Métricas de Rendimiento</h3>
+                <p>Tus datos históricos individuales en esta PC.</p>
+              </div>
+              <div class="dashboard-grid" style="margin-bottom: 20px;">
+                <div class="dashboard-metric">
+                  <span class="dashboard-label">Record Personal</span>
+                  <span id="dashboard-mejor-porcentaje" class="dashboard-value">0%</span>
+                </div>
+                <div class="dashboard-metric">
+                  <span class="dashboard-label">Preguntas Vistas</span>
+                  <span id="dashboard-total-preguntas" class="dashboard-value">0</span>
+                </div>
+              </div>
+              <div class="panel-head" style="margin-bottom: 12px;">
+                <h3>Últimos Simulacros</h3>
+              </div>
+              <div id="historial-lista" class="history-list"></div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="pantalla-quiz" class="screen">
+        <article class="quiz-shell">
+          <div class="quiz-header">
+            <div>
+              <span id="chip-modo" class="chip chip-primary">Modo</span>
+              <span id="chip-tema" class="chip chip-soft">Tema</span>
+            </div>
+            <!-- Cuadro unificado de avance y marcado (Fase 2 - Sidebar en Desktop, Cabecera en Móvil) -->
+            <div class="sidebar-unified-card">
+              <div class="sidebar-counter-row">
+                <span id="contador-pregunta" class="quiz-counter">Pregunta -- de --</span>
+                <span id="temporizador" class="quiz-timer hidden">00:00</span>
+              </div>
+              <button id="btn-flag-pregunta" class="btn-flag sidebar-flag-btn" type="button">🏳️ Marcar</button>
+            </div>
+          </div>
+          <div class="progress-wrap">
+            <div class="progress-track"><div id="progress-fill" class="progress-fill"></div></div>
+          </div>
+          <div id="simulacro-navigation-map" class="hidden" style="background: var(--bg-card); border: 1px solid var(--border); padding: 15px; border-radius: 12px; margin-bottom: 20px;">
+            <p style="font-size: 13px; color: var(--text-dim); margin-bottom: 10px; font-weight: 500;">Mapa del Examen (Haz clic para saltar a una pregunta):</p>
+            <div id="grid-preguntas-container" style="display: flex; flex-wrap: wrap; gap: 8px;"></div>
+          </div>
+          <div class="question-card">
+            <h3 id="pregunta-texto" class="question-text">Cargando caso clínico...</h3>
+            <div id="opciones-container" class="options-grid"></div>
+          </div>
+          <div id="feedback-box" class="feedback-box hidden">
+            <div id="feedback-estado" class="feedback-estado"></div>
+            <p id="feedback-explicacion" class="feedback-explicacion"></p>
+          </div>
+          <div class="quiz-actions">
+            <button id="btn-siguiente" class="btn btn-primary hidden" type="button">Siguiente Pregunta</button>
+            <button id="btn-finalizar" class="btn btn-secondary hidden" type="button">Terminar</button>
+          </div>
+        </article>
+      </section>
+
+      <section id="pantalla-resultados" class="screen">
+        <article class="results-shell">
+          <div class="results-header">
+            <span class="eyebrow">Evaluación Finalizada</span>
+            <h2>Informe de Desempeño</h2>
+          </div>
+          <div class="results-stats">
+            <div class="result-stat"><span class="result-label">Aciertos</span><span id="resultado-puntaje" class="result-value">0/0</span></div>
+            <div class="result-stat"><span class="result-label">Porcentaje</span><span id="resultado-porcentaje" class="result-value">0%</span></div>
+            <div class="result-stat"><span class="result-label">Especialidad</span><span id="resultado-tema" class="result-value">General</span></div>
+          </div>
+          <div class="review-head">
+            <h3>Disección del Examen</h3>
+            <p>Revisa las explicaciones científicas de cada opción errada o acertada.</p>
+          </div>
+          <!-- Filtros de revisión interactiva (Fase 4) -->
+          <div class="review-filters" style="display: flex; gap: 8px; margin-bottom: 20px;">
+            <button id="btn-filtro-revision-todas" class="btn btn-ghost active" style="min-width: auto; padding: 10px 18px; font-size: 13px; font-weight: 600;" type="button">Todas las preguntas</button>
+            <button id="btn-filtro-revision-marcadas" class="btn btn-ghost" style="min-width: auto; padding: 10px 18px; font-size: 13px; font-weight: 600; border-color: rgba(239, 68, 68, 0.2); color: var(--danger);" type="button">🚩 Marcadas</button>
+            <button id="btn-filtro-revision-erradas" class="btn btn-ghost" style="min-width: auto; padding: 10px 18px; font-size: 13px; font-weight: 600; border-color: rgba(239, 68, 68, 0.2); color: var(--danger);" type="button">❌ Incorrectas</button>
+          </div>
+
+          <div id="revision-container" class="review-list"></div>
+          <div class="results-actions">
+            <button id="btn-reiniciar" class="btn btn-primary" type="button">Regresar al Panel Principal</button>
+          </div>
+        </article>
+      </section>
+
+      <!-- FASE 1: PANTALLA INDEPENDIENTE DE PERFIL -->
+      <section id="pantalla-perfil" class="screen">
+        <div class="profile-shell" style="max-width: 840px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px;">
+          
+          <!-- Tarjeta Premium de Datos Personales del Médico (Rediseño AMBOSS Premium) -->
+          <article class="panel" style="position: relative; overflow: hidden; border-radius: 28px; padding: 32px; background: linear-gradient(135deg, var(--panel-strong) 0%, rgba(10, 20, 38, 0.98) 100%); border: 1px solid var(--border);">
+            <div class="profile-header-premium" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 24px;">
+              <div style="display: flex; align-items: center; gap: 24px;">
+                <div id="perfil-avatar-interactivo" style="width: 90px; height: 90px; background: linear-gradient(135deg, var(--primary) 0%, #3b82f6 100%); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 42px; box-shadow: 0 10px 28px rgba(59, 130, 246, 0.4); border: 3px solid rgba(255,255,255,0.08); transition: transform 0.3s ease; cursor: pointer;">
+                  👨‍⚕️
+                </div>
+                <div>
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                    <h2 id="perfil-nombre" style="margin: 0; color: var(--text); font-size: 28px; font-weight: 800; letter-spacing: -0.5px;">Dr. Nombre del Usuario</h2>
+                    <span id="perfil-rol-badge" class="chip chip-primary" style="font-size: 10px; padding: 2px 8px;">Cargando rol...</span>
+                  </div>
+                  <p id="perfil-correo" style="margin: 4px 0 8px 0; font-size: 15px; color: var(--text-soft);">correo@resimed.com</p>
+                  
+                  <div style="display: flex; flex-wrap: wrap; gap: 12px; font-size: 13px;">
+                    <span class="chip chip-soft" style="border-color: rgba(255,255,255,0.08); color: var(--text);">🎯 Aspira a: <strong id="perfil-aspiracion" style="color: var(--warning); margin-left:4px;">Cargando...</strong></span>
+                    <span class="chip chip-soft" style="border-color: rgba(255,255,255,0.08); color: var(--text);">📅 Meta Semanal: <strong id="perfil-meta-val" style="color: var(--success); margin-left:4px;">50 q.</strong></span>
+                  </div>
+                </div>
+              </div>
+              <button id="btn-perfil-editar" class="btn btn-ghost" style="border-color: var(--warning); color: var(--warning); font-size: 13px; font-weight: 600; padding: 10px 16px; border-radius: 12px; transition: all 0.2s;" type="button">
+                ⚙️ Editar Perfil
+              </button>
+            </div>
+          </article>
+
+          <!-- TABS DEL PERFIL (NUEVO CON TRES SECCIONES) -->
+          <div class="auth-tabs" style="margin-bottom: 0;">
+            <button id="tab-perfil-progreso" class="auth-tab active" type="button" style="border-radius: 12px 12px 0 0;">📊 Mi Progreso</button>
+            <button id="tab-perfil-errores" class="auth-tab" type="button" style="border-radius: 12px 12px 0 0;">🚨 Banco de Errores</button>
+            <button id="tab-perfil-marcadas" class="auth-tab" type="button" style="border-radius: 12px 12px 0 0;">🚩 Preguntas Dudosas</button>
+          </div>
+
+          <!-- CONTENIDO: MI PROGRESO -->
+          <div id="perfil-contenido-progreso" class="perfil-seccion-tab">
+            <!-- Bloque de Progreso del Estudiante (Aislado de Home) -->
+            <div class="admin-box" style="padding: 24px; border: 1px solid var(--border-strong); border-radius: 12px; background: var(--panel-soft); margin-top: 20px;">
+              <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 20px; border-bottom: 1px solid var(--border-strong); padding-bottom: 16px;">
+                <div style="width: 48px; height: 48px; background: var(--warning); color: #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 20px;">
+                  👤
+                </div>
+                <div>
+                  <h3 style="margin: 0; color: var(--text); font-size: 18px;">Perfil del Estudiante</h3>
+                  <p style="margin: 0; font-size: 13px; color: var(--text-soft);">Monitoreo de rendimiento en tiempo real para el examen nacional.</p>
+                </div>
+              </div>
+
+              <div style="display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 130px; background: rgba(255,255,255,0.02); padding: 12px; border-radius: 8px; border-left: 4px solid var(--primary); text-align: center;">
+                  <span style="font-size: 11px; color: var(--text-soft); display: block; text-transform: uppercase;">Simulacros</span>
+                  <span id="progreso-total-examenes" style="font-size: 22px; font-weight: bold; color: var(--text);">0</span>
+                </div>
+                <div style="flex: 1; min-width: 130px; background: rgba(255,255,255,0.02); padding: 12px; border-radius: 8px; border-left: 4px solid var(--success); text-align: center;">
+                  <span style="font-size: 11px; color: var(--text-soft); display: block; text-transform: uppercase;">Contestadas</span>
+                  <span id="progreso-total-preguntas" style="font-size: 22px; font-weight: bold; color: var(--text);">0</span>
+                </div>
+                <div style="flex: 1; min-width: 130px; background: rgba(255,255,255,0.02); padding: 12px; border-radius: 8px; border-left: 4px solid var(--warning); text-align: center;">
+                  <span style="font-size: 11px; color: var(--text-soft); display: block; text-transform: uppercase;">Promedio</span>
+                  <span id="progreso-promedio-global" style="font-size: 22px; font-weight: bold; color: var(--warning);">0%</span>
+                </div>
+              </div>
+
+              <h4 style="margin: 0 0 16px 0; font-size: 13px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px;">Rendimiento y Cobertura por Especialidad:</h4>
+              <div id="perfil-especialidades-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px;">
+                <!-- Cargado dinámicamente desde JS -->
+              </div>
+            </div>
+
+            <!-- FASE 2: Tabla Detallada de Progreso Histórico -->
+            <article class="panel" style="border-radius: 28px; padding: 32px; background: var(--panel); border: 1px solid var(--border); margin-top: 24px;">
+              <div class="panel-head" style="margin-bottom: 20px;">
+                <h3 style="color: var(--text); font-size: 20px; font-weight: 700;">Historial de Evaluaciones</h3>
+                <p style="font-size: 14px; color: var(--text-dim); margin-top: 4px;">Registro completo y cronológico de todas tus sesiones de estudio y simulacros.</p>
+              </div>
+              
+              <div class="table-container" style="overflow-x: auto; margin-top: 16px;">
+                <table id="tabla-progreso-historial" style="width: 100%; border-collapse: collapse; text-align: left; font-size: 14px;">
+                  <thead>
+                    <tr style="border-bottom: 2px solid var(--border-strong); color: var(--text-soft); font-weight: 600; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px;">
+                      <th style="padding: 12px 16px;">Fecha</th>
+                      <th style="padding: 12px 16px;">Especialidad / Tema</th>
+                      <th style="padding: 12px 16px;">Modalidad</th>
+                      <th style="padding: 12px 16px; text-align: center;">Preguntas</th>
+                      <th style="padding: 12px 16px; text-align: center;">Aciertos</th>
+                      <th style="padding: 12px 16px; text-align: right;">Nota</th>
+                      <th style="padding: 12px 16px; text-align: center;">Acción</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tabla-progreso-cuerpo" style="color: var(--text-soft);">
+                    <!-- Cargado dinámicamente -->
+                  </tbody>
+                </table>
+                <div id="tabla-historial-vacio" class="history-empty hidden" style="margin-top: 16px; text-align: center; padding: 24px; color: var(--text-dim);">
+                  Aún no registras exámenes en tu cuenta.
+                </div>
+              </div>
+            </article>
+          </div>
+
+          <!-- CONTENIDO: BANCO DE ERRORES -->
+          <div id="perfil-contenido-errores" class="perfil-seccion-tab hidden" style="margin-top: 20px;">
+            <article class="panel" style="border-radius: 28px; padding: 32px; background: var(--panel); border: 1px solid var(--border);">
+              <div class="panel-head" style="margin-bottom: 20px;">
+                <h3 style="color: var(--text); font-size: 20px; font-weight: 700;">🚨 Mi Banco de Errores</h3>
+                <p style="font-size: 14px; color: var(--text-dim); margin-top: 4px;">Recopilación automática de todas las preguntas que has fallado en tus simulacros.</p>
+              </div>
+              
+              <div id="banco-errores-lista" class="review-list" style="margin-top: 16px;">
+                <!-- Inyectado dinámicamente desde JS -->
+              </div>
+              <div id="banco-errores-vacio" class="history-empty hidden" style="margin-top: 16px; text-align: center; padding: 24px; color: var(--text-dim);">
+                ¡Felicidades! No tienes errores registrados en tu cuenta actualmente.
+              </div>
+            </article>
+          </div>
+
+          <!-- CONTENIDO: PREGUNTAS MARCADAS / DUDOSAS -->
+          <div id="perfil-contenido-marcadas" class="perfil-seccion-tab hidden" style="margin-top: 20px;">
+            <article class="panel" style="border-radius: 28px; padding: 32px; background: var(--panel); border: 1px solid var(--border);">
+              <div class="panel-head" style="margin-bottom: 20px;">
+                <h3 style="color: var(--text); font-size: 20px; font-weight: 700;">🚩 Preguntas Dudosas / Marcadas</h3>
+                <p style="font-size: 14px; color: var(--text-dim); margin-top: 4px;">Historial en tiempo real de todos los reactivos marcados con bandera (🚩) en tus simulacros para su repaso seguro.</p>
+              </div>
+              
+              <div id="banco-marcadas-lista" class="review-list" style="margin-top: 16px;">
+                <!-- Inyectado dinámicamente desde JS -->
+              </div>
+              <div id="banco-marcadas-vacio" class="history-empty hidden" style="margin-top: 16px; text-align: center; padding: 24px; color: var(--text-dim);">
+                No tienes preguntas marcadas con duda en este momento.
+              </div>
+            </article>
+          </div>
+
+          <!-- Acciones -->
+          <div style="display: flex; justify-content: flex-start; margin-top: 12px;">
+            <button id="btn-perfil-regresar" class="btn btn-secondary" type="button" style="gap: 8px;">
+              ← Volver al Panel Principal
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- FASE 3: MÓDULO INTERACTIVO DE FLASHCARDS ENURM -->
+      <section id="pantalla-flashcards" class="screen">
+        <div class="flashcards-shell">
+          
+          <!-- Encabezado -->
+          <article class="panel" style="border-radius: 28px; padding: 32px; background: linear-gradient(100deg, var(--panel-strong) 0%, rgba(15, 28, 50, 0.95) 100%); border: 1px solid var(--border);">
+            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
+              <div style="display: flex; align-items: center; gap: 16px;">
+                <div style="width: 48px; height: 48px; background: var(--warning); color: #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 20px;">
+                  ⚡
+                </div>
+                <div>
+                  <h2 style="margin: 0; color: var(--text); font-size: 22px; font-weight: 800; letter-spacing: -0.5px;">Flashcards ENURM Premium</h2>
+                  <p style="margin: 4px 0 0 0; font-size: 13px; color: var(--text-soft);">Repaso activo y memorización de datos puros de alta frecuencia para el examen nacional.</p>
+                </div>
+              </div>
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <div class="form-block" style="margin: 0;">
+                  <select id="flashcard-filtro-tema" class="input" style="width: 180px; font-size: 13px; padding: 10px 14px; margin: 0;"></select>
+                </div>
+                <button id="btn-flashcard-crear-manual" class="btn btn-primary" style="background: var(--warning); color: #000; font-weight: bold; border: none; font-size: 13px; padding: 11px 16px; border-radius: 12px;" type="button">
+                  ➕ Crear Tarjeta
+                </button>
+              </div>
+            </div>
+          </article>
+
+          <!-- Zona de Estudio Principal -->
+          <div id="flashcards-estudio-zona" style="display: flex; flex-direction: column; align-items: center;">
+            <div id="flashcard-contador-indicador" style="font-size: 14px; font-weight: 600; color: var(--text-soft); background: var(--panel-soft); padding: 6px 16px; border-radius: 100px; border: 1px solid var(--border);">
+              Cargando tarjetas...
+            </div>
+
+            <!-- Tarjeta 3D -->
+            <div id="flashcard-click-trigger" class="flashcard-container">
+              <div class="flashcard-inner">
+                <!-- Frente -->
+                <div class="flashcard-front">
+                  <span id="flashcard-front-tag" class="flashcard-tag">Especialidad</span>
+                  <p id="flashcard-front-texto" class="flashcard-q">¿Cargando dato puro?</p>
+                  <div class="flashcard-hint">
+                    <span>💡</span> Haz clic para voltear y revelar respuesta
+                  </div>
+                </div>
+                <!-- Reverso -->
+                <div class="flashcard-back">
+                  <span id="flashcard-back-tag" class="flashcard-tag back-tag">Respuesta Oficial</span>
+                  <p id="flashcard-back-texto" class="flashcard-a">Cargando diagnóstico/tratamiento...</p>
+                  <div class="flashcard-hint">
+                    <span>🔄</span> Haz clic para ver la pregunta de nuevo
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Panel de Autoevaluación (Inicialmente invisible, se muestra solo cuando la tarjeta se voltea) -->
+            <div id="flashcard-eval-box" class="self-eval-box hidden">
+              <button id="btn-flashcard-dont" class="btn-eval btn-eval-dont" type="button">
+                ❌ No lo sabía
+              </button>
+              <button id="btn-flashcard-know" class="btn-eval btn-eval-know" type="button">
+                ✓ Lo sabía
+              </button>
+            </div>
+          </div>
+
+          <!-- Panel de Felicitación / Fin de mazo -->
+          <div id="flashcards-congrats-zona" class="congrats-panel hidden">
+            <span style="font-size: 48px; display: block; margin-bottom: 16px;">🏆</span>
+            <h3 style="font-size: 24px; font-weight: 800; color: var(--success); margin-bottom: 8px;">¡Bloque Completado!</h3>
+            <p style="font-size: 14px; color: var(--text-soft); margin-bottom: 24px; max-width: 500px; margin-left: auto; margin-right: auto;">
+              Has repasado todos los datos puros seleccionados de este bloque con éxito. Revisa tus estadísticas de retención a continuación.
+            </p>
+            <button id="btn-flashcard-reiniciar" class="btn btn-primary" style="margin-right: 12px;" type="button">
+              ⚡ Repasar de Nuevo
+            </button>
+            <button id="btn-flashcard-congrats-regresar" class="btn btn-secondary" type="button">
+              Volver al Inicio
+            </button>
+          </div>
+
+          <!-- Estadísticas e Historial de Retención de la Sesión -->
+          <div class="flashcards-stats-grid">
+            <div class="flashcards-stat-card">
+              <span class="flashcards-stat-label">Dominadas</span>
+              <span id="flashcard-stat-dominadas" class="flashcards-stat-value" style="color: var(--success);">0</span>
+            </div>
+            <div class="flashcards-stat-card">
+              <span class="flashcards-stat-label">Por Repasar</span>
+              <span id="flashcard-stat-repaso" class="flashcards-stat-value" style="color: var(--danger);">0</span>
+            </div>
+            <div class="flashcards-stat-card">
+              <span class="flashcards-stat-label">Retención</span>
+              <span id="flashcard-stat-retencion" class="flashcards-stat-value retention-rate">0%</span>
+            </div>
+          </div>
+
+          <!-- Acciones de Navegación del Módulo -->
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px; border-top: 1px solid var(--border); padding-top: 24px;">
+            <button id="btn-flashcards-regresar" class="btn btn-secondary" style="border-color: var(--danger); color: var(--danger);" type="button">
+              🚪 Finalizar Sesión
+            </button>
+            <div style="display: flex; gap: 8px;">
+              <button id="btn-flashcard-prev" class="btn btn-ghost" type="button" style="min-width: auto; padding: 12px 18px;">
+                ◀ Tarjeta Anterior
+              </button>
+              <button id="btn-flashcard-next" class="btn btn-ghost" type="button" style="min-width: auto; padding: 12px 18px;">
+                Siguiente Tarjeta ▶
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- MODAL TUTOR IA (FASE 5) -->
+  <div id="modal-tutor-ia" class="modal-ia-overlay">
+    <div class="modal-ia-container">
+      <div class="modal-ia-header">
+        <div class="modal-ia-title">
+          <span style="font-size: 24px;">🧠</span>
+          <h3>Tutor IA ResiMed</h3>
+        </div>
+        <button id="btn-modal-ia-cerrar" class="modal-ia-close" type="button">&times;</button>
+      </div>
+      <div id="modal-ia-body" class="modal-ia-body">
+        <!-- El contenido se inyectará dinámicamente -->
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL CREAR FLASHCARD MANUAL -->
+  <div id="modal-crear-flashcard" class="modal-ia-overlay">
+    <div class="modal-ia-container" style="max-width: 500px;">
+      <div class="modal-ia-header">
+        <div class="modal-ia-title">
+          <span style="font-size: 24px;">⚡</span>
+          <h3>Crear Flashcard Médica</h3>
+        </div>
+        <button id="btn-modal-flashcard-cerrar" class="modal-ia-close" type="button">&times;</button>
+      </div>
+      <form id="form-crear-flashcard" style="padding: 20px; display: flex; flex-direction: column; gap: 16px;">
+        <div class="form-block" style="margin: 0;">
+          <label style="margin-bottom: 6px; font-weight: 500; font-size: 13px;">Bloque de Especialidad</label>
+          <select id="modal-flashcard-tema" class="input" required style="width: 100%;"></select>
+        </div>
+        <div class="form-block" style="margin: 0;">
+          <label style="margin-bottom: 6px; font-weight: 500; font-size: 13px;">Dato Clínico / Pregunta (Frente)</label>
+          <textarea id="modal-flashcard-pregunta" class="input" style="min-height: 80px; width: 100%; font-family: inherit;" placeholder="Ej: ¿Qué escala clínica se utiliza de elección para evaluar la gravedad en pancreatitis aguda?" required></textarea>
+        </div>
+        <div class="form-block" style="margin: 0;">
+          <label style="margin-bottom: 6px; font-weight: 500; font-size: 13px;">Diagnóstico / Respuesta (Reverso)</label>
+          <textarea id="modal-flashcard-respuesta" class="input" style="min-height: 80px; width: 100%; font-family: inherit;" placeholder="Ej: Criterios de Ranson o escala de APACHE II." required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary" style="background: var(--warning); color: #000; font-weight: bold; width: 100%; margin-top: 10px;">➕ Inyectar Tarjeta al Mazo</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL EDITAR PERFIL DEL ESTUDIANTE -->
+  <div id="modal-editar-perfil" class="modal-ia-overlay">
+    <div class="modal-ia-container" style="max-width: 480px;">
+      <div class="modal-ia-header">
+        <div class="modal-ia-title">
+          <span style="font-size: 24px;">⚙️</span>
+          <h3>Editar Perfil Médico</h3>
+        </div>
+        <button id="btn-modal-perfil-cerrar" class="modal-ia-close" type="button">&times;</button>
+      </div>
+      <form id="form-editar-perfil" style="padding: 20px; display: flex; flex-direction: column; gap: 16px;">
+        <div class="form-block" style="margin: 0;">
+          <label style="margin-bottom: 6px; font-weight: 500; font-size: 13px;">Nombre Completo</label>
+          <input type="text" id="modal-perfil-nombre" class="input" style="width: 100%;" required />
+        </div>
+        <div class="form-block" style="margin: 0;">
+          <label style="margin-bottom: 6px; font-weight: 500; font-size: 13px;">Especialidad a la que Aspira (ENURM)</label>
+          <select id="modal-perfil-aspiracion" class="input" style="width: 100%;" required></select>
+        </div>
+        <div class="form-block" style="margin: 0;">
+          <label style="margin-bottom: 6px; font-weight: 500; font-size: 13px;">Meta de Preguntas Semanal</label>
+          <select id="modal-perfil-meta" class="input" style="width: 100%;" required>
+            <option value="10">10 Preguntas</option>
+            <option value="20">20 Preguntas</option>
+            <option value="50">50 Preguntas (Recomendado)</option>
+            <option value="100">100 Preguntas (Intenso)</option>
+            <option value="150">150 Preguntas (AMBOSS Elite)</option>
+            <option value="200">200 Preguntas (PrepMed Leyenda)</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;">💾 Guardar Cambios</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL REPORTAR ERROR EN PREGUNTA (FASE 6) -->
+  <div id="modal-reportar-error" class="modal-ia-overlay">
+    <div class="modal-ia-container" style="max-width: 480px;">
+      <div class="modal-ia-header">
+        <div class="modal-ia-title">
+          <span style="font-size: 24px;">⚠️</span>
+          <h3>Reportar Error en Pregunta</h3>
+        </div>
+        <button id="btn-modal-reporte-cerrar" class="modal-ia-close" type="button">&times;</button>
+      </div>
+      <form id="form-reportar-error" style="padding: 20px; display: flex; flex-direction: column; gap: 16px;">
+        <input type="hidden" id="modal-reporte-pregunta-id" />
+        <div class="form-block" style="margin: 0;">
+          <label style="margin-bottom: 6px; font-weight: 500; font-size: 13px;">Motivo del Reporte</label>
+          <select id="modal-reporte-motivo" class="input" style="width: 100%;" required>
+            <option value="" disabled selected>Selecciona un motivo...</option>
+            <option value="Error en la clave / respuesta correcta">Error en la clave / respuesta correcta</option>
+            <option value="Caso clínico confuso o con errores">Caso clínico confuso o con errores</option>
+            <option value="Explicación académica incompleta o errónea">Explicación académica incompleta o errónea</option>
+            <option value="Error en la fuente bibliográfica">Error en la fuente bibliográfica</option>
+            <option value="Otro motivo">Otro motivo</option>
+          </select>
+        </div>
+        <div class="form-block" style="margin: 0;">
+          <label style="margin-bottom: 6px; font-weight: 500; font-size: 13px;">Comentarios / Detalles Adicionales</label>
+          <textarea id="modal-reporte-comentario" class="input" style="min-height: 100px; width: 100%; font-family: inherit;" placeholder="Describe detalladamente cuál es la inconsistencia detectada..." required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary" style="background: var(--danger); color: #fff; width: 100%; margin-top: 10px; border: none; box-shadow: 0 4px 14px rgba(239, 68, 68, 0.25);">Enviar Reporte Académico</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL DEBILIDADES POR ESPECIALIDAD & RECOMENDACIÓN ENURM (FASE 1) -->
+  <div id="modal-debilidades-especialidad" class="modal-ia-overlay">
+    <div class="modal-ia-container" style="max-width: 520px;">
+      <div class="modal-ia-header">
+        <div class="modal-ia-title">
+          <span style="font-size: 24px;">📊</span>
+          <h3 id="modal-debilidades-titulo">Análisis Académico</h3>
+        </div>
+        <button id="btn-modal-debilidades-cerrar" class="modal-ia-close" type="button">&times;</button>
+      </div>
+      <div class="modal-ia-body" style="padding: 24px; display: flex; flex-direction: column; gap: 16px;">
+        <!-- Métricas Rápidas -->
+        <div style="display: flex; gap: 12px; margin-bottom: 8px;">
+          <div style="flex: 1; background: rgba(255,255,255,0.02); border: 1px solid var(--border); padding: 12px; border-radius: 12px; text-align: center;">
+            <span style="font-size: 11px; color: var(--text-dim); display: block; text-transform: uppercase; letter-spacing: 0.5px;">Nota Promedio</span>
+            <span id="modal-debilidades-nota" style="font-size: 20px; font-weight: bold; color: var(--warning);">0%</span>
+          </div>
+          <div style="flex: 1; background: rgba(255,255,255,0.02); border: 1px solid var(--border); padding: 12px; border-radius: 12px; text-align: center;">
+            <span style="font-size: 11px; color: var(--text-dim); display: block; text-transform: uppercase; letter-spacing: 0.5px;">Preguntas Vistas</span>
+            <span id="modal-debilidades-cobertura" style="font-size: 20px; font-weight: bold; color: var(--text);">0 / 0</span>
+          </div>
+        </div>
+
+        <!-- Lista de fallos más comunes -->
+        <div>
+          <h4 style="font-size: 12px; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px;">🔍 Temas con Mayor Tasa de Error:</h4>
+          <div id="modal-debilidades-lista-temas" style="display: flex; flex-direction: column; gap: 8px;">
+            <!-- Inyectado dinámicamente -->
+          </div>
+        </div>
+
+        <!-- Caja de recomendaciones de libros oficiales ENURM -->
+        <div class="book-rec-box" style="border: 1px solid rgba(245, 158, 11, 0.2); background: rgba(245, 158, 11, 0.02); border-radius: 16px; padding: 16px; display: flex; gap: 16px; align-items: center; margin-top: 8px;">
+          <div id="modal-debilidades-libro-cover" style="font-size: 32px; padding: 8px; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid var(--border); width: 60px; height: 72px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.2); flex-shrink: 0;">
+            📚
+          </div>
+          <div style="flex: 1;">
+            <span style="font-size: 10px; color: var(--warning); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 2px;">📖 Bibliografía Oficial ENURM</span>
+            <h4 id="modal-debilidades-libro-titulo" style="font-size: 14px; font-weight: 700; color: var(--text); margin: 0 0 2px 0;">Harrison's Principles of Internal Medicine</h4>
+            <p id="modal-debilidades-libro-desc" style="font-size: 11.5px; color: var(--text-dim); margin: 0; line-height: 1.4;">Para superar estos temas débiles, te recomendamos revisar detalladamente la última actualización en esta área específica.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL EDITAR / CORREGIR PREGUNTA (FASE 2 - ADMIN) -->
+  <div id="modal-corregir-pregunta" class="modal-ia-overlay">
+    <div class="modal-ia-container" style="max-width: 500px;">
+      <div class="modal-ia-header">
+        <div class="modal-ia-title">
+          <span style="font-size: 24px;">✏️</span>
+          <h3>Corregir Pregunta Académica</h3>
+        </div>
+        <button id="btn-modal-corregir-cerrar" class="modal-ia-close" type="button">&times;</button>
+      </div>
+      <form id="form-corregir-pregunta" style="padding: 20px; display: flex; flex-direction: column; gap: 12px;">
+        <input type="hidden" id="modal-corregir-pregunta-id" />
+        <input type="hidden" id="modal-corregir-reporte-id" />
+        
+        <div>
+          <label style="font-size: 12px; font-weight: 600; color: var(--text-soft); text-transform: uppercase; display:block; margin-bottom:4px;">Enunciado o Caso Clínico</label>
+          <textarea id="modal-corregir-texto" class="input" style="min-height: 70px; font-family: inherit;" required></textarea>
+        </div>
+        
+        <div>
+          <label style="font-size: 12px; font-weight: 600; color: var(--text-soft); text-transform: uppercase; display:block; margin-bottom:4px;">Opciones de Respuesta</label>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+            <input type="text" id="modal-corregir-opc0" class="input" placeholder="Opción A" required />
+            <input type="text" id="modal-corregir-opc1" class="input" placeholder="Opción B" required />
+            <input type="text" id="modal-corregir-opc2" class="input" placeholder="Opción C" required />
+            <input type="text" id="modal-corregir-opc3" class="input" placeholder="Opción D" required />
+          </div>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+          <div>
+            <label style="font-size: 12px; font-weight: 600; color: var(--text-soft); text-transform: uppercase; display:block; margin-bottom:4px;">Respuesta Correcta</label>
+            <select id="modal-corregir-correcta" class="input">
+              <option value="0">Opción A</option>
+              <option value="1">Opción B</option>
+              <option value="2">Opción C</option>
+              <option value="3">Opción D</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size: 12px; font-weight: 600; color: var(--text-soft); text-transform: uppercase; display:block; margin-bottom:4px;">Especialidad / Tema</label>
+            <input type="text" id="modal-corregir-tema" class="input" required />
+          </div>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+          <div>
+            <label style="font-size: 12px; font-weight: 600; color: var(--text-soft); text-transform: uppercase; display:block; margin-bottom:4px;">Subtema específico</label>
+            <input type="text" id="modal-corregir-subtema" class="input" placeholder="Ej: Fisiología Renal" />
+          </div>
+          <div>
+            <label style="font-size: 12px; font-weight: 600; color: var(--text-soft); text-transform: uppercase; display:block; margin-bottom:4px;">Fuente Oficial</label>
+            <input type="text" id="modal-corregir-fuente" class="input" required />
+          </div>
+        </div>
+        
+        <div>
+          <label style="font-size: 12px; font-weight: 600; color: var(--text-soft); text-transform: uppercase; display:block; margin-bottom:4px;">Explicación Clínica / Desglose Docente</label>
+          <textarea id="modal-corregir-explicacion" class="input" style="min-height: 50px; font-family: inherit;" placeholder="Usa 🔬 JUSTIFICACIÓN (Por qué SÍ): y 🚫 DESCARTE (Por qué NO): para visual premium" required></textarea>
+        </div>
+        
+        <button type="submit" class="btn btn-primary" style="background: var(--warning); color: #000; font-weight: bold; width: 100%; margin-top: 4px;">💾 Guardar Cambios y Resolver Reporte</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/state.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/spaced_repetition.js"></script>
+  <script src="js/analytics.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/quiz.js"></script>
+  <script src="js/flashcards.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

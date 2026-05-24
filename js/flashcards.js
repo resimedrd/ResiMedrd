@@ -1,0 +1,378 @@
+// ====== CONTROLADOR DE FLASHCARDS ENURM (flashcards.js) ======
+
+// Mazo estático base original de la plataforma
+const baseDatosFlashcardsEstaticas = [
+  {
+    tema: "Pediatría",
+    pregunta: "¿Cuál es el tratamiento preventivo de elección para evitar aneurismas coronarios en la Enfermedad de Kawasaki?",
+    respuesta: "Inmunoglobulina Intravenosa (IGIV) a dosis altas (2 g/kg en infusión única) + Ácido Acetilsalicílico (Aspirina) a dosis antiinflamatorias."
+  },
+  {
+    tema: "Pediatría",
+    pregunta: "¿Cuál es la causa más común de bronquiolitis en lactantes y cuál es su manejo terapéutico principal?",
+    respuesta: "Virus Sincitial Respiratorio (VSR). El manejo es puramente de soporte: oxigenoterapia (si SatO2 <90-92%), hidratación adecuada y aspiración de secreciones nasales."
+  },
+  {
+    tema: "Pediatría",
+    pregunta: "¿Cuál es la triada clásica de la Laringotraqueitis Aguda (Crup) en pediatría?",
+    respuesta: "Estridor inspiratorio + Tos perruna (o de foca) + Disfonía."
+  },
+  {
+    tema: "Gineco-Obstetricia",
+    pregunta: "¿Cuál es la tríada diagnóstica patognomónica de sospecha para el Embarazo Ectópico?",
+    respuesta: "Dolor abdominal bajo + Sangrado vaginal anormal + Amenorrea."
+  },
+  {
+    tema: "Gineco-Obstetricia",
+    pregunta: "¿Cómo se define la Preeclampsia con Criterios de Severidad según las cifras tensionales y síntomas?",
+    respuesta: "Presión arterial ≥ 160/110 mmHg en dos ocasiones con diferencia de 4 horas, o presencia de disfunción de órgano diana (trombocitopenia, alteración hepática de aminotransferasas, cefalea severa, escotomas, etc.)."
+  },
+  {
+    tema: "Gineco-Obstetricia",
+    pregunta: "Sangrado transvaginal indoloro, rojo rutilante, abundante en el tercer trimestre de embarazo. Sin hipertonía uterina. ¿Sospecha diagnóstica principal?",
+    respuesta: "Placenta Previa."
+  },
+  {
+    tema: "Cirugía General",
+    pregunta: "¿Cuáles son los componentes de la tríada de Charcot y la péntada de Reynolds para el diagnóstico de Colangitis Aguda?",
+    respuesta: "Tríada de Charcot: Fiebre + Ictericia + Dolor en hipocondrio derecho.\nPéntada de Reynolds: Tríada de Charcot + Shock (hipotensión) + Confusión mental."
+  },
+  {
+    tema: "Cirugía General",
+    pregunta: "¿Cuál es el estudio de imagen inicial y el estándar de oro ('gold standard') para el diagnóstico de Colecistitis Aguda?",
+    respuesta: "Inicial de elección: Ecografía abdominal (hipocondrio derecho).\nEstándar de Oro: Gammagrafía biliar (HIDA)."
+  },
+  {
+    tema: "Cirugía General",
+    pregunta: "¿Qué escala clínica se utiliza para estimar la probabilidad diagnóstica de Apendicitis Aguda?",
+    respuesta: "Escala de Alvarado (valores ≥ 7 indican alta probabilidad y ameritan conducta quirúrgica o de imagen)."
+  },
+  {
+    tema: "Medicina Interna",
+    pregunta: "¿Cuál es la medida terapéutica inicial más crítica e inmediata en el manejo de la Cetoacidosis Diabética (CAD)?",
+    respuesta: "Reposición agresiva de volumen intravascular con Solución Salina al 0.9% IV (típicamente 1-1.5 litros en la primera hora) antes de inyectar insulina."
+  },
+  {
+    tema: "Medicina Interna",
+    pregunta: "¿Cuál es el microorganismo bacteriano causante más común de la Neumonía Adquirida en la Comunidad (NAC)?",
+    respuesta: "Streptococcus pneumoniae (Neumococo)."
+  },
+  {
+    tema: "Medicina Interna",
+    pregunta: "¿Cuál es el tratamiento antimicrobiano empírico de elección para una Meningitis Bacteriana aguda en adultos de 18-50 años?",
+    respuesta: "Ceftriaxona (o Cefotaxima) + Vancomicina (para cubrir neumococo resistente a penicilina)."
+  },
+  {
+    tema: "Ciencias Básicas",
+    pregunta: "¿Cuál es el principal neurotransmisor con función excitatoria en el Sistema Nervioso Central del adulto?",
+    respuesta: "Glutamato (actúa sobre receptores NMDA y AMPA)."
+  },
+  {
+    tema: "Ciencias Básicas",
+    pregunta: "¿Qué par craneal se encarga de la inervación motora de la musculatura mímica de la cara?",
+    respuesta: "VII Par Craneal o Nervio Facial."
+  },
+  {
+    tema: "Ciencias Básicas",
+    pregunta: "¿Qué enzima es el marcapasos o limitante de velocidad en la vía metabólica de la Glucólisis anaerobia?",
+    respuesta: "Fosfofructocinasa-1 (PFK-1)."
+  },
+  {
+    tema: "Cardiología",
+    pregunta: "¿Cuál es el hallazgo electrocardiográfico clásico y patognomónico del Taponamiento Cardíaco?",
+    respuesta: "Alternancia eléctrica (variación en la amplitud de las ondas QRS latido a latido) + Bajo voltaje generalizado."
+  },
+  {
+    tema: "Neumología",
+    pregunta: "¿Cuál es el tratamiento farmacológico inicial de elección para una crisis asmática moderada a grave?",
+    respuesta: "Agonistas beta-2 adrenérgicos de acción corta (SABA) inhalados (ej: Salbutamol) + Anticolinérgicos inhalados (Bromuro de Ipratropio) + Corticoides sistémicos."
+  },
+  {
+    tema: "Gastroenterología",
+    pregunta: "¿Qué escala pronóstica se utiliza de elección para evaluar la gravedad en pancreatitis aguda en las primeras 48 horas?",
+    respuesta: "Criterios de Ranson o escala de APACHE II (esta última calculable en cualquier momento)."
+  },
+  {
+    tema: "Nefrología y Urología",
+    pregunta: "¿Cuál es la causa más común de Lesión Renal Aguda (LRA) intrínseca o renal en pacientes hospitalizados?",
+    respuesta: "Necrosis Tubular Aguda (NTA), caracterizada en el sedimento urinario por cilindros granulosos ('marrón lodoso')."
+  },
+  {
+    tema: "Neurología",
+    pregunta: "¿Cuál es la ventana terapéutica máxima recomendada para realizar trombólisis intravenosa con rtPA en un Ictus Isquémico Agudo?",
+    respuesta: "Hasta 4.5 horas desde el inicio de los síntomas, en ausencia de contraindicaciones absolutas."
+  },
+  {
+    tema: "Infectología",
+    pregunta: "¿Cuál es el tratamiento empírico de elección para un paciente adulto sospechoso de Cólera grave?",
+    respuesta: "Doxiciclina a dosis única (300 mg VO) asociada a hidratación parenteral agresiva inmediata."
+  }
+];
+
+// Completamos las demás estáticas
+baseDatosFlashcardsEstaticas[21] = {
+  tema: "Traumatología y Ortopedia",
+  pregunta: "¿Cuál es la complicación neurovascular más común y temida de la luxación posterior de rodilla?",
+  respuesta: "Lesión de la arteria poplítea y afectación del nervio peroneo común."
+};
+baseDatosFlashcardsEstaticas[22] = {
+  tema: "Psiquiatría",
+  pregunta: "¿Cuál es el tratamiento de primera elección para el trastorno afectivo bipolar en fase de mantenimiento?",
+  respuesta: "Carbonato de Litio (vigilando estrechamente los niveles séricos de litemia para evitar toxicidad)."
+};
+baseDatosFlashcardsEstaticas[23] = {
+  tema: "Salud Pública y Epidemiología",
+  pregunta: "¿Cómo se define la Sensibilidad de una prueba diagnóstica?",
+  respuesta: "La probabilidad de que la prueba resulte positiva si el paciente realmente tiene la enfermedad (Tasa de Verdaderos Positivos)."
+};
+
+const flashcards = {
+  inicializar() {
+    const btnIrFlashcards = document.getElementById("btn-ir-flashcards");
+    const btnFlashcardsRegresar = document.getElementById("btn-flashcards-regresar");
+    const btnFlashcardPrev = document.getElementById("btn-flashcard-prev");
+    const btnFlashcardNext = document.getElementById("btn-flashcard-next");
+    const btnFlashcardKnow = document.getElementById("btn-flashcard-know");
+    const btnFlashcardDont = document.getElementById("btn-flashcard-dont");
+    const btnFlashcardReiniciar = document.getElementById("btn-flashcard-reiniciar");
+    const btnFlashcardCongratsRegresar = document.getElementById("btn-flashcard-congrats-regresar");
+    const flashcardFiltroTema = document.getElementById("flashcard-filtro-tema");
+    const flashcardClickTrigger = document.getElementById("flashcard-click-trigger");
+
+    if (btnIrFlashcards) {
+      btnIrFlashcards.addEventListener("click", () => ui.mostrarPantalla("flashcards"));
+    }
+    if (btnFlashcardsRegresar) {
+      btnFlashcardsRegresar.addEventListener("click", () => ui.mostrarPantalla("home"));
+    }
+    if (btnFlashcardPrev) {
+      btnFlashcardPrev.addEventListener("click", () => {
+        if (state.indiceActualFlashcard > 0) {
+          state.indiceActualFlashcard--;
+          flashcards.renderizarActual();
+        }
+      });
+    }
+    if (btnFlashcardNext) {
+      btnFlashcardNext.addEventListener("click", () => {
+        if (state.indiceActualFlashcard < state.mazoActualFlashcards.length - 1) {
+          state.indiceActualFlashcard++;
+          flashcards.renderizarActual();
+        }
+      });
+    }
+    if (btnFlashcardKnow) {
+      btnFlashcardKnow.addEventListener("click", () => flashcards.avanzar(true));
+    }
+    if (btnFlashcardDont) {
+      btnFlashcardDont.addEventListener("click", () => flashcards.avanzar(false));
+    }
+    if (btnFlashcardReiniciar) {
+      btnFlashcardReiniciar.addEventListener("click", () => flashcards.inicializarMazo());
+    }
+    if (btnFlashcardCongratsRegresar) {
+      btnFlashcardCongratsRegresar.addEventListener("click", () => ui.mostrarPantalla("home"));
+    }
+    if (flashcardFiltroTema) {
+      flashcardFiltroTema.addEventListener("change", () => flashcards.inicializarMazo());
+    }
+
+    if (flashcardClickTrigger) {
+      flashcardClickTrigger.addEventListener("click", () => {
+        flashcardClickTrigger.classList.toggle("flipped");
+        const flashcardEvalBox = document.getElementById("flashcard-eval-box");
+        if (flashcardClickTrigger.classList.contains("flipped")) {
+          if (flashcardEvalBox) flashcardEvalBox.classList.remove("hidden");
+        } else {
+          if (flashcardEvalBox) flashcardEvalBox.classList.add("hidden");
+        }
+      });
+    }
+
+    // Listener para inyectar flashcards automáticas desde errores (Fase 5)
+    document.addEventListener("click", async (e) => {
+      const btn = e.target.closest(".btn-auto-flashcard");
+      if (!btn) return;
+      
+      const tema = btn.getAttribute("data-tema");
+      const pregunta = btn.getAttribute("data-pregunta");
+      const respuesta = btn.getAttribute("data-respuesta");
+      
+      try {
+        await api.guardarFlashcardPersonalizada(state.usuarioConectado.id, tema, pregunta, respuesta);
+        btn.disabled = true;
+        btn.textContent = "⚡ Flashcard Guardada";
+        btn.style.background = "var(--success)";
+      } catch (err) {
+        alert("Falla al guardar flashcard personalizada: " + err.message);
+      }
+    });
+  },
+
+  // CARGAR MAZO EN BASE A MATERIA (Filtro Insensible & Carga de Personalizadas)
+  async inicializarMazo() {
+    const selectorFiltro = document.getElementById("flashcard-filtro-tema");
+    const filtroTema = selectorFiltro ? selectorFiltro.value.trim().toLowerCase() : "todos";
+    let filtrados = [];
+    
+    state.mazoFalladasSesion = []; // Limpiar acumulador de falladas
+
+    try {
+      // 1. Obtener flashcards personalizadas creadas por el usuario desde el servidor
+      let personalizadas = [];
+      if (state.usuarioConectado) {
+        personalizadas = await api.obtenerFlashcardsPersonalizadas(state.usuarioConectado.id);
+      }
+
+      // 2. Unir mazos
+      const mazoCompleto = [...baseDatosFlashcardsEstaticas, ...personalizadas];
+
+      // 3. Filtrar por materia de forma insensible a espacios/mayúsculas
+      if (filtroTema === "todos") {
+        filtrados = [...mazoCompleto];
+      } else {
+        filtrados = mazoCompleto.filter(c => c.tema.trim().toLowerCase() === filtroTema);
+      }
+
+      // 4. Integrar con Spaced Repetition (Priorizar las de menor repetitions / próximas a vencer)
+      let estados = {};
+      if (state.usuarioConectado) {
+        const srEstados = await api.obtenerRepeticionEspaciada(state.usuarioConectado.id);
+        srEstados.forEach(e => {
+          if (e.flashcard_id) estados[e.flashcard_id] = e;
+        });
+      }
+
+      filtrados.sort((a, b) => {
+        const estadoA = estados[a.pregunta] || { interval: 0, repetitions: 0 };
+        const estadoB = estados[b.pregunta] || { interval: 0, repetitions: 0 };
+        
+        if (estadoA.interval !== estadoB.interval) {
+          return estadoA.interval - estadoB.interval;
+        }
+        return estadoA.repetitions - estadoB.repetitions;
+      });
+
+      state.mazoActualFlashcards = filtrados;
+      state.indiceActualFlashcard = 0;
+      state.dominadasFlashcards = 0;
+      state.repasoFlashcards = 0;
+
+      const flashcardsEstudioZona = document.getElementById("flashcards-estudio-zona");
+      const flashcardsCongratsZona = document.getElementById("flashcards-congrats-zona");
+
+      if (flashcardsEstudioZona) flashcardsEstudioZona.classList.remove("hidden");
+      if (flashcardsCongratsZona) flashcardsCongratsZona.classList.add("hidden");
+
+      flashcards.actualizarContadores();
+      flashcards.renderizarActual();
+    } catch (e) {
+      console.error("Error al inyectar mazo adaptativo:", e);
+    }
+  },
+
+  renderizarActual() {
+    const flashcardClickTrigger = document.getElementById("flashcard-click-trigger");
+    const flashcardEvalBox = document.getElementById("flashcard-eval-box");
+    const indicador = document.getElementById("flashcard-contador-indicador");
+
+    if (flashcardClickTrigger) flashcardClickTrigger.classList.remove("flipped");
+    if (flashcardEvalBox) flashcardEvalBox.classList.add("hidden");
+
+    if (state.mazoActualFlashcards.length === 0) {
+      if (indicador) indicador.textContent = "0 de 0 Tarjetas";
+      document.getElementById("flashcard-front-tag").textContent = "Vacío";
+      document.getElementById("flashcard-front-texto").textContent = "No hay flashcards registradas para esta materia.";
+      document.getElementById("flashcard-back-tag").textContent = "Vacío";
+      document.getElementById("flashcard-back-texto").textContent = "Prueba con otra materia en el selector superior.";
+      return;
+    }
+
+    if (indicador) {
+      indicador.textContent = `Tarjeta ${state.indiceActualFlashcard + 1} de ${state.mazoActualFlashcards.length}`;
+    }
+
+    const card = state.mazoActualFlashcards[state.indiceActualFlashcard];
+
+    document.getElementById("flashcard-front-tag").textContent = card.tema;
+    document.getElementById("flashcard-front-texto").textContent = card.pregunta;
+    document.getElementById("flashcard-back-tag").textContent = `Respuesta • ${card.tema}`;
+    document.getElementById("flashcard-back-texto").textContent = card.respuesta;
+  },
+
+  // AVANZAR TARJETA CON MOTOR DE SPACED REPETITION (SM-2 / FSRS) PERSISTENTE
+  async avanzar(seLaSabia) {
+    const card = state.mazoActualFlashcards[state.indiceActualFlashcard];
+    
+    // Sincronizar FSRS/SM-2 persistente en el servidor
+    // SeLaSabia: true -> Bien (2), false -> Fallado (0)
+    await spacedRepetition.sincronizarEstado(null, card.pregunta, seLaSabia, seLaSabia ? 2 : 0);
+
+    if (seLaSabia) {
+      state.dominadasFlashcards++;
+    } else {
+      state.repasoFlashcards++;
+      // Mazo secundario seguro para evitar fallos de splicing en caliente
+      state.mazoFalladasSesion.push(card);
+    }
+
+    flashcards.actualizarContadores();
+
+    const flashcardClickTrigger = document.getElementById("flashcard-click-trigger");
+    const flashcardEvalBox = document.getElementById("flashcard-eval-box");
+
+    if (state.indiceActualFlashcard < state.mazoActualFlashcards.length - 1) {
+      state.indiceActualFlashcard++;
+      if (flashcardClickTrigger) flashcardClickTrigger.classList.remove("flipped");
+      if (flashcardEvalBox) flashcardEvalBox.classList.add("hidden");
+      setTimeout(() => {
+        flashcards.renderizarActual();
+      }, 150);
+    } else {
+      // Fin del mazo
+      if (state.mazoFalladasSesion.length > 0) {
+        state.mazoActualFlashcards = [...state.mazoFalladasSesion];
+        state.mazoFalladasSesion = [];
+        state.indiceActualFlashcard = 0;
+
+        alert("Comenzando mazo de repaso rápido de tus tarjetas falladas en esta sesión");
+
+        if (flashcardClickTrigger) flashcardClickTrigger.classList.remove("flipped");
+        if (flashcardEvalBox) flashcardEvalBox.classList.add("hidden");
+        setTimeout(() => {
+          flashcards.renderizarActual();
+        }, 150);
+      } else {
+        const flashcardsEstudioZona = document.getElementById("flashcards-estudio-zona");
+        const flashcardsCongratsZona = document.getElementById("flashcards-congrats-zona");
+        if (flashcardsEstudioZona) flashcardsEstudioZona.classList.add("hidden");
+        if (flashcardsCongratsZona) flashcardsCongratsZona.classList.remove("hidden");
+      }
+    }
+  },
+
+  actualizarContadores() {
+    const domEl = document.getElementById("flashcard-stat-dominadas");
+    const repEl = document.getElementById("flashcard-stat-repaso");
+    const retEl = document.getElementById("flashcard-stat-retencion");
+
+    if (domEl) domEl.textContent = state.dominadasFlashcards;
+    if (repEl) repEl.textContent = state.repasoFlashcards;
+
+    const totalRespondidas = state.dominadasFlashcards + state.repasoFlashcards;
+    const porcentaje = totalRespondidas > 0 ? Math.round((state.dominadasFlashcards / totalRespondidas) * 100) : 0;
+    
+    if (retEl) {
+      retEl.textContent = `${porcentaje}%`;
+      if (porcentaje >= 75) {
+        retEl.style.color = "var(--success)";
+      } else if (porcentaje >= 50) {
+        retEl.style.color = "var(--warning)";
+      } else {
+        retEl.style.color = "var(--danger)";
+      }
+    }
+  }
+};
+
+window.flashcards = flashcards;
