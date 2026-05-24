@@ -304,11 +304,36 @@ const ui = {
         
         const opt = document.createElement("option");
         opt.value = esp.nombre;
-        opt.textContent = `${esp.emoji} ${esp.nombre} (${totalPreguntas})`;
+        opt.textContent = `${esp.nombre} (${totalPreguntas})`;
         select.appendChild(opt);
       });
     } catch (err) {
       console.error("Error cargando especialidades:", err);
+    }
+  },
+
+  async cargarFiltrosAnos() {
+    try {
+      const anos = await api.obtenerAnosExamen();
+      const select = document.getElementById("selector-ano");
+      if (!select) return;
+      
+      select.innerHTML = "";
+      
+      if (anos.length === 0) {
+        select.innerHTML = '<option value="Todos" selected>No hay años registrados</option>';
+        return;
+      }
+      
+      select.innerHTML = '<option value="Todos" selected>Todos los años disponibles</option>';
+      anos.forEach(ano => {
+        const opt = document.createElement("option");
+        opt.value = ano;
+        opt.textContent = `ENURM ${ano}`;
+        select.appendChild(opt);
+      });
+    } catch (err) {
+      console.error("Error cargando años de examen:", err);
     }
   },
 

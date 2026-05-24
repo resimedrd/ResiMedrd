@@ -101,39 +101,66 @@
               <h3>Configurar Entrenamiento</h3>
               <p>Escoge tus parámetros de simulación médica.</p>
             </div>
+            
+            <!-- FASE 1: TABS DE TIPO DE SIMULACRO -->
             <div class="form-block">
-              <label for="especialidad">Bloque de Estudio</label>
+              <label>Tipo de Simulacro</label>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 6px;">
+                <button id="tab-sim-especialidad" class="btn btn-ghost active" style="min-width: auto; padding: 10px 14px; font-size: 13px;" type="button">Por Especialidad</button>
+                <button id="tab-sim-ano" class="btn btn-ghost" style="min-width: auto; padding: 10px 14px; font-size: 13px;" type="button">Por Año ENURM</button>
+              </div>
+            </div>
+
+            <!-- SELECTOR DINÁMICO DE ESPECIALIDAD -->
+            <div id="block-especialidad" class="form-block">
+              <label for="especialidad">Especialidad Temática</label>
               <select id="especialidad" class="input"></select>
             </div>
+
+            <!-- SELECTOR DINÁMICO DE AÑO (INICIALMENTE OCULTO) -->
+            <div id="block-ano" class="form-block hidden">
+              <label for="selector-ano">Año de Examen</label>
+              <select id="selector-ano" class="input"></select>
+            </div>
+
             <div class="form-block">
               <label for="cantidad">Número de Preguntas</label>
               <select id="cantidad" class="input">
                 <option value="10">10 Preguntas</option>
                 <option value="20" selected>20 Preguntas</option>
                 <option value="30">30 Preguntas</option>
-                <option value="40">40 Preguntas</option>
+                <option value="45">45 Preguntas</option>
                 <option value="50">50 Preguntas</option>
-                <option value="60">60 Preguntas</option>
-                <option value="70">70 Preguntas</option>
-                <option value="80">80 Preguntas</option>
-                <option value="90">90 Preguntas</option>
+                <option value="75">75 Preguntas</option>
                 <option value="100">100 Preguntas</option>
               </select>
             </div>
+
+            <!-- SELECCIONAR MODALIDAD -->
             <div class="form-block">
-              <label>Seleccionar Modalidad</label>
-              <div class="mode-grid">
-                <button id="btn-modo-estudio" class="mode-card" type="button">
-                  <span class="mode-icon">📘</span>
-                  <span class="mode-title">Modo Estudio</span>
-                  <span class="mode-desc">Retroalimentación analítica y justificación inmediata por reactivo.</span>
+              <label>Modalidad de Examen</label>
+              <div class="mode-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 6px;">
+                <button id="btn-modo-estudio" class="mode-card active" type="button" style="border-radius: 12px; padding: 16px; border: 2px solid #0A66C2; background: var(--bg-card); display: flex; flex-direction: column; gap: 4px; text-align: left; transition: all 0.2s;">
+                  <span class="mode-title" style="font-weight: 700; color: var(--text); font-size: 13.5px;">Modo Estudio</span>
+                  <span class="mode-desc" style="font-size: 11px; color: var(--text-dim); line-height: 1.3;">Retroalimentación analítica y justificación médica por reactivo.</span>
                 </button>
-                <button id="btn-modo-simulacro" class="mode-card" type="button">
-                  <span class="mode-icon">⏱️</span>
-                  <span class="mode-title">Modo Simulacro</span>
-                  <span class="mode-desc">Sin ayudas visuales. Evaluación global con cronómetro estricto.</span>
+                <button id="btn-modo-simulacro" class="mode-card" type="button" style="border-radius: 12px; padding: 16px; border: 1px solid var(--border); background: var(--bg-card); display: flex; flex-direction: column; gap: 4px; text-align: left; transition: all 0.2s;">
+                  <span class="mode-title" style="font-weight: 700; color: var(--text); font-size: 13.5px;">Modo Simulacro</span>
+                  <span class="mode-desc" style="font-size: 11px; color: var(--text-dim); line-height: 1.3;">Evaluación con cronómetro estricto y resultados al finalizar.</span>
                 </button>
               </div>
+            </div>
+
+            <!-- INTERRUPTOR DE RETROALIMENTACIÓN INMEDIATA (MODO ESTUDIO) -->
+            <div id="block-config-estudio" class="form-block" style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border); border-radius: 12px; padding: 14px; margin-top: 16px; display: flex; align-items: center; justify-content: space-between;">
+              <div style="padding-right: 8px;">
+                <span style="font-weight: 600; font-size: 13px; color: var(--text); display: block; margin-bottom: 2px;">Retroalimentación Inmediata</span>
+                <span style="font-size: 11px; color: var(--text-dim); display: block; line-height: 1.3;">Mostrar respuestas y desglose médico al contestar cada pregunta.</span>
+              </div>
+              <label class="switch" style="position: relative; display: inline-block; width: 44px; height: 24px; flex-shrink: 0; cursor: pointer;">
+                <input type="checkbox" id="chk-retroalimentacion-inmediata" checked style="opacity: 0; width: 0; height: 0;">
+                <span class="slider round" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--border-strong); transition: .3s; border-radius: 24px;"></span>
+              </label>
             </div>
           </article>
 

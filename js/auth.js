@@ -143,6 +143,7 @@ const auth = {
     await ui.inicializarGridEspecialidades();
     await ui.inicializarFiltrosFlashcards();
     await ui.cargarFiltrosEspecialidad();
+    await ui.cargarFiltrosAnos();
     await ui.cargarDashboardHome();
     await ui.cargarHistorialReciente();
 

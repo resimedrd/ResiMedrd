@@ -2197,6 +2197,27 @@ select.input option {
   }
 }
 
+/* === ESTILOS DEL INTERRUPTOR SWITCH (FASE 1) === */
+.switch input:checked + .slider {
+  background-color: #0A66C2 !important;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: .3s;
+  border-radius: 50%;
+}
+
+.switch input:checked + .slider:before {
+  transform: translateX(20px);
+}
+
 
 
 

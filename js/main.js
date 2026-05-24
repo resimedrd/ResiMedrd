@@ -70,6 +70,65 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
+  // === FASE 1: EVENT LISTENERS DE CONFIGURACIÓN DE EXAMEN ===
+  const tabSimEspecialidad = document.getElementById("tab-sim-especialidad");
+  const tabSimAno = document.getElementById("tab-sim-ano");
+  const blockEspecialidad = document.getElementById("block-especialidad");
+  const blockAno = document.getElementById("block-ano");
+
+  state.tipoSimulacroSeleccionado = "especialidad";
+
+  if (tabSimEspecialidad && tabSimAno && blockEspecialidad && blockAno) {
+    tabSimEspecialidad.addEventListener("click", () => {
+      tabSimEspecialidad.classList.add("active");
+      tabSimAno.classList.remove("active");
+      blockEspecialidad.classList.remove("hidden");
+      blockAno.classList.add("hidden");
+      state.tipoSimulacroSeleccionado = "especialidad";
+    });
+
+    tabSimAno.addEventListener("click", () => {
+      tabSimAno.classList.add("active");
+      tabSimEspecialidad.classList.remove("active");
+      blockAno.classList.remove("hidden");
+      blockEspecialidad.classList.add("hidden");
+      state.tipoSimulacroSeleccionado = "ano";
+    });
+  }
+
+  const btnModoEstudio = document.getElementById("btn-modo-estudio");
+  const btnModoSimulacro = document.getElementById("btn-modo-simulacro");
+  const blockConfigEstudio = document.getElementById("block-config-estudio");
+
+  state.modoActual = "estudio";
+
+  if (btnModoEstudio && btnModoSimulacro) {
+    btnModoEstudio.addEventListener("click", () => {
+      btnModoEstudio.classList.add("active");
+      btnModoEstudio.style.borderColor = "#0A66C2";
+      btnModoEstudio.style.borderWidth = "2px";
+      
+      btnModoSimulacro.classList.remove("active");
+      btnModoSimulacro.style.borderColor = "var(--border)";
+      btnModoSimulacro.style.borderWidth = "1px";
+      
+      if (blockConfigEstudio) blockConfigEstudio.classList.remove("hidden");
+      state.modoActual = "estudio";
+    });
+
+    btnModoSimulacro.addEventListener("click", () => {
+      btnModoSimulacro.classList.add("active");
+      btnModoSimulacro.style.borderColor = "#0A66C2";
+      btnModoSimulacro.style.borderWidth = "2px";
+      
+      btnModoEstudio.classList.remove("active");
+      btnModoEstudio.style.borderColor = "var(--border)";
+      btnModoEstudio.style.borderWidth = "1px";
+      
+      if (blockConfigEstudio) blockConfigEstudio.classList.add("hidden");
+      state.modoActual = "simulacro";
+    });
+  }
 
   // 3. Inicializar módulos
   auth.inicializar();

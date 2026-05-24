@@ -140,7 +140,17 @@ const api = {
     }),
 
   obtenerMapeoTemas: () =>
-    request("/api/preguntas/mapeo-temas")
+    request("/api/preguntas/mapeo-temas"),
+
+  // === FASE 1: NUEVOS ENDPOINTS ===
+  obtenerAnosExamen: () =>
+    request("/api/examenes/anos"),
+
+  prepararExamen: (tipo, valor, cantidad) =>
+    request("/api/exam-setup", {
+      method: "POST",
+      body: JSON.stringify({ tipo, valor, cantidad })
+    })
 };
 
 window.api = api;

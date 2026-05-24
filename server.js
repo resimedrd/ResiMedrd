@@ -163,7 +163,11 @@ async function iniciarBaseDeDatos() {
     { nombre: "success_rate", definicion: "REAL DEFAULT 0.0" },
     { nombre: "veces_respondida", definicion: "INTEGER DEFAULT 0" },
     { nombre: "veces_fallada", definicion: "INTEGER DEFAULT 0" },
-    { nombre: "discrimination_index", definicion: "REAL DEFAULT 0.0" }
+    { nombre: "discrimination_index", definicion: "REAL DEFAULT 0.0" },
+    { nombre: "especialidad", definicion: "TEXT" },
+    { nombre: "ano_examen", definicion: "INTEGER" },
+    { nombre: "explicacion_correcta", definicion: "TEXT" },
+    { nombre: "explicacion_incorrecta", definicion: "TEXT" }
   ];
 
   for (const col of columnasPreguntas) {
@@ -180,9 +184,9 @@ async function iniciarBaseDeDatos() {
     
     // Si existen preguntas iniciales pero tienen explicaciones antiguas sin justificación o fuentes desactualizadas, forzamos su actualización premium
     if (totalPreguntas && totalPreguntas.total > 0) {
-      const primeraP = await db.get(`SELECT explicacion, fuente FROM preguntas ORDER BY id LIMIT 1`);
-      if (primeraP && (!primeraP.explicacion || !primeraP.explicacion.includes("JUSTIFICACIÓN") || primeraP.fuente === 'ENURM 2024')) {
-        console.log("Detectadas explicaciones o fuentes antiguas. Limpiando banco base para re-siembra premium...");
+      const primeraP = await db.get(`SELECT explicacion, fuente, explicacion_correcta FROM preguntas ORDER BY id LIMIT 1`);
+      if (primeraP && (!primeraP.explicacion || !primeraP.explicacion_correcta || !primeraP.explicacion.includes("JUSTIFICACIÓN") || primeraP.fuente === 'ENURM 2024')) {
+        console.log("Detectadas explicaciones antiguas o migración de Fase 1 requerida. Limpiando banco base para re-siembra premium...");
         await db.run(`DELETE FROM preguntas`);
         totalPreguntas.total = 0;
       }
@@ -531,9 +535,30 @@ async function iniciarBaseDeDatos() {
           difficulty = 0.5;
         }
 
+        let explicacionCorrecta = "";
+        let explicacionIncorrecta = "";
+        
+        if (p.explicacion) {
+          const partes = p.explicacion.split("🚫 DESCARTE (Por qué NO):");
+          if (partes.length > 1) {
+            explicacionCorrecta = partes[0].replace("🔬 JUSTIFICACIÓN (Por qué SÍ):\n", "").trim();
+            explicacionIncorrecta = partes[1].trim();
+          } else {
+            explicacionCorrecta = p.explicacion;
+            explicacionIncorrecta = "No disponible.";
+          }
+        }
+
+        let anoExamen = 2024;
+        const fuenteStr = p.fuente || "ENURM 2024";
+        const matchAno = fuenteStr.match(/\d{4}/);
+        if (matchAno) {
+          anoExamen = parseInt(matchAno[0]);
+        }
+
         await db.run(
-          `INSERT INTO preguntas (texto, opciones, correcta, explicacion, tema, subtema, microtema, tags, difficulty, fuente) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-          [p.texto, p.opciones, p.correcta, p.explicacion, p.tema, subtema, microtema, tags, difficulty, p.fuente || "ENURM 2024"]
+          `INSERT INTO preguntas (texto, opciones, correcta, explicacion, tema, subtema, microtema, tags, difficulty, fuente, especialidad, ano_examen, explicacion_correcta, explicacion_incorrecta) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          [p.texto, p.opciones, p.correcta, p.explicacion, p.tema, subtema, microtema, tags, difficulty, fuenteStr, p.tema, anoExamen, explicacionCorrecta, explicacionIncorrecta]
         );
       }
     }
@@ -1342,6 +1367,62 @@ app.put("/api/admin/preguntas/:id", autenticarToken, async (req, res) => {
   } catch (error) {
     console.error("Error al modificar la pregunta:", error);
     res.status(500).json({ error: "Error interno del servidor al guardar los cambios." });
+  }
+});
+
+
+// === ENDPOINTS DE CONFIGURACIÓN DE EXAMEN (FASE 1) ===
+
+// 1. Obtener los años disponibles de exámenes en el banco
+app.get("/api/examenes/anos", autenticarToken, async (req, res) => {
+  try {
+    const filas = await db.all(
+      `SELECT DISTINCT ano_examen FROM preguntas WHERE ano_examen IS NOT NULL ORDER BY ano_examen DESC`
+    );
+    // Retornar array de años
+    const anos = filas.map(f => f.ano_examen);
+    res.json(anos);
+  } catch (error) {
+    console.error("Error al obtener años de exámenes:", error);
+    res.status(500).json({ error: "Error al cargar la lista de años." });
+  }
+});
+
+// 2. Endpoint central para preparar y filtrar el bloque de preguntas de un examen
+app.post("/api/exam-setup", autenticarToken, async (req, res) => {
+  try {
+    const { tipo, valor, cantidad } = req.body;
+    const maxPreguntas = parseInt(cantidad) || 10;
+
+    let preguntas = [];
+
+    if (tipo === "especialidad") {
+      preguntas = await db.all(
+        `SELECT * FROM preguntas 
+         WHERE (LOWER(TRIM(especialidad)) = LOWER(?) OR LOWER(TRIM(tema)) = LOWER(?)) 
+         ORDER BY RANDOM() LIMIT ?`,
+        [valor.trim(), valor.trim(), maxPreguntas]
+      );
+    } else if (tipo === "ano") {
+      const anoNum = parseInt(valor);
+      preguntas = await db.all(
+        `SELECT * FROM preguntas 
+         WHERE ano_examen = ? 
+         ORDER BY RANDOM() LIMIT ?`,
+        [anoNum, maxPreguntas]
+      );
+    } else {
+      preguntas = await db.all(
+        `SELECT * FROM preguntas 
+         ORDER BY RANDOM() LIMIT ?`,
+        [maxPreguntas]
+      );
+    }
+
+    res.json(preguntas);
+  } catch (error) {
+    console.error("Error al configurar bloque de examen:", error);
+    res.status(500).json({ error: "Error interno del servidor al configurar el examen." });
   }
 });
 

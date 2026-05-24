@@ -71,10 +71,15 @@ const quiz = {
   },
 
   // ⏱️ INICIAR SESIÓN (CON ADAPTIVE LEARNING & MODO GUARDIA)
-  async iniciarSesion(modo) {
+  async iniciarSesion(modoForce) {
+    const modo = modoForce || state.modoActual || "estudio";
     state.modoActual = modo;
-    state.especialidadSeleccionada = document.getElementById("especialidad").value;
-    state.cantidadSolicitada = parseInt(document.getElementById("cantidad").value) || 5;
+    
+    // Capturar retroalimentación inmediata
+    const chkRetro = document.getElementById("chk-retroalimentacion-inmediata");
+    state.retroalimentacionInmediata = (modo === "estudio" && chkRetro) ? chkRetro.checked : false;
+
+    state.cantidadSolicitada = parseInt(document.getElementById("cantidad").value) || 20;
 
     // Reseteo de intervalos si estaban activos
     clearInterval(state.intervaloTemporizador);
@@ -83,16 +88,27 @@ const quiz = {
     if (temporizadorEl) temporizadorEl.classList.add("hidden");
 
     try {
-      // 1. Cargar preguntas
-      let preguntas = await api.obtenerPreguntas(state.especialidadSeleccionada, 100); // Traer pool para adaptar
-      
+      // 1. Cargar preguntas desde nuestro nuevo endpoint centralizado POST /api/exam-setup
+      let preguntas = [];
+      if (modo === "guardia") {
+        preguntas = await api.prepararExamen("todos", "todos", 10);
+        state.cantidadSolicitada = 10;
+      } else {
+        const tipo = state.tipoSimulacroSeleccionado || "especialidad";
+        const valor = tipo === "especialidad" ? document.getElementById("especialidad").value : document.getElementById("selector-ano").value;
+        
+        preguntas = await api.prepararExamen(tipo, valor, state.cantidadSolicitada);
+      }
+
       if (preguntas.length === 0) {
         alert("No hay preguntas registradas en este bloque actualmente.");
         return;
       }
 
       // 2. Motor de Aprendizaje Adaptativo (Filtrado & Priorización)
-      preguntas = await quiz.aplicarFiltroAdaptativo(preguntas);
+      if (modo !== "guardia" && state.tipoSimulacroSeleccionado === "especialidad") {
+        preguntas = await quiz.aplicarFiltroAdaptativo(preguntas);
+      }
 
       // Limitar a la cantidad solicitada
       state.preguntasCargadas = preguntas.slice(0, state.cantidadSolicitada);
