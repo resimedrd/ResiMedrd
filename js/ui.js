@@ -439,7 +439,8 @@ const ui = {
         revisionContainer.innerHTML = "";
 
         preguntas.forEach((p, idx) => {
-          const opcionesArray = p.opciones;
+          const opcionesRaw = (typeof p.opciones === 'string') ? JSON.parse(p.opciones) : (Array.isArray(p.opciones) ? p.opciones : []);
+          const opcionesArray = Array.isArray(opcionesRaw) ? opcionesRaw : [];
           const seleccion = p.seleccionada;
           
           let opcionesHtml = "";

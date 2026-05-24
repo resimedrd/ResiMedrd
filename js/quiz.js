@@ -4,6 +4,22 @@
 let tiempoPorPreguntaRestante = 30;
 let guardiaTimerInterval = null;
 
+function safeParseOpciones(opciones) {
+  if (!opciones) return [];
+  if (Array.isArray(opciones)) return opciones;
+  if (typeof opciones === "string") {
+    try {
+      const parsed = JSON.parse(opciones);
+      if (Array.isArray(parsed)) return parsed;
+      return [parsed];
+    } catch (e) {
+      console.error("Error al parsear opciones JSON, usando fallback:", opciones, e);
+      return opciones.split(",").map(opt => opt.trim());
+    }
+  }
+  return [];
+}
+
 const quiz = {
   inicializar() {
     const btnModoEstudio = document.getElementById("btn-modo-estudio");
@@ -292,7 +308,7 @@ const quiz = {
     if (preguntaTexto) preguntaTexto.innerHTML = p.texto;
     if (opcionesContainer) opcionesContainer.innerHTML = "";
 
-    const opcionesArray = JSON.parse(p.opciones);
+    const opcionesArray = safeParseOpciones(p.opciones);
     opcionesArray.forEach((opcion, index) => {
       const wrapper = document.createElement("div");
       wrapper.className = "option-wrapper";
@@ -520,7 +536,7 @@ const quiz = {
       const detalleExamen = state.preguntasCargadas.map((p, i) => ({
         id: p.id,
         texto: p.texto,
-        opciones: JSON.parse(p.opciones),
+        opciones: safeParseOpciones(p.opciones),
         correcta: p.correcta,
         seleccionada: state.respuestasUsuario[i],
         explicacion: p.explicacion,
@@ -576,7 +592,7 @@ const quiz = {
       revisionContainer.innerHTML = "";
 
       state.preguntasCargadas.forEach((p, idx) => {
-        const opcionesArray = JSON.parse(p.opciones);
+        const opcionesArray = safeParseOpciones(p.opciones);
         const seleccion = state.respuestasUsuario[idx];
         
         let opcionesHtml = "";
