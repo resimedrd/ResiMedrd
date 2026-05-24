@@ -562,8 +562,33 @@ async function iniciarBaseDeDatos() {
         );
       }
     }
+
+    // 🧠 INYECCIÓN SEGURA DEL EXAMEN ENURM 2025 A (Fase 4 - Producción Persistente)
+    const fs = require("fs");
+    const total2025 = await db.get(`SELECT COUNT(*) as total FROM preguntas WHERE ano_examen = 2025`);
+    if (total2025 && total2025.total === 0) {
+      const jsonPath = path.join(__dirname, "preguntas_enurm_2025.json");
+      if (fs.existsSync(jsonPath)) {
+        console.log("📂 Detectado preguntas_enurm_2025.json. Sembrando en base de datos de producción...");
+        const rawJson = fs.readFileSync(jsonPath, "utf-8");
+        const preguntas2025 = JSON.parse(rawJson);
+        
+        for (const p of preguntas2025) {
+          const subtema = "Evaluación Oficial";
+          const microtema = "Bloque de Reactivos";
+          const tags = `${p.tema},ENURM,2025`;
+          const difficulty = 0.5;
+          
+          await db.run(
+            `INSERT INTO preguntas (texto, opciones, correcta, explicacion, tema, subtema, microtema, tags, difficulty, fuente, especialidad, ano_examen, explicacion_correcta, explicacion_incorrecta) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            [p.texto, p.opciones, p.correcta, p.explicacion, p.tema, subtema, microtema, tags, difficulty, p.fuente, p.especialidad, p.ano_examen, p.explicacion_correcta, p.explicacion_incorrecta]
+          );
+        }
+        console.log(`✅ ¡Éxito! Se inyectaron ${preguntas2025.length} preguntas oficiales del ENURM 2025 en producción.`);
+      }
+    }
   } catch (err) {
-    console.error("Error al inyectar banco inicial:", err);
+    console.error("Error al inyectar banco inicial o ENURM 2025:", err);
   }
 }
 
