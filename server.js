@@ -19,6 +19,22 @@ const ADMIN_EMAIL = "frank@resimed.com";
 app.use(cors());
 app.use(express.json({ limit: "50mb" })); // Aumentamos el límite para soportar textos largos de preguntas
 app.use(express.urlencoded({ extended: true, limit: "50mb" }));
+
+// Interceptor robusto de errores de parsing de JSON (SyntaxError)
+app.use((err, req, res, next) => {
+  if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+    console.error("❌ ERROR CRÍTICO DE PARSING DE JSON EN EL SERVIDOR:");
+    console.error("Mensaje:", err.message);
+    console.error("Cuerpo que causó la falla:", err.body);
+    return res.status(400).json({ 
+      error: "JSON Inválido enviado por el cliente.", 
+      detalle: err.message,
+      cuerpoRecibido: err.body 
+    });
+  }
+  next();
+});
+
 app.use(express.static(__dirname));
 
 let db = null;
