@@ -1,28 +1,30 @@
 :root {
-  --bg: #07111f;
-  --bg-2: #0b1728;
-  --panel: rgba(13, 23, 39, 0.82);
-  --panel-strong: rgba(11, 18, 31, 0.95);
-  --panel-soft: rgba(255, 255, 255, 0.04);
+  --bg: #f8fafc;
+  --bg-2: #f1f5f9;
+  --panel: #ffffff;
+  --panel-strong: #ffffff;
+  --panel-soft: #f8fafc;
+  --bg-card: #ffffff;
 
-  --border: rgba(255, 255, 255, 0.08);
-  --border-strong: rgba(255, 255, 255, 0.14);
+  --border: #e2e8f0;
+  --border-strong: #cbd5e1;
 
-  --text: #eef4ff;
-  --text-soft: #b9c7e3;
-  --text-dim: #8897b8;
+  --text: #0f172a;
+  --text-soft: #334155;
+  --text-dim: #64748b;
 
-  --primary: #4f8cff;
-  --primary-2: #76a9ff;
-  --primary-soft: rgba(79, 140, 255, 0.12);
+  --primary: #0A66C2;
+  --primary-2: #00509d;
+  --primary-soft: #e0f2fe;
 
-  --success: #22c55e;
-  --success-soft: rgba(34, 197, 94, 0.14);
+  --success: #15803d;
+  --success-soft: #dcfce7;
 
-  --danger: #ef4444;
-  --danger-soft: rgba(239, 68, 68, 0.14);
+  --danger: #b91c1c;
+  --danger-soft: #fee2e2;
 
-  --warning: #f59e0b;
+  --warning: #ca8a04;
+  --warning-soft: #fef9c3;
 }
 
 * {
@@ -51,7 +53,7 @@ h1, h2, h3, h4, h5, h6, .brand-mark, .flashcard-q, .mode-title, .quiz-timer, .re
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: radial-gradient(circle at 50% -20%, #162a4a 0%, var(--bg) 70%);
+  background: radial-gradient(circle at 50% -20%, #e0f2fe 0%, var(--bg) 70%);
   z-index: -1;
 }
 
@@ -526,13 +528,15 @@ select.input option {
 .option-btn.correct {
   background: var(--success-soft) !important;
   border-color: var(--success) !important;
-  color: #fff !important;
+  color: var(--success) !important;
+  font-weight: 600;
 }
 
 .option-btn.wrong {
   background: var(--danger-soft) !important;
   border-color: var(--danger) !important;
-  color: #fff !important;
+  color: var(--danger) !important;
+  font-weight: 600;
 }
 
 .feedback-box {
@@ -1767,34 +1771,34 @@ select.input option {
    🏠 FASE 1: ACABADOS DE DISEÑO PROFESIONAL SAAS Y GLASSMORPHISM
    ========================================================================= */
 .panel, .question-card, .results-shell, .quiz-shell, .profile-shell article.panel {
-  background: rgba(13, 22, 41, 0.75) !important;
-  backdrop-filter: blur(18px) saturate(160%) !important;
-  -webkit-backdrop-filter: blur(18px) saturate(160%) !important;
-  border: 1px solid rgba(255, 255, 255, 0.06) !important;
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.35) !important;
+  background: var(--bg-card) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.04) !important;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .input {
-  background: rgba(255, 255, 255, 0.02) !important;
-  border: 1px solid rgba(255, 255, 255, 0.07) !important;
-  box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+  background: #ffffff !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: none !important;
 }
 
 .input:focus {
-  background: rgba(255, 255, 255, 0.04) !important;
+  background: #ffffff !important;
   border-color: var(--primary) !important;
-  box-shadow: inset 0 2px 4px rgba(0,0,0,0.2), 0 0 12px rgba(79, 140, 255, 0.2);
+  box-shadow: 0 0 0 3px rgba(10, 102, 194, 0.15) !important;
 }
 
 .btn-primary {
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 14px rgba(79, 140, 255, 0.2);
+  box-shadow: 0 4px 12px rgba(10, 102, 194, 0.2);
 }
 
 .btn-primary:hover:not(:disabled) {
   transform: translateY(-1.5px);
-  box-shadow: 0 6px 20px rgba(79, 140, 255, 0.35);
+  box-shadow: 0 6px 16px rgba(10, 102, 194, 0.3);
 }
 
 .btn-secondary {
@@ -1802,7 +1806,7 @@ select.input option {
 }
 
 .btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--bg-2);
   transform: translateY(-1.5px);
 }
 
@@ -2007,150 +2011,136 @@ select.input option {
 /* ==========================================================================
    🎯 FASE 2 Y 5: DISEÑO DE SIMULADOR EXCLUSIVO PARA ESCRITORIO
    ========================================================================== */
-@media (min-width: 681px) {
-  /* En escritorio, la tarjeta principal del quiz adquiere un padding izquierdo generoso */
-  .quiz-shell {
-    position: relative !important;
-    padding-left: 280px !important; /* Espacio para la caja flotante */
-  }
-
-  /* La caja unificada flotará absolutamente en ese espacio lateral izquierdo */
-  .sidebar-unified-card {
-    position: absolute !important;
-    left: 28px !important;
-    top: 40px !important;
-    width: 220px !important;
-    background: rgba(13, 22, 41, 0.75) !important;
-    backdrop-filter: blur(18px) saturate(160%) !important;
-    -webkit-backdrop-filter: blur(18px) saturate(160%) !important;
-    border: 1px solid rgba(255, 255, 255, 0.08) !important;
-    border-radius: 24px !important;
-    padding: 20px 16px !important;
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 14px !important;
-    align-items: center !important;
-    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.35) !important;
-    z-index: 10 !important;
-  }
-
-  .sidebar-counter-row {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    gap: 8px !important;
-    text-align: center !important;
-    width: 100% !important;
-    padding-bottom: 12px !important;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
-  }
-
-  .sidebar-counter-row .quiz-counter {
-    font-size: 15px !important;
-    font-weight: 700 !important;
-    color: var(--text) !important;
-    font-family: 'Outfit', sans-serif !important;
-  }
-
-  .sidebar-counter-row .quiz-timer {
-    margin-left: 0 !important;
-    font-size: 16px !important;
-    font-weight: 700 !important;
-    color: var(--warning) !important;
-    background: rgba(245, 158, 11, 0.1) !important;
-    padding: 4px 12px !important;
-    border-radius: 8px !important;
-    display: inline-block !important;
-  }
-
-  .sidebar-flag-btn {
-    width: 100% !important;
-    justify-content: center !important;
-    padding: 12px !important;
-    font-size: 13.5px !important;
-    font-weight: 600 !important;
-    border-radius: 12px !important;
-  }
+.quiz-layout {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 24px;
+  align-items: start;
 }
 
-/* --- BOTÓN DE MARCAR RESPUESTAS & EFECTO HIGHLIGHTED (Escritorio) --- */
-@media (min-width: 681px) {
-  .btn-marcar-respuesta {
-    background: rgba(255, 255, 255, 0.03) !important;
-    border: 1px solid var(--border) !important;
-    color: var(--text-dim) !important;
-    border-radius: 8px !important;
-    width: 36px !important;
-    height: 44px !important;
-    font-size: 14px !important;
-    cursor: pointer !important;
-    transition: all 0.2s !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-  }
+.quiz-main-column {
+  min-width: 0;
+}
 
-  .btn-marcar-respuesta:hover {
-    background: rgba(245, 158, 11, 0.12) !important;
-    border-color: var(--warning) !important;
-    color: var(--warning) !important;
-  }
+.quiz-side-column {
+  position: sticky;
+  top: 24px;
+}
 
-  .btn-marcar-respuesta.active {
-    background: rgba(245, 158, 11, 0.2) !important;
-    border-color: var(--warning) !important;
-    color: #fff !important;
-    box-shadow: 0 0 8px rgba(245, 158, 11, 0.3) !important;
-  }
+.sidebar-unified-card-v2 {
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 24px !important;
+  padding: 24px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 16px !important;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.04) !important;
+}
 
-  /* Efecto destacado premium para la opción marcada */
-  .option-btn.marked-option {
-    border-color: var(--warning) !important;
-    background: rgba(245, 158, 11, 0.06) !important;
-    box-shadow: 0 0 12px rgba(245, 158, 11, 0.15) !important;
-    color: var(--text) !important;
-  }
+.sidebar-counter-row {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 8px !important;
+  text-align: center !important;
+  width: 100% !important;
+  padding-bottom: 16px !important;
+  border-bottom: 1px solid var(--border) !important;
+}
+
+.sidebar-counter-row .quiz-counter {
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  color: var(--text) !important;
+  font-family: 'Outfit', sans-serif !important;
+}
+
+.sidebar-counter-row .quiz-timer {
+  margin-left: 0 !important;
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  color: var(--warning) !important;
+  background: var(--warning-soft) !important;
+  padding: 6px 14px !important;
+  border-radius: 10px !important;
+  display: inline-block !important;
+  border: 1px solid rgba(202, 138, 4, 0.2) !important;
+}
+
+.sidebar-flag-btn {
+  width: 100% !important;
+  justify-content: center !important;
+  padding: 12px !important;
+  font-size: 13.5px !important;
+  font-weight: 600 !important;
+  border-radius: 12px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+.btn-marcar-respuesta {
+  background: #ffffff !important;
+  border: 1px solid var(--border) !important;
+  color: var(--text-dim) !important;
+  border-radius: 8px !important;
+  width: 36px !important;
+  height: 44px !important;
+  font-size: 13px !important;
+  font-weight: bold !important;
+  cursor: pointer !important;
+  transition: all 0.2s !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.btn-marcar-respuesta:hover {
+  background: var(--warning-soft) !important;
+  border-color: var(--warning) !important;
+  color: var(--warning) !important;
+}
+
+.btn-marcar-respuesta.active {
+  background: var(--warning) !important;
+  border-color: var(--warning) !important;
+  color: #000000 !important;
+}
+
+.option-btn.marked-option {
+  border-color: var(--warning) !important;
+  background: var(--warning-soft) !important;
+  box-shadow: 0 0 12px rgba(202, 138, 4, 0.15) !important;
+  color: var(--text) !important;
 }
 
 /* ==========================================================================
-   📱 3. ANULACIÓN DE CAMBIOS EN LA VERSIÓN MÓVIL (100% ORIGINAL)
+   📱 3. ANULACIÓN DE CAMBIOS EN LA VERSIÓN MÓVIL
    ========================================================================== */
-@media (max-width: 680px) {
-  /* Restaurar cabecera original inline del quiz */
-  .quiz-shell {
-    position: static !important;
-    padding-left: 20px !important;
-    padding-right: 20px !important;
+@media (max-width: 768px) {
+  .quiz-layout {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  .quiz-side-column {
+    position: static;
   }
 
-  .quiz-header {
-    display: flex !important;
-    justify-content: space-between !important;
-    align-items: center !important;
-    margin-bottom: 24px !important;
-    width: 100% !important;
-  }
-
-  /* Desactivar caja y convertir a flex inline como en la versión original */
-  .sidebar-unified-card {
-    position: static !important;
-    width: auto !important;
-    background: transparent !important;
-    border: none !important;
-    padding: 0 !important;
-    display: flex !important;
+  .sidebar-unified-card-v2 {
     flex-direction: row !important;
     align-items: center !important;
-    gap: 10px !important;
-    box-shadow: none !important;
-    border-radius: 0 !important;
+    justify-content: space-between !important;
+    padding: 16px !important;
+    gap: 12px !important;
   }
 
   .sidebar-counter-row {
     display: flex !important;
-    flex-direction: row-reverse !important; /* Mantiene timer y contador inline */
+    flex-direction: row-reverse !important;
     align-items: center !important;
-    gap: 8px !important;
+    gap: 10px !important;
     border-bottom: none !important;
     padding-bottom: 0 !important;
     width: auto !important;
@@ -2164,36 +2154,14 @@ select.input option {
 
   .sidebar-counter-row .quiz-timer {
     font-size: 14px !important;
-    font-weight: 700 !important;
-    color: var(--warning) !important;
-    background: rgba(245, 158, 11, 0.1) !important;
     padding: 4px 10px !important;
     border-radius: 8px !important;
-    margin-left: 10px !important;
-    display: inline-block !important;
   }
 
   .sidebar-flag-btn {
     width: auto !important;
     padding: 6px 12px !important;
     font-size: 12px !important;
-    font-weight: 600 !important;
-    border-radius: 8px !important;
-    background: rgba(255, 255, 255, 0.03) !important;
-    border: 1px solid var(--border) !important;
-    color: var(--text-soft) !important;
-  }
-
-  /* Ocultar completamente los pinceles de marcado de respuestas en celulares */
-  .btn-marcar-respuesta {
-    display: none !important;
-  }
-
-  /* Asegurar que las opciones no tengan estilos de marcado en la versión móvil */
-  .option-btn.marked-option {
-    border-color: var(--border) !important;
-    background: rgba(255, 255, 255, 0.02) !important;
-    box-shadow: none !important;
   }
 }
 

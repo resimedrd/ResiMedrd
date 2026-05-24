@@ -123,7 +123,7 @@ const quiz = {
 
       if (chipModo) {
         if (modo === "guardia") {
-          chipModo.textContent = "🚨 MODO GUARDIA";
+          chipModo.textContent = "MODO GUARDIA";
           chipModo.className = "chip chip-primary";
           chipModo.style.background = "linear-gradient(135deg, var(--danger) 0%, #b91c1c 100%)";
         } else {
@@ -223,7 +223,7 @@ const quiz = {
 
       if (tiempoPorPreguntaRestante <= 0) {
         clearInterval(guardiaTimerInterval);
-        alert("⏱️ ¡Tiempo de guardia agotado en esta pregunta!");
+        alert("¡Tiempo de guardia agotado en esta pregunta!");
         // Marcar como no respondida y saltar
         state.respuestasUsuario[state.indiceActual] = -1; 
         quiz.siguientePregunta();
@@ -234,7 +234,7 @@ const quiz = {
   actualizarRelojGuardiaVisual() {
     const temporizadorEl = document.getElementById("temporizador");
     if (temporizadorEl) {
-      temporizadorEl.textContent = `🚨 ${tiempoPorPreguntaRestante}s`;
+      temporizadorEl.textContent = `${tiempoPorPreguntaRestante}s`;
       if (tiempoPorPreguntaRestante <= 10) {
         temporizadorEl.style.color = "var(--danger)";
         temporizadorEl.style.fontWeight = "bold";
@@ -307,7 +307,7 @@ const quiz = {
       const btnMarcar = document.createElement("button");
       btnMarcar.className = "btn-marcar-respuesta";
       btnMarcar.type = "button";
-      btnMarcar.innerHTML = "🖍️";
+      btnMarcar.innerHTML = "H";
       btnMarcar.title = "Marcar esta opción";
 
       btnMarcar.addEventListener("click", (e) => {
@@ -417,7 +417,6 @@ const quiz = {
       
       let contenidoBtn = `${idx + 1}`;
       if (state.preguntasMarcadas[idx]) {
-        contenidoBtn += " 🚩";
         btn.classList.add("flagged");
       }
       btn.innerHTML = contenidoBtn;
@@ -448,10 +447,10 @@ const quiz = {
     if (!btnFlagPregunta) return;
     if (state.preguntasMarcadas[state.indiceActual]) {
       btnFlagPregunta.classList.add("active");
-      btnFlagPregunta.innerHTML = "🚩 Marcada";
+      btnFlagPregunta.innerHTML = "Marcada";
     } else {
       btnFlagPregunta.classList.remove("active");
-      btnFlagPregunta.innerHTML = "🏳️ Marcar";
+      btnFlagPregunta.innerHTML = "Marcar pregunta";
     }
   },
 
@@ -463,10 +462,10 @@ const quiz = {
     if (feedbackBox) feedbackBox.classList.remove("hidden");
     if (feedbackEstado) {
       if (esCorrecto) {
-        feedbackEstado.textContent = "✓ RESPUESTA ACERTADA";
+        feedbackEstado.textContent = "RESPUESTA ACERTADA";
         feedbackEstado.className = "feedback-estado correct";
       } else {
-        feedbackEstado.textContent = "✗ RESPUESTA INCORRECTA";
+        feedbackEstado.textContent = "RESPUESTA INCORRECTA";
         feedbackEstado.className = "feedback-estado wrong";
       }
     }
@@ -476,7 +475,7 @@ const quiz = {
       feedbackExplicacion.innerHTML = `
         ${ui.formatearExplicacionClinica(explicacion, fuente)}
         <div style="display: flex; justify-content: flex-end; margin-top: 8px;">
-          <button class="btn btn-reportar-pregunta" data-id="${preguntaActual ? preguntaActual.id : ''}" style="margin: 0;" type="button">⚠️ Reportar Error en Pregunta</button>
+          <button class="btn btn-reportar-pregunta" data-id="${preguntaActual ? preguntaActual.id : ''}" style="margin: 0;" type="button">Reportar Error en Pregunta</button>
         </div>
       `;
     }
@@ -540,7 +539,7 @@ const quiz = {
         localStorage.setItem("resiMed_session", JSON.stringify(state.usuarioConectado));
         
         // Notificación de gamificación
-        alert(`🏆 ¡Examen finalizado! Ganaste +${datosFinal.xpGanado} XP. Nivel actual: ${state.usuarioConectado.nivel}`);
+        alert(`¡Examen finalizado! Ganaste +${datosFinal.xpGanado} XP. Nivel actual: ${state.usuarioConectado.nivel}`);
       }
     } catch (err) {
       console.error("Error al guardar la sesión de estudio: " + err.message);
@@ -578,13 +577,13 @@ const quiz = {
             ? opcionesArray[seleccion].replace(/"/g, "&quot;") 
             : "Sin responder";
           botonesAccionHtml += `
-            <button class="btn-ia btn-consultar-tutor" data-texto="${textoEscapado}" data-seleccion="${seleccionText}" type="button">🧠 Consultar Tutor IA</button>
-            <button class="btn btn-primary btn-auto-flashcard" data-tema="${temaEscapado}" data-pregunta="${textoEscapado}" data-respuesta="${explicacionEscapada}" style="background: var(--warning); color:#000; font-size:12px; padding:6px 12px; border:none;" type="button">⚡ Crear Flashcard</button>
+            <button class="btn-ia btn-consultar-tutor" data-texto="${textoEscapado}" data-seleccion="${seleccionText}" type="button">Consultar Tutor IA</button>
+            <button class="btn btn-primary btn-auto-flashcard" data-tema="${temaEscapado}" data-pregunta="${textoEscapado}" data-respuesta="${explicacionEscapada}" style="background: var(--warning); color:#000; font-size:12px; padding:6px 12px; border:none;" type="button">Crear Flashcard</button>
           `;
         }
         
         botonesAccionHtml += `
-          <button class="btn btn-reportar-pregunta" data-id="${p.id}" type="button">⚠️ Reportar Error</button>
+          <button class="btn btn-reportar-pregunta" data-id="${p.id}" type="button">Reportar Error</button>
         </div>`;
 
         const div = document.createElement("div");
@@ -594,7 +593,7 @@ const quiz = {
         let badgeMarcadaHtml = "";
         if (esMarcada) {
           div.classList.add("review-flagged");
-          badgeMarcadaHtml = `<span class="flagged-review-chip">🚩 PREGUNTA MARCADA</span>`;
+          badgeMarcadaHtml = `<span class="flagged-review-chip">PREGUNTA MARCADA</span>`;
         }
         if (seleccion !== p.correcta) {
           div.classList.add("review-wrong");

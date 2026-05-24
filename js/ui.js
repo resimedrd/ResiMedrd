@@ -67,8 +67,8 @@ const ui = {
     const porcentajeXp = Math.round((xpProgreso / xpNivelSiguiente) * 100);
 
     gamificationEl.innerHTML = `
-      <span class="chip chip-soft" style="font-size: 11px; padding: 2px 8px; border-color: var(--warning); color: var(--warning);">⭐ Nivel ${user.nivel || 1}</span>
-      <span class="chip chip-soft" style="font-size: 11px; padding: 2px 8px; border-color: #ef4444; color: #ef4444; font-weight: bold;">🔥 ${user.streak || 0} Días de Racha</span>
+      <span class="chip chip-soft" style="font-size: 11px; padding: 2px 8px; border-color: var(--warning); color: var(--warning);">Nivel ${user.nivel || 1}</span>
+      <span class="chip chip-soft" style="font-size: 11px; padding: 2px 8px; border-color: #ef4444; color: #ef4444; font-weight: bold;">${user.streak || 0} Días de Racha</span>
       <div style="display: flex; align-items: center; gap: 6px;">
         <span style="font-size: 10px; color: var(--text-dim); font-weight: 500;">XP: ${xpProgreso}/1000</span>
         <div style="width: 80px; height: 5px; background: rgba(255,255,255,0.06); border-radius: 10px; overflow: hidden;">
@@ -193,7 +193,6 @@ const ui = {
         if (subtemasOrdenados.length === 0) {
           listaTemasEl.innerHTML = `
             <div style="background: rgba(34, 197, 94, 0.04); border: 1px solid rgba(34,197,94,0.15); padding: 12px; border-radius: 12px; font-size:12.5px; color: var(--success); display:flex; align-items:center; gap:8px;">
-              <span>🏆</span>
               <strong>¡Excelente rendimiento! No tienes fallas registradas en esta materia.</strong>
             </div>
           `;
@@ -386,7 +385,7 @@ const ui = {
         item.innerHTML = `
           <div class="history-info">
             <h4>${s.tema === "Todos" ? "Examen General" : s.tema}</h4>
-            <p>${s.modo === "estudio" ? "📘 Estudio" : s.modo === "guardia" ? "🚨 Guardia" : "⏱️ Simulacro"} • ${s.cantidad_preguntas} q. • 👁️ Revisar</p>
+            <p>${s.modo === "estudio" ? "Estudio" : s.modo === "guardia" ? "Guardia" : "Simulacro"} • ${s.cantidad_preguntas} q. • Revisar</p>
           </div>
           <div class="history-badge ${clase}">${s.porcentaje}%</div>
         `;
@@ -447,13 +446,13 @@ const ui = {
               ? opcionesArray[seleccion].replace(/"/g, "&quot;") 
               : "Sin responder";
             botonesAccionHtml += `
-              <button class="btn-ia btn-consultar-tutor" data-texto="${textoEscapado}" data-seleccion="${seleccionText}" type="button">🧠 Consultar Tutor IA</button>
-              <button class="btn btn-primary btn-auto-flashcard" data-tema="${temaEscapado}" data-pregunta="${textoEscapado}" data-respuesta="${explicacionEscapada}" style="background: var(--warning); color:#000; font-size:12px; padding:6px 12px; border:none;" type="button">⚡ Crear Flashcard</button>
+              <button class="btn-ia btn-consultar-tutor" data-texto="${textoEscapado}" data-seleccion="${seleccionText}" type="button">Consultar Tutor IA</button>
+              <button class="btn btn-primary btn-auto-flashcard" data-tema="${temaEscapado}" data-pregunta="${textoEscapado}" data-respuesta="${explicacionEscapada}" style="background: var(--warning); color:#000; font-size:12px; padding:6px 12px; border:none;" type="button">Crear Flashcard</button>
             `;
           }
           
           botonesAccionHtml += `
-            <button class="btn btn-reportar-pregunta" data-id="${p.id}" type="button">⚠️ Reportar Error</button>
+            <button class="btn btn-reportar-pregunta" data-id="${p.id}" type="button">Reportar Error</button>
           </div>`;
 
           const div = document.createElement("div");
@@ -462,7 +461,7 @@ const ui = {
           let badgeMarcadaHtml = "";
           if (p.marcada) {
             div.classList.add("review-flagged");
-            badgeMarcadaHtml = `<span class="flagged-review-chip">🚩 PREGUNTA MARCADA</span>`;
+            badgeMarcadaHtml = `<span class="flagged-review-chip">PREGUNTA MARCADA</span>`;
           }
           if (seleccion !== p.correcta) {
             div.classList.add("review-wrong");
@@ -711,7 +710,7 @@ const ui = {
       const esEstudio = sesion.modo === "estudio";
       const esGuardia = sesion.modo === "guardia";
       const claseModo = esEstudio ? "chip-primary" : esGuardia ? "chip-primary" : "chip-soft";
-      const modoText = esEstudio ? "📘 Estudio" : esGuardia ? "🚨 Guardia" : "⏱️ Simulacro";
+      const modoText = esEstudio ? "Estudio" : esGuardia ? "Guardia" : "Simulacro";
 
       const fila = document.createElement("tr");
       fila.className = "tr-history-row";
@@ -726,7 +725,7 @@ const ui = {
         <td class="td-score">${sesion.correctas} / ${sesion.cantidad_preguntas}</td>
         <td class="td-percentage" style="color: ${colorNota};">${sesion.porcentaje}%</td>
         <td class="td-action">
-          <button class="btn btn-ghost btn-revisar-sesion btn-revisar-sesion-custom">👁️ Revisar</button>
+          <button class="btn btn-ghost btn-revisar-sesion btn-revisar-sesion-custom">Revisar</button>
         </td>
       `;
       
@@ -841,9 +840,9 @@ const ui = {
         <div class="review-options">${opcionesHtml}</div>
         <div class="review-exp-container">${ui.formatearExplicacionClinica(p.explicacion, p.fuente)}</div>
         <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top: 10px;">
-          <button class="btn-ia btn-consultar-tutor" data-texto="${textoEscapado}" data-seleccion="${seleccionText}" type="button">🧠 Consultar Tutor IA</button>
-          <button class="btn btn-primary btn-auto-flashcard" data-tema="${temaEscapado}" data-pregunta="${textoEscapado}" data-respuesta="${explicacionEscapada}" style="background: var(--warning); color:#000; font-size:12px; padding:6px 12px; border:none;" type="button">⚡ Crear Flashcard</button>
-          <button class="btn btn-reportar-pregunta" data-id="${p.id}" type="button">⚠️ Reportar Error</button>
+          <button class="btn-ia btn-consultar-tutor" data-texto="${textoEscapado}" data-seleccion="${seleccionText}" type="button">Consultar Tutor IA</button>
+          <button class="btn btn-primary btn-auto-flashcard" data-tema="${temaEscapado}" data-pregunta="${textoEscapado}" data-respuesta="${explicacionEscapada}" style="background: var(--warning); color:#000; font-size:12px; padding:6px 12px; border:none;" type="button">Crear Flashcard</button>
+          <button class="btn btn-reportar-pregunta" data-id="${p.id}" type="button">Reportar Error</button>
         </div>
       `;
       listaEl.appendChild(div);
@@ -918,7 +917,7 @@ const ui = {
       div.className = "review-item";
       div.innerHTML = `
         <div class="error-bank-header">
-          <span class="chip chip-soft flagged-chip">🚩 Dudosa</span>
+          <span class="chip chip-soft flagged-chip">Dudosa</span>
           <span class="chip chip-soft error-bank-chip">Materia: ${p.tema || "General"}</span>
           <span class="chip chip-soft" style="font-size:11px;">Subtema: ${p.subtema || "Varios"}</span>
         </div>
@@ -926,9 +925,9 @@ const ui = {
         <div class="review-options">${opcionesHtml}</div>
         <div class="review-exp-container">${ui.formatearExplicacionClinica(p.explicacion, p.fuente)}</div>
         <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top: 10px;">
-          <button class="btn-ia btn-consultar-tutor" data-texto="${textoEscapado}" data-seleccion="${seleccionText}" type="button">🧠 Consultar Tutor IA</button>
-          <button class="btn btn-primary btn-auto-flashcard" data-tema="${temaEscapado}" data-pregunta="${textoEscapado}" data-respuesta="${explicacionEscapada}" style="background: var(--warning); color:#000; font-size:12px; padding:6px 12px; border:none;" type="button">⚡ Crear Flashcard</button>
-          <button class="btn btn-reportar-pregunta" data-id="${p.id}" type="button">⚠️ Reportar Error</button>
+          <button class="btn-ia btn-consultar-tutor" data-texto="${textoEscapado}" data-seleccion="${seleccionText}" type="button">Consultar Tutor IA</button>
+          <button class="btn btn-primary btn-auto-flashcard" data-tema="${temaEscapado}" data-pregunta="${textoEscapado}" data-respuesta="${explicacionEscapada}" style="background: var(--warning); color:#000; font-size:12px; padding:6px 12px; border:none;" type="button">Crear Flashcard</button>
+          <button class="btn btn-reportar-pregunta" data-id="${p.id}" type="button">Reportar Error</button>
         </div>
       `;
       listaEl.appendChild(div);
@@ -982,7 +981,7 @@ const ui = {
         if (r.leido === 0) {
           botonResolucionHtml = `
             <div class="report-card-actions" style="display: flex; gap: 8px; justify-content: flex-end;">
-              <button class="btn-corregir-pregunta-admin" type="button" style="background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.2); color: var(--warning); font-size: 11.5px; font-weight: 600; padding: 5px 10px; border-radius: 8px; cursor: pointer; transition: all 0.2s ease;">✏️ Corregir Pregunta</button>
+              <button class="btn-corregir-pregunta-admin" type="button" style="background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.2); color: var(--warning); font-size: 11.5px; font-weight: 600; padding: 5px 10px; border-radius: 8px; cursor: pointer; transition: all 0.2s ease;">Corregir Pregunta</button>
               <button class="btn-resolver-reporte" data-id="${r.id}" type="button">✓ Marcar como Resuelto</button>
             </div>
           `;
@@ -1185,13 +1184,11 @@ const ui = {
 
     const fuenteHtml = fuente ? `
       <div class="clinical-source-box">
-        <span class="clinical-source-icon">📚</span>
         <span class="clinical-source-label">Fuente oficial:</span>
         <span class="clinical-source-text">${fuente}</span>
       </div>
     ` : `
       <div class="clinical-source-box">
-        <span class="clinical-source-icon">📚</span>
         <span class="clinical-source-label">Fuente oficial:</span>
         <span class="clinical-source-text">ENURM Referencia Académica Oficial</span>
       </div>
@@ -1203,7 +1200,6 @@ const ui = {
       html += `
         <div class="clinical-box clinical-box-justification">
           <div class="clinical-box-header">
-            <span class="clinical-box-icon">🔬</span>
             <span class="clinical-box-title">JUSTIFICACIÓN (Respuesta Correcta)</span>
           </div>
           <div class="clinical-box-content">${justificacion}</div>
@@ -1215,7 +1211,6 @@ const ui = {
       html += `
         <div class="clinical-box clinical-box-discard">
           <div class="clinical-box-header">
-            <span class="clinical-box-icon">🚫</span>
             <span class="clinical-box-title">EXPLICACIÓN DE OPCIONES INCORRECTAS</span>
           </div>
           <div class="clinical-box-content">${descarte}</div>

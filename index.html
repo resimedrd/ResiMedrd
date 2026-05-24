@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="styles.css?v=1.1.0" />
 </head>
 <body>
   <div class="app-bg"></div>
@@ -23,7 +23,7 @@
       </div>
       <div class="topbar-actions">
         <button id="btn-ir-inicio" class="btn btn-ghost hidden" type="button">Inicio</button>
-        <button id="btn-ver-perfil" class="btn btn-ghost hidden" type="button">👤 Mi Perfil</button>
+        <button id="btn-ver-perfil" class="btn btn-ghost hidden" type="button">Mi Perfil</button>
         <button id="btn-cerrar-sesion" class="btn btn-ghost hidden" style="border-color: var(--danger); color: var(--danger);" type="button">Cerrar Sesión</button>
       </div>
     </header>
@@ -80,7 +80,7 @@
               <span class="badge">Separación de Roles</span>
             </div>
             <button id="btn-ir-flashcards" class="btn btn-primary" style="background: linear-gradient(135deg, var(--warning) 0%, #d97706 100%); color: #000; font-weight: bold; border: none; box-shadow: 0 4px 14px rgba(245, 158, 11, 0.35); gap: 8px;" type="button">
-              ⚡ Estudiar Flashcards ENURM
+              Estudiar Flashcards ENURM
             </button>
           </div>
           <div class="hero-stats">
@@ -263,41 +263,50 @@
       </section>
 
       <section id="pantalla-quiz" class="screen">
-        <article class="quiz-shell">
-          <div class="quiz-header">
-            <div>
-              <span id="chip-modo" class="chip chip-primary">Modo</span>
-              <span id="chip-tema" class="chip chip-soft">Tema</span>
-            </div>
-            <!-- Cuadro unificado de avance y marcado (Fase 2 - Sidebar en Desktop, Cabecera en Móvil) -->
-            <div class="sidebar-unified-card">
+        <div class="quiz-layout">
+          <!-- Columna Principal: Enunciado y Opciones -->
+          <div class="quiz-main-column">
+            <article class="quiz-shell" style="padding: 32px !important;">
+              <div class="quiz-header" style="margin-bottom: 20px;">
+                <div>
+                  <span id="chip-modo" class="chip chip-primary">Modo</span>
+                  <span id="chip-tema" class="chip chip-soft">Tema</span>
+                </div>
+              </div>
+              <div class="progress-wrap" style="margin-bottom: 24px;">
+                <div class="progress-track"><div id="progress-fill" class="progress-fill"></div></div>
+              </div>
+              <div class="question-card">
+                <h3 id="pregunta-texto" class="question-text">Cargando caso clínico...</h3>
+                <div id="opciones-container" class="options-grid"></div>
+              </div>
+              <div id="feedback-box" class="feedback-box hidden">
+                <div id="feedback-estado" class="feedback-estado"></div>
+                <p id="feedback-explicacion" class="feedback-explicacion"></p>
+              </div>
+              <div class="quiz-actions" style="margin-top: 24px;">
+                <button id="btn-siguiente" class="btn btn-primary hidden" type="button">Siguiente Pregunta</button>
+                <button id="btn-finalizar" class="btn btn-secondary hidden" type="button">Terminar</button>
+              </div>
+            </article>
+          </div>
+
+          <!-- Columna Lateral: Estado y Mapa del Examen -->
+          <aside class="quiz-side-column">
+            <div class="sidebar-unified-card-v2">
               <div class="sidebar-counter-row">
                 <span id="contador-pregunta" class="quiz-counter">Pregunta -- de --</span>
                 <span id="temporizador" class="quiz-timer hidden">00:00</span>
               </div>
-              <button id="btn-flag-pregunta" class="btn-flag sidebar-flag-btn" type="button">🏳️ Marcar</button>
+              <button id="btn-flag-pregunta" class="btn-flag sidebar-flag-btn" type="button">Marcar pregunta</button>
+              
+              <div id="simulacro-navigation-map" class="hidden" style="margin-top: 8px; width: 100%;">
+                <p style="font-size: 11px; color: var(--text-dim); margin-bottom: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Mapa del Examen</p>
+                <div id="grid-preguntas-container"></div>
+              </div>
             </div>
-          </div>
-          <div class="progress-wrap">
-            <div class="progress-track"><div id="progress-fill" class="progress-fill"></div></div>
-          </div>
-          <div id="simulacro-navigation-map" class="hidden" style="background: var(--bg-card); border: 1px solid var(--border); padding: 15px; border-radius: 12px; margin-bottom: 20px;">
-            <p style="font-size: 13px; color: var(--text-dim); margin-bottom: 10px; font-weight: 500;">Mapa del Examen (Haz clic para saltar a una pregunta):</p>
-            <div id="grid-preguntas-container" style="display: flex; flex-wrap: wrap; gap: 8px;"></div>
-          </div>
-          <div class="question-card">
-            <h3 id="pregunta-texto" class="question-text">Cargando caso clínico...</h3>
-            <div id="opciones-container" class="options-grid"></div>
-          </div>
-          <div id="feedback-box" class="feedback-box hidden">
-            <div id="feedback-estado" class="feedback-estado"></div>
-            <p id="feedback-explicacion" class="feedback-explicacion"></p>
-          </div>
-          <div class="quiz-actions">
-            <button id="btn-siguiente" class="btn btn-primary hidden" type="button">Siguiente Pregunta</button>
-            <button id="btn-finalizar" class="btn btn-secondary hidden" type="button">Terminar</button>
-          </div>
-        </article>
+          </aside>
+        </div>
       </section>
 
       <section id="pantalla-resultados" class="screen">
@@ -318,8 +327,8 @@
           <!-- Filtros de revisión interactiva (Fase 4) -->
           <div class="review-filters" style="display: flex; gap: 8px; margin-bottom: 20px;">
             <button id="btn-filtro-revision-todas" class="btn btn-ghost active" style="min-width: auto; padding: 10px 18px; font-size: 13px; font-weight: 600;" type="button">Todas las preguntas</button>
-            <button id="btn-filtro-revision-marcadas" class="btn btn-ghost" style="min-width: auto; padding: 10px 18px; font-size: 13px; font-weight: 600; border-color: rgba(239, 68, 68, 0.2); color: var(--danger);" type="button">🚩 Marcadas</button>
-            <button id="btn-filtro-revision-erradas" class="btn btn-ghost" style="min-width: auto; padding: 10px 18px; font-size: 13px; font-weight: 600; border-color: rgba(239, 68, 68, 0.2); color: var(--danger);" type="button">❌ Incorrectas</button>
+            <button id="btn-filtro-revision-marcadas" class="btn btn-ghost" style="min-width: auto; padding: 10px 18px; font-size: 13px; font-weight: 600; border-color: rgba(239, 68, 68, 0.2); color: var(--danger);" type="button">Marcadas</button>
+            <button id="btn-filtro-revision-erradas" class="btn btn-ghost" style="min-width: auto; padding: 10px 18px; font-size: 13px; font-weight: 600; border-color: rgba(239, 68, 68, 0.2); color: var(--danger);" type="button">Incorrectas</button>
           </div>
 
           <div id="revision-container" class="review-list"></div>
@@ -816,14 +825,14 @@
     </div>
   </div>
 
-  <script src="js/state.js?v=1.0.2"></script>
-  <script src="js/api.js?v=1.0.2"></script>
-  <script src="js/spaced_repetition.js?v=1.0.2"></script>
-  <script src="js/analytics.js?v=1.0.2"></script>
-  <script src="js/ui.js?v=1.0.2"></script>
-  <script src="js/auth.js?v=1.0.2"></script>
-  <script src="js/quiz.js?v=1.0.2"></script>
-  <script src="js/flashcards.js?v=1.0.2"></script>
-  <script src="js/main.js?v=1.0.2"></script>
+  <script src="js/state.js?v=1.1.0"></script>
+  <script src="js/api.js?v=1.1.0"></script>
+  <script src="js/spaced_repetition.js?v=1.1.0"></script>
+  <script src="js/analytics.js?v=1.1.0"></script>
+  <script src="js/ui.js?v=1.1.0"></script>
+  <script src="js/auth.js?v=1.1.0"></script>
+  <script src="js/quiz.js?v=1.1.0"></script>
+  <script src="js/flashcards.js?v=1.1.0"></script>
+  <script src="js/main.js?v=1.1.0"></script>
 </body>
 </html>
