@@ -184,8 +184,13 @@ const quiz = {
       } else {
         // Modo estudio
         state.duracionTotalSegundos = 0;
+        if (temporizadorEl) {
+          temporizadorEl.classList.remove("hidden");
+          quiz.actualizarRelojEstudioVisual();
+        }
         state.intervaloTemporizador = setInterval(() => {
           state.duracionTotalSegundos++;
+          quiz.actualizarRelojEstudioVisual();
         }, 1000);
       }
 
@@ -271,6 +276,15 @@ const quiz = {
     }
   },
 
+  actualizarRelojEstudioVisual() {
+    const temporizadorEl = document.getElementById("temporizador");
+    if (temporizadorEl) {
+      const min = Math.floor(state.duracionTotalSegundos / 60);
+      const seg = state.duracionTotalSegundos % 60;
+      temporizadorEl.textContent = `${min.toString().padStart(2, "0")}:${seg.toString().padStart(2, "0")}`;
+    }
+  },
+
   renderizarPreguntaActual() {
     quiz.ocultarFeedback();
     const btnSiguiente = document.getElementById("btn-siguiente");
@@ -317,15 +331,15 @@ const quiz = {
       boton.className = "option-btn";
       boton.type = "button";
       boton.style.flex = "1";
-      boton.innerHTML = `<strong>${String.fromCharCode(65 + index)}.</strong> ${opcion}`;
+      boton.innerHTML = `<span class="option-letter">${String.fromCharCode(65 + index)}</span><span class="option-text-content">${opcion}</span>`;
       
       if (state.respuestasUsuario[state.indiceActual] === index) boton.classList.add("selected");
 
       const btnMarcar = document.createElement("button");
       btnMarcar.className = "btn-marcar-respuesta";
       btnMarcar.type = "button";
-      btnMarcar.innerHTML = "H";
-      btnMarcar.title = "Marcar esta opción";
+      btnMarcar.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="icon-marcar"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>`;
+      btnMarcar.title = "Tachar o descartar esta opción";
 
       btnMarcar.addEventListener("click", (e) => {
         e.stopPropagation();

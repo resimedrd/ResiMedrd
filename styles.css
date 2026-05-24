@@ -453,18 +453,18 @@ select.input option {
 /* QUIZ */
 .quiz-shell, .results-shell {
   max-width: 840px;
-  margin: 0 auto;
+  margin: 0 auto 48px auto;
   background: var(--panel);
   border: 1px solid var(--border);
   border-radius: 36px;
-  padding: 40px;
+  padding: 40px 40px 48px 40px !important;
 }
 
 .quiz-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
+  margin-bottom: 32px !important;
 }
 
 .chip {
@@ -502,7 +502,7 @@ select.input option {
 }
 
 .progress-wrap {
-  margin-bottom: 36px;
+  margin-bottom: 36px !important;
 }
 
 .progress-track {
@@ -525,13 +525,14 @@ select.input option {
 }
 
 .question-text {
-  font-size: 23px;
+  font-size: 25px;
   font-weight: 700;
   line-height: 1.6;
   margin-top: 6px;
   margin-bottom: 28px;
   letter-spacing: -0.3px;
   color: var(--text) !important;
+  padding: 0 16px;
 }
 
 .options-grid {
@@ -547,28 +548,47 @@ select.input option {
   border-radius: 16px;
   text-align: left;
   color: var(--text-soft) !important;
-  font-size: 17.5px;
-  font-weight: 600;
+  font-size: 17px;
+  font-weight: 500;
   cursor: pointer;
   outline: none;
-  transition: all 0.2s;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   line-height: 1.5;
   display: flex;
   align-items: flex-start;
-  gap: 12px;
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+  gap: 8px;
+  box-shadow: 0 2px 4px rgba(15, 23, 42, 0.02);
+}
+
+.option-letter {
+  font-weight: 800;
+  color: var(--primary);
+  margin-right: 14px;
+  display: inline-block;
+  min-width: 20px;
+  user-select: none;
+  font-size: 17.5px;
+}
+
+.option-text-content {
+  flex: 1;
+  font-weight: 600;
 }
 
 .option-btn:hover:not(:disabled) {
-  background: var(--primary-soft) !important;
-  border-color: var(--primary) !important;
-  color: var(--primary) !important;
+  background: rgba(10, 102, 194, 0.05) !important;
+  border-color: #0A66C2 !important;
+  color: var(--text) !important;
+  box-shadow: 0 6px 16px rgba(10, 102, 194, 0.1) !important;
+  transform: translateY(-1.5px);
 }
 
 .option-btn.selected {
-  background: var(--primary-soft) !important;
-  border-color: var(--primary) !important;
+  background: rgba(10, 102, 194, 0.08) !important;
+  border-color: #0A66C2 !important;
+  border-width: 2px !important;
   color: var(--text) !important;
+  box-shadow: 0 6px 20px rgba(10, 102, 194, 0.16) !important;
 }
 
 .option-btn.correct {
@@ -1284,19 +1304,18 @@ select.input option {
 
 /* 1. Mapa de Navegación del Examen */
 .nav-map-btn {
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--bg-card);
   border: 1px solid var(--border);
-  color: var(--text-soft);
-  border-radius: 8px;
-  min-width: 36px;
-  height: 36px;
-  font-size: 13px;
-  font-weight: 600;
+  color: var(--text);
+  border-radius: 6px;
+  min-width: 32px;
+  height: 32px;
+  font-size: 12px;
+  font-weight: 700;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
   transition: all 0.2s ease;
 }
 
@@ -1306,28 +1325,29 @@ select.input option {
 }
 
 .nav-map-btn.current {
-  background: var(--primary-soft) !important;
-  border: 2px solid var(--primary) !important;
-  color: #fff !important;
-  box-shadow: 0 0 8px rgba(79, 140, 255, 0.4);
+  background: #0A66C2 !important;
+  border: 2px solid #0A66C2 !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 10px rgba(10, 102, 194, 0.3) !important;
 }
 
 .nav-map-btn.answered {
-  background: var(--success-soft) !important;
-  border-color: var(--success) !important;
-  color: var(--success) !important;
+  background: rgba(34, 197, 94, 0.08) !important;
+  border: 1px solid #22c55e !important;
+  color: #15803d !important;
 }
 
 .nav-map-btn.pending {
-  background: rgba(255, 255, 255, 0.02);
-  color: var(--text-dim);
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border) !important;
+  color: var(--text-dim) !important;
 }
 
 .nav-map-btn.flagged {
   border: 2px solid var(--warning) !important;
-  background: var(--warning-soft) !important;
-  color: var(--warning) !important;
-  box-shadow: 0 0 8px rgba(202, 138, 4, 0.25) !important;
+  background: rgba(245, 158, 11, 0.08) !important;
+  color: #d97706 !important;
+  box-shadow: 0 4px 8px rgba(245, 158, 11, 0.15) !important;
 }
 
 /* 2. Sistema de Marcado de Preguntas (Flagging) */
@@ -2066,6 +2086,7 @@ select.input option {
   grid-template-columns: 1fr 280px;
   gap: 24px;
   align-items: start;
+  margin-bottom: 48px;
 }
 
 .quiz-main-column {
@@ -2131,23 +2152,21 @@ select.input option {
 }
 
 .btn-marcar-respuesta {
-  background: #ffffff !important;
+  background: var(--bg-card) !important;
   border: 1px solid var(--border) !important;
   color: var(--text-dim) !important;
-  border-radius: 8px !important;
-  width: 36px !important;
+  border-radius: 12px !important;
+  width: 40px !important;
   height: 44px !important;
-  font-size: 13px !important;
-  font-weight: bold !important;
   cursor: pointer !important;
-  transition: all 0.2s !important;
+  transition: all 0.2s ease !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
 }
 
 .btn-marcar-respuesta:hover {
-  background: var(--warning-soft) !important;
+  background: rgba(245, 158, 11, 0.08) !important;
   border-color: var(--warning) !important;
   color: var(--warning) !important;
 }
@@ -2156,6 +2175,14 @@ select.input option {
   background: var(--warning) !important;
   border-color: var(--warning) !important;
   color: #000000 !important;
+}
+
+.icon-marcar {
+  transition: transform 0.2s ease;
+}
+
+.btn-marcar-respuesta:hover .icon-marcar {
+  transform: scale(1.1);
 }
 
 .option-btn.marked-option {
