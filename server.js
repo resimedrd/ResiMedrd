@@ -1396,14 +1396,16 @@ app.post("/api/exam-setup", autenticarToken, async (req, res) => {
 
     let preguntas = [];
 
-    if (tipo === "especialidad") {
+    const esTodos = !valor || valor.trim().toLowerCase() === "todos";
+
+    if (tipo === "especialidad" && !esTodos) {
       preguntas = await db.all(
         `SELECT * FROM preguntas 
          WHERE (LOWER(TRIM(especialidad)) = LOWER(?) OR LOWER(TRIM(tema)) = LOWER(?)) 
          ORDER BY RANDOM() LIMIT ?`,
         [valor.trim(), valor.trim(), maxPreguntas]
       );
-    } else if (tipo === "ano") {
+    } else if (tipo === "ano" && !esTodos) {
       const anoNum = parseInt(valor);
       preguntas = await db.all(
         `SELECT * FROM preguntas 
