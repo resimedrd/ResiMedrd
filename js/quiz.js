@@ -478,8 +478,10 @@ const quiz = {
     if (feedbackExplicacion) {
       const preguntaActual = state.preguntasCargadas[state.indiceActual];
       const fuente = preguntaActual ? preguntaActual.fuente : null;
+      const expCorrecta = preguntaActual ? preguntaActual.explicacion_correcta : null;
+      const expIncorrecta = preguntaActual ? preguntaActual.explicacion_incorrecta : null;
       feedbackExplicacion.innerHTML = `
-        ${ui.formatearExplicacionClinica(explicacion, fuente)}
+        ${ui.formatearExplicacionClinica(explicacion, fuente, expCorrecta, expIncorrecta)}
         <div style="display: flex; justify-content: flex-end; margin-top: 8px;">
           <button class="btn btn-reportar-pregunta" data-id="${preguntaActual ? preguntaActual.id : ''}" style="margin: 0;" type="button">Reportar Error en Pregunta</button>
         </div>
@@ -504,6 +506,16 @@ const quiz = {
 
     const porcentaje = Math.round((aciertos / state.preguntasCargadas.length) * 100) || 0;
 
+    // Calcular y formatear duración total de la sesión
+    const minutos = Math.floor(state.duracionTotalSegundos / 60);
+    const segundos = state.duracionTotalSegundos % 60;
+    const duracionFormateada = `${minutos.toString().padStart(2, "0")}:${segundos.toString().padStart(2, "0")}`;
+    
+    const resultadoTiempoEl = document.getElementById("resultado-tiempo");
+    if (resultadoTiempoEl) {
+      resultadoTiempoEl.textContent = duracionFormateada;
+    }
+
     try {
       const detalleExamen = state.preguntasCargadas.map((p, i) => ({
         id: p.id,
@@ -516,7 +528,10 @@ const quiz = {
         tema: p.tema,
         subtema: p.subtema,
         microtema: p.microtema,
-        marcada: !!state.preguntasMarcadas[i]
+        marcada: !!state.preguntasMarcadas[i],
+        duracionTotalSegundos: state.duracionTotalSegundos,
+        explicacion_correcta: p.explicacion_correcta,
+        explicacion_incorrecta: p.explicacion_incorrecta
       }));
 
       // Sincronizar repetición espaciada de cada pregunta fallada o acertada en el examen
@@ -614,7 +629,7 @@ const quiz = {
           </div>
           <div class="review-q-text">${idx + 1}. ${p.texto}</div>
           <div class="review-options">${opcionesHtml}</div>
-          <div class="review-exp-container">${ui.formatearExplicacionClinica(p.explicacion, p.fuente)}</div>
+          <div class="review-exp-container">${ui.formatearExplicacionClinica(p.explicacion, p.fuente, p.explicacion_correcta, p.explicacion_incorrecta)}</div>
           ${botonesAccionHtml}
         `;
         revisionContainer.appendChild(div);

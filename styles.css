@@ -771,16 +771,17 @@ select.input option {
 }
 
 .review-opt.correct {
-  background: rgba(34, 197, 94, 0.08);
-  border-color: rgba(34, 197, 94, 0.3);
-  color: #22c55e;
+  background: var(--success-soft) !important;
+  border-color: var(--success) !important;
+  color: var(--success) !important;
   font-weight: 600;
 }
 
 .review-opt.wrong {
-  background: rgba(239, 68, 68, 0.08);
-  border-color: rgba(239, 68, 68, 0.3);
-  color: #ef4444;
+  background: var(--danger-soft) !important;
+  border-color: var(--danger) !important;
+  color: var(--danger) !important;
+  font-weight: 600;
 }
 
 .review-exp {

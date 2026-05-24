@@ -82,6 +82,24 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
+  const btnReiniciar = document.getElementById("btn-reiniciar");
+  if (btnReiniciar) {
+    btnReiniciar.addEventListener("click", () => {
+      const pantallaDestino = state.pantallaDeRetorno || "home";
+      ui.mostrarPantalla(pantallaDestino);
+      state.pantallaDeRetorno = null;
+      
+      const btnVerPerfil = document.getElementById("btn-ver-perfil");
+      if (btnVerPerfil) {
+        if (pantallaDestino === "home") {
+          btnVerPerfil.innerHTML = "👤 Mi Perfil";
+        } else {
+          btnVerPerfil.innerHTML = "🏠 Volver al Inicio";
+        }
+      }
+    });
+  }
+
   // Vincular click en el logo de ResiMed para volver al Inicio (Fase 3)
   const brandLogo = document.querySelector(".brand");
   if (brandLogo) {

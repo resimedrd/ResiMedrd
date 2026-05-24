@@ -420,6 +420,20 @@ const ui = {
       document.getElementById("resultado-porcentaje").textContent = `${sesion.porcentaje}%`;
       document.getElementById("resultado-tema").textContent = sesion.tema === "Todos" ? "Examen General" : sesion.tema;
 
+      // Recuperar y formatear la duración de la sesión
+      const segundosTotales = preguntas[0]?.duracionTotalSegundos || 0;
+      let duracionFormateada = "N/D";
+      if (segundosTotales > 0) {
+        const minutos = Math.floor(segundosTotales / 60);
+        const segundos = segundosTotales % 60;
+        duracionFormateada = `${minutos.toString().padStart(2, "0")}:${segundos.toString().padStart(2, "0")}`;
+      }
+      
+      const resultadoTiempoEl = document.getElementById("resultado-tiempo");
+      if (resultadoTiempoEl) {
+        resultadoTiempoEl.textContent = duracionFormateada;
+      }
+
       const revisionContainer = document.getElementById("revision-container");
       if (revisionContainer) {
         revisionContainer.innerHTML = "";
@@ -476,7 +490,7 @@ const ui = {
             </div>
             <div class="review-q-text">${idx + 1}. ${p.texto}</div>
             <div class="review-options">${opcionesHtml}</div>
-            <div class="review-exp-container">${ui.formatearExplicacionClinica(p.explicacion, p.fuente)}</div>
+            <div class="review-exp-container">${ui.formatearExplicacionClinica(p.explicacion, p.fuente, p.explicacion_correcta, p.explicacion_incorrecta)}</div>
             ${botonesAccionHtml}
           `;
           revisionContainer.appendChild(div);
@@ -787,6 +801,8 @@ const ui = {
                   correcta: p.correcta,
                   seleccionada: p.seleccionada,
                   explicacion: p.explicacion,
+                  explicacion_correcta: p.explicacion_correcta,
+                  explicacion_incorrecta: p.explicacion_incorrecta,
                   tema: p.tema || sesion.tema,
                   subtema: p.subtema || "Varios",
                   microtema: p.microtema || "Varios"
@@ -838,7 +854,7 @@ const ui = {
         </div>
         <div class="review-q-text error-bank-q-text">${idx}. ${p.texto}</div>
         <div class="review-options">${opcionesHtml}</div>
-        <div class="review-exp-container">${ui.formatearExplicacionClinica(p.explicacion, p.fuente)}</div>
+        <div class="review-exp-container">${ui.formatearExplicacionClinica(p.explicacion, p.fuente, p.explicacion_correcta, p.explicacion_incorrecta)}</div>
         <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top: 10px;">
           <button class="btn-ia btn-consultar-tutor" data-texto="${textoEscapado}" data-seleccion="${seleccionText}" type="button">Consultar Tutor IA</button>
           <button class="btn btn-primary btn-auto-flashcard" data-tema="${temaEscapado}" data-pregunta="${textoEscapado}" data-respuesta="${explicacionEscapada}" style="background: var(--warning); color:#000; font-size:12px; padding:6px 12px; border:none;" type="button">Crear Flashcard</button>
@@ -871,6 +887,8 @@ const ui = {
                   correcta: p.correcta,
                   seleccionada: p.seleccionada,
                   explicacion: p.explicacion,
+                  explicacion_correcta: p.explicacion_correcta,
+                  explicacion_incorrecta: p.explicacion_incorrecta,
                   tema: p.tema || sesion.tema,
                   subtema: p.subtema || "Varios",
                   microtema: p.microtema || "Varios"
@@ -923,7 +941,7 @@ const ui = {
         </div>
         <div class="review-q-text error-bank-q-text">${idx}. ${p.texto}</div>
         <div class="review-options">${opcionesHtml}</div>
-        <div class="review-exp-container">${ui.formatearExplicacionClinica(p.explicacion, p.fuente)}</div>
+        <div class="review-exp-container">${ui.formatearExplicacionClinica(p.explicacion, p.fuente, p.explicacion_correcta, p.explicacion_incorrecta)}</div>
         <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top: 10px;">
           <button class="btn-ia btn-consultar-tutor" data-texto="${textoEscapado}" data-seleccion="${seleccionText}" type="button">Consultar Tutor IA</button>
           <button class="btn btn-primary btn-auto-flashcard" data-tema="${temaEscapado}" data-pregunta="${textoEscapado}" data-respuesta="${explicacionEscapada}" style="background: var(--warning); color:#000; font-size:12px; padding:6px 12px; border:none;" type="button">Crear Flashcard</button>
@@ -1122,41 +1140,46 @@ const ui = {
     if (tipo === "erradas" && btnErradas) btnErradas.classList.add("active");
   },
 
-  formatearExplicacionClinica(explicacion, fuente) {
-    if (!explicacion) return `<div class="exp-vacia" style="color: var(--text-dim); font-size: 13.5px; font-style: italic;">Sin explicación docente registrada.</div>`;
+  formatearExplicacionClinica(explicacion, fuente, explicacionCorrecta, explicacionIncorrecta) {
+    if (!explicacion && !explicacionCorrecta) return `<div class="exp-vacia" style="color: var(--text-dim); font-size: 13.5px; font-style: italic;">Sin explicación docente registrada.</div>`;
 
     let justificacion = "";
     let descarte = "";
     
-    const regexJust = /(?:🔬\s*)?JUSTIFICACIÓN\s*\((?:Por\s+qué\s+SÍ|Por\s+que\s+SI)\):?/i;
-    const regexDesc = /(?:🚫\s*)?DESCARTE\s*\((?:Por\s+qué\s+NO|Por\s+que\s+NO)\):?/i;
-    
-    let matchJust = explicacion.match(regexJust);
-    let matchDesc = explicacion.match(regexDesc);
-    
-    if (matchJust && matchDesc) {
-      const idxJust = matchJust.index;
-      const lenJust = matchJust[0].length;
-      const idxDesc = matchDesc.index;
-      const lenDesc = matchDesc[0].length;
+    if (explicacionCorrecta || explicacionIncorrecta) {
+      justificacion = explicacionCorrecta || "";
+      descarte = explicacionIncorrecta || "";
+    } else if (explicacion) {
+      const regexJust = /(?:🔬\s*)?JUSTIFICACIÓN\s*\((?:Por\s+qué\s+SÍ|Por\s+que\s+SI)\):?/i;
+      const regexDesc = /(?:🚫\s*)?DESCARTE\s*\((?:Por\s+qué\s+NO|Por\s+que\s+NO)\):?/i;
       
-      if (idxJust < idxDesc) {
-        justificacion = explicacion.substring(idxJust + lenJust, idxDesc).trim();
+      let matchJust = explicacion.match(regexJust);
+      let matchDesc = explicacion.match(regexDesc);
+      
+      if (matchJust && matchDesc) {
+        const idxJust = matchJust.index;
+        const lenJust = matchJust[0].length;
+        const idxDesc = matchDesc.index;
+        const lenDesc = matchDesc[0].length;
+        
+        if (idxJust < idxDesc) {
+          justificacion = explicacion.substring(idxJust + lenJust, idxDesc).trim();
+          descarte = explicacion.substring(idxDesc + lenDesc).trim();
+        } else {
+          descarte = explicacion.substring(idxDesc + lenDesc, idxJust).trim();
+          justificacion = explicacion.substring(idxJust + lenJust).trim();
+        }
+      } else if (matchJust) {
+        const idxJust = matchJust.index;
+        const lenJust = matchJust[0].length;
+        justificacion = explicacion.substring(idxJust + lenJust).trim();
+      } else if (matchDesc) {
+        const idxDesc = matchDesc.index;
+        const lenDesc = matchDesc[0].length;
         descarte = explicacion.substring(idxDesc + lenDesc).trim();
       } else {
-        descarte = explicacion.substring(idxDesc + lenDesc, idxJust).trim();
-        justificacion = explicacion.substring(idxJust + lenJust).trim();
+        justificacion = explicacion.trim();
       }
-    } else if (matchJust) {
-      const idxJust = matchJust.index;
-      const lenJust = matchJust[0].length;
-      justificacion = explicacion.substring(idxJust + lenJust).trim();
-    } else if (matchDesc) {
-      const idxDesc = matchDesc.index;
-      const lenDesc = matchDesc[0].length;
-      descarte = explicacion.substring(idxDesc + lenDesc).trim();
-    } else {
-      justificacion = explicacion.trim();
     }
     
     justificacion = justificacion.replace(/^\n+|\n+$/g, "").replace(/\n/g, "<br>");
