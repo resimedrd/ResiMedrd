@@ -1374,3 +1374,4 @@ async function arrancar() {
   });
 }
 arrancar();
+// Sincronización automática de producción en Railway v2
