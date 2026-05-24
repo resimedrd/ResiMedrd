@@ -1,6 +1,31 @@
 // ====== COORDINDADOR DE ARRANQUE / PUNTO DE ENTRADA (main.js) ======
 
 document.addEventListener("DOMContentLoaded", async () => {
+  // 0. Inicializar y controlar el sistema de Tema Dual (Claro / Oscuro)
+  const btnToggleTheme = document.getElementById("btn-toggle-theme");
+  
+  const aplicarTema = (tema) => {
+    if (tema === "dark") {
+      document.body.classList.add("dark-mode");
+      if (btnToggleTheme) btnToggleTheme.textContent = "Modo Claro";
+    } else {
+      document.body.classList.remove("dark-mode");
+      if (btnToggleTheme) btnToggleTheme.textContent = "Modo Oscuro";
+    }
+  };
+
+  const temaGuardado = localStorage.getItem("resiMed_theme") || "light";
+  aplicarTema(temaGuardado);
+
+  if (btnToggleTheme) {
+    btnToggleTheme.addEventListener("click", () => {
+      const esOscuro = document.body.classList.contains("dark-mode");
+      const nuevoTema = esOscuro ? "light" : "dark";
+      localStorage.setItem("resiMed_theme", nuevoTema);
+      aplicarTema(nuevoTema);
+    });
+  }
+
   // 1. Inyectar botón interactivo del MODO GUARDIA en el DOM de forma dinámica
   const modeGrid = document.querySelector(".mode-grid");
   if (modeGrid) {
