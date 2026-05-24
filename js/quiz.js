@@ -568,15 +568,15 @@ const quiz = {
         detalle: JSON.stringify(detalleExamen)
       });
 
-      // Actualizar datos del usuario conectados con XP del servidor
+      // Sincronizar datos del usuario conectados internamente
       if (datosFinal.usuarioActualizado) {
         state.usuarioConectado.xp = datosFinal.usuarioActualizado.xp;
         state.usuarioConectado.nivel = datosFinal.usuarioActualizado.nivel;
         state.usuarioConectado.streak = datosFinal.usuarioActualizado.streak;
         localStorage.setItem("resiMed_session", JSON.stringify(state.usuarioConectado));
         
-        // Notificación de gamificación
-        alert(`¡Examen finalizado! Ganaste +${datosFinal.xpGanado} XP. Nivel actual: ${state.usuarioConectado.nivel}`);
+        // Notificación académica formal
+        alert(`¡Evaluación finalizada con éxito! Tus respuestas han sido guardadas y sincronizadas con tu historial de estudio.`);
       }
     } catch (err) {
       console.error("Error al guardar la sesión de estudio: " + err.message);

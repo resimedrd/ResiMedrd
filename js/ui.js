@@ -42,40 +42,12 @@ const ui = {
     }
   },
 
-  // WIDGET DE GAMIFICACIÓN PREMIUM EN CABECERA
+  // WIDGET DE GAMIFICACIÓN PREMIUM EN CABECERA (Eliminado para estética profesional sobria)
   actualizarWidgetGamificacion() {
-    const user = state.usuarioConectado;
-    if (!user) return;
-
-    const brandCopy = document.querySelector(".brand-copy");
-    if (!brandCopy) return;
-
-    // Buscar o crear contenedor de gamificación interactivo
-    let gamificationEl = document.getElementById("widget-gamificacion-cabecera");
-    if (!gamificationEl) {
-      gamificationEl = document.createElement("div");
-      gamificationEl.id = "widget-gamificacion-cabecera";
-      gamificationEl.style.display = "flex";
-      gamificationEl.style.alignItems = "center";
-      gamificationEl.style.gap = "12px";
-      gamificationEl.style.marginTop = "6px";
-      brandCopy.appendChild(gamificationEl);
+    const gamificationEl = document.getElementById("widget-gamificacion-cabecera");
+    if (gamificationEl) {
+      gamificationEl.remove();
     }
-
-    const xpNivelSiguiente = 1000;
-    const xpProgreso = user.xp % xpNivelSiguiente;
-    const porcentajeXp = Math.round((xpProgreso / xpNivelSiguiente) * 100);
-
-    gamificationEl.innerHTML = `
-      <span class="chip chip-soft" style="font-size: 11px; padding: 2px 8px; border-color: var(--warning); color: var(--warning);">Nivel ${user.nivel || 1}</span>
-      <span class="chip chip-soft" style="font-size: 11px; padding: 2px 8px; border-color: #ef4444; color: #ef4444; font-weight: bold;">${user.streak || 0} Días de Racha</span>
-      <div style="display: flex; align-items: center; gap: 6px;">
-        <span style="font-size: 10px; color: var(--text-dim); font-weight: 500;">XP: ${xpProgreso}/1000</span>
-        <div style="width: 80px; height: 5px; background: rgba(255,255,255,0.06); border-radius: 10px; overflow: hidden;">
-          <div style="width: ${porcentajeXp}%; height: 100%; background: var(--warning); transition: width 0.3s ease;"></div>
-        </div>
-      </div>
-    `;
   },
 
   // RENDERIZAR GRID DE ESPECIALIDADES EN MI PERFIL
