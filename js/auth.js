@@ -95,13 +95,20 @@ const auth = {
   },
 
   async restaurarSesion() {
-    const sesionGuardada = localStorage.getItem("resiMed_session");
-    const token = localStorage.getItem("resiMed_jwt_token");
-    
-    if (sesionGuardada && token) {
-      state.usuarioConectado = JSON.parse(sesionGuardada);
-      await auth.inicializarEntornoUsuario();
-    } else {
+    try {
+      const sesionGuardada = localStorage.getItem("resiMed_session");
+      const token = localStorage.getItem("resiMed_jwt_token");
+      
+      if (sesionGuardada && token) {
+        state.usuarioConectado = JSON.parse(sesionGuardada);
+        await auth.inicializarEntornoUsuario();
+      } else {
+        ui.mostrarPantalla("auth");
+      }
+    } catch (err) {
+      console.warn("⚠️ Sesión local corrupta o desactualizada. Limpiando almacenamiento...", err);
+      localStorage.removeItem("resiMed_session");
+      localStorage.removeItem("resiMed_jwt_token");
       ui.mostrarPantalla("auth");
     }
   },
