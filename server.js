@@ -833,6 +833,24 @@ app.get("/api/temas", async (req, res) => {
   }
 });
 
+// FASE 3: Endpoint para recuperar subtemas de forma autónoma
+app.get("/api/especialidades/:especialidad/subtemas", async (req, res) => {
+  try {
+    const { especialidad } = req.params;
+    const filas = await db.all(
+      `SELECT DISTINCT subtema FROM preguntas 
+       WHERE LOWER(TRIM(especialidad)) = LOWER(?) OR LOWER(TRIM(tema)) = LOWER(?) 
+       ORDER BY subtema ASC`,
+      [especialidad.trim(), especialidad.trim()]
+    );
+    const subtemas = filas.map(f => f.subtema).filter(s => s && s.trim() !== "");
+    res.json(subtemas);
+  } catch (error) {
+    console.error("Error al obtener subtemas:", error);
+    res.status(500).json({ error: "Error al cargar la lista de subtemas." });
+  }
+});
+
 app.post("/api/sesiones", autenticarToken, async (req, res) => {
   try {
     const { usuarioId, tema, modo, cantidadPreguntas, correctas, porcentaje, detalle } = req.body;
@@ -1416,20 +1434,31 @@ app.get("/api/examenes/anos", autenticarToken, async (req, res) => {
 // 2. Endpoint central para preparar y filtrar el bloque de preguntas de un examen
 app.post("/api/exam-setup", autenticarToken, async (req, res) => {
   try {
-    const { tipo, valor, cantidad } = req.body;
+    const { tipo, valor, subtema, cantidad } = req.body;
     const maxPreguntas = parseInt(cantidad) || 10;
 
     let preguntas = [];
 
     const esTodos = !valor || valor.trim().toLowerCase() === "todos";
+    const esTodosSub = !subtema || subtema.trim().toLowerCase() === "todos";
 
     if (tipo === "especialidad" && !esTodos) {
-      preguntas = await db.all(
-        `SELECT * FROM preguntas 
-         WHERE (LOWER(TRIM(especialidad)) = LOWER(?) OR LOWER(TRIM(tema)) = LOWER(?)) 
-         ORDER BY RANDOM() LIMIT ?`,
-        [valor.trim(), valor.trim(), maxPreguntas]
-      );
+      if (!esTodosSub) {
+        preguntas = await db.all(
+          `SELECT * FROM preguntas 
+           WHERE (LOWER(TRIM(especialidad)) = LOWER(?) OR LOWER(TRIM(tema)) = LOWER(?)) 
+             AND LOWER(TRIM(subtema)) = LOWER(?)
+           ORDER BY RANDOM() LIMIT ?`,
+          [valor.trim(), valor.trim(), subtema.trim(), maxPreguntas]
+        );
+      } else {
+        preguntas = await db.all(
+          `SELECT * FROM preguntas 
+           WHERE (LOWER(TRIM(especialidad)) = LOWER(?) OR LOWER(TRIM(tema)) = LOWER(?)) 
+           ORDER BY RANDOM() LIMIT ?`,
+          [valor.trim(), valor.trim(), maxPreguntas]
+        );
+      }
     } else if (tipo === "ano" && !esTodos) {
       const anoNum = parseInt(valor);
       preguntas = await db.all(

@@ -126,6 +126,14 @@ document.addEventListener("DOMContentLoaded", async () => {
       tabSimAno.classList.remove("active");
       blockEspecialidad.classList.remove("hidden");
       blockAno.classList.add("hidden");
+      
+      const selectEsp = document.getElementById("especialidad");
+      const blockSubtema = document.getElementById("block-subtema");
+      const selectorSubtema = document.getElementById("selector-subtema");
+      if (selectEsp && blockSubtema && selectorSubtema && selectEsp.value !== "Todos" && selectorSubtema.options.length > 0) {
+        blockSubtema.classList.remove("hidden");
+      }
+      
       state.tipoSimulacroSeleccionado = "especialidad";
     });
 
@@ -134,6 +142,12 @@ document.addEventListener("DOMContentLoaded", async () => {
       tabSimEspecialidad.classList.remove("active");
       blockAno.classList.remove("hidden");
       blockEspecialidad.classList.add("hidden");
+      
+      const blockSubtema = document.getElementById("block-subtema");
+      if (blockSubtema) {
+        blockSubtema.classList.add("hidden");
+      }
+      
       state.tipoSimulacroSeleccionado = "ano";
     });
   }

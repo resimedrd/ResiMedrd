@@ -146,10 +146,14 @@ const api = {
   obtenerAnosExamen: () =>
     request("/api/examenes/anos"),
 
-  prepararExamen: (tipo, valor, cantidad) =>
+  // FASE 3: Endpoint dinámico para recuperar subtemas de una especialidad
+  obtenerSubtemas: (especialidad) =>
+    request(`/api/especialidades/${encodeURIComponent(especialidad)}/subtemas`),
+
+  prepararExamen: (tipo, valor, cantidad, subtema = "Todos") =>
     request("/api/exam-setup", {
       method: "POST",
-      body: JSON.stringify({ tipo, valor, cantidad })
+      body: JSON.stringify({ tipo, valor, cantidad, subtema })
     })
 };
 

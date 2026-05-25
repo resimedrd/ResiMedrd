@@ -278,6 +278,45 @@ const ui = {
         opt.textContent = `${esp.nombre} (${totalPreguntas})`;
         select.appendChild(opt);
       });
+
+      // FASE 3: Carga dinámica y autónoma de subtemas al cambiar de especialidad
+      if (!select.dataset.hasChangeListener) {
+        select.dataset.hasChangeListener = "true";
+        select.addEventListener("change", async () => {
+          const especialidad = select.value;
+          const blockSubtema = document.getElementById("block-subtema");
+          const selectorSubtema = document.getElementById("selector-subtema");
+          
+          if (!blockSubtema || !selectorSubtema) return;
+          
+          if (especialidad === "Todos") {
+            blockSubtema.classList.add("hidden");
+            selectorSubtema.innerHTML = "";
+            return;
+          }
+          
+          try {
+            const subtemas = await api.obtenerSubtemas(especialidad);
+            if (subtemas && subtemas.length > 0) {
+              selectorSubtema.innerHTML = '<option value="Todos" selected>Todos los temas de esta especialidad</option>';
+              subtemas.forEach(s => {
+                const opt = document.createElement("option");
+                opt.value = s;
+                opt.textContent = s;
+                selectorSubtema.appendChild(opt);
+              });
+              blockSubtema.classList.remove("hidden");
+            } else {
+              blockSubtema.classList.add("hidden");
+              selectorSubtema.innerHTML = "";
+            }
+          } catch (err) {
+            console.error("Error al cargar subtemas autónomamente:", err);
+            blockSubtema.classList.add("hidden");
+            selectorSubtema.innerHTML = "";
+          }
+        });
+      }
     } catch (err) {
       console.error("Error cargando especialidades:", err);
     }

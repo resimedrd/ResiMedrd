@@ -188,11 +188,19 @@ const quiz = {
       if (modo === "guardia") {
         preguntas = await api.prepararExamen("todos", "todos", 10);
         state.cantidadSolicitada = 10;
+        state.especialidadSeleccionada = "Todos";
+        state.subtemaSeleccionado = "Todos";
       } else {
         const tipo = state.tipoSimulacroSeleccionado || "especialidad";
         const valor = tipo === "especialidad" ? document.getElementById("especialidad").value : document.getElementById("selector-ano").value;
-        
-        preguntas = await api.prepararExamen(tipo, valor, state.cantidadSolicitada);
+        const selectorSub = document.getElementById("selector-subtema");
+        const subtema = (tipo === "especialidad" && selectorSub) ? selectorSub.value : "Todos";
+
+        // FASE 3: Guardar en el estado para consistencia visual premium
+        state.especialidadSeleccionada = valor;
+        state.subtemaSeleccionado = subtema;
+
+        preguntas = await api.prepararExamen(tipo, valor, state.cantidadSolicitada, subtema);
       }
 
       if (preguntas.length === 0) {
@@ -228,7 +236,15 @@ const quiz = {
         }
       }
       if (chipTema) {
-        chipTema.textContent = state.especialidadSeleccionada === "Todos" ? "Examen General" : state.especialidadSeleccionada;
+        if (modo === "guardia") {
+          chipTema.textContent = "Urgencias Médicas";
+        } else if (state.especialidadSeleccionada === "Todos") {
+          chipTema.textContent = "Examen General";
+        } else {
+          chipTema.textContent = (state.subtemaSeleccionado && state.subtemaSeleccionado !== "Todos")
+            ? `${state.especialidadSeleccionada} - ${state.subtemaSeleccionado}`
+            : state.especialidadSeleccionada;
+        }
       }
       if (mapEl) mapEl.classList.remove("hidden");
 
@@ -674,7 +690,20 @@ const quiz = {
     // Renderizar Informe de Desempeño
     document.getElementById("resultado-puntaje").textContent = `${aciertos} / ${state.preguntasCargadas.length}`;
     document.getElementById("resultado-porcentaje").textContent = `${porcentaje}%`;
-    document.getElementById("resultado-tema").textContent = state.especialidadSeleccionada === "Todos" ? "Examen General" : state.especialidadSeleccionada;
+    
+    // FASE 3: Detalle dinámico y completo en el informe de rendimiento
+    const resultadoTemaEl = document.getElementById("resultado-tema");
+    if (resultadoTemaEl) {
+      if (state.modoActual === "guardia") {
+        resultadoTemaEl.textContent = "Urgencias Médicas";
+      } else if (state.especialidadSeleccionada === "Todos") {
+        resultadoTemaEl.textContent = "Examen General";
+      } else {
+        resultadoTemaEl.textContent = (state.subtemaSeleccionado && state.subtemaSeleccionado !== "Todos")
+          ? `${state.especialidadSeleccionada} - ${state.subtemaSeleccionado}`
+          : state.especialidadSeleccionada;
+      }
+    }
 
     const revisionContainer = document.getElementById("revision-container");
     if (revisionContainer) {
