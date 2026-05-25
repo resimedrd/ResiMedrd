@@ -164,8 +164,9 @@ const quiz = {
         
         if (temporizadorEl) temporizadorEl.classList.remove("hidden");
         quiz.iniciarTemporizadorGuardia();
-      } else if (modo === "simulacro") {
+      } else if (modo === "simulacro" || modo === "estudio") {
         state.tiempoRestanteSegundos = state.preguntasCargadas.length * 90;
+        state.duracionTotalSegundos = 0;
         if (temporizadorEl) {
           temporizadorEl.classList.remove("hidden");
           quiz.actualizarRelojVisual();
@@ -177,20 +178,9 @@ const quiz = {
           if (state.tiempoRestanteSegundos <= 0) {
             clearInterval(state.intervaloTemporizador);
             quiz.congelarControles();
-            alert("Tiempo límite de simulacro alcanzado. Guardando tus respuestas...");
+            alert("Tiempo límite de evaluación alcanzado. Guardando tus respuestas...");
             quiz.finalizarSesion();
           }
-        }, 1000);
-      } else {
-        // Modo estudio
-        state.duracionTotalSegundos = 0;
-        if (temporizadorEl) {
-          temporizadorEl.classList.remove("hidden");
-          quiz.actualizarRelojEstudioVisual();
-        }
-        state.intervaloTemporizador = setInterval(() => {
-          state.duracionTotalSegundos++;
-          quiz.actualizarRelojEstudioVisual();
         }, 1000);
       }
 
@@ -569,12 +559,13 @@ const quiz = {
         explicacion_incorrecta: p.explicacion_incorrecta
       }));
 
-      // Sincronizar repetición espaciada de cada pregunta fallada o acertada en el examen
-      for (let i = 0; i < state.preguntasCargadas.length; i++) {
-        const p = state.preguntasCargadas[i];
+      // Sincronizar repetición espaciada en segundo plano de forma no bloqueante para velocidad instantánea
+      state.preguntasCargadas.forEach((p, i) => {
         const esCorrecto = (state.respuestasUsuario[i] === p.correcta);
-        await spacedRepetition.sincronizarEstado(p.id, null, esCorrecto, esCorrecto ? 2 : 1);
-      }
+        spacedRepetition.sincronizarEstado(p.id, null, esCorrecto, esCorrecto ? 2 : 1).catch(err => {
+          console.warn("Falla silenciosa al sincronizar SR en segundo plano:", err);
+        });
+      });
 
       // Guardar el examen en el servidor
       const datosFinal = await api.guardarSesion({
