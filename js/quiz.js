@@ -27,23 +27,35 @@ const quiz = {
     const descEl = document.getElementById("modal-confirmar-descripcion-box");
     const btnAceptar = document.getElementById("btn-confirmar-aceptar");
     const btnCancelar = document.getElementById("btn-confirmar-cerrar");
+    const toggleBox = document.getElementById("modal-confirmar-estudio-toggle-box");
+    const chkRetro = document.getElementById("chk-retroalimentacion-inmediata");
 
     if (!modal) {
       quiz.iniciarSesion(modo);
       return;
     }
 
-    // Configurar contenidos sobrios y ultra-resumidos por modo
-    if (modo === "estudio") {
-      const chkRetro = document.getElementById("chk-retroalimentacion-inmediata");
-      const retroInmediata = chkRetro ? chkRetro.checked : true;
-      
-      if (retroInmediata) {
+    // Mostrar u ocultar el switch de retroalimentación según corresponda
+    if (toggleBox) {
+      toggleBox.style.display = (modo === "estudio") ? "flex" : "none";
+    }
+
+    const actualizarTextoEstudio = () => {
+      if (!chkRetro) return;
+      if (chkRetro.checked) {
         tituloEl.textContent = "Modo Estudio (Respuestas al Instante)";
         descEl.textContent = "Sesión de aprendizaje adaptativo con respuestas y justificaciones clínicas al instante al contestar cada pregunta. Límite de 90 segundos por pregunta.";
       } else {
         tituloEl.textContent = "Modo Estudio (Respuestas al Final)";
         descEl.textContent = "Sesión de aprendizaje adaptativo con respuestas y justificaciones clínicas consolidadas al finalizar el bloque de preguntas. Límite de 90 segundos por pregunta.";
+      }
+    };
+
+    // Configurar contenidos sobrios y ultra-resumidos por modo
+    if (modo === "estudio") {
+      actualizarTextoEstudio();
+      if (chkRetro) {
+        chkRetro.addEventListener("change", actualizarTextoEstudio);
       }
     } else if (modo === "simulacro") {
       tituloEl.textContent = "Modo Simulacro";
@@ -59,6 +71,9 @@ const quiz = {
       btnAceptar.removeEventListener("click", alAceptar);
       btnCancelar.removeEventListener("click", alCancelar);
       modal.removeEventListener("click", alFondo);
+      if (chkRetro) {
+        chkRetro.removeEventListener("change", actualizarTextoEstudio);
+      }
       quiz.iniciarSesion(modo);
     };
 
@@ -67,6 +82,9 @@ const quiz = {
       btnAceptar.removeEventListener("click", alAceptar);
       btnCancelar.removeEventListener("click", alCancelar);
       modal.removeEventListener("click", alFondo);
+      if (chkRetro) {
+        chkRetro.removeEventListener("change", actualizarTextoEstudio);
+      }
     };
 
     const alFondo = (e) => {

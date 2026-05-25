@@ -151,18 +151,6 @@
                 </button>
               </div>
             </div>
-
-            <!-- INTERRUPTOR DE RETROALIMENTACIÓN INMEDIATA (MODO ESTUDIO) -->
-            <div id="block-config-estudio" class="form-block" style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border); border-radius: 12px; padding: 14px; margin-top: 16px; display: flex; align-items: center; justify-content: space-between;">
-              <div style="padding-right: 8px;">
-                <span style="font-weight: 600; font-size: 13px; color: var(--text); display: block; margin-bottom: 2px;">Retroalimentación Inmediata</span>
-                <span style="font-size: 11px; color: var(--text-dim); display: block; line-height: 1.3;">Mostrar respuestas y desglose médico al contestar cada pregunta.</span>
-              </div>
-              <label class="switch" style="position: relative; display: inline-block; width: 44px; height: 24px; flex-shrink: 0; cursor: pointer;">
-                <input type="checkbox" id="chk-retroalimentacion-inmediata" checked style="opacity: 0; width: 0; height: 0;">
-                <span class="slider round" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--border-strong); transition: .3s; border-radius: 24px;"></span>
-              </label>
-            </div>
           </article>
 
           <div class="side-panel-container">
@@ -837,6 +825,18 @@
         <button id="btn-confirmar-cerrar" class="modal-ia-close" type="button" style="background: none; border: none; font-size: 20px; color: var(--text-dim); cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1;">&times;</button>
       </div>
       <div class="modal-ia-body" style="padding: 24px; display: flex; flex-direction: column; gap: 16px; text-align: left;">
+        <!-- FASE 2: Switch de Retroalimentación en Modo Estudio -->
+        <div id="modal-confirmar-estudio-toggle-box" style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 4px; display: none; align-items: center; justify-content: space-between;">
+          <div style="padding-right: 8px;">
+            <span style="font-weight: 600; font-size: 13px; color: var(--text); display: block; margin-bottom: 2px;">Retroalimentación Inmediata</span>
+            <span style="font-size: 11px; color: var(--text-dim); display: block; line-height: 1.3;">Mostrar respuestas y desglose médico al contestar cada pregunta.</span>
+          </div>
+          <label class="switch" style="position: relative; display: inline-block; width: 44px; height: 24px; flex-shrink: 0; cursor: pointer;">
+            <input type="checkbox" id="chk-retroalimentacion-inmediata" checked style="opacity: 0; width: 0; height: 0;">
+            <span class="slider round" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--border-strong); transition: .3s; border-radius: 24px;"></span>
+          </label>
+        </div>
+        
         <div id="modal-confirmar-descripcion-box" style="line-height: 1.6; font-size: 13.5px; color: var(--text-soft); font-weight: 500;">
           <!-- Explicación dinámica de la modalidad de examen inyectada por JS -->
         </div>

@@ -140,7 +140,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const btnModoEstudio = document.getElementById("btn-modo-estudio");
   const btnModoSimulacro = document.getElementById("btn-modo-simulacro");
-  const blockConfigEstudio = document.getElementById("block-config-estudio");
 
   state.modoActual = "estudio";
 
@@ -154,7 +153,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       btnModoSimulacro.style.borderColor = "var(--border)";
       btnModoSimulacro.style.borderWidth = "1px";
       
-      if (blockConfigEstudio) blockConfigEstudio.classList.remove("hidden");
       state.modoActual = "estudio";
     });
 
@@ -167,7 +165,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       btnModoEstudio.style.borderColor = "var(--border)";
       btnModoEstudio.style.borderWidth = "1px";
       
-      if (blockConfigEstudio) blockConfigEstudio.classList.add("hidden");
       state.modoActual = "simulacro";
     });
   }
