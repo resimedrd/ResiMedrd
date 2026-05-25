@@ -147,13 +147,32 @@ const auth = {
     await ui.cargarDashboardHome();
     await ui.cargarHistorialReciente();
 
-    ui.mostrarPantalla("home");
+    // FASE 4: Restaurar examen activo si existe en recarga de página
+    const tieneExamenActivo = localStorage.getItem("resiMed_examen_activo");
+    if (tieneExamenActivo) {
+      const restaurado = quiz.restaurarExamenActivo();
+      if (restaurado) return;
+    }
+
+    // FASE 4: Restaurar la pantalla correspondiente al Hash de la URL actual
+    const hash = window.location.hash.replace("#", "");
+    const pantallasValidas = ["home", "perfil", "flashcards", "quiz", "resultados"];
+    if (pantallasValidas.includes(hash)) {
+      ui.mostrarPantalla(hash, false);
+    } else {
+      ui.mostrarPantalla("home");
+    }
   },
 
   logout() {
     state.usuarioConectado = null;
     localStorage.removeItem("resiMed_session");
     localStorage.removeItem("resiMed_jwt_token");
+    
+    // FASE 4: Limpiar estado de examen activo al cerrar sesión
+    if (window.quiz && quiz.limpiarEstadoExamenActivo) {
+      quiz.limpiarEstadoExamenActivo();
+    }
 
     const btnIrInicio = document.getElementById("btn-ir-inicio");
     const btnVerPerfil = document.getElementById("btn-ver-perfil");

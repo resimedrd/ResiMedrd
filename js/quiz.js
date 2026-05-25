@@ -21,6 +21,124 @@ function safeParseOpciones(opciones) {
 }
 
 const quiz = {
+  guardarEstadoExamenActivo() {
+    if (state.preguntasCargadas && state.preguntasCargadas.length > 0) {
+      localStorage.setItem("resiMed_examen_activo", JSON.stringify({
+        modoActual: state.modoActual,
+        especialidadSeleccionada: state.especialidadSeleccionada,
+        subtemaSeleccionado: state.subtemaSeleccionado,
+        cantidadSolicitada: state.cantidadSolicitada,
+        preguntasCargadas: state.preguntasCargadas,
+        indiceActual: state.indiceActual,
+        respuestasUsuario: state.respuestasUsuario,
+        preguntasMarcadas: state.preguntasMarcadas,
+        duracionTotalSegundos: state.duracionTotalSegundos,
+        tiempoRestanteSegundos: state.tiempoRestanteSegundos,
+        retroalimentacionInmediata: state.retroalimentacionInmediata
+      }));
+    }
+  },
+
+  limpiarEstadoExamenActivo() {
+    localStorage.removeItem("resiMed_examen_activo");
+  },
+
+  restaurarExamenActivo() {
+    try {
+      const dataStr = localStorage.getItem("resiMed_examen_activo");
+      if (!dataStr) return false;
+      const data = JSON.parse(dataStr);
+      if (!data || !data.preguntasCargadas || data.preguntasCargadas.length === 0) return false;
+
+      // Restaurar estado global
+      state.modoActual = data.modoActual;
+      state.especialidadSeleccionada = data.especialidadSeleccionada;
+      state.subtemaSeleccionado = data.subtemaSeleccionado;
+      state.cantidadSolicitada = data.cantidadSolicitada;
+      state.preguntasCargadas = data.preguntasCargadas;
+      state.indiceActual = data.indiceActual;
+      state.respuestasUsuario = data.respuestasUsuario;
+      state.preguntasMarcadas = data.preguntasMarcadas;
+      state.duracionTotalSegundos = data.duracionTotalSegundos;
+      state.tiempoRestanteSegundos = data.tiempoRestanteSegundos;
+      state.retroalimentacionInmediata = data.retroalimentacionInmediata;
+
+      // Reseteo de intervalos si estaban activos
+      clearInterval(state.intervaloTemporizador);
+      clearInterval(guardiaTimerInterval);
+
+      const chipModo = document.getElementById("chip-modo");
+      const chipTema = document.getElementById("chip-tema");
+      const mapEl = document.getElementById("simulacro-navigation-map");
+      const temporizadorEl = document.getElementById("temporizador");
+
+      if (chipModo) {
+        if (state.modoActual === "guardia") {
+          chipModo.textContent = "MODO GUARDIA";
+          chipModo.className = "chip chip-primary";
+          chipModo.style.background = "linear-gradient(135deg, var(--danger) 0%, #b91c1c 100%)";
+        } else {
+          chipModo.textContent = state.modoActual === "estudio" ? "Modo Estudio" : "Modo Simulacro";
+          chipModo.className = "chip chip-primary";
+          chipModo.style.background = "";
+        }
+      }
+
+      if (chipTema) {
+        if (state.modoActual === "guardia") {
+          chipTema.textContent = "Urgencias Médicas";
+        } else if (state.especialidadSeleccionada === "Todos") {
+          chipTema.textContent = "Examen General";
+        } else {
+          chipTema.textContent = (state.subtemaSeleccionado && state.subtemaSeleccionado !== "Todos")
+            ? `${state.especialidadSeleccionada} - ${state.subtemaSeleccionado}`
+            : state.especialidadSeleccionada;
+        }
+      }
+
+      if (mapEl) mapEl.classList.remove("hidden");
+
+      // Iniciar UI
+      quiz.ocultarFeedback();
+      ui.mostrarPantalla("quiz", false);
+
+      // Re-arrancar cronómetros
+      if (state.modoActual === "guardia") {
+        if (temporizadorEl) temporizadorEl.classList.remove("hidden");
+        // Reiniciar el temporizador para la pregunta actual (30 segundos)
+        quiz.iniciarTemporizadorGuardia();
+      } else if (state.modoActual === "simulacro" || state.modoActual === "estudio") {
+        if (temporizadorEl) {
+          temporizadorEl.classList.remove("hidden");
+          quiz.actualizarRelojVisual();
+        }
+        state.intervaloTemporizador = setInterval(() => {
+          state.tiempoRestanteSegundos--;
+          state.duracionTotalSegundos++;
+          quiz.actualizarRelojVisual();
+
+          if (state.duracionTotalSegundos % 2 === 0) {
+            quiz.guardarEstadoExamenActivo();
+          }
+
+          if (state.tiempoRestanteSegundos <= 0) {
+            clearInterval(state.intervaloTemporizador);
+            quiz.congelarControles();
+            alert("Tiempo límite de evaluación alcanzado. Guardando tus respuestas...");
+            quiz.finalizarSesion();
+          }
+        }, 1000);
+      }
+
+      quiz.renderizarPreguntaActual();
+      return true;
+    } catch (e) {
+      console.error("Error al restaurar examen activo:", e);
+      localStorage.removeItem("resiMed_examen_activo");
+      return false;
+    }
+  },
+
   solicitarConfirmacionInicio(modo) {
     const modal = document.getElementById("modal-confirmar-inicio");
     const tituloEl = document.getElementById("modal-confirmar-titulo");
@@ -125,6 +243,7 @@ const quiz = {
         state.preguntasMarcadas[state.indiceActual] = !state.preguntasMarcadas[state.indiceActual];
         quiz.actualizarBotonFlagVisual();
         quiz.renderizarMapaNavegacion();
+        quiz.guardarEstadoExamenActivo();
       });
     }
 
@@ -270,6 +389,12 @@ const quiz = {
           state.tiempoRestanteSegundos--;
           state.duracionTotalSegundos++;
           quiz.actualizarRelojVisual();
+          
+          // FASE 4: Guardar el tiempo restante de forma incremental cada 2 segundos
+          if (state.duracionTotalSegundos % 2 === 0) {
+            quiz.guardarEstadoExamenActivo();
+          }
+
           if (state.tiempoRestanteSegundos <= 0) {
             clearInterval(state.intervaloTemporizador);
             quiz.congelarControles();
@@ -280,6 +405,7 @@ const quiz = {
       }
 
       quiz.renderizarPreguntaActual();
+      quiz.guardarEstadoExamenActivo();
     } catch (e) {
       alert("Error al estructurar el examen: " + e.message);
     }
@@ -466,6 +592,7 @@ const quiz = {
           
           quiz.chequearBotonesNavegacion();
           quiz.renderizarMapaNavegacion();
+          quiz.guardarEstadoExamenActivo();
         } else {
           const botones = opcionesContainer.querySelectorAll(".option-btn");
           botones.forEach(b => b.classList.remove("selected"));
@@ -474,6 +601,7 @@ const quiz = {
           
           quiz.chequearBotonesNavegacion();
           quiz.renderizarMapaNavegacion();
+          quiz.guardarEstadoExamenActivo();
         }
       });
 
@@ -529,6 +657,7 @@ const quiz = {
       quiz.iniciarTemporizadorGuardia();
     }
     quiz.renderizarPreguntaActual();
+    quiz.guardarEstadoExamenActivo();
   },
 
   renderizarMapaNavegacion() {
@@ -562,6 +691,7 @@ const quiz = {
           quiz.iniciarTemporizadorGuardia();
         }
         quiz.renderizarPreguntaActual();
+        quiz.guardarEstadoExamenActivo();
       });
 
       gridContainer.appendChild(btn);
@@ -616,6 +746,7 @@ const quiz = {
 
   // 🏁 FINALIZAR EVALUACIÓN (CON CONEXIÓN JWT & PROCESO DE GAMIFICACIÓN)
   async finalizarSesion() {
+    quiz.limpiarEstadoExamenActivo();
     clearInterval(state.intervaloTemporizador);
     clearInterval(guardiaTimerInterval);
     

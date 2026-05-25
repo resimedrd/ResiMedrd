@@ -2,11 +2,17 @@
 
 const ui = {
   // CONTROL DE PANTALLAS CON TRANSICIONES SUAVES
-  mostrarPantalla(idPantalla) {
+  mostrarPantalla(idPantalla, pushState = true) {
     // Si no empieza con "pantalla-", agregar el prefijo de forma inteligente
     let idReal = idPantalla;
     if (idReal && !idReal.startsWith("pantalla-")) {
       idReal = "pantalla-" + idReal;
+    }
+
+    const nombrePantalla = idReal.replace("pantalla-", "");
+
+    if (pushState) {
+      window.history.pushState({ pantalla: nombrePantalla }, "", "#" + nombrePantalla);
     }
 
     const pantallas = ["pantalla-auth", "pantalla-home", "pantalla-perfil", "pantalla-flashcards", "pantalla-quiz", "pantalla-resultados"];
@@ -32,10 +38,10 @@ const ui = {
     }
 
     // Refrescar analíticas y gamificación al cambiar al Home o Perfil
-    if (idPantalla === "home" || idPantalla === "pantalla-home") {
+    if (nombrePantalla === "home") {
       ui.cargarDashboardHome();
       ui.cargarHistorialReciente();
-    } else if (idPantalla === "perfil" || idPantalla === "pantalla-perfil") {
+    } else if (nombrePantalla === "perfil") {
       ui.actualizarProgresoEstudiante();
       const tabPerfilProgreso = document.getElementById("tab-perfil-progreso");
       if (tabPerfilProgreso) tabPerfilProgreso.click();
@@ -1264,5 +1270,20 @@ const ui = {
     return html;
   }
 };
+
+// FASE 4: Ruteo e interactividad con el botón Atrás del navegador
+window.addEventListener("popstate", (e) => {
+  const sesion = localStorage.getItem("resiMed_session");
+  if (!sesion) {
+    ui.mostrarPantalla("auth", false);
+    return;
+  }
+
+  if (e.state && e.state.pantalla) {
+    ui.mostrarPantalla(e.state.pantalla, false);
+  } else {
+    ui.mostrarPantalla("home", false);
+  }
+});
 
 window.ui = ui;
