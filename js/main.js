@@ -39,15 +39,14 @@ document.addEventListener("DOMContentLoaded", async () => {
       btnGuardia.style.boxShadow = "0 4px 12px rgba(239, 68, 68, 0.1)";
       
       btnGuardia.innerHTML = `
-        <span class="mode-icon">🚨</span>
         <span class="mode-title" style="color: var(--danger); font-weight: 700;">Modo Guardia</span>
-        <span class="mode-desc">Entrenamiento ultra-rápido de 10 reactivos de emergencias. 30 segundos por pregunta.</span>
+        <span class="mode-desc">Entrenamiento ultra-rápido de 10 preguntas de emergencias. 30 segundos por pregunta.</span>
       `;
       
       modeGrid.appendChild(btnGuardia);
       
       btnGuardia.addEventListener("click", () => {
-        quiz.iniciarSesion("guardia");
+        quiz.solicitarConfirmacionInicio("guardia");
       });
     }
   }
@@ -376,7 +375,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         await api.guardarReporteError(preguntaId, motivo, comentario);
         formReportarError.reset();
         modalReportarError.classList.remove("active");
-        alert("✓ ¡Reporte de error enviado con éxito! Los docentes revisarán este reactivo.");
+        alert("✓ ¡Reporte de error enviado con éxito! Los docentes revisarán esta pregunta.");
         
         // Si el usuario reportante también es administrador, recargar en caliente
         if (state.usuarioConectado.rol === "admin") {

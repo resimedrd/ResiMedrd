@@ -753,7 +753,7 @@ const ui = {
       
       let debilidadesHtml = "";
       metricas.debilidadesDetectadas.forEach(d => {
-        debilidadesHtml += `<li><strong>${d.tema}</strong>: Precisión del ${d.porcentaje}% (${d.totales} reactivos analizados).</li>`;
+        debilidadesHtml += `<li><strong>${d.tema}</strong>: Precisión del ${d.porcentaje}% (${d.totales} preguntas analizadas).</li>`;
       });
 
       alertDebilidad.innerHTML = `

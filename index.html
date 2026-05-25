@@ -143,7 +143,7 @@
               <div class="mode-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 6px;">
                 <button id="btn-modo-estudio" class="mode-card active" type="button" style="border-radius: 12px; padding: 16px; border: 2px solid #0A66C2; background: var(--bg-card); display: flex; flex-direction: column; gap: 4px; text-align: left; transition: all 0.2s;">
                   <span class="mode-title" style="font-weight: 700; color: var(--text); font-size: 13.5px;">Modo Estudio</span>
-                  <span class="mode-desc" style="font-size: 11px; color: var(--text-dim); line-height: 1.3;">Retroalimentación analítica y justificación médica por reactivo.</span>
+                  <span class="mode-desc" style="font-size: 11px; color: var(--text-dim); line-height: 1.3;">Retroalimentación analítica y justificación médica por pregunta.</span>
                 </button>
                 <button id="btn-modo-simulacro" class="mode-card" type="button" style="border-radius: 12px; padding: 16px; border: 1px solid var(--border); background: var(--bg-card); display: flex; flex-direction: column; gap: 4px; text-align: left; transition: all 0.2s;">
                   <span class="mode-title" style="font-weight: 700; color: var(--text); font-size: 13.5px;">Modo Simulacro</span>
@@ -228,7 +228,7 @@
               </h3>
               <button id="btn-admin-refrescar-reportes" class="btn btn-ghost" style="padding: 4px 8px; font-size: 11px; border-color: rgba(239,68,68,0.2); color: var(--danger); min-width: auto;" type="button">🔄 Refrescar</button>
             </div>
-            <p style="font-size: 12.5px; color: var(--text-soft); margin-bottom: 16px;">Revisa y resuelve las fallas en reactivos reportadas por los estudiantes en tiempo real.</p>
+            <p style="font-size: 12.5px; color: var(--text-soft); margin-bottom: 16px;">Revisa y resuelve las fallas en preguntas reportadas por los estudiantes en tiempo real.</p>
             
             <div id="admin-reportes-lista" style="display: flex; flex-direction: column; gap: 12px; max-height: 400px; overflow-y: auto; padding-right: 4px;">
               <!-- Inyectado dinámicamente -->
@@ -465,7 +465,7 @@
             <article class="panel" style="border-radius: 28px; padding: 32px; background: var(--panel); border: 1px solid var(--border);">
               <div class="panel-head" style="margin-bottom: 20px;">
                 <h3 style="color: var(--text); font-size: 20px; font-weight: 700;">🚩 Preguntas Dudosas / Marcadas</h3>
-                <p style="font-size: 14px; color: var(--text-dim); margin-top: 4px;">Historial en tiempo real de todos los reactivos marcados con bandera (🚩) en tus simulacros para su repaso seguro.</p>
+                <p style="font-size: 14px; color: var(--text-dim); margin-top: 4px;">Historial en tiempo real de todas las preguntas marcadas con bandera (🚩) en tus simulacros para su repaso seguro.</p>
               </div>
               
               <div id="banco-marcadas-lista" class="review-list" style="margin-top: 16px;">
@@ -827,14 +827,32 @@
     </div>
   </div>
 
-  <script src="js/state.js?v=1.4.0"></script>
-  <script src="js/api.js?v=1.4.0"></script>
-  <script src="js/spaced_repetition.js?v=1.4.0"></script>
-  <script src="js/analytics.js?v=1.4.0"></script>
-  <script src="js/ui.js?v=1.4.0"></script>
-  <script src="js/auth.js?v=1.4.0"></script>
-  <script src="js/quiz.js?v=1.4.0"></script>
-  <script src="js/flashcards.js?v=1.4.0"></script>
-  <script src="js/main.js?v=1.4.0"></script>
+  <!-- MODAL DE CONFIRMACIÓN DE INICIO DE EXAMEN (Fase 1) -->
+  <div id="modal-confirmar-inicio" class="modal-ia-overlay">
+    <div class="modal-ia-container" style="max-width: 440px; padding: 0; border-radius: 20px; overflow: hidden; border: 1px solid var(--border);">
+      <div class="modal-ia-header" style="padding: 18px 24px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.01);">
+        <div class="modal-ia-title">
+          <h3 id="modal-confirmar-titulo" style="font-size: 15px; font-weight: 700; color: var(--text); margin: 0;">Presentación de Modalidad</h3>
+        </div>
+        <button id="btn-confirmar-cerrar" class="modal-ia-close" type="button" style="background: none; border: none; font-size: 20px; color: var(--text-dim); cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1;">&times;</button>
+      </div>
+      <div class="modal-ia-body" style="padding: 24px; display: flex; flex-direction: column; gap: 16px; text-align: left;">
+        <div id="modal-confirmar-descripcion-box" style="line-height: 1.6; font-size: 13.5px; color: var(--text-soft); font-weight: 500;">
+          <!-- Explicación dinámica de la modalidad de examen inyectada por JS -->
+        </div>
+        <button id="btn-confirmar-aceptar" class="btn btn-primary" style="width: 100%; margin-top: 8px; justify-content: center; font-weight: 700; background: #0A66C2 !important; border-color: #0A66C2 !important;" type="button">Continuar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/state.js?v=1.5.0"></script>
+  <script src="js/api.js?v=1.5.0"></script>
+  <script src="js/spaced_repetition.js?v=1.5.0"></script>
+  <script src="js/analytics.js?v=1.5.0"></script>
+  <script src="js/ui.js?v=1.5.0"></script>
+  <script src="js/auth.js?v=1.5.0"></script>
+  <script src="js/quiz.js?v=1.5.0"></script>
+  <script src="js/flashcards.js?v=1.5.0"></script>
+  <script src="js/main.js?v=1.5.0"></script>
 </body>
 </html>

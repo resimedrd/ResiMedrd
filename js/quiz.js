@@ -21,6 +21,67 @@ function safeParseOpciones(opciones) {
 }
 
 const quiz = {
+  solicitarConfirmacionInicio(modo) {
+    const modal = document.getElementById("modal-confirmar-inicio");
+    const tituloEl = document.getElementById("modal-confirmar-titulo");
+    const descEl = document.getElementById("modal-confirmar-descripcion-box");
+    const btnAceptar = document.getElementById("btn-confirmar-aceptar");
+    const btnCancelar = document.getElementById("btn-confirmar-cerrar");
+
+    if (!modal) {
+      quiz.iniciarSesion(modo);
+      return;
+    }
+
+    // Configurar contenidos sobrios y ultra-resumidos por modo
+    if (modo === "estudio") {
+      const chkRetro = document.getElementById("chk-retroalimentacion-inmediata");
+      const retroInmediata = chkRetro ? chkRetro.checked : true;
+      
+      if (retroInmediata) {
+        tituloEl.textContent = "Modo Estudio (Respuestas al Instante)";
+        descEl.textContent = "Sesión de aprendizaje adaptativo con respuestas y justificaciones clínicas al instante al contestar cada pregunta. Límite de 90 segundos por pregunta.";
+      } else {
+        tituloEl.textContent = "Modo Estudio (Respuestas al Final)";
+        descEl.textContent = "Sesión de aprendizaje adaptativo con respuestas y justificaciones clínicas consolidadas al finalizar el bloque de preguntas. Límite de 90 segundos por pregunta.";
+      }
+    } else if (modo === "simulacro") {
+      tituloEl.textContent = "Modo Simulacro";
+      descEl.textContent = "Evaluación formal y estricta bajo condiciones reales de examen (cuenta regresiva de 90 segundos por pregunta) con respuestas y resultados bloqueados hasta finalizar el test.";
+    } else if (modo === "guardia") {
+      tituloEl.textContent = "Modo Guardia";
+      descEl.textContent = "Entrenamiento acelerado de 10 preguntas aleatorias de emergencias médicas con límite estricto de 30 segundos por pregunta.";
+    }
+
+    // Manejar eventos de forma limpia libres de acumulaciones
+    const alAceptar = () => {
+      modal.classList.remove("active");
+      btnAceptar.removeEventListener("click", alAceptar);
+      btnCancelar.removeEventListener("click", alCancelar);
+      modal.removeEventListener("click", alFondo);
+      quiz.iniciarSesion(modo);
+    };
+
+    const alCancelar = () => {
+      modal.classList.remove("active");
+      btnAceptar.removeEventListener("click", alAceptar);
+      btnCancelar.removeEventListener("click", alCancelar);
+      modal.removeEventListener("click", alFondo);
+    };
+
+    const alFondo = (e) => {
+      if (e.target === modal) {
+        alCancelar();
+      }
+    };
+
+    btnAceptar.addEventListener("click", alAceptar);
+    btnCancelar.addEventListener("click", alCancelar);
+    modal.addEventListener("click", alFondo);
+
+    modal.classList.add("active");
+  },
+
   inicializar() {
     const btnModoEstudio = document.getElementById("btn-modo-estudio");
     const btnModoSimulacro = document.getElementById("btn-modo-simulacro");
@@ -30,10 +91,10 @@ const quiz = {
     const preguntaTexto = document.getElementById("pregunta-texto");
 
     if (btnModoEstudio) {
-      btnModoEstudio.addEventListener("click", () => quiz.iniciarSesion("estudio"));
+      btnModoEstudio.addEventListener("click", () => quiz.solicitarConfirmacionInicio("estudio"));
     }
     if (btnModoSimulacro) {
-      btnModoSimulacro.addEventListener("click", () => quiz.iniciarSesion("simulacro"));
+      btnModoSimulacro.addEventListener("click", () => quiz.solicitarConfirmacionInicio("simulacro"));
     }
     if (btnSiguiente) {
       btnSiguiente.addEventListener("click", () => quiz.siguientePregunta());
@@ -222,7 +283,7 @@ const quiz = {
     }
   },
 
-  // Temporizador Rápido para MODO GUARDIA (30 segundos por reactivo)
+  // Temporizador Rápido para MODO GUARDIA (30 segundos por pregunta)
   iniciarTemporizadorGuardia() {
     clearInterval(guardiaTimerInterval);
     tiempoPorPreguntaRestante = 30;
