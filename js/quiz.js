@@ -331,7 +331,12 @@ const quiz = {
       boton.className = "option-btn";
       boton.type = "button";
       boton.style.flex = "1";
-      boton.innerHTML = `<span class="option-letter">${String.fromCharCode(65 + index)}</span><span class="option-text-content">${opcion}</span>`;
+      
+      let opcionLimpia = opcion;
+      const regexPrefijo = /^[a-d](?:\)|\.-|\.\s|\s-\s)\s*/i;
+      opcionLimpia = opcionLimpia.replace(regexPrefijo, "");
+
+      boton.innerHTML = `<span class="option-letter">${String.fromCharCode(65 + index)}</span><span class="option-text-content">${opcionLimpia}</span>`;
       
       if (state.respuestasUsuario[state.indiceActual] === index) boton.classList.add("selected");
 
@@ -614,7 +619,12 @@ const quiz = {
           let claseOpt = "";
           if (oIdx === p.correcta) claseOpt = "correct";
           if (oIdx === seleccion && seleccion !== p.correcta) claseOpt = "wrong";
-          opcionesHtml += `<div class="review-opt ${claseOpt}"><strong>${String.fromCharCode(65 + oIdx)}.</strong> ${o}</div>`;
+          
+          let oLimpia = o;
+          const regexPrefijo = /^[a-d](?:\)|\.-|\.\s|\s-\s)\s*/i;
+          oLimpia = oLimpia.replace(regexPrefijo, "");
+          
+          opcionesHtml += `<div class="review-opt ${claseOpt}"><strong>${String.fromCharCode(65 + oIdx)}.</strong> ${oLimpia}</div>`;
         });
 
         // Habilitar botón para Tutor IA, Inyección de Flashcards Automáticas y Reporte de Error

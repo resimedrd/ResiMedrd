@@ -420,7 +420,12 @@ const ui = {
             let claseOpt = "";
             if (oIdx === p.correcta) claseOpt = "correct";
             if (oIdx === seleccion && seleccion !== p.correcta) claseOpt = "wrong";
-            opcionesHtml += `<div class="review-opt ${claseOpt}"><strong>${String.fromCharCode(65 + oIdx)}.</strong> ${o}</div>`;
+            
+            let oLimpia = o;
+            const regexPrefijo = /^[a-d](?:\)|\.-|\.\s|\s-\s)\s*/i;
+            oLimpia = oLimpia.replace(regexPrefijo, "");
+            
+            opcionesHtml += `<div class="review-opt ${claseOpt}"><strong>${String.fromCharCode(65 + oIdx)}.</strong> ${oLimpia}</div>`;
           });
 
           let botonesAccionHtml = `<div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px;">`;
