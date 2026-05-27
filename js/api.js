@@ -1,6 +1,12 @@
 // ====== CENTRAL DE PETICIONES HTTP (api.js) ======
 
-const BASE_URL = "";
+// Detecta automáticamente si el frontend se ejecuta de forma local o en un servidor estático (como GitHub Pages)
+const BASE_URL = window.location.hostname === "localhost" || 
+                 window.location.hostname === "127.0.0.1" || 
+                 window.location.hostname.startsWith("192.168.") || 
+                 window.location.hostname.startsWith("10.")
+  ? "" 
+  : "https://resimedrd-production.up.railway.app";
 
 // Helper centralizado para inyectar token JWT de forma automática
 async function request(url, options = {}) {
@@ -15,9 +21,9 @@ async function request(url, options = {}) {
     options.headers["Authorization"] = `Bearer ${token}`;
   }
   
-  const respuesta = await fetch(url, options);
+  const respuesta = await fetch(BASE_URL + url, options);
   
-  if (respuesta.status === 401 || respuesta.status === 403) {
+  if ((respuesta.status === 401 || respuesta.status === 403) && !url.includes("/api/auth/")) {
     // Si la sesión expiró o no está autorizado, forzar logout
     localStorage.removeItem("resiMed_session");
     localStorage.removeItem("resiMed_jwt_token");
