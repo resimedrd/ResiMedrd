@@ -607,6 +607,10 @@ select.input option {
   border-color: var(--danger) !important;
   color: var(--danger) !important;
   font-weight: 600;
+  text-decoration: underline !important;
+  text-decoration-color: #f59e0b !important; /* Ámbar/Amarillo UWorld */
+  text-decoration-thickness: 2.5px !important;
+  text-underline-offset: 4px !important;
 }
 
 .feedback-box {
@@ -806,6 +810,10 @@ select.input option {
   border-color: var(--danger) !important;
   color: var(--danger) !important;
   font-weight: 600;
+  text-decoration: underline !important;
+  text-decoration-color: #f59e0b !important; /* Ámbar/Amarillo UWorld */
+  text-decoration-thickness: 2.5px !important;
+  text-underline-offset: 4px !important;
 }
 
 .review-exp {
