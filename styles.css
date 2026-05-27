@@ -2366,6 +2366,14 @@ body.dark-mode::-webkit-scrollbar-thumb:hover {
   background: #2a2a2c;
 }
 
+#pantalla-flashcards .btn-ghost.active {
+  background: var(--primary-soft) !important;
+  border-color: var(--primary) !important;
+  color: var(--text) !important;
+  font-weight: 700 !important;
+  box-shadow: 0 4px 12px rgba(10, 102, 194, 0.15) !important;
+}
+
 
 
 
