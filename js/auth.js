@@ -132,42 +132,57 @@ const auth = {
     }
     if (btnCerrarSesion) btnCerrarSesion.classList.remove("hidden");
 
+    // Decidir inmediatamente la pantalla de destino en primer plano para un inicio instantáneo (Non-blocking Boot)
+    let enrutadoExamen = false;
+    const tieneExamenActivo = localStorage.getItem("resiMed_examen_activo");
+    if (tieneExamenActivo) {
+      enrutadoExamen = quiz.restaurarExamenActivo();
+    }
+
+    if (!enrutadoExamen) {
+      const hash = window.location.hash.replace("#", "");
+      const pantallasValidas = ["home", "perfil", "flashcards", "quiz", "resultados"];
+      
+      if (hash === "resultados") {
+        const restaurado = quiz.restaurarUltimoResultado();
+        if (restaurado) {
+          ui.mostrarPantalla("resultados", false);
+        } else {
+          ui.mostrarPantalla("home", false);
+        }
+      } else if (pantallasValidas.includes(hash)) {
+        ui.mostrarPantalla(hash, false);
+      } else {
+        ui.mostrarPantalla("home", false);
+      }
+    }
+
+    // Inicializar y cargar datos en segundo plano sin bloquear el hilo principal (Non-blocking Background Queries)
     if (state.usuarioConectado.rol === "admin") {
       if (panelAdministrador) panelAdministrador.classList.remove("hidden");
-      await ui.cargarReportesAdministrador();
+      ui.cargarReportesAdministrador().catch(err => console.error("Error al cargar reportes admin:", err));
     } else {
       if (panelAdministrador) panelAdministrador.classList.add("hidden");
     }
 
-    // Inicializar los componentes de la UI dinámica del usuario
-    await ui.inicializarGridEspecialidades();
-    await ui.inicializarFiltrosFlashcards();
-    await ui.cargarFiltrosEspecialidad();
-    await ui.cargarFiltrosAnos();
-    await ui.cargarDashboardHome();
-    await ui.cargarHistorialReciente();
-
-    // FASE 4: Restaurar examen activo si existe en recarga de página
-    const tieneExamenActivo = localStorage.getItem("resiMed_examen_activo");
-    if (tieneExamenActivo) {
-      const restaurado = quiz.restaurarExamenActivo();
-      if (restaurado) return;
-    }
-
-    // FASE 4: Restaurar la pantalla correspondiente al Hash de la URL actual
-    const hash = window.location.hash.replace("#", "");
-    const pantallasValidas = ["home", "perfil", "flashcards", "quiz", "resultados"];
-    if (pantallasValidas.includes(hash)) {
-      ui.mostrarPantalla(hash, false);
-    } else {
-      ui.mostrarPantalla("home");
-    }
+    // Cargar componentes de la UI dinámica de forma concurrente
+    Promise.all([
+      ui.inicializarGridEspecialidades(),
+      ui.inicializarFiltrosFlashcards(),
+      ui.cargarFiltrosEspecialidad(),
+      ui.cargarFiltrosAnos(),
+      ui.cargarDashboardHome(),
+      ui.cargarHistorialReciente()
+    ]).catch(err => {
+      console.warn("Falla silenciosa al inicializar algunos datos del entorno:", err);
+    });
   },
 
   logout() {
     state.usuarioConectado = null;
     localStorage.removeItem("resiMed_session");
     localStorage.removeItem("resiMed_jwt_token");
+    localStorage.removeItem("resiMed_ultimo_resultado");
     
     // FASE 4: Limpiar estado de examen activo al cerrar sesión
     if (window.quiz && quiz.limpiarEstadoExamenActivo) {

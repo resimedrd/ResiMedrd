@@ -805,6 +805,23 @@ const quiz = {
         explicacion_incorrecta: p.explicacion_incorrecta
       }));
 
+      // Guardar el último resultado localmente para persistencia en recarga F5
+      const ultimoResultado = {
+        aciertos: aciertos,
+        totalPreguntas: state.preguntasCargadas.length,
+        porcentaje: porcentaje,
+        duracionFormateada: duracionFormateada,
+        temaTexto: (state.modoActual === "guardia")
+          ? "Urgencias Médicas"
+          : (state.especialidadSeleccionada === "Todos")
+            ? "Examen General"
+            : (state.subtemaSeleccionado && state.subtemaSeleccionado !== "Todos")
+              ? `${state.especialidadSeleccionada} - ${state.subtemaSeleccionado}`
+              : state.especialidadSeleccionada,
+        detalleExamen: detalleExamen
+      };
+      localStorage.setItem("resiMed_ultimo_resultado", JSON.stringify(ultimoResultado));
+
       // Sincronizar repetición espaciada en segundo plano de forma no bloqueante para velocidad instantánea
       state.preguntasCargadas.forEach((p, i) => {
         const esCorrecto = (state.respuestasUsuario[i] === p.correcta);
@@ -957,6 +974,109 @@ const quiz = {
     if (btnFinalizar) {
       btnFinalizar.textContent = "Procesando...";
       btnFinalizar.disabled = true;
+    }
+  },
+
+  restaurarUltimoResultado() {
+    try {
+      const dataStr = localStorage.getItem("resiMed_ultimo_resultado");
+      if (!dataStr) return false;
+      const data = JSON.parse(dataStr);
+      if (!data || !data.detalleExamen || data.detalleExamen.length === 0) return false;
+
+      // Restablecer los datos visuales de la interfaz de resultados
+      const resultadoPuntajeEl = document.getElementById("resultado-puntaje");
+      if (resultadoPuntajeEl) resultadoPuntajeEl.textContent = `${data.aciertos} / ${data.totalPreguntas}`;
+      
+      const resultadoPorcentajeEl = document.getElementById("resultado-porcentaje");
+      if (resultadoPorcentajeEl) resultadoPorcentajeEl.textContent = `${data.porcentaje}%`;
+
+      const resultadoTiempoEl = document.getElementById("resultado-tiempo");
+      if (resultadoTiempoEl) resultadoTiempoEl.textContent = data.duracionFormateada;
+
+      const resultadoTemaEl = document.getElementById("resultado-tema");
+      if (resultadoTemaEl) resultadoTemaEl.textContent = data.temaTexto;
+
+      // Reconstruir la disección del examen (revisionContainer)
+      const revisionContainer = document.getElementById("revision-container");
+      if (revisionContainer) {
+        revisionContainer.innerHTML = "";
+
+        data.detalleExamen.forEach((p, idx) => {
+          const opcionesArray = p.opciones;
+          const seleccion = p.seleccionada;
+          
+          let opcionesHtml = "";
+          opcionesArray.forEach((o, oIdx) => {
+            let claseOpt = "";
+            if (oIdx === p.correcta) claseOpt = "correct";
+            if (oIdx === seleccion && seleccion !== p.correcta) claseOpt = "wrong";
+            
+            let oLimpia = o;
+            const regexPrefijo = /^[a-d](?:\)|\.-|\.\s|\s-\s)\s*/i;
+            oLimpia = oLimpia.replace(regexPrefijo, "");
+            
+            opcionesHtml += `<div class="review-opt ${claseOpt}"><strong>${String.fromCharCode(65 + oIdx)}.</strong> ${oLimpia}</div>`;
+          });
+
+          let botonesAccionHtml = `<div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px;">`;
+          const textoEscapado = p.texto.replace(/"/g, "&quot;");
+          const explicacionEscapada = (p.explicacion || "Sin desglose.").replace(/"/g, "&quot;");
+          const temaEscapado = (p.tema || "General").replace(/"/g, "&quot;");
+
+          if (seleccion !== p.correcta) {
+            const seleccionText = (seleccion !== null && opcionesArray[seleccion]) 
+              ? opcionesArray[seleccion].replace(/"/g, "&quot;") 
+              : "Sin responder";
+            botonesAccionHtml += `
+              <button class="btn-ia btn-consultar-tutor" data-texto="${textoEscapado}" data-seleccion="${seleccionText}" type="button">Consultar Tutor IA</button>
+              <button class="btn btn-primary btn-auto-flashcard" data-tema="${temaEscapado}" data-pregunta="${textoEscapado}" data-respuesta="${explicacionEscapada}" style="background: var(--warning); color:#000; font-size:12px; padding:6px 12px; border:none;" type="button">Crear Flashcard</button>
+            `;
+          }
+          
+          botonesAccionHtml += `
+            <button class="btn btn-reportar-pregunta" data-id="${p.id}" type="button">Reportar Error</button>
+          </div>`;
+
+          const div = document.createElement("div");
+          div.className = "review-item";
+          
+          const esMarcada = !!p.marcada;
+          let badgeMarcadaHtml = "";
+          if (esMarcada) {
+            div.classList.add("review-flagged");
+            badgeMarcadaHtml = `<span class="flagged-review-chip">PREGUNTA MARCADA</span>`;
+          }
+          if (seleccion !== p.correcta) {
+            div.classList.add("review-wrong");
+          }
+
+          div.innerHTML = `
+            <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 8px;">
+              ${badgeMarcadaHtml}
+              <div style="font-size: 11px; color: var(--text-dim);">
+                Taxonomía: <strong>${p.tema || "General"}</strong>
+              </div>
+            </div>
+            <div class="review-q-text">${idx + 1}. ${p.texto}</div>
+            <div class="review-options">${opcionesHtml}</div>
+            <div class="review-exp-container">${ui.formatearExplicacionClinica(p.explicacion, p.fuente, p.explicacion_correcta, p.explicacion_incorrecta)}</div>
+            ${botonesAccionHtml}
+          `;
+          revisionContainer.appendChild(div);
+        });
+      }
+
+      // Ocultar Mapa del Examen
+      const mapEl = document.getElementById("simulacro-navigation-map");
+      if (mapEl) mapEl.classList.add("hidden");
+
+      ui.filtrarRevision("todas");
+      return true;
+    } catch (e) {
+      console.error("Error al restaurar último resultado:", e);
+      localStorage.removeItem("resiMed_ultimo_resultado");
+      return false;
     }
   }
 };
