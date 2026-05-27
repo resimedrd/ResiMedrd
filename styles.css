@@ -2312,6 +2312,29 @@ select.input option {
   transition: all 0.25s ease !important;
 }
 
+/* Estilo premium para los intentos incorrectos previos en la misma pregunta (amarillo/ámbar) */
+.option-btn.previous-attempt {
+  background: var(--warning-soft) !important;
+  border-color: var(--warning) !important;
+  color: var(--text) !important;
+  text-decoration: underline !important;
+  text-decoration-color: #f59e0b !important;
+  text-decoration-thickness: 2.5px !important;
+  text-underline-offset: 4px !important;
+  opacity: 0.85;
+}
+
+.review-opt.previous-attempt {
+  background: var(--warning-soft) !important;
+  border-color: var(--warning) !important;
+  color: var(--text) !important;
+  text-decoration: underline !important;
+  text-decoration-color: #f59e0b !important;
+  text-decoration-thickness: 2.5px !important;
+  text-underline-offset: 4px !important;
+  opacity: 0.85;
+}
+
 
 
 
