@@ -243,6 +243,17 @@ const quiz = {
         state.preguntasMarcadas[state.indiceActual] = !state.preguntasMarcadas[state.indiceActual];
         quiz.actualizarBotonFlagVisual();
         quiz.renderizarMapaNavegacion();
+        
+        // Actualizar reactivamente la clase de la pregunta en pantalla
+        const pTexto = document.getElementById("pregunta-texto");
+        if (pTexto) {
+          if (state.preguntasMarcadas[state.indiceActual]) {
+            pTexto.classList.add("flagged-question");
+          } else {
+            pTexto.classList.remove("flagged-question");
+          }
+        }
+
         quiz.guardarEstadoExamenActivo();
       });
     }
@@ -530,7 +541,14 @@ const quiz = {
       progressFill.style.width = `${((state.indiceActual + 1) / state.preguntasCargadas.length) * 100}%`;
     }
 
-    if (preguntaTexto) preguntaTexto.innerHTML = p.texto;
+    if (preguntaTexto) {
+      preguntaTexto.innerHTML = p.texto;
+      if (state.preguntasMarcadas[state.indiceActual]) {
+        preguntaTexto.classList.add("flagged-question");
+      } else {
+        preguntaTexto.classList.remove("flagged-question");
+      }
+    }
     if (opcionesContainer) opcionesContainer.innerHTML = "";
 
     const opcionesArray = safeParseOpciones(p.opciones);
@@ -676,12 +694,14 @@ const quiz = {
       }
       btn.innerHTML = contenidoBtn;
 
-      if (idx === state.indiceActual) {
-        btn.classList.add("current");
-      } else if (state.respuestasUsuario[idx] !== null) {
+      if (state.respuestasUsuario[idx] !== null) {
         btn.classList.add("answered");
       } else {
         btn.classList.add("pending");
+      }
+
+      if (idx === state.indiceActual) {
+        btn.classList.add("current");
       }
 
       btn.addEventListener("click", () => {

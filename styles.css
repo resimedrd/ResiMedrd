@@ -2267,6 +2267,43 @@ select.input option {
   transform: translateX(20px);
 }
 
+/* ====== ESTILOS DE SUBRAYADO Y DESTAQUE PARA PREGUNTAS CONTESTADAS Y MARCADAS ====== */
+
+/* Subrayado para preguntas contestadas en el Mapa de Navegación */
+.nav-map-btn.answered {
+  text-decoration: underline !important;
+  text-decoration-thickness: 2px !important;
+  text-underline-offset: 3px !important;
+}
+
+/* Subrayado para preguntas marcadas/dudosas (flagged) en el Mapa de Navegación */
+.nav-map-btn.flagged {
+  text-decoration: underline !important;
+  text-decoration-color: #d97706 !important;
+  text-decoration-thickness: 2px !important;
+  text-underline-offset: 3px !important;
+}
+
+/* Estilo premium cuando la pregunta actual está contestada (combina current + answered) */
+.nav-map-btn.current.answered {
+  text-decoration: underline !important;
+  text-decoration-color: #ffffff !important;
+  text-decoration-thickness: 2px !important;
+  text-underline-offset: 3px !important;
+}
+
+/* Destaque premium para el texto de la pregunta en pantalla cuando está marcada (flagged/dudosa) */
+.question-text.flagged-question {
+  border-left: 4px solid var(--warning) !important;
+  padding-left: 16px !important;
+  color: var(--text) !important;
+  text-decoration: underline !important;
+  text-decoration-color: var(--warning) !important;
+  text-decoration-thickness: 2px !important;
+  text-underline-offset: 6px !important;
+  transition: all 0.25s ease !important;
+}
+
 
 
 
