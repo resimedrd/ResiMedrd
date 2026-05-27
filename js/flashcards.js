@@ -128,6 +128,8 @@ baseDatosFlashcardsEstaticas[23] = {
 
 const flashcards = {
   inicializar() {
+    state.modoFlashcard = "classic"; // "classic" or "active"
+
     const btnIrFlashcards = document.getElementById("btn-ir-flashcards");
     const btnFlashcardsRegresar = document.getElementById("btn-flashcards-regresar");
     const btnFlashcardPrev = document.getElementById("btn-flashcard-prev");
@@ -138,6 +140,111 @@ const flashcards = {
     const btnFlashcardCongratsRegresar = document.getElementById("btn-flashcard-congrats-regresar");
     const flashcardFiltroTema = document.getElementById("flashcard-filtro-tema");
     const flashcardClickTrigger = document.getElementById("flashcard-click-trigger");
+
+    // Modalidad selectores
+    const btnClassic = document.getElementById("btn-flashcard-mode-classic");
+    const btnActive = document.getElementById("btn-flashcard-mode-active");
+    const inputActiveBox = document.getElementById("flashcard-active-input-box");
+    const comparisonBox = document.getElementById("flashcard-active-comparison-box");
+
+    if (btnClassic && btnActive) {
+      btnClassic.addEventListener("click", () => {
+        state.modoFlashcard = "classic";
+        btnClassic.classList.add("active");
+        btnActive.classList.remove("active");
+        if (inputActiveBox) inputActiveBox.classList.add("hidden");
+        if (comparisonBox) comparisonBox.classList.add("hidden");
+        if (flashcardClickTrigger) {
+          flashcardClickTrigger.classList.remove("active-mode-card");
+          flashcardClickTrigger.style.pointerEvents = "auto";
+        }
+        flashcards.renderizarActual();
+      });
+
+      btnActive.addEventListener("click", () => {
+        state.modoFlashcard = "active";
+        btnActive.classList.add("active");
+        btnClassic.classList.remove("active");
+        if (inputActiveBox) inputActiveBox.classList.remove("hidden");
+        if (comparisonBox) comparisonBox.classList.add("hidden");
+        if (flashcardClickTrigger) {
+          flashcardClickTrigger.classList.add("active-mode-card");
+          flashcardClickTrigger.style.pointerEvents = "none";
+        }
+        flashcards.renderizarActual();
+      });
+    }
+
+    // Botón de comparar respuesta escrita
+    const btnComparar = document.getElementById("btn-flashcard-comparar");
+    if (btnComparar) {
+      btnComparar.addEventListener("click", () => {
+        const card = state.mazoActualFlashcards[state.indiceActualFlashcard];
+        if (!card) return;
+
+        const txtRespuesta = document.getElementById("flashcard-txt-respuesta");
+        const respuestaEscrita = txtRespuesta ? txtRespuesta.value.trim() : "";
+
+        if (respuestaEscrita === "") {
+          alert("Por favor, escribe una respuesta antes de comparar.");
+          return;
+        }
+
+        // Ejecutar algoritmo de similitud conceptual
+        const resultado = flashcards.compararRespuestas(card.respuesta, respuestaEscrita);
+
+        // Actualizar visualmente la caja de comparación
+        const compCorrecta = document.getElementById("flashcard-comp-correcta");
+        const compEscrita = document.getElementById("flashcard-comp-escrita");
+        const badge = document.getElementById("flashcard-similarity-badge");
+        const veredicto = document.getElementById("flashcard-feedback-veredicto");
+
+        if (compCorrecta) compCorrecta.innerHTML = resultado.correctaHtml;
+        if (compEscrita) compEscrita.innerHTML = resultado.escritaHtml;
+        
+        if (badge) {
+          badge.textContent = `Similitud: ${resultado.score}%`;
+          badge.className = "chip"; // reset
+          
+          if (resultado.colorClass === "success") {
+            badge.classList.add("flashcard-similarity-good");
+          } else if (resultado.colorClass === "warning") {
+            badge.classList.add("flashcard-similarity-mid");
+          } else {
+            badge.classList.add("flashcard-similarity-bad");
+          }
+        }
+
+        if (veredicto) {
+          veredicto.textContent = resultado.veredicto;
+          
+          if (resultado.colorClass === "success") {
+            veredicto.style.background = "var(--success-soft)";
+            veredicto.style.color = "var(--success)";
+            veredicto.style.border = "1px solid rgba(34, 197, 94, 0.2)";
+          } else if (resultado.colorClass === "warning") {
+            veredicto.style.background = "var(--warning-soft)";
+            veredicto.style.color = "var(--warning)";
+            veredicto.style.border = "1px solid rgba(245, 158, 11, 0.2)";
+          } else {
+            veredicto.style.background = "var(--danger-soft)";
+            veredicto.style.color = "var(--danger)";
+            veredicto.style.border = "1px solid rgba(239, 68, 68, 0.2)";
+          }
+        }
+
+        if (comparisonBox) comparisonBox.classList.remove("hidden");
+
+        // Voltear automáticamente la tarjeta para revelar el reverso
+        if (flashcardClickTrigger) {
+          flashcardClickTrigger.classList.add("flipped");
+        }
+
+        // Mostrar caja de autoevaluación (dont/know)
+        const flashcardEvalBox = document.getElementById("flashcard-eval-box");
+        if (flashcardEvalBox) flashcardEvalBox.classList.remove("hidden");
+      });
+    }
 
     if (btnIrFlashcards) {
       btnIrFlashcards.addEventListener("click", () => ui.mostrarPantalla("flashcards"));
@@ -179,6 +286,9 @@ const flashcards = {
 
     if (flashcardClickTrigger) {
       flashcardClickTrigger.addEventListener("click", () => {
+        // En modo Respuesta Activa, no permitimos hacer click directo para voltear
+        if (state.modoFlashcard === "active") return;
+
         flashcardClickTrigger.classList.toggle("flipped");
         const flashcardEvalBox = document.getElementById("flashcard-eval-box");
         if (flashcardClickTrigger.classList.contains("flipped")) {
@@ -279,6 +389,30 @@ const flashcards = {
     if (flashcardClickTrigger) flashcardClickTrigger.classList.remove("flipped");
     if (flashcardEvalBox) flashcardEvalBox.classList.add("hidden");
 
+    // Reset de Respuesta Activa
+    const txtRespuesta = document.getElementById("flashcard-txt-respuesta");
+    if (txtRespuesta) txtRespuesta.value = "";
+    
+    const comparisonBox = document.getElementById("flashcard-active-comparison-box");
+    if (comparisonBox) comparisonBox.classList.add("hidden");
+
+    const inputActiveBox = document.getElementById("flashcard-active-input-box");
+    if (inputActiveBox) {
+      if (state.modoFlashcard === "active") {
+        inputActiveBox.classList.remove("hidden");
+        if (flashcardClickTrigger) {
+          flashcardClickTrigger.classList.add("active-mode-card");
+          flashcardClickTrigger.style.pointerEvents = "none";
+        }
+      } else {
+        inputActiveBox.classList.add("hidden");
+        if (flashcardClickTrigger) {
+          flashcardClickTrigger.classList.remove("active-mode-card");
+          flashcardClickTrigger.style.pointerEvents = "auto";
+        }
+      }
+    }
+
     if (state.mazoActualFlashcards.length === 0) {
       if (indicador) indicador.textContent = "0 de 0 Tarjetas";
       document.getElementById("flashcard-front-tag").textContent = "Vacío";
@@ -298,6 +432,99 @@ const flashcards = {
     document.getElementById("flashcard-front-texto").textContent = card.pregunta;
     document.getElementById("flashcard-back-tag").textContent = `Respuesta • ${card.tema}`;
     document.getElementById("flashcard-back-texto").textContent = card.respuesta;
+  },
+
+  compararRespuestas(correcta, escrita) {
+    if (!escrita || escrita.trim() === "") {
+      return {
+        score: 0,
+        correctaHtml: correcta,
+        escritaHtml: "(No ingresaste respuesta)",
+        veredicto: "No se ingresó ninguna respuesta escrita.",
+        colorClass: "danger"
+      };
+    }
+
+    // Limpieza de texto para comparación conceptual médica
+    const limpiar = (txt) => {
+      return txt
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "") // quitar acentos
+        .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?]/g, " ") // cambiar puntuación por espacios
+        .split(/\s+/)
+        .filter(w => w.trim().length > 2); // palabras con más de 2 letras
+    };
+
+    const palabrasCorrectas = limpiar(correcta);
+    const palabrasEscritas = limpiar(escrita);
+
+    if (palabrasCorrectas.length === 0) {
+      return { score: 100, correctaHtml: correcta, escritaHtml: escrita, veredicto: "✓ Coincidencia completa.", colorClass: "success" };
+    }
+
+    // Filtro de stop words comunes en español
+    const stopWords = new Set([
+      "del", "que", "con", "por", "una", "uno", "los", "las", "para", "como", "mas",
+      "este", "esta", "estos", "estas", "todo", "toda", "todos", "todas", "donde", "cuando"
+    ]);
+    
+    // Conceptos médicos clave (excluyendo stop words)
+    const palabrasClaveCorrectas = palabrasCorrectas.filter(w => !stopWords.has(w));
+    const setEscritas = new Set(palabrasEscritas);
+    
+    let coincidentes = 0;
+    palabrasClaveCorrectas.forEach(w => {
+      if (setEscritas.has(w)) {
+        coincidentes++;
+      }
+    });
+
+    // Recall score: porcentaje de conceptos clave correctos incluidos
+    const score = palabrasClaveCorrectas.length > 0 
+      ? Math.round((coincidentes / palabrasClaveCorrectas.length) * 100) 
+      : 0;
+
+    // Resaltar palabras coincidentes en el HTML
+    const resaltarMatch = (original, matches) => {
+      let palabras = original.split(/\s+/);
+      return palabras.map(p => {
+        const limpiaPalabra = p.toLowerCase()
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?]/g, "");
+          
+        if (matches.has(limpiaPalabra) && limpiaPalabra.length > 2 && !stopWords.has(limpiaPalabra)) {
+          return `<span class="flashcard-match-highlight">${p}</span>`;
+        }
+        return p;
+      }).join(" ");
+    };
+
+    const matchesSet = new Set(palabrasClaveCorrectas.filter(w => setEscritas.has(w)));
+    const correctaHtml = resaltarMatch(correcta, matchesSet);
+    const escritaHtml = resaltarMatch(escrita, matchesSet);
+
+    let veredicto = "";
+    let colorClass = "";
+    if (score >= 70) {
+      veredicto = "🏆 ¡Excelente coincidencia! Has incluido los conceptos fundamentales de la literatura médica oficial.";
+      colorClass = "success";
+    } else if (score >= 35) {
+      veredicto = "⚠️ Coincidencia parcial. Cubres algunos términos clave, pero necesitas mayor precisión académica.";
+      colorClass = "warning";
+    } else {
+      veredicto = "❌ Coincidencia baja. Repasa los criterios de diagnóstico y tratamiento oficiales de esta materia.";
+      colorClass = "danger";
+    }
+
+    return {
+      score,
+      correctaHtml,
+      escritaHtml,
+      veredicto,
+      colorClass
+    };
   },
 
   // AVANZAR TARJETA CON MOTOR DE SPACED REPETITION (SM-2 / FSRS) PERSISTENTE

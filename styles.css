@@ -34,16 +34,16 @@
 }
 
 body.dark-mode {
-  --bg: #07111f;
-  --bg-2: #0b1728;
-  --panel: #0d1727;
-  --panel-strong: #0b121f;
-  --panel-soft: rgba(255, 255, 255, 0.04);
-  --bg-card: #0d1727;
-  --option-bg: #111e33;
+  --bg: #000000;
+  --bg-2: #050505;
+  --panel: #0a0a0c;
+  --panel-strong: #020202;
+  --panel-soft: rgba(255, 255, 255, 0.03);
+  --bg-card: #08080a;
+  --option-bg: #070709;
 
-  --border: rgba(255, 255, 255, 0.08);
-  --border-strong: rgba(255, 255, 255, 0.16);
+  --border: rgba(255, 255, 255, 0.05);
+  --border-strong: rgba(255, 255, 255, 0.10);
 
   --text: #f8fafc;
   --text-soft: #cbd5e1;
@@ -62,10 +62,10 @@ body.dark-mode {
   --warning: #f59e0b;
   --warning-soft: rgba(245, 158, 11, 0.15);
 
-  --hero-bg: linear-gradient(100deg, #0b121f 0%, rgba(15, 28, 50, 0.95) 100%);
+  --hero-bg: linear-gradient(135deg, #020202 0%, #0c0c0f 100%);
   --hero-text: #f8fafc;
   --hero-text-soft: #cbd5e1;
-  --hero-border: rgba(255, 255, 255, 0.08);
+  --hero-border: rgba(255, 255, 255, 0.05);
 }
 
 * {
@@ -81,6 +81,7 @@ body {
   min-height: 100vh;
   overflow-x: hidden;
   position: relative;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 h1, h2, h3, h4, h5, h6, .brand-mark, .flashcard-q, .mode-title, .quiz-timer, .result-value, .stat-value, .dashboard-value {
@@ -96,6 +97,11 @@ h1, h2, h3, h4, h5, h6, .brand-mark, .flashcard-q, .mode-title, .quiz-timer, .re
   height: 100vh;
   background: linear-gradient(135deg, #f1f5f9 0%, #cbd5e1 100%);
   z-index: -1;
+  transition: background 0.3s ease;
+}
+
+body.dark-mode .app-bg {
+  background: #000000 !important;
 }
 
 .layout {
@@ -326,7 +332,7 @@ select.input {
 }
 
 select.input option {
-  background-color: #0b1424;
+  background-color: var(--panel);
   color: var(--text);
 }
 
@@ -1854,14 +1860,16 @@ select.input option {
 }
 
 .input {
-  background: #ffffff !important;
+  background: var(--panel) !important;
   border: 1px solid var(--border) !important;
+  color: var(--text) !important;
   box-shadow: none !important;
 }
 
 .input:focus {
-  background: #ffffff !important;
+  background: var(--panel) !important;
   border-color: var(--primary) !important;
+  color: var(--text) !important;
   box-shadow: 0 0 0 3px rgba(10, 102, 194, 0.15) !important;
 }
 
@@ -2275,6 +2283,87 @@ select.input option {
   padding-left: 16px !important;
   color: var(--text) !important;
   transition: all 0.25s ease !important;
+}
+
+/* Smooth global transitions for theme change */
+.topbar, .panel, .input, .card, .hero-card, .sidebar-unified-card-v2, .app-bg, .tr-history-row, .modal-ia-container {
+  transition: background 0.3s ease, background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease !important;
+}
+
+/* ==========================================================================
+   ✍️ FASE ACTIVAS: ESTILOS DE RESPUESTA ESCRITA & COMPARACIÓN
+   ========================================================================== */
+#flashcard-active-input-box {
+  animation: slide-up-active 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+#flashcard-active-comparison-box {
+  animation: slide-up-active 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  transition: all 0.3s ease;
+}
+
+@keyframes slide-up-active {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.flashcard-similarity-good {
+  background: var(--success-soft) !important;
+  color: var(--success) !important;
+  border: 1px solid rgba(34, 197, 94, 0.25) !important;
+}
+
+.flashcard-similarity-mid {
+  background: var(--warning-soft) !important;
+  color: var(--warning) !important;
+  border: 1px solid rgba(245, 158, 11, 0.25) !important;
+}
+
+.flashcard-similarity-bad {
+  background: var(--danger-soft) !important;
+  color: var(--danger) !important;
+  border: 1px solid rgba(239, 68, 68, 0.25) !important;
+}
+
+/* Matched keyword highlight */
+.flashcard-match-highlight {
+  background: rgba(34, 197, 94, 0.15) !important;
+  color: var(--success) !important;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 700;
+  border-bottom: 2px solid var(--success);
+  display: inline-block;
+  margin: 1px 0;
+}
+
+/* Active Mode specific card modifications */
+.flashcard-container.active-mode-card {
+  box-shadow: 0 10px 24px rgba(10, 102, 194, 0.08) !important;
+  border-color: var(--primary) !important;
+}
+
+/* Scrollbar custom style in dark mode */
+body.dark-mode::-webkit-scrollbar {
+  width: 10px;
+}
+body.dark-mode::-webkit-scrollbar-track {
+  background: #000000;
+}
+body.dark-mode::-webkit-scrollbar-thumb {
+  background: #1a1a1c;
+  border-radius: 5px;
+  border: 2px solid #000000;
+}
+body.dark-mode::-webkit-scrollbar-thumb:hover {
+  background: #2a2a2c;
 }
 
 
