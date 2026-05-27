@@ -466,12 +466,6 @@ const ui = {
             if (oIdx === p.correcta) claseOpt = "correct";
             if (oIdx === seleccion && seleccion !== p.correcta) claseOpt = "wrong";
             
-            // Si fue un intento incorrecto previo, lo marcamos como previous-attempt (amarillo)
-            const intentos = p.intentosPrevios || [];
-            if (intentos.includes(oIdx) && oIdx !== seleccion && oIdx !== p.correcta) {
-              claseOpt = "previous-attempt";
-            }
-            
             let oLimpia = o;
             const regexPrefijo = /^[a-d](?:\)|\.-|\.\s|\s-\s)\s*/i;
             oLimpia = oLimpia.replace(regexPrefijo, "");

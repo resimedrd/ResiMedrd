@@ -34,8 +34,7 @@ const quiz = {
         preguntasMarcadas: state.preguntasMarcadas,
         duracionTotalSegundos: state.duracionTotalSegundos,
         tiempoRestanteSegundos: state.tiempoRestanteSegundos,
-        retroalimentacionInmediata: state.retroalimentacionInmediata,
-        intentosPrevios: state.intentosPrevios || {}
+        retroalimentacionInmediata: state.retroalimentacionInmediata
       }));
     }
   },
@@ -63,7 +62,6 @@ const quiz = {
       state.duracionTotalSegundos = data.duracionTotalSegundos;
       state.tiempoRestanteSegundos = data.tiempoRestanteSegundos;
       state.retroalimentacionInmediata = data.retroalimentacionInmediata;
-      state.intentosPrevios = data.intentosPrevios || {};
 
       // Reseteo de intervalos si estaban activos
       clearInterval(state.intervaloTemporizador);
@@ -351,7 +349,6 @@ const quiz = {
       state.respuestasUsuario = new Array(state.preguntasCargadas.length).fill(null);
       state.preguntasMarcadas = new Array(state.preguntasCargadas.length).fill(false);
       state.duracionTotalSegundos = 0;
-      state.intentosPrevios = {};
 
       const chipModo = document.getElementById("chip-modo");
       const chipTema = document.getElementById("chip-tema");
@@ -593,72 +590,30 @@ const quiz = {
         if (state.modoActual === "estudio") {
           const botones = opcionesContainer.querySelectorAll(".option-btn");
           const marcadores = opcionesContainer.querySelectorAll(".btn-marcar-respuesta");
+          botones.forEach(b => b.disabled = true);
+          marcadores.forEach(bm => bm.classList.add("hidden"));
+          state.respuestasUsuario[state.indiceActual] = index;
           
-          state.intentosPrevios = state.intentosPrevios || {};
-          state.intentosPrevios[state.indiceActual] = state.intentosPrevios[state.indiceActual] || [];
-          const anteriores = state.intentosPrevios[state.indiceActual];
-
           const esCorrecto = (index === p.correcta);
           
           if (esCorrecto) {
-            // Si es correcto, finalizamos la pregunta
             boton.classList.add("correct");
-            botones.forEach(b => b.disabled = true);
-            marcadores.forEach(bm => bm.classList.add("hidden"));
-            state.respuestasUsuario[state.indiceActual] = index;
-            
-            // Todos los intentos incorrectos anteriores en esta pregunta se marcan en amarillo (previous-attempt)
-            anteriores.forEach(idxIntentado => {
-              if (botones[idxIntentado]) {
-                botones[idxIntentado].classList.remove("wrong");
-                botones[idxIntentado].classList.add("previous-attempt");
-              }
-            });
-            
             quiz.mostrarFeedback(true, p.explicacion);
-            
-            // Cuenta como correcto en SM-2 si fue al primer intento
-            const esAlPrimerIntento = (anteriores.length === 0);
-            await spacedRepetition.sincronizarEstado(p.id, null, esAlPrimerIntento, esAlPrimerIntento ? 2 : 1);
-            
-            quiz.chequearBotonesNavegacion();
-            quiz.renderizarMapaNavegacion();
-            quiz.guardarEstadoExamenActivo();
           } else {
-            // Si es incorrecto, no bloqueamos la pregunta completa
-            // Cualquier intento "wrong" (rojo) anterior pasa a ser "previous-attempt" (amarillo)
-            anteriores.forEach(idxIntentado => {
-              if (botones[idxIntentado]) {
-                botones[idxIntentado].classList.remove("wrong");
-                botones[idxIntentado].classList.add("previous-attempt");
-              }
-            });
-            
-            // El intento actual incorrecto se marca en rojo ("wrong") y se deshabilita
             boton.classList.add("wrong");
-            boton.disabled = true;
-            
-            // Registrar este intento
-            if (!anteriores.includes(index)) {
-              anteriores.push(index);
-            }
-            
-            // La opción correcta se resalta en verde de una vez como ya está configurado
-            if (botones[p.correcta]) {
-              botones[p.correcta].classList.add("correct");
-            }
-            
+            botones[p.correcta].classList.add("correct");
             quiz.mostrarFeedback(false, p.explicacion);
-            
-            quiz.chequearBotonesNavegacion();
-            quiz.renderizarMapaNavegacion();
-            quiz.guardarEstadoExamenActivo();
           }
+          
+          // Sincronizar repetición espaciada en caliente (SM-2)
+          await spacedRepetition.sincronizarEstado(p.id, null, esCorrecto, esCorrecto ? 2 : 1);
+          
+          quiz.chequearBotonesNavegacion();
+          quiz.renderizarMapaNavegacion();
+          quiz.guardarEstadoExamenActivo();
         } else {
           const botones = opcionesContainer.querySelectorAll(".option-btn");
-          if (botones) {
-            botones.forEach(b => b.classList.remove("selected"));
-          }
+          botones.forEach(b => b.classList.remove("selected"));
           boton.classList.add("selected");
           state.respuestasUsuario[state.indiceActual] = index;
           
@@ -691,18 +646,6 @@ const quiz = {
           quiz.mostrarFeedback(false, p.explicacion);
         }
       }
-      
-      // Aplicar estilos de intentos previos en amarillo (previous-attempt)
-      const intentos = (state.intentosPrevios && state.intentosPrevios[state.indiceActual]) || [];
-      intentos.forEach(idxIntentado => {
-        if (idxIntentado !== yaRespondida && idxIntentado !== p.correcta) {
-          if (botones[idxIntentado]) {
-            botones[idxIntentado].classList.remove("wrong");
-            botones[idxIntentado].classList.add("previous-attempt");
-          }
-        }
-      });
-      
       quiz.chequearBotonesNavegacion();
     }
     
@@ -859,8 +802,7 @@ const quiz = {
         marcada: !!state.preguntasMarcadas[i],
         duracionTotalSegundos: state.duracionTotalSegundos,
         explicacion_correcta: p.explicacion_correcta,
-        explicacion_incorrecta: p.explicacion_incorrecta,
-        intentosPrevios: (state.intentosPrevios && state.intentosPrevios[i]) || []
+        explicacion_incorrecta: p.explicacion_incorrecta
       }));
 
       // Sincronizar repetición espaciada en segundo plano de forma no bloqueante para velocidad instantánea
