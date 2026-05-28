@@ -5,19 +5,7 @@ let tiempoPorPreguntaRestante = 30;
 let guardiaTimerInterval = null;
 
 function safeParseOpciones(opciones) {
-  if (!opciones) return [];
-  if (Array.isArray(opciones)) return opciones;
-  if (typeof opciones === "string") {
-    try {
-      const parsed = JSON.parse(opciones);
-      if (Array.isArray(parsed)) return parsed;
-      return [parsed];
-    } catch (e) {
-      console.error("Error al parsear opciones JSON, usando fallback:", opciones, e);
-      return opciones.split(",").map(opt => opt.trim());
-    }
-  }
-  return [];
+  return state.safeParseOpciones(opciones);
 }
 
 const quiz = {

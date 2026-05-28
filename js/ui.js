@@ -458,8 +458,7 @@ const ui = {
         revisionContainer.innerHTML = "";
 
         preguntas.forEach((p, idx) => {
-          const opcionesRaw = (typeof p.opciones === 'string') ? JSON.parse(p.opciones) : (Array.isArray(p.opciones) ? p.opciones : []);
-          const opcionesArray = Array.isArray(opcionesRaw) ? opcionesRaw : [];
+          const opcionesArray = state.safeParseOpciones(p.opciones);
           const seleccion = p.seleccionada;
           
           let opcionesHtml = "";
@@ -1229,12 +1228,7 @@ const ui = {
     document.getElementById("modal-corregir-texto").value = r.pregunta_texto;
 
     // Parsear Opciones
-    let opcionesArray = [];
-    try {
-      opcionesArray = JSON.parse(r.pregunta_opciones);
-    } catch (e) {
-      console.warn("Error al parsear opciones de pregunta en modal corrección:", e);
-    }
+    let opcionesArray = state.safeParseOpciones(r.pregunta_opciones);
 
     // Poblar Opciones en los inputs correspondientes
     for (let i = 0; i < 4; i++) {

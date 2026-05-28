@@ -191,6 +191,17 @@ async function iniciarBaseDeDatos() {
     }
   }
 
+  // Crear índices de alto rendimiento para acelerar las consultas
+  try {
+    await db.exec(`CREATE INDEX IF NOT EXISTS idx_preguntas_examen_id ON preguntas(examen_id)`);
+    await db.exec(`CREATE INDEX IF NOT EXISTS idx_preguntas_tema ON preguntas(tema)`);
+    await db.exec(`CREATE INDEX IF NOT EXISTS idx_preguntas_activo ON preguntas(activo)`);
+    await db.exec(`CREATE INDEX IF NOT EXISTS idx_preguntas_ano_examen ON preguntas(ano_examen)`);
+    console.log("📈 Índices de alto rendimiento creados con éxito en SQLite.");
+  } catch (errIndexes) {
+    console.error("Error al crear índices de rendimiento:", errIndexes);
+  }
+
   // Cargar banco inicial premium de 14 especialidades si está vacío o con explicaciones antiguas
   try {
     let totalPreguntas = await db.get(`SELECT COUNT(*) as total FROM preguntas`);
@@ -650,16 +661,13 @@ async function iniciarBaseDeDatos() {
    ========================================================================== */
 
 // 1. Guardar una sola pregunta de forma segura (Soporte FASE 3)
-app.post("/api/preguntas", async (req, res) => {
+app.post("/api/preguntas", autenticarToken, async (req, res) => {
   try {
-    const { texto, opciones, correcta, tema, explicacion, fuente, usuarioId, examen_id, difficulty } = req.body;
+    const { texto, opciones, correcta, tema, explicacion, fuente, examen_id, difficulty } = req.body;
+    const usuarioId = req.usuario.id;
 
     // REVISIÓN INTEGRAL: En vez de creerle al texto "admin", le preguntamos directamente 
     // a la base de datos quién es este usuario usando su ID único de cuenta.
-    if (!usuarioId) {
-      return res.status(401).json({ error: "No tienes permiso. Inicia sesión nuevamente." });
-    }
-
     const usuarioReal = await db.get(`SELECT rol FROM usuarios WHERE id = ?`, [usuarioId]);
     
     if (!usuarioReal || usuarioReal.rol !== "admin") {
@@ -714,16 +722,13 @@ app.post("/api/preguntas", async (req, res) => {
   }
 });
 
-// 2. Cargar muchas preguntas en bloque de forma segura (Soporte FASE 3)
-app.post("/api/admin/cargar-masivo", async (req, res) => {
+// 2. Cargar muchas preguntas en bloque de forma segura y veloz (Soporte FASE 3)
+app.post("/api/admin/cargar-masivo", autenticarToken, async (req, res) => {
   try {
-    const { preguntas, usuarioId, examen_id } = req.body;
+    const { preguntas, examen_id } = req.body;
+    const usuarioId = req.usuario.id;
 
     // Volvemos a preguntar a la base de datos si el ID realmente es un administrador
-    if (!usuarioId) {
-      return res.status(401).json({ error: "No tienes permiso. Inicia sesión nuevamente." });
-    }
-
     const usuarioReal = await db.get(`SELECT rol FROM usuarios WHERE id = ?`, [usuarioId]);
     
     if (!usuarioReal || usuarioReal.rol !== "admin") {
@@ -744,54 +749,64 @@ app.post("/api/admin/cargar-masivo", async (req, res) => {
       }
     }
 
-    // Si todo está bien, guardamos el bloque completo de preguntas
-    for (const p of preguntas) {
-      const opcionesJSON = JSON.stringify(p.opciones);
-      
-      const subtema = p.subtema || "Evaluación Oficial";
-      const microtema = p.microtema || "Bloque de Reactivos";
-      const tags = p.tags || `${p.tema || "General"},ENURM`;
-      const difficulty = p.difficulty !== undefined ? parseFloat(p.difficulty) : 0.5;
-      const especialidad = p.especialidad || p.tema || "General";
-      const fuente = p.fuente || (finalExamenId ? `ENURM ${anoExamen}` : "ENURM Referencia Académica Oficial");
+    // Iniciar transacción de base de datos para alta velocidad y prevención de bloqueos de archivo
+    await db.run("BEGIN TRANSACTION");
 
-      let explicacionCorrecta = "";
-      let explicacionIncorrecta = "";
-      if (p.explicacion_correcta || p.explicacion_incorrecta) {
-        explicacionCorrecta = p.explicacion_correcta || "";
-        explicacionIncorrecta = p.explicacion_incorrecta || "";
-      } else if (p.explicacion) {
-        const partes = p.explicacion.split("🚫 DESCARTE (Por qué NO):");
-        if (partes.length > 1) {
-          explicacionCorrecta = partes[0].replace("🔬 JUSTIFICACIÓN (Por qué SÍ):\n", "").trim();
-          explicacionIncorrecta = partes[1].trim();
-        } else {
-          explicacionCorrecta = p.explicacion;
-          explicacionIncorrecta = "No disponible.";
+    try {
+      // Si todo está bien, guardamos el bloque completo de preguntas
+      for (const p of preguntas) {
+        const opcionesJSON = JSON.stringify(p.opciones);
+        
+        const subtema = p.subtema || "Evaluación Oficial";
+        const microtema = p.microtema || "Bloque de Reactivos";
+        const tags = p.tags || `${p.tema || "General"},ENURM`;
+        const difficulty = p.difficulty !== undefined ? parseFloat(p.difficulty) : 0.5;
+        const especialidad = p.especialidad || p.tema || "General";
+        const fuente = p.fuente || (finalExamenId ? `ENURM ${anoExamen}` : "ENURM Referencia Académica Oficial");
+
+        let explicacionCorrecta = "";
+        let explicacionIncorrecta = "";
+        if (p.explicacion_correcta || p.explicacion_incorrecta) {
+          explicacionCorrecta = p.explicacion_correcta || "";
+          explicacionIncorrecta = p.explicacion_incorrecta || "";
+        } else if (p.explicacion) {
+          const partes = p.explicacion.split("🚫 DESCARTE (Por qué NO):");
+          if (partes.length > 1) {
+            explicacionCorrecta = partes[0].replace("🔬 JUSTIFICACIÓN (Por qué SÍ):\n", "").trim();
+            explicacionIncorrecta = partes[1].trim();
+          } else {
+            explicacionCorrecta = p.explicacion;
+            explicacionIncorrecta = "No disponible.";
+          }
         }
-      }
 
-      await db.run(
-        `INSERT INTO preguntas (texto, opciones, correcta, explicacion, tema, subtema, microtema, tags, difficulty, fuente, especialidad, ano_examen, explicacion_correcta, explicacion_incorrecta, activo, examen_id) 
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?)`,
-        [
-          p.texto, 
-          opcionesJSON, 
-          p.correcta, 
-          p.explicacion || "", 
-          p.tema || "General", 
-          subtema, 
-          microtema, 
-          tags, 
-          difficulty, 
-          fuente, 
-          especialidad, 
-          anoExamen, 
-          explicacionCorrecta, 
-          explicacionIncorrecta,
-          finalExamenId
-        ]
-      );
+        await db.run(
+          `INSERT INTO preguntas (texto, opciones, correcta, explicacion, tema, subtema, microtema, tags, difficulty, fuente, especialidad, ano_examen, explicacion_correcta, explicacion_incorrecta, activo, examen_id) 
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?)`,
+          [
+            p.texto, 
+            opcionesJSON, 
+            p.correcta, 
+            p.explicacion || "", 
+            p.tema || "General", 
+            subtema, 
+            microtema, 
+            tags, 
+            difficulty, 
+            fuente, 
+            especialidad, 
+            anoExamen, 
+            explicacionCorrecta, 
+            explicacionIncorrecta,
+            finalExamenId
+          ]
+        );
+      }
+      
+      await db.run("COMMIT");
+    } catch (transactionError) {
+      await db.run("ROLLBACK");
+      throw transactionError;
     }
 
     // Recalcular cantidad de preguntas del examen

@@ -11,6 +11,22 @@ const state = {
   cantidadSolicitada: 5,
   pantallaDeRetorno: "home",
 
+  safeParseOpciones(opciones) {
+    if (!opciones) return [];
+    if (Array.isArray(opciones)) return opciones;
+    if (typeof opciones === "string") {
+      try {
+        const parsed = JSON.parse(opciones);
+        if (Array.isArray(parsed)) return parsed;
+        return [parsed];
+      } catch (e) {
+        console.error("Error al parsear opciones JSON, usando fallback:", opciones, e);
+        return opciones.split(",").map(opt => opt.trim());
+      }
+    }
+    return [];
+  },
+
   // Temporizadores
   tiempoRestanteSegundos: 0,
   intervaloTemporizador: null,
