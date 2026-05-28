@@ -28,7 +28,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
-  // 1. Inyectar botón interactivo del MODO GUARDIA en el DOM de forma dinámica
+  // 1. Inyectar botón interactivo del MODO INTENSIVO en el DOM de forma dinámica
   const modeGrid = document.querySelector(".mode-grid");
   if (modeGrid) {
     const btnGuardiaExistente = document.getElementById("btn-modo-guardia");
@@ -41,8 +41,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       btnGuardia.style.boxShadow = "0 4px 12px rgba(239, 68, 68, 0.1)";
       
       btnGuardia.innerHTML = `
-        <span class="mode-title" style="color: var(--danger); font-weight: 700;">Modo Guardia</span>
-        <span class="mode-desc">Entrenamiento ultra-rápido de 10 preguntas de emergencias. 30 segundos por pregunta.</span>
+        <span class="mode-title" style="color: var(--danger); font-weight: 700;">Modo Intensivo</span>
+        <span class="mode-desc">Entrenamiento ultra-rápido e intensivo de 10 preguntas. 30 segundos por pregunta.</span>
       `;
       
       modeGrid.appendChild(btnGuardia);

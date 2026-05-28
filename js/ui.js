@@ -512,7 +512,7 @@ const ui = {
         item.innerHTML = `
           <div class="history-info">
             <h4>${s.tema === "Todos" ? "Examen General" : s.tema}</h4>
-            <p>${s.modo === "estudio" ? "Estudio" : s.modo === "guardia" ? "Guardia" : "Simulacro"} • ${s.cantidad_preguntas} q. • Revisar</p>
+            <p>${s.modo === "estudio" ? "Estudio" : s.modo === "guardia" ? "Intensivo" : "Simulacro"} • ${s.cantidad_preguntas} q. • Revisar</p>
           </div>
           <div class="history-badge ${clase}">${s.porcentaje}%</div>
         `;
@@ -996,7 +996,7 @@ const ui = {
       const esEstudio = sesion.modo === "estudio";
       const esGuardia = sesion.modo === "guardia";
       const claseModo = esEstudio ? "chip-primary" : esGuardia ? "chip-primary" : "chip-soft";
-      const modoText = esEstudio ? "Estudio" : esGuardia ? "Guardia" : "Simulacro";
+      const modoText = esEstudio ? "Estudio" : esGuardia ? "Intensivo" : "Simulacro";
 
       const fila = document.createElement("tr");
       fila.className = "tr-history-row";

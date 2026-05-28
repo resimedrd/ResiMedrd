@@ -62,7 +62,7 @@ const quiz = {
 
       if (chipModo) {
         if (state.modoActual === "guardia") {
-          chipModo.textContent = "MODO GUARDIA";
+          chipModo.textContent = "MODO INTENSIVO";
           chipModo.className = "chip chip-primary";
           chipModo.style.background = "linear-gradient(135deg, var(--danger) 0%, #b91c1c 100%)";
         } else {
@@ -74,7 +74,13 @@ const quiz = {
 
       if (chipTema) {
         if (state.modoActual === "guardia") {
-          chipTema.textContent = "Urgencias Médicas";
+          if (state.especialidadSeleccionada === "Todos") {
+            chipTema.textContent = "Urgencias Médicas";
+          } else {
+            chipTema.textContent = (state.subtemaSeleccionado && state.subtemaSeleccionado !== "Todos")
+              ? `Guardia: ${state.especialidadSeleccionada} - ${state.subtemaSeleccionado}`
+              : `Guardia: ${state.especialidadSeleccionada}`;
+          }
         } else if (state.especialidadSeleccionada === "Todos") {
           chipTema.textContent = "Examen General";
         } else {
@@ -167,8 +173,8 @@ const quiz = {
       tituloEl.textContent = "Modo Simulacro";
       descEl.textContent = "Evaluación formal y estricta bajo condiciones reales de examen (cuenta regresiva de 90 segundos por pregunta) con respuestas y resultados bloqueados hasta finalizar el test.";
     } else if (modo === "guardia") {
-      tituloEl.textContent = "Modo Guardia";
-      descEl.textContent = "Entrenamiento acelerado de 10 preguntas aleatorias de emergencias médicas con límite estricto de 30 segundos por pregunta.";
+      tituloEl.textContent = "Modo Intensivo";
+      descEl.textContent = "Entrenamiento intensivo y acelerado de 10 preguntas con límite estricto de 30 segundos por pregunta.";
     }
 
     // Manejar eventos de forma limpia libres de acumulaciones
@@ -303,33 +309,31 @@ const quiz = {
     try {
       // 1. Cargar preguntas desde nuestro nuevo endpoint centralizado POST /api/exam-setup
       let preguntas = [];
-      if (modo === "guardia") {
-        preguntas = await api.prepararExamen("todos", "todos", 10);
-        state.cantidadSolicitada = 10;
-        state.especialidadSeleccionada = "Todos";
-        state.subtemaSeleccionado = "Todos";
+      const tipo = state.tipoSimulacroSeleccionado || "especialidad";
+      let valor = "";
+      let nombreParaEstado = "";
+      
+      if (tipo === "especialidad") {
+        valor = document.getElementById("especialidad").value;
+        nombreParaEstado = valor;
       } else {
-        const tipo = state.tipoSimulacroSeleccionado || "especialidad";
-        let valor = "";
-        let nombreParaEstado = "";
-        
-        if (tipo === "especialidad") {
-          valor = document.getElementById("especialidad").value;
-          nombreParaEstado = valor;
-        } else {
-          const selectAno = document.getElementById("selector-ano");
-          valor = selectAno.value;
-          const opcionSeleccionada = selectAno.options[selectAno.selectedIndex];
-          nombreParaEstado = valor === "Todos" ? "Todos" : (opcionSeleccionada ? opcionSeleccionada.textContent.split(" (")[0] : "Examen Oficial");
-        }
-        
-        const selectorSub = document.getElementById("selector-subtema");
-        const subtema = (tipo === "especialidad" && selectorSub) ? selectorSub.value : "Todos";
+        const selectAno = document.getElementById("selector-ano");
+        valor = selectAno.value;
+        const opcionSeleccionada = selectAno.options[selectAno.selectedIndex];
+        nombreParaEstado = valor === "Todos" ? "Todos" : (opcionSeleccionada ? opcionSeleccionada.textContent.split(" (")[0] : "Examen Oficial");
+      }
+      
+      const selectorSub = document.getElementById("selector-subtema");
+      const subtema = (tipo === "especialidad" && selectorSub) ? selectorSub.value : "Todos";
 
-        // FASE 3: Guardar en el estado para consistencia visual premium
-        state.especialidadSeleccionada = nombreParaEstado;
-        state.subtemaSeleccionado = subtema;
+      // FASE 3: Guardar en el estado para consistencia visual premium
+      state.especialidadSeleccionada = nombreParaEstado;
+      state.subtemaSeleccionado = subtema;
 
+      if (modo === "guardia") {
+        state.cantidadSolicitada = 10;
+        preguntas = await api.prepararExamen(tipo, valor, 10, subtema);
+      } else {
         preguntas = await api.prepararExamen(tipo, valor, state.cantidadSolicitada, subtema);
       }
 
@@ -356,7 +360,7 @@ const quiz = {
 
       if (chipModo) {
         if (modo === "guardia") {
-          chipModo.textContent = "MODO GUARDIA";
+          chipModo.textContent = "MODO INTENSIVO";
           chipModo.className = "chip chip-primary";
           chipModo.style.background = "linear-gradient(135deg, var(--danger) 0%, #b91c1c 100%)";
         } else {
@@ -367,7 +371,13 @@ const quiz = {
       }
       if (chipTema) {
         if (modo === "guardia") {
-          chipTema.textContent = "Urgencias Médicas";
+          if (state.especialidadSeleccionada === "Todos") {
+            chipTema.textContent = "Urgencias Médicas";
+          } else {
+            chipTema.textContent = (state.subtemaSeleccionado && state.subtemaSeleccionado !== "Todos")
+              ? `Guardia: ${state.especialidadSeleccionada} - ${state.subtemaSeleccionado}`
+              : `Guardia: ${state.especialidadSeleccionada}`;
+          }
         } else if (state.especialidadSeleccionada === "Todos") {
           chipTema.textContent = "Examen General";
         } else {
@@ -467,7 +477,7 @@ const quiz = {
 
       if (tiempoPorPreguntaRestante <= 0) {
         clearInterval(guardiaTimerInterval);
-        alert("¡Tiempo de guardia agotado en esta pregunta!");
+        alert("¡Tiempo intensivo agotado en esta pregunta!");
         // Marcar como no respondida y saltar
         state.respuestasUsuario[state.indiceActual] = -1; 
         quiz.siguientePregunta();
@@ -812,7 +822,7 @@ const quiz = {
         porcentaje: porcentaje,
         duracionFormateada: duracionFormateada,
         temaTexto: (state.modoActual === "guardia")
-          ? "Urgencias Médicas"
+          ? (state.especialidadSeleccionada === "Todos" ? "Urgencias Médicas" : `Guardia: ${state.especialidadSeleccionada}`)
           : (state.especialidadSeleccionada === "Todos")
             ? "Examen General"
             : (state.subtemaSeleccionado && state.subtemaSeleccionado !== "Todos")
