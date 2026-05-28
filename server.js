@@ -35,7 +35,13 @@ app.use((err, req, res, next) => {
   next();
 });
 
-app.use(express.static(__dirname));
+app.use(express.static(__dirname, {
+  setHeaders: (res, path) => {
+    if (path.endsWith('.html')) {
+      res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+    }
+  }
+}));
 
 let db = null;
 
