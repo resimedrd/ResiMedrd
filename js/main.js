@@ -331,6 +331,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         
         // Recargar mazo de flashcards en caliente
         await flashcards.inicializarMazo();
+        if (typeof ui !== "undefined" && typeof ui.inicializarFiltrosFlashcards === "function") {
+          await ui.inicializarFiltrosFlashcards();
+        }
       } catch (err) {
         alert("✗ Falla al guardar la flashcard: " + err.message);
       }

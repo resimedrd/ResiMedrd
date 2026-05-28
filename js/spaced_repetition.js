@@ -84,7 +84,8 @@ const spacedRepetition = {
         ease: nuevoEstado.ease,
         repetitions: nuevoEstado.repetitions,
         interval: nuevoEstado.interval,
-        nextReview: nuevoEstado.nextReview
+        nextReview: nuevoEstado.nextReview,
+        lastReviewedDate: new Date().toLocaleDateString('en-CA')
       });
       
       return nuevoEstado;

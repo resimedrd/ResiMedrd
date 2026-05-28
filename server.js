@@ -191,6 +191,13 @@ async function iniciarBaseDeDatos() {
     }
   }
 
+  // Migración retrocompatible para la tabla spaced_repetition (FASE 2)
+  try {
+    await db.exec(`ALTER TABLE spaced_repetition ADD COLUMN last_reviewed_date TEXT`);
+  } catch (e) {
+    // Ignorar si ya existe
+  }
+
   // Crear índices de alto rendimiento para acelerar las consultas
   try {
     await db.exec(`CREATE INDEX IF NOT EXISTS idx_preguntas_examen_id ON preguntas(examen_id)`);
@@ -1413,7 +1420,7 @@ app.get("/api/spaced-repetition", autenticarToken, async (req, res) => {
 
 app.post("/api/spaced-repetition", autenticarToken, async (req, res) => {
   try {
-    const { usuarioId, preguntaId, flashcardId, stability, difficulty, ease, repetitions, interval, nextReview } = req.body;
+    const { usuarioId, preguntaId, flashcardId, stability, difficulty, ease, repetitions, interval, nextReview, lastReviewedDate } = req.body;
     
     if (parseInt(usuarioId) !== req.usuario.id) {
       return res.status(403).json({ error: "Acceso no autorizado." });
@@ -1426,15 +1433,17 @@ app.post("/api/spaced-repetition", autenticarToken, async (req, res) => {
       existente = await db.get(`SELECT id FROM spaced_repetition WHERE usuario_id = ? AND pregunta_id = ?`, [usuarioId, preguntaId]);
     }
 
+    const reviewDate = lastReviewedDate || new Date().toLocaleDateString('en-CA');
+
     if (existente) {
       await db.run(
-        `UPDATE spaced_repetition SET stability = ?, difficulty = ?, ease = ?, repetitions = ?, interval = ?, next_review = ? WHERE id = ?`,
-        [stability, difficulty, ease, repetitions, interval, nextReview, existente.id]
+        `UPDATE spaced_repetition SET stability = ?, difficulty = ?, ease = ?, repetitions = ?, interval = ?, next_review = ?, last_reviewed_date = ? WHERE id = ?`,
+        [stability, difficulty, ease, repetitions, interval, nextReview, reviewDate, existente.id]
       );
     } else {
       await db.run(
-        `INSERT INTO spaced_repetition (usuario_id, pregunta_id, flashcard_id, stability, difficulty, ease, repetitions, interval, next_review) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-        [usuarioId, preguntaId, flashcardId, stability, difficulty, ease, repetitions, interval, nextReview]
+        `INSERT INTO spaced_repetition (usuario_id, pregunta_id, flashcard_id, stability, difficulty, ease, repetitions, interval, next_review, last_reviewed_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [usuarioId, preguntaId, flashcardId, stability, difficulty, ease, repetitions, interval, nextReview, reviewDate]
       );
     }
 

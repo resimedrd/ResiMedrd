@@ -45,6 +45,11 @@ const ui = {
       ui.actualizarProgresoEstudiante();
       const tabPerfilProgreso = document.getElementById("tab-perfil-progreso");
       if (tabPerfilProgreso) tabPerfilProgreso.click();
+    } else if (nombrePantalla === "flashcards") {
+      // FASE 1: Cargar mazo por defecto "Todos" inmediatamente al acceder a la pantalla
+      if (typeof flashcards !== "undefined" && typeof flashcards.inicializarMazo === "function") {
+        flashcards.inicializarMazo();
+      }
     }
   },
 
@@ -248,14 +253,40 @@ const ui = {
     modal.classList.add("active");
   },
 
-  inicializarFiltrosFlashcards() {
+  async inicializarFiltrosFlashcards() {
     const select = document.getElementById("flashcard-filtro-tema");
     if (!select) return;
-    select.innerHTML = '<option value="Todos" selected>Todas las materias</option>';
+
+    let personalizadas = [];
+    if (state.usuarioConectado) {
+      try {
+        personalizadas = await api.obtenerFlashcardsPersonalizadas(state.usuarioConectado.id);
+      } catch (e) {
+        console.warn("Falla al obtener flashcards personalizadas:", e);
+      }
+    }
+
+    const totalEstaticas = (typeof baseDatosFlashcardsEstaticas !== "undefined") ? baseDatosFlashcardsEstaticas : [];
+    const mazoCompleto = [...totalEstaticas, ...personalizadas];
+
+    // Contar por materia de forma insensible a espacios/mayúsculas
+    const conteo = {};
+    mazoCompleto.forEach(c => {
+      if (c && c.tema) {
+        const key = c.tema.trim().toLowerCase();
+        conteo[key] = (conteo[key] || 0) + 1;
+      }
+    });
+
+    const totalMazo = mazoCompleto.length;
+    select.innerHTML = `<option value="Todos" selected>Todas las materias (${totalMazo})</option>`;
+
     state.LISTA_ESPECIALIDADES.forEach(esp => {
+      const key = esp.nombre.trim().toLowerCase();
+      const cantidad = conteo[key] || 0;
       const opt = document.createElement("option");
       opt.value = esp.nombre;
-      opt.textContent = esp.nombre;
+      opt.textContent = `${esp.nombre} (${cantidad})`;
       select.appendChild(opt);
     });
   },
@@ -560,11 +591,17 @@ const ui = {
         metaEl.textContent = `${user.meta_semanal || 50} q.`;
       }
 
-      const datosResumen = await api.obtenerResumenDashboard(user.id);
+      const [datosResumen, personalizadas, srEstados] = await Promise.all([
+        api.obtenerResumenDashboard(user.id),
+        api.obtenerFlashcardsPersonalizadas(user.id).catch(() => []),
+        api.obtenerRepeticionEspaciada(user.id).catch(() => [])
+      ]);
       
       const pExamenes = document.getElementById("progreso-total-examenes");
       const pPreguntas = document.getElementById("progreso-total-preguntas");
       const pPromedio = document.getElementById("progreso-promedio-global");
+      const pFlashcardsActivas = document.getElementById("progreso-flashcards-activas");
+      const pConceptosDebiles = document.getElementById("progreso-conceptos-debiles");
 
       if (pExamenes) pExamenes.textContent = datosResumen.totalSesiones || 0;
       if (pPreguntas) pPreguntas.textContent = datosResumen.totalPreguntasRespondidas || 0;
@@ -579,6 +616,33 @@ const ui = {
         }
         pPromedio.style.color = colorPromedio;
       }
+
+      // FASE 4: Computar y renderizar métricas inteligentes de Flashcards y Conceptos Débiles
+      const totalEstaticas = (typeof baseDatosFlashcardsEstaticas !== "undefined") ? baseDatosFlashcardsEstaticas.length : 0;
+      const totalActivas = totalEstaticas + personalizadas.length;
+      const conceptosDebiles = srEstados.filter(e => e.interval === 0 && e.flashcard_id).length;
+
+      if (pFlashcardsActivas) pFlashcardsActivas.textContent = totalActivas;
+      if (pConceptosDebiles) pConceptosDebiles.textContent = conceptosDebiles;
+
+      // FASE 2: Computar y renderizar métricas diarias (Hoy)
+      const hoy = new Date().toLocaleDateString('en-CA');
+      const repasosHoy = srEstados.filter(e => e.last_reviewed_date === hoy && e.flashcard_id);
+      
+      const totalEvaluadasHoy = repasosHoy.length;
+      const dominadasHoy = repasosHoy.filter(e => e.interval > 0).length;
+      const falladasHoy = repasosHoy.filter(e => e.interval === 0).length;
+
+      const pctEficiencia = totalEvaluadasHoy > 0 ? Math.round((dominadasHoy / totalEvaluadasHoy) * 100) : 0;
+      const pctRepasar = totalEvaluadasHoy > 0 ? Math.round((falladasHoy / totalEvaluadasHoy) * 100) : 0;
+
+      const dEvaluadas = document.getElementById("diario-tarjetas-evaluadas");
+      const dEficiencia = document.getElementById("diario-porcentaje-eficiencia");
+      const dRepasar = document.getElementById("diario-porcentaje-repasar");
+
+      if (dEvaluadas) dEvaluadas.textContent = totalEvaluadasHoy;
+      if (dEficiencia) dEficiencia.textContent = `${pctEficiencia}%`;
+      if (dRepasar) dRepasar.textContent = `${pctRepasar}%`;
 
       const historial = await api.obtenerHistorialCompleto(user.id);
 

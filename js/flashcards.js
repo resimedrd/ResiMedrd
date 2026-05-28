@@ -313,10 +313,25 @@ const flashcards = {
         btn.disabled = true;
         btn.textContent = "⚡ Flashcard Guardada";
         btn.style.background = "var(--success)";
+        if (typeof ui !== "undefined" && typeof ui.inicializarFiltrosFlashcards === "function") {
+          await ui.inicializarFiltrosFlashcards();
+        }
       } catch (err) {
         alert("Falla al guardar flashcard personalizada: " + err.message);
       }
     });
+  },
+
+  // Implementación del algoritmo Fisher-Yates Shuffle para aleatoriedad genuina
+  barajarMazo(array) {
+    let m = array.length, t, i;
+    while (m) {
+      i = Math.floor(Math.random() * m--);
+      t = array[m];
+      array[m] = array[i];
+      array[i] = t;
+    }
+    return array;
   },
 
   // CARGAR MAZO EN BASE A MATERIA (Filtro Insensible & Carga de Personalizadas)
@@ -344,7 +359,7 @@ const flashcards = {
         filtrados = mazoCompleto.filter(c => c.tema.trim().toLowerCase() === filtroTema);
       }
 
-      // 4. Integrar con Spaced Repetition (Priorizar las de menor repetitions / próximas a vencer)
+      // 4. Integrar con Spaced Repetition (Filtro de Enfriamiento por Dominio)
       let estados = {};
       if (state.usuarioConectado) {
         const srEstados = await api.obtenerRepeticionEspaciada(state.usuarioConectado.id);
@@ -353,17 +368,25 @@ const flashcards = {
         });
       }
 
-      filtrados.sort((a, b) => {
-        const estadoA = estados[a.pregunta] || { interval: 0, repetitions: 0 };
-        const estadoB = estados[b.pregunta] || { interval: 0, repetitions: 0 };
-        
-        if (estadoA.interval !== estadoB.interval) {
-          return estadoA.interval - estadoB.interval;
+      // Segmentar en dos bloques en caliente: prioritario (interval === 0) y enfriamiento (interval > 0)
+      const prioritario = [];
+      const enfriamiento = [];
+
+      filtrados.forEach(c => {
+        const estado = estados[c.pregunta] || { interval: 0, repetitions: 0 };
+        if (estado.interval === 0) {
+          prioritario.push(c);
+        } else {
+          enfriamiento.push(c);
         }
-        return estadoA.repetitions - estadoB.repetitions;
       });
 
-      state.mazoActualFlashcards = filtrados;
+      // Barajar de forma independiente cada bloque para conservar el azar genuino
+      flashcards.barajarMazo(prioritario);
+      flashcards.barajarMazo(enfriamiento);
+
+      // Concatenar colocando los prioritarios al principio de la sesión y las dominadas al final
+      state.mazoActualFlashcards = [...prioritario, ...enfriamiento];
       state.indiceActualFlashcard = 0;
       state.dominadasFlashcards = 0;
       state.repasoFlashcards = 0;
