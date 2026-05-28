@@ -1027,9 +1027,39 @@ app.get("/api/preguntas/mapeo-temas", autenticarToken, async (req, res) => {
 
 app.get("/api/temas", async (req, res) => {
   try {
-    const filas = await db.all(`SELECT tema, COUNT(*) as total FROM preguntas GROUP BY tema ORDER BY tema ASC`);
-    res.json(filas);
+    const preguntas = await db.all(`SELECT tema FROM preguntas WHERE (activo = 1 OR activo IS NULL)`);
+    
+    const conteo = {};
+    preguntas.forEach(p => {
+      const espId = normalizarTema(p.tema);
+      conteo[espId] = (conteo[espId] || 0) + 1;
+    });
+
+    const ESPECIALIDADES_OFICIALES = [
+      { id: "pediatria", nombre: "Pediatría" },
+      { id: "ginecologia", nombre: "Gineco-Obstetricia" },
+      { id: "cirugia", nombre: "Cirugía General" },
+      { id: "interna", nombre: "Medicina Interna" },
+      { id: "basicas", nombre: "Ciencias Básicas" },
+      { id: "cardiologia", nombre: "Cardiología" },
+      { id: "neumologia", nombre: "Neumología" },
+      { id: "gastro", nombre: "Gastroenterología" },
+      { id: "nefro", nombre: "Nefrología y Urología" },
+      { id: "neurologia", nombre: "Neurología" },
+      { id: "infectologia", nombre: "Infectología" },
+      { id: "trauma", nombre: "Traumatología y Ortopedia" },
+      { id: "psiquiatria", nombre: "Psiquiatría" },
+      { id: "salud", nombre: "Salud Pública y Epidemiología" }
+    ];
+
+    const resultado = ESPECIALIDADES_OFICIALES.map(esp => ({
+      tema: esp.nombre,
+      total: conteo[esp.id] || 0
+    }));
+
+    res.json(resultado);
   } catch (error) {
+    console.error("Error al obtener temas:", error);
     res.status(500).json({ error: "Error al mapear especialidades." });
   }
 });
@@ -1038,13 +1068,20 @@ app.get("/api/temas", async (req, res) => {
 app.get("/api/especialidades/:especialidad/subtemas", async (req, res) => {
   try {
     const { especialidad } = req.params;
-    const filas = await db.all(
-      `SELECT DISTINCT subtema FROM preguntas 
-       WHERE LOWER(TRIM(especialidad)) = LOWER(?) OR LOWER(TRIM(tema)) = LOWER(?) 
-       ORDER BY subtema ASC`,
-      [especialidad.trim(), especialidad.trim()]
+    const requestedEspId = normalizarTema(especialidad);
+
+    const todas = await db.all(
+      `SELECT DISTINCT subtema, tema FROM preguntas WHERE (activo = 1 OR activo IS NULL)`
     );
-    const subtemas = filas.map(f => f.subtema).filter(s => s && s.trim() !== "");
+
+    const subtemasSet = new Set();
+    todas.forEach(p => {
+      if (normalizarTema(p.tema) === requestedEspId && p.subtema && p.subtema.trim() !== "") {
+        subtemasSet.add(p.subtema.trim());
+      }
+    });
+
+    const subtemas = Array.from(subtemasSet).sort();
     res.json(subtemas);
   } catch (error) {
     console.error("Error al obtener subtemas:", error);
@@ -1911,24 +1948,29 @@ app.post("/api/exam-setup", autenticarToken, async (req, res) => {
     const esTodosSub = !subtema || subtema.trim().toLowerCase() === "todos";
 
     if (tipo === "especialidad" && !esTodos) {
-      if (!esTodosSub) {
-        preguntas = await db.all(
-          `SELECT * FROM preguntas 
-           WHERE (LOWER(TRIM(especialidad)) = LOWER(?) OR LOWER(TRIM(tema)) = LOWER(?)) 
-             AND LOWER(TRIM(subtema)) = LOWER(?)
-             AND (activo = 1 OR activo IS NULL)
-           ORDER BY RANDOM() LIMIT ?`,
-          [valor.trim(), valor.trim(), subtema.trim(), maxPreguntas]
-        );
-      } else {
-        preguntas = await db.all(
-          `SELECT * FROM preguntas 
-           WHERE (LOWER(TRIM(especialidad)) = LOWER(?) OR LOWER(TRIM(tema)) = LOWER(?)) 
-             AND (activo = 1 OR activo IS NULL)
-           ORDER BY RANDOM() LIMIT ?`,
-          [valor.trim(), valor.trim(), maxPreguntas]
-        );
-      }
+      const requestedEspId = normalizarTema(valor);
+      
+      // Obtener todas las preguntas activas
+      const todas = await db.all(
+        `SELECT * FROM preguntas WHERE (activo = 1 OR activo IS NULL)`
+      );
+      
+      // Filtrar por especialidad normalizada y subtema si se requiere
+      let filtradas = todas.filter(p => {
+        const espId = normalizarTema(p.tema);
+        const matchesEsp = (espId === requestedEspId);
+        
+        if (!esTodosSub) {
+          const subTemaLower = (p.subtema || "").trim().toLowerCase();
+          const reqSubLower = subtema.trim().toLowerCase();
+          return matchesEsp && (subTemaLower === reqSubLower);
+        }
+        return matchesEsp;
+      });
+      
+      // Barajar y limitar a maxPreguntas
+      filtradas.sort(() => 0.5 - Math.random());
+      preguntas = filtradas.slice(0, maxPreguntas);
     } else if (tipo === "ano" && !esTodos) {
       const valorNum = parseInt(valor);
       
