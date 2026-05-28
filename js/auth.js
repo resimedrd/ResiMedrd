@@ -166,16 +166,20 @@ const auth = {
       if (panelAdministrador) panelAdministrador.classList.add("hidden");
     }
 
-    // Cargar componentes de la UI dinámica de forma concurrente
-    Promise.all([
+    // Cargar componentes de la UI dinámica de forma concurrente protegiendo fallas individuales (Robust boot)
+    const inicializaciones = [
       ui.inicializarGridEspecialidades(),
       ui.inicializarFiltrosFlashcards(),
       ui.cargarFiltrosEspecialidad(),
       ui.cargarFiltrosAnos(),
       ui.cargarDashboardHome(),
       ui.cargarHistorialReciente()
-    ]).catch(err => {
-      console.warn("Falla silenciosa al inicializar algunos datos del entorno:", err);
+    ];
+
+    inicializaciones.forEach(p => {
+      if (p && typeof p.catch === "function") {
+        p.catch(err => console.warn("Falla en sub-módulo de inicialización:", err));
+      }
     });
   },
 

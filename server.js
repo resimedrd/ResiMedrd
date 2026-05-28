@@ -617,37 +617,46 @@ async function iniciarBaseDeDatos() {
       // 1. Obtener todos los años únicos presentes en preguntas
       const anosExistentes = await db.all(`SELECT DISTINCT ano_examen FROM preguntas WHERE ano_examen IS NOT NULL`);
       
-      for (const { ano_examen } of anosExistentes) {
-        const nombreExamen = `ENURM ${ano_examen}`;
-        
-        // Insertar el examen si no existe
-        await db.run(
-          `INSERT OR IGNORE INTO examenes (nombre, ano, activo) VALUES (?, ?, 1)`,
-          [nombreExamen, ano_examen]
-        );
-        
-        // Obtener el id del examen recién insertado o existente
-        const examenObj = await db.get(`SELECT id FROM examenes WHERE ano = ?`, [ano_examen]);
-        if (examenObj) {
-          // Actualizar preguntas que correspondan a este año y que no tengan examen_id asignado
-          await db.run(
-            `UPDATE preguntas SET examen_id = ? WHERE ano_examen = ? AND examen_id IS NULL`,
-            [examenObj.id, ano_examen]
-          );
-        }
-      }
+      await db.run("BEGIN TRANSACTION");
       
-      // 2. Recalcular cantidad de preguntas activas por examen
-      const todosExamenes = await db.all(`SELECT id FROM examenes`);
-      for (const ex of todosExamenes) {
-        const countRow = await db.get(
-          `SELECT COUNT(*) as total FROM preguntas WHERE examen_id = ? AND (activo = 1 OR activo IS NULL)`,
-          [ex.id]
-        );
-        const cantidad = countRow ? countRow.total : 0;
-        await db.run(`UPDATE examenes SET cantidad_preguntas = ? WHERE id = ?`, [cantidad, ex.id]);
+      try {
+        for (const { ano_examen } of anosExistentes) {
+          const nombreExamen = `ENURM ${ano_examen}`;
+          
+          // Insertar el examen si no existe
+          await db.run(
+            `INSERT OR IGNORE INTO examenes (nombre, ano, activo) VALUES (?, ?, 1)`,
+            [nombreExamen, ano_examen]
+          );
+          
+          // Obtener el id del examen recién insertado o existente
+          const examenObj = await db.get(`SELECT id FROM examenes WHERE ano = ?`, [ano_examen]);
+          if (examenObj) {
+            // Actualizar preguntas que correspondan a este año y que no tengan examen_id asignado
+            await db.run(
+              `UPDATE preguntas SET examen_id = ? WHERE ano_examen = ? AND examen_id IS NULL`,
+              [examenObj.id, ano_examen]
+            );
+          }
+        }
+        
+        // 2. Recalcular cantidad de preguntas activas por examen
+        const todosExamenes = await db.all(`SELECT id FROM examenes`);
+        for (const ex of todosExamenes) {
+          const countRow = await db.get(
+            `SELECT COUNT(*) as total FROM preguntas WHERE examen_id = ? AND (activo = 1 OR activo IS NULL)`,
+            [ex.id]
+          );
+          const cantidad = countRow ? countRow.total : 0;
+          await db.run(`UPDATE examenes SET cantidad_preguntas = ? WHERE id = ?`, [cantidad, ex.id]);
+        }
+        
+        await db.run("COMMIT");
+        console.log("✅ Auto-enlace y conteo de exámenes completado de forma retrocompatible.");
+      } catch (transactionError) {
+        await db.run("ROLLBACK");
+        throw transactionError;
       }
-      console.log("✅ Auto-enlace y conteo de exámenes completado de forma retrocompatible.");
     } catch (errExamenes) {
       console.error("Error al auto-enlazar preguntas con exámenes:", errExamenes);
     }
