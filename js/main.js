@@ -250,16 +250,14 @@ document.addEventListener("DOMContentLoaded", async () => {
   // === 5. CONTROLADOR DE PESTAÑAS (TABS) EN MI PERFIL ===
   const tabProgreso = document.getElementById("tab-perfil-progreso");
   const tabErrores = document.getElementById("tab-perfil-errores");
-  const tabMarcadas = document.getElementById("tab-perfil-marcadas");
 
   const secProgreso = document.getElementById("perfil-contenido-progreso");
   const secErrores = document.getElementById("perfil-contenido-errores");
-  const secMarcadas = document.getElementById("perfil-contenido-marcadas");
 
-  if (tabProgreso && tabErrores && tabMarcadas && secProgreso && secErrores && secMarcadas) {
+  if (tabProgreso && tabErrores && secProgreso && secErrores) {
     const alternarTabs = (tabActivo, secActiva) => {
-      [tabProgreso, tabErrores, tabMarcadas].forEach(t => t.classList.remove("active"));
-      [secProgreso, secErrores, secMarcadas].forEach(s => s.classList.add("hidden"));
+      [tabProgreso, tabErrores].forEach(t => t.classList.remove("active"));
+      [secProgreso, secErrores].forEach(s => s.classList.add("hidden"));
       
       tabActivo.classList.add("active");
       secActiva.classList.remove("hidden");
@@ -272,11 +270,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     tabErrores.addEventListener("click", () => {
       alternarTabs(tabErrores, secErrores);
-      ui.actualizarProgresoEstudiante();
-    });
-
-    tabMarcadas.addEventListener("click", () => {
-      alternarTabs(tabMarcadas, secMarcadas);
       ui.actualizarProgresoEstudiante();
     });
   }

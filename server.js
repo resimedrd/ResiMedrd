@@ -1171,6 +1171,33 @@ app.get("/api/dashboard/resumen", autenticarToken, async (req, res) => {
   }
 });
 
+function normalizarTema(tema) {
+  if (!tema) return "";
+  const t = tema.trim().toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, ""); // Quitar acentos
+  
+  if (t.includes("pediatria") || t.includes("pediatra")) return "pediatria";
+  if (t.includes("ginecologia") || t.includes("obstetricia") || t.includes("gineco")) return "ginecologia";
+  if (t.includes("cirugia")) return "cirugia";
+  if (t.includes("interna")) return "interna";
+  if (t.includes("basica") || t.includes("fisiologia") || t.includes("anatomia") || t.includes("farmacologia") || t.includes("embriologia") || t.includes("histologia") || t.includes("microbiologia") || t.includes("parasitologia") || t.includes("bioquimica") || t.includes("genetica")) return "basicas";
+  if (t.includes("cardio")) return "cardiologia";
+  if (t.includes("neumo")) return "neumologia";
+  if (t.includes("gastro")) return "gastro";
+  if (t.includes("nefro") || t.includes("urolo")) return "nefro";
+  if (t.includes("neuro")) return "neurologia";
+  if (t.includes("infecto") || t.includes("virologia") || t.includes("bacteriologia")) return "infectologia";
+  if (t.includes("trauma") || t.includes("orto")) return "trauma";
+  if (t.includes("psiquia")) return "psiquiatria";
+  if (t.includes("salud publica") || t.includes("epidemio") || t.includes("preventiva") || t === "salud") return "salud";
+  
+  if (t.includes("pediat")) return "pediatria";
+  if (t.includes("obstet") || t.includes("ginec")) return "ginecologia";
+  if (t.includes("cirug")) return "cirugia";
+  
+  return t; // Fallback
+}
+
 app.get("/api/dashboard/cobertura", autenticarToken, async (req, res) => {
   try {
     const { usuarioId } = req.query;
@@ -1181,74 +1208,93 @@ app.get("/api/dashboard/cobertura", autenticarToken, async (req, res) => {
       return res.status(403).json({ error: "Acceso no autorizado." });
     }
 
-    // 1. Obtener todas las especialidades y su total absoluto en el banco
-    const especialidadesBanco = await db.all(
-      `SELECT tema, COUNT(*) as total FROM preguntas GROUP BY tema`
+    const ESPECIALIDADES_OFICIALES = [
+      { id: "pediatria", nombre: "Pediatría" },
+      { id: "ginecologia", nombre: "Gineco-Obstetricia" },
+      { id: "cirugia", nombre: "Cirugía General" },
+      { id: "interna", nombre: "Medicina Interna" },
+      { id: "basicas", nombre: "Ciencias Básicas" },
+      { id: "cardiologia", nombre: "Cardiología" },
+      { id: "neumologia", nombre: "Neumología" },
+      { id: "gastro", nombre: "Gastroenterología" },
+      { id: "nefro", nombre: "Nefrología y Urología" },
+      { id: "neurologia", nombre: "Neurología" },
+      { id: "infectologia", nombre: "Infectología" },
+      { id: "trauma", nombre: "Traumatología y Ortopedia" },
+      { id: "psiquiatria", nombre: "Psiquiatría" },
+      { id: "salud", nombre: "Salud Pública y Epidemiología" }
+    ];
+
+    // 1. Obtener todas las preguntas activas para calcular el total absoluto por especialidad normalizada
+    const preguntasBanco = await db.all(
+      `SELECT id, tema, texto FROM preguntas WHERE activo = 1`
     );
 
-    // 2. Obtener todas las sesiones de este usuario para calcular cobertura
+    const totalPorEspecialidad = {};
+    ESPECIALIDADES_OFICIALES.forEach(esp => {
+      totalPorEspecialidad[esp.id] = 0;
+    });
+
+    preguntasBanco.forEach(p => {
+      const espId = normalizarTema(p.tema);
+      if (totalPorEspecialidad[espId] !== undefined) {
+        totalPorEspecialidad[espId] += 1;
+      }
+    });
+
+    // 2. Obtener todas las sesiones de este usuario para calcular preguntas respondidas
     const sesiones = await db.all(
       `SELECT tema, cantidad_preguntas, detalle FROM sesiones WHERE usuario_id = ?`,
       [usuarioId]
     );
 
-    // Mapa para acumular preguntas únicas vistas (por su texto) por especialidad (clave insensible)
-    const preguntasVistasPorTema = {};
-    // Acumulador de cantidad para sesiones antiguas sin detalle (clave insensible)
-    const cantAntiguasPorTema = {};
+    const preguntasVistasPorEspecialidad = {};
+    const cantAntiguasPorEspecialidad = {};
 
-    especialidadesBanco.forEach(esp => {
-      const key = esp.tema.trim().toLowerCase();
-      preguntasVistasPorTema[key] = new Set();
-      cantAntiguasPorTema[key] = 0;
+    ESPECIALIDADES_OFICIALES.forEach(esp => {
+      preguntasVistasPorEspecialidad[esp.id] = new Set();
+      cantAntiguasPorEspecialidad[esp.id] = 0;
     });
 
     sesiones.forEach(s => {
-      const tema = s.tema;
+      const temaSesion = s.tema;
       if (s.detalle) {
         try {
           const preguntas = JSON.parse(s.detalle);
           if (Array.isArray(preguntas)) {
             preguntas.forEach(p => {
-              const temaPregunta = p.tema || tema; // fallback al tema de la sesión
-              const key = temaPregunta ? temaPregunta.trim().toLowerCase() : "";
-              if (key) {
-                if (!preguntasVistasPorTema[key]) {
-                  preguntasVistasPorTema[key] = new Set();
-                }
-                preguntasVistasPorTema[key].add(p.texto);
+              const temaPregunta = p.tema || temaSesion;
+              const espId = normalizarTema(temaPregunta);
+              if (preguntasVistasPorEspecialidad[espId]) {
+                preguntasVistasPorEspecialidad[espId].add(p.texto);
               }
             });
           }
         } catch (e) {
-          const key = tema ? tema.trim().toLowerCase() : "";
-          if (key) {
-            cantAntiguasPorTema[key] = (cantAntiguasPorTema[key] || 0) + s.cantidad_preguntas;
+          const espId = normalizarTema(temaSesion);
+          if (cantAntiguasPorEspecialidad[espId] !== undefined) {
+            cantAntiguasPorEspecialidad[espId] += s.cantidad_preguntas;
           }
         }
       } else {
-        const key = tema ? tema.trim().toLowerCase() : "";
-        if (key) {
-          cantAntiguasPorTema[key] = (cantAntiguasPorTema[key] || 0) + s.cantidad_preguntas;
+        const espId = normalizarTema(temaSesion);
+        if (cantAntiguasPorEspecialidad[espId] !== undefined) {
+          cantAntiguasPorEspecialidad[espId] += s.cantidad_preguntas;
         }
       }
     });
 
     // 3. Compilar el resultado de cobertura
     const cobertura = {};
-    especialidadesBanco.forEach(esp => {
-      const tema = esp.tema;
-      const key = tema.trim().toLowerCase();
-      const totalBanco = esp.total;
+    ESPECIALIDADES_OFICIALES.forEach(esp => {
+      const totalBanco = totalPorEspecialidad[esp.id] || 0;
+      const unicasNuevas = preguntasVistasPorEspecialidad[esp.id] ? preguntasVistasPorEspecialidad[esp.id].size : 0;
+      const cantidadAntiguas = cantAntiguasPorEspecialidad[esp.id] || 0;
       
-      const unicasNuevas = preguntasVistasPorTema[key] ? preguntasVistasPorTema[key].size : 0;
-      const cantidadAntiguas = cantAntiguasPorTema[key] || 0;
-      
-      // Estimación combinada capada al máximo del banco
       const respondidasEstimado = Math.min(unicasNuevas + cantidadAntiguas, totalBanco);
       const porcentaje = totalBanco > 0 ? Math.round((respondidasEstimado / totalBanco) * 100) : 0;
 
-      cobertura[tema] = {
+      cobertura[esp.nombre] = {
         totalBanco,
         respondidas: respondidasEstimado,
         porcentaje

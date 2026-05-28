@@ -417,11 +417,10 @@
             </div>
           </article>
 
-          <!-- TABS DEL PERFIL (NUEVO CON TRES SECCIONES) -->
+          <!-- TABS DEL PERFIL (NUEVO CON DOS SECCIONES) -->
           <div class="auth-tabs" style="margin-bottom: 0;">
             <button id="tab-perfil-progreso" class="auth-tab active" type="button" style="border-radius: 12px 12px 0 0;">📈 Estadísticas y Métricas</button>
             <button id="tab-perfil-errores" class="auth-tab" type="button" style="border-radius: 12px 12px 0 0;">🚨 Banco de Errores</button>
-            <button id="tab-perfil-marcadas" class="auth-tab" type="button" style="border-radius: 12px 12px 0 0;">🚩 Preguntas Dudosas</button>
           </div>
 
           <!-- CONTENIDO: MI PROGRESO -->
@@ -632,22 +631,6 @@
             </article>
           </div>
 
-          <!-- CONTENIDO: PREGUNTAS MARCADAS / DUDOSAS -->
-          <div id="perfil-contenido-marcadas" class="perfil-seccion-tab hidden" style="margin-top: 20px;">
-            <article class="panel" style="border-radius: 28px; padding: 32px; background: var(--panel); border: 1px solid var(--border);">
-              <div class="panel-head" style="margin-bottom: 20px;">
-                <h3 style="color: var(--text); font-size: 20px; font-weight: 700;">🚩 Preguntas Dudosas / Marcadas</h3>
-                <p style="font-size: 14px; color: var(--text-dim); margin-top: 4px;">Historial en tiempo real de todas las preguntas marcadas con bandera (🚩) en tus simulacros para su repaso seguro.</p>
-              </div>
-              
-              <div id="banco-marcadas-lista" class="review-list" style="margin-top: 16px;">
-                <!-- Inyectado dinámicamente desde JS -->
-              </div>
-              <div id="banco-marcadas-vacio" class="history-empty hidden" style="margin-top: 16px; text-align: center; padding: 24px; color: var(--text-dim);">
-                No tienes preguntas marcadas con duda en este momento.
-              </div>
-            </article>
-          </div>
 
           <!-- Acciones -->
           <div style="display: flex; justify-content: flex-start; margin-top: 12px;">
@@ -949,6 +932,9 @@
             <span id="modal-debilidades-cobertura" style="font-size: 20px; font-weight: bold; color: var(--text);">0 / 0</span>
           </div>
         </div>
+
+        <!-- Retroalimentación Académica Adaptativa (Fase 2) -->
+        <div id="modal-debilidades-retroalimentacion" style="margin-bottom: 8px;"></div>
 
         <!-- Lista de fallos más comunes -->
         <div>

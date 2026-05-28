@@ -1,6 +1,33 @@
 // ====== CONTROLADOR DE INTERFAZ Y RENDERIZACIÓN (ui.js) ======
 
 const ui = {
+  normalizarTema(tema) {
+    if (!tema) return "";
+    const t = tema.trim().toLowerCase()
+      .normalize("NFD").replace(/[\u0300-\u036f]/g, ""); // Quitar acentos
+    
+    if (t.includes("pediatria") || t.includes("pediatra")) return "pediatria";
+    if (t.includes("ginecologia") || t.includes("obstetricia") || t.includes("gineco")) return "ginecologia";
+    if (t.includes("cirugia")) return "cirugia";
+    if (t.includes("interna")) return "interna";
+    if (t.includes("basica") || t.includes("fisiologia") || t.includes("anatomia") || t.includes("farmacologia") || t.includes("embriologia") || t.includes("histologia") || t.includes("microbiologia") || t.includes("parasitologia") || t.includes("bioquimica") || t.includes("genetica")) return "basicas";
+    if (t.includes("cardio")) return "cardiologia";
+    if (t.includes("neumo")) return "neumologia";
+    if (t.includes("gastro")) return "gastro";
+    if (t.includes("nefro") || t.includes("urolo")) return "nefro";
+    if (t.includes("neuro")) return "neurologia";
+    if (t.includes("infecto") || t.includes("virologia") || t.includes("bacteriologia")) return "infectologia";
+    if (t.includes("trauma") || t.includes("orto")) return "trauma";
+    if (t.includes("psiquia")) return "psiquiatria";
+    if (t.includes("salud publica") || t.includes("epidemio") || t.includes("preventiva") || t === "salud") return "salud";
+    
+    if (t.includes("pediat")) return "pediatria";
+    if (t.includes("obstet") || t.includes("ginec")) return "ginecologia";
+    if (t.includes("cirug")) return "cirugia";
+    
+    return t; // Fallback
+  },
+
   // CONTROL DE PANTALLAS CON TRANSICIONES SUAVES
   mostrarPantalla(idPantalla, pushState = true) {
     // Si no empieza con "pantalla-", agregar el prefijo de forma inteligente
@@ -122,6 +149,57 @@ const ui = {
       modalCobertura.textContent = coberturaEl.textContent;
     }
 
+    // Cargar Retroalimentación Académica Adaptativa (Fase 2)
+    const retroEl = document.getElementById("modal-debilidades-retroalimentacion");
+    if (retroEl) {
+      const scoreText = (notaEl ? notaEl.textContent : "0%").replace("%", "");
+      const score = parseInt(scoreText) || 0;
+      const vistasText = (coberturaEl ? coberturaEl.textContent : "0 / 0").split(" ")[0];
+      const vistas = parseInt(vistasText) || 0;
+
+      let feedbackBadge = "";
+      let feedbackText = "";
+      let feedbackBg = "";
+      let feedbackBorder = "";
+      let feedbackColor = "";
+
+      if (vistas === 0) {
+        feedbackBadge = "⚪ Sin Datos";
+        feedbackText = "Aún no has respondido preguntas de esta especialidad en tus simulacros. ¡Inicia un entrenamiento para evaluar tu nivel!";
+        feedbackBg = "rgba(255,255,255,0.02)";
+        feedbackBorder = "1px solid var(--border)";
+        feedbackColor = "var(--text-soft)";
+      } else if (score >= 85) {
+        feedbackBadge = "🏆 Sobresaliente";
+        feedbackText = "¡Rendimiento excepcional! Tu precisión y dominio conceptual en esta especialidad son sobresalientes. Sigue así y afianza repasando flashcards complejas.";
+        feedbackBg = "rgba(34, 197, 94, 0.04)";
+        feedbackBorder = "1px solid rgba(34, 197, 94, 0.2)";
+        feedbackColor = "var(--success)";
+      } else if (score >= 70) {
+        feedbackBadge = "✅ Buen Nivel";
+        feedbackText = "Buen rendimiento general. Demuestras bases sólidas en esta materia, pero te sugerimos revisar las debilidades listadas abajo para pulir tu precisión.";
+        feedbackBg = "rgba(16, 185, 129, 0.03)";
+        feedbackBorder = "1px solid rgba(16, 185, 129, 0.15)";
+        feedbackColor = "#10b981";
+      } else {
+        feedbackBadge = "⚠️ Debe Mejorar";
+        feedbackText = "Requieres reforzar esta materia de forma prioritaria. Te recomendamos revisar detalladamente las explicaciones de tus simulacros y la bibliografía oficial indicada abajo.";
+        feedbackBg = "rgba(245, 158, 11, 0.03)";
+        feedbackBorder = "1px solid rgba(245, 158, 11, 0.2)";
+        feedbackColor = "var(--warning)";
+      }
+
+      retroEl.innerHTML = `
+        <div style="background: ${feedbackBg}; border: ${feedbackBorder}; border-radius: 12px; padding: 14px 18px; display: flex; flex-direction: column; gap: 8px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px;">
+            <span style="font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-dim);">Evaluación de Nivel:</span>
+            <span class="chip" style="background: rgba(255,255,255,0.03); border-color: ${feedbackColor}; color: ${feedbackColor}; font-size: 11px; font-weight: 700; padding: 3px 10px; margin:0;">${feedbackBadge}</span>
+          </div>
+          <p style="margin: 0; font-size: 12.5px; line-height: 1.5; color: var(--text-soft); font-weight: 500;">${feedbackText}</p>
+        </div>
+      `;
+    }
+
     // Calcular debilidades reales
     const listaTemasEl = document.getElementById("modal-debilidades-lista-temas");
     if (listaTemasEl) {
@@ -151,10 +229,9 @@ const ui = {
                   subtemaReal = deMapeo.subtema || subtemaReal;
                 }
 
-                const materiaPregunta = (temaReal || "").trim().toLowerCase();
-                const materiaBuscada = esp.nombre.trim().toLowerCase();
+                const espIdPregunta = ui.normalizarTema(temaReal);
 
-                if (materiaPregunta === materiaBuscada && p.seleccionada !== p.correcta && p.seleccionada !== null) {
+                if (espIdPregunta === esp.id && p.seleccionada !== p.correcta && p.seleccionada !== null) {
                   const subtema = (subtemaReal || "Conceptos Generales").trim();
                   fallosPorSubtema[subtema] = (fallosPorSubtema[subtema] || 0) + 1;
                 }
@@ -734,7 +811,6 @@ const ui = {
       // Analizar historial para analíticas de subtemas y debilidades
       const metricasAv = analytics.procesarMetricas(historial);
       ui.renderizarBancoDeErrores(historial, metricasAv);
-      ui.renderizarPreguntasMarcadas(historial);
 
       // Calcular preguntas contestadas esta semana
       const ahora = new Date();
@@ -784,7 +860,7 @@ const ui = {
       // Rendimiento por especialidad
       const conteoEspecialidades = {};
       state.LISTA_ESPECIALIDADES.forEach(esp => {
-        conteoEspecialidades[esp.nombre.trim().toLowerCase()] = { correctas: 0, totales: 0 };
+        conteoEspecialidades[esp.id] = { correctas: 0, totales: 0 };
       });
 
       historial.forEach(sesion => {
@@ -793,18 +869,19 @@ const ui = {
             const preguntas = JSON.parse(sesion.detalle);
             if (Array.isArray(preguntas)) {
               preguntas.forEach(p => {
-                const temaPregunta = (p.tema || sesion.tema || "").trim().toLowerCase();
-                if (conteoEspecialidades[temaPregunta]) {
-                  conteoEspecialidades[temaPregunta].totales += 1;
+                const temaPregunta = p.tema || sesion.tema || "";
+                const key = ui.normalizarTema(temaPregunta);
+                if (conteoEspecialidades[key]) {
+                  conteoEspecialidades[key].totales += 1;
                   if (p.seleccionada === p.correcta) {
-                    conteoEspecialidades[temaPregunta].correctas += 1;
+                    conteoEspecialidades[key].correctas += 1;
                   }
                 }
               });
             }
           } catch (e) {
             // Fallback si falla el parseo
-            const key = sesion.tema ? sesion.tema.trim().toLowerCase() : "";
+            const key = ui.normalizarTema(sesion.tema);
             if (conteoEspecialidades[key]) {
               const correctasEnSesion = Math.round((sesion.porcentaje / 100) * sesion.cantidad_preguntas);
               conteoEspecialidades[key].correctas += correctasEnSesion;
@@ -813,7 +890,7 @@ const ui = {
           }
         } else {
           // Fallback para sesiones antiguas sin detalle
-          const key = sesion.tema ? sesion.tema.trim().toLowerCase() : "";
+          const key = ui.normalizarTema(sesion.tema);
           if (conteoEspecialidades[key]) {
             const correctasEnSesion = Math.round((sesion.porcentaje / 100) * sesion.cantidad_preguntas);
             conteoEspecialidades[key].correctas += correctasEnSesion;
@@ -824,7 +901,7 @@ const ui = {
 
       // Actualizar barras de rendimiento por especialidad
       state.LISTA_ESPECIALIDADES.forEach(esp => {
-        const info = conteoEspecialidades[esp.nombre.trim().toLowerCase()];
+        const info = conteoEspecialidades[esp.id];
         let porcentajeFinal = 0;
         if (info && info.totales > 0) {
           porcentajeFinal = Math.round((info.correctas / info.totales) * 100);
@@ -1385,92 +1462,7 @@ const ui = {
     });
   },
 
-  renderizarPreguntasMarcadas(historial) {
-    const listaEl = document.getElementById("banco-marcadas-lista");
-    const vacioEl = document.getElementById("banco-marcadas-vacio");
-    if (!listaEl) return;
-    
-    listaEl.innerHTML = "";
-    
-    const preguntasMarcadasMap = new Map();
-    historial.forEach(sesion => {
-      if (sesion.detalle) {
-        try {
-          const preguntas = JSON.parse(sesion.detalle);
-          if (Array.isArray(preguntas)) {
-            preguntas.forEach(p => {
-              if (p.marcada === true) {
-                preguntasMarcadasMap.set(p.texto, {
-                  id: p.id,
-                  texto: p.texto,
-                  opciones: p.opciones,
-                  correcta: p.correcta,
-                  seleccionada: p.seleccionada,
-                  explicacion: p.explicacion,
-                  explicacion_correcta: p.explicacion_correcta,
-                  explicacion_incorrecta: p.explicacion_incorrecta,
-                  tema: p.tema || sesion.tema,
-                  subtema: p.subtema || "Varios",
-                  microtema: p.microtema || "Varios"
-                });
-              }
-            });
-          }
-        } catch (e) {
-          console.error("Error al estructurar banco de dudosas:", e);
-        }
-      }
-    });
-    
-    if (preguntasMarcadasMap.size === 0) {
-      if (vacioEl) vacioEl.classList.remove("hidden");
-      return;
-    }
-    
-    if (vacioEl) vacioEl.classList.add("hidden");
-    
-    let idx = 0;
-    preguntasMarcadasMap.forEach(p => {
-      idx++;
-      const opcionesArray = p.opciones;
-      const seleccion = p.seleccionada;
-      
-      let opcionesHtml = "";
-      opcionesArray.forEach((o, oIdx) => {
-        let claseOpt = "";
-        if (oIdx === p.correcta) claseOpt = "correct";
-        if (oIdx === seleccion && seleccion !== p.correcta) claseOpt = "wrong";
-        opcionesHtml += `<div class="review-opt ${claseOpt}"><strong>${String.fromCharCode(65 + oIdx)}.</strong> ${o}</div>`;
-      });
 
-      const textoEscapado = p.texto.replace(/"/g, "&quot;");
-      const explicacionEscapada = (p.explicacion || "Sin desglose.").replace(/"/g, "&quot;");
-      const temaEscapado = (p.tema || "General").replace(/"/g, "&quot;");
-      
-      const seleccionText = (seleccion !== null && opcionesArray[seleccion]) 
-        ? opcionesArray[seleccion].replace(/"/g, "&quot;") 
-        : "Sin responder";
-      
-      const div = document.createElement("div");
-      div.className = "review-item";
-      div.innerHTML = `
-        <div class="error-bank-header">
-          <span class="chip chip-soft flagged-chip">Dudosa</span>
-          <span class="chip chip-soft error-bank-chip">Materia: ${p.tema || "General"}</span>
-          <span class="chip chip-soft" style="font-size:11px;">Subtema: ${p.subtema || "Varios"}</span>
-        </div>
-        <div class="review-q-text error-bank-q-text">${idx}. ${p.texto}</div>
-        <div class="review-options">${opcionesHtml}</div>
-        <div class="review-exp-container">${ui.formatearExplicacionClinica(p.explicacion, p.fuente, p.explicacion_correcta, p.explicacion_incorrecta)}</div>
-        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top: 10px;">
-          <button class="btn-ia btn-consultar-tutor" data-texto="${textoEscapado}" data-seleccion="${seleccionText}" type="button">Consultar Tutor IA</button>
-          <button class="btn btn-primary btn-auto-flashcard" data-tema="${temaEscapado}" data-pregunta="${textoEscapado}" data-respuesta="${explicacionEscapada}" style="background: var(--warning); color:#000; font-size:12px; padding:6px 12px; border:none;" type="button">Crear Flashcard</button>
-          <button class="btn btn-reportar-pregunta" data-id="${p.id}" type="button">Reportar Error</button>
-        </div>
-      `;
-      listaEl.appendChild(div);
-    });
-  },
 
   async cargarReportesAdministrador() {
     const badgeEl = document.getElementById("admin-reportes-badge");
