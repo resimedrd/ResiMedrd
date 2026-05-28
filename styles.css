@@ -2373,8 +2373,42 @@ body.dark-mode::-webkit-scrollbar-thumb:hover {
   font-weight: 700 !important;
   box-shadow: 0 4px 12px rgba(10, 102, 194, 0.15) !important;
 }
+/* ==========================================================================
+   📈 ESTILOS DE GRÁFICOS Y MÉTRICAS AVANZADAS
+   ========================================================================== */
 
+#seccion-graficos-desplegable.activo {
+  max-height: 2000px !important;
+  opacity: 1 !important;
+  margin-top: 10px !important;
+}
 
+#btn-toggle-graficos:hover {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-color: var(--primary) !important;
+  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.15) !important;
+}
 
+#btn-toggle-graficos.activo #icono-toggle-graficos {
+  transform: rotate(180deg);
+  color: var(--primary);
+}
 
+.chart-card-premium {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+  border: 1px solid var(--border) !important;
+  backdrop-filter: blur(8px);
+}
 
+.chart-card-premium:hover {
+  transform: translateY(-3px);
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+}
+
+@media (max-width: 768px) {
+  .charts-dashboard-grid {
+    grid-template-columns: 1fr !important;
+  }
+}

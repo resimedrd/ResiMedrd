@@ -652,6 +652,33 @@ const ui = {
       
       // Renderizar tabla de historial diario de flashcards
       ui.renderizarTablaDiarioFlashcards(diarioFlashcards);
+
+      // Vincular toggle del Cajón Desplegable de Gráficos Analíticos
+      const btnToggle = document.getElementById("btn-toggle-graficos");
+      if (btnToggle && !btnToggle.dataset.hasListener) {
+        btnToggle.dataset.hasListener = "true";
+        btnToggle.addEventListener("click", () => {
+          const seccion = document.getElementById("seccion-graficos-desplegable");
+          if (seccion) {
+            const estaActivo = seccion.classList.toggle("activo");
+            btnToggle.classList.toggle("activo", estaActivo);
+            const icono = document.getElementById("icono-toggle-graficos");
+            if (icono) {
+              icono.textContent = estaActivo ? "▲" : "▼";
+            }
+            if (estaActivo) {
+              // Dibujar los gráficos dinámicos con Chart.js
+              ui.renderizarGraficosAvanzados(historial, srEstados, personalizadas.length);
+            }
+          }
+        });
+      }
+      
+      // Si la sección de gráficos ya está activa al recargar el perfil, refrescarlos en caliente
+      const seccionGraficos = document.getElementById("seccion-graficos-desplegable");
+      if (seccionGraficos && seccionGraficos.classList.contains("activo")) {
+        ui.renderizarGraficosAvanzados(historial, srEstados, personalizadas.length);
+      }
       
       // Analizar historial para analíticas de subtemas y debilidades
       const metricasAv = analytics.procesarMetricas(historial);
@@ -928,6 +955,274 @@ const ui = {
       
       tablaCuerpo.appendChild(fila);
     });
+  },
+
+  renderizarGraficosAvanzados(historial, srEstados, totalPersonalizadas = 0) {
+    if (typeof Chart === "undefined") {
+      console.warn("Chart.js aún no se ha cargado.");
+      return;
+    }
+
+    // 1. Destruir de forma segura instancias de gráficos previas
+    if (!window.resiMedCharts) {
+      window.resiMedCharts = { line: null, bar: null, doughnut: null };
+    }
+    if (window.resiMedCharts.line) window.resiMedCharts.line.destroy();
+    if (window.resiMedCharts.bar) window.resiMedCharts.bar.destroy();
+    if (window.resiMedCharts.doughnut) window.resiMedCharts.doughnut.destroy();
+
+    // 2. Extraer datos para el Gráfico 1: Curva de Rendimiento Académico (Line Chart)
+    const ultimasSesiones = [...historial]
+      .filter(s => s.porcentaje !== undefined && s.fecha)
+      .sort((a, b) => new Date(a.fecha) - new Date(b.fecha))
+      .slice(-7);
+
+    const labelsLinea = ultimasSesiones.map(s => {
+      try {
+        const d = new Date(s.fecha);
+        return d.toLocaleDateString("es-ES", { day: "2-digit", month: "2-digit" });
+      } catch (e) {
+        return "q.";
+      }
+    });
+    const dataLinea = ultimasSesiones.map(s => s.porcentaje);
+
+    // Si no hay datos, mostrar placeholders elegantes
+    const lineLabels = labelsLinea.length > 0 ? labelsLinea : ["Vacío"];
+    const lineData = dataLinea.length > 0 ? dataLinea : [0];
+
+    // Gráfico 1: Line Chart
+    const ctxLinea = document.getElementById('chart-rendimiento-linea');
+    if (ctxLinea) {
+      const isDark = document.body.classList.contains("dark-mode");
+      const textColor = isDark ? '#94a3b8' : '#475569';
+      const gridColor = isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)';
+
+      const ctx = ctxLinea.getContext('2d');
+      const gradient = ctx.createLinearGradient(0, 0, 0, 200);
+      gradient.addColorStop(0, isDark ? 'rgba(59, 130, 246, 0.25)' : 'rgba(10, 102, 194, 0.25)');
+      gradient.addColorStop(1, 'rgba(59, 130, 246, 0.0)');
+
+      window.resiMedCharts.line = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: lineLabels,
+          datasets: [{
+            label: 'Precisión (%)',
+            data: lineData,
+            borderColor: isDark ? '#3b82f6' : '#0A66C2',
+            borderWidth: 3,
+            backgroundColor: gradient,
+            fill: true,
+            tension: 0.35,
+            pointBackgroundColor: isDark ? '#60a5fa' : '#0A66C2',
+            pointBorderColor: isDark ? '#0f172a' : '#ffffff',
+            pointBorderWidth: 2,
+            pointRadius: 5,
+            pointHoverRadius: 7
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: isDark ? '#1e293b' : '#ffffff',
+              titleColor: isDark ? '#f8fafc' : '#0f172a',
+              bodyColor: isDark ? '#cbd5e1' : '#334155',
+              borderColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)',
+              borderWidth: 1,
+              callbacks: {
+                label: (context) => `Nota: ${context.raw}%`
+              }
+            }
+          },
+          scales: {
+            x: {
+              grid: { display: false },
+              ticks: { color: textColor, font: { size: 11 } }
+            },
+            y: {
+              min: 0,
+              max: 100,
+              grid: { color: gridColor },
+              ticks: { color: textColor, font: { size: 11 }, stepSize: 20 }
+            }
+          }
+        }
+      });
+    }
+
+    // 3. Extraer datos para el Gráfico 2: Cobertura por Especialidad (Horizontal Bar)
+    const conteoEspecialidades = {};
+    state.LISTA_ESPECIALIDADES.forEach(esp => {
+      conteoEspecialidades[esp.nombre.trim().toLowerCase()] = { correctas: 0, totales: 0 };
+    });
+
+    historial.forEach(sesion => {
+      if (sesion.detalle) {
+        try {
+          const preguntas = JSON.parse(sesion.detalle);
+          if (Array.isArray(preguntas)) {
+            preguntas.forEach(p => {
+              const temaPregunta = (p.tema || sesion.tema || "").trim().toLowerCase();
+              if (conteoEspecialidades[temaPregunta]) {
+                conteoEspecialidades[temaPregunta].totales += 1;
+                if (p.seleccionada === p.correcta) {
+                  conteoEspecialidades[temaPregunta].correctas += 1;
+                }
+              }
+            });
+          }
+        } catch (e) {
+          const key = sesion.tema ? sesion.tema.trim().toLowerCase() : "";
+          if (conteoEspecialidades[key]) {
+            const correctasEnSesion = Math.round((sesion.porcentaje / 100) * sesion.cantidad_preguntas);
+            conteoEspecialidades[key].correctas += correctasEnSesion;
+            conteoEspecialidades[key].totales += sesion.cantidad_preguntas;
+          }
+        }
+      } else {
+        const key = sesion.tema ? sesion.tema.trim().toLowerCase() : "";
+        if (conteoEspecialidades[key]) {
+          const correctasEnSesion = Math.round((sesion.porcentaje / 100) * sesion.cantidad_preguntas);
+          conteoEspecialidades[key].correctas += correctasEnSesion;
+          conteoEspecialidades[key].totales += sesion.cantidad_preguntas;
+        }
+      }
+    });
+
+    const labelsBar = [];
+    const dataBar = [];
+    const colorsBar = [];
+
+    state.LISTA_ESPECIALIDADES.forEach(esp => {
+      const info = conteoEspecialidades[esp.nombre.trim().toLowerCase()];
+      if (info && info.totales > 0) {
+        labelsBar.push(esp.emoji + " " + esp.nombre.split(" ")[0]);
+        const pct = Math.round((info.correctas / info.totales) * 100);
+        dataBar.push(pct);
+        
+        if (pct >= 75) colorsBar.push('rgba(34, 197, 94, 0.7)');
+        else if (pct >= 50) colorsBar.push('rgba(245, 158, 11, 0.7)');
+        else colorsBar.push('rgba(239, 68, 68, 0.7)');
+      }
+    });
+
+    if (labelsBar.length === 0) {
+      state.LISTA_ESPECIALIDADES.slice(0, 5).forEach(esp => {
+        labelsBar.push(esp.emoji + " " + esp.nombre.split(" ")[0]);
+        dataBar.push(0);
+        colorsBar.push('rgba(148, 163, 184, 0.3)');
+      });
+    }
+
+    const ctxBarras = document.getElementById('chart-especialidad-barras');
+    if (ctxBarras) {
+      const isDark = document.body.classList.contains("dark-mode");
+      const textColor = isDark ? '#94a3b8' : '#475569';
+      const gridColor = isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)';
+
+      window.resiMedCharts.bar = new Chart(ctxBarras, {
+        type: 'bar',
+        data: {
+          labels: labelsBar,
+          datasets: [{
+            data: dataBar,
+            backgroundColor: colorsBar,
+            borderRadius: 6,
+            barThickness: 16
+          }]
+        },
+        options: {
+          indexAxis: 'y',
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: isDark ? '#1e293b' : '#ffffff',
+              titleColor: isDark ? '#f8fafc' : '#0f172a',
+              bodyColor: isDark ? '#cbd5e1' : '#334155',
+              borderColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)',
+              borderWidth: 1,
+              callbacks: {
+                label: (context) => `Precisión: ${context.raw}%`
+              }
+            }
+          },
+          scales: {
+            x: {
+              min: 0,
+              max: 100,
+              grid: { color: gridColor },
+              ticks: { color: textColor, font: { size: 10 } }
+            },
+            y: {
+              grid: { display: false },
+              ticks: { color: textColor, font: { size: 10 } }
+            }
+          }
+        }
+      });
+    }
+
+    // 4. Extraer datos para el Gráfico 3: Estado de Repetición Espaciada (Doughnut Chart)
+    const totalRepasos = srEstados.filter(e => e.flashcard_id);
+    const dominadas = totalRepasos.filter(e => e.interval > 0).length;
+    const criticas = totalRepasos.filter(e => e.interval === 0).length;
+
+    const totalEstaticas = (typeof baseDatosFlashcardsEstaticas !== "undefined") ? baseDatosFlashcardsEstaticas.length : 0;
+    const totalActivas = totalEstaticas + totalPersonalizadas;
+    const sinRepasar = Math.max(0, totalActivas - totalRepasos.length);
+
+    const ctxDona = document.getElementById('chart-repeticion-dona');
+    if (ctxDona) {
+      const isDark = document.body.classList.contains("dark-mode");
+      const textColor = isDark ? '#f8fafc' : '#0f172a';
+
+      window.resiMedCharts.doughnut = new Chart(ctxDona, {
+        type: 'doughnut',
+        data: {
+          labels: ['Dominadas', 'Críticas', 'Sin Repasar'],
+          datasets: [{
+            data: [dominadas, criticas, sinRepasar],
+            backgroundColor: [
+              'rgba(16, 185, 129, 0.8)',
+              'rgba(239, 68, 68, 0.8)',
+              'rgba(59, 130, 246, 0.8)'
+            ],
+            borderWidth: isDark ? 2 : 1,
+            borderColor: isDark ? '#08080a' : '#ffffff',
+            hoverOffset: 4
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'right',
+              labels: {
+                color: isDark ? '#94a3b8' : '#475569',
+                font: { size: 11, weight: '600' },
+                boxWidth: 10,
+                padding: 10
+              }
+            },
+            tooltip: {
+              backgroundColor: isDark ? '#1e293b' : '#ffffff',
+              titleColor: isDark ? '#f8fafc' : '#0f172a',
+              bodyColor: isDark ? '#cbd5e1' : '#334155',
+              borderColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)',
+              borderWidth: 1
+            }
+          },
+          cutout: '65%'
+        }
+      });
+    }
   },
 
   // BANCO DE ERRORES DINÁMICO & ANÁLISIS DE DEBILIDADES
