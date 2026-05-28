@@ -497,26 +497,7 @@
                 </div>
               </div>
 
-              <!-- FASE 2: Evaluación Diaria de Flashcards -->
-              <div id="widget-evaluacion-diaria" style="background: rgba(255, 255, 255, 0.01); border: 1px solid var(--border); border-radius: 20px; padding: 24px; margin-bottom: 24px;">
-                <h4 style="margin: 0 0 16px 0; font-size: 13px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 8px;">
-                  <span>⚡</span> Evaluación Diaria de Flashcards (Hoy)
-                </h4>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; text-align: center;">
-                  <div style="background: var(--panel-soft); padding: 16px; border-radius: 12px; border: 1px solid var(--border); border-left: 4px solid var(--text-dim);">
-                    <span style="font-size: 11px; color: var(--text-soft); display: block; text-transform: uppercase; margin-bottom: 4px;">Tarjetas Evaluadas</span>
-                    <span id="diario-tarjetas-evaluadas" style="font-size: 24px; font-weight: 800; color: var(--text);">0</span>
-                  </div>
-                  <div style="background: var(--panel-soft); padding: 16px; border-radius: 12px; border: 1px solid var(--border); border-left: 4px solid var(--success);">
-                    <span style="font-size: 11px; color: var(--text-soft); display: block; text-transform: uppercase; margin-bottom: 4px;">Eficiencia / Dominadas</span>
-                    <span id="diario-porcentaje-eficiencia" style="font-size: 24px; font-weight: 800; color: var(--success);">0%</span>
-                  </div>
-                  <div style="background: var(--panel-soft); padding: 16px; border-radius: 12px; border: 1px solid var(--border); border-left: 4px solid var(--danger);">
-                    <span style="font-size: 11px; color: var(--text-soft); display: block; text-transform: uppercase; margin-bottom: 4px;">Por Repasar / Falladas</span>
-                    <span id="diario-porcentaje-repasar" style="font-size: 24px; font-weight: 800; color: var(--danger);">0%</span>
-                  </div>
-                </div>
-              </div>
+
 
               <!-- Rendimiento y Cobertura por Especialidad Colapsable -->
               <div id="contenedor-especialidades-acordeon" style="margin-top: 24px; border-top: 1px dashed var(--border-strong); padding-top: 20px;">
@@ -583,6 +564,27 @@
               </button>
 
               <div id="seccion-diario-desplegable" style="max-height: 0; overflow: hidden; opacity: 0; transition: max-height 0.4s ease-out, opacity 0.3s ease; margin-top: 0;">
+                <!-- FASE 2: Evaluación Diaria de Flashcards -->
+                <div id="widget-evaluacion-diaria" style="background: rgba(255, 255, 255, 0.01); border: 1px solid var(--border); border-radius: 20px; padding: 24px; margin-top: 20px; margin-bottom: 24px;">
+                  <h4 style="margin: 0 0 16px 0; font-size: 13px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 8px;">
+                    <span>⚡</span> Evaluación Diaria de Flashcards (Hoy)
+                  </h4>
+                  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; text-align: center;">
+                    <div style="background: var(--panel-soft); padding: 16px; border-radius: 12px; border: 1px solid var(--border); border-left: 4px solid var(--text-dim);">
+                      <span style="font-size: 11px; color: var(--text-soft); display: block; text-transform: uppercase; margin-bottom: 4px;">Tarjetas Evaluadas</span>
+                      <span id="diario-tarjetas-evaluadas" style="font-size: 24px; font-weight: 800; color: var(--text);">0</span>
+                    </div>
+                    <div style="background: var(--panel-soft); padding: 16px; border-radius: 12px; border: 1px solid var(--border); border-left: 4px solid var(--success);">
+                      <span style="font-size: 11px; color: var(--text-soft); display: block; text-transform: uppercase; margin-bottom: 4px;">Eficiencia / Dominadas</span>
+                      <span id="diario-porcentaje-eficiencia" style="font-size: 24px; font-weight: 800; color: var(--success);">0%</span>
+                    </div>
+                    <div style="background: var(--panel-soft); padding: 16px; border-radius: 12px; border: 1px solid var(--border); border-left: 4px solid var(--danger);">
+                      <span style="font-size: 11px; color: var(--text-soft); display: block; text-transform: uppercase; margin-bottom: 4px;">Por Repasar / Falladas</span>
+                      <span id="diario-porcentaje-repasar" style="font-size: 24px; font-weight: 800; color: var(--danger);">0%</span>
+                    </div>
+                  </div>
+                </div>
+
                 <article class="panel" style="border-radius: 28px; padding: 32px; background: var(--panel); border: 1px solid var(--border); margin-top: 20px;">
                   <div class="panel-head" style="margin-bottom: 20px;">
                     <h3 style="color: var(--text); font-size: 20px; font-weight: 700;">📈 Historial de Estudio Diario (Flashcards)</h3>
