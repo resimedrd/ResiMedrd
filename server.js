@@ -46,6 +46,17 @@ async function iniciarBaseDeDatos() {
     driver: sqlite3.Database
   });
 
+  // 0. Tabla de Exámenes (FASE 3)
+  await db.exec(`
+    CREATE TABLE IF NOT EXISTS examenes (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      nombre TEXT UNIQUE NOT NULL,
+      ano INTEGER UNIQUE NOT NULL,
+      cantidad_preguntas INTEGER DEFAULT 0,
+      activo INTEGER DEFAULT 1
+    )
+  `);
+
   // 1. Tabla de Usuarios
   await db.exec(`
     CREATE TABLE IF NOT EXISTS usuarios (
@@ -167,7 +178,9 @@ async function iniciarBaseDeDatos() {
     { nombre: "especialidad", definicion: "TEXT" },
     { nombre: "ano_examen", definicion: "INTEGER" },
     { nombre: "explicacion_correcta", definicion: "TEXT" },
-    { nombre: "explicacion_incorrecta", definicion: "TEXT" }
+    { nombre: "explicacion_incorrecta", definicion: "TEXT" },
+    { nombre: "activo", definicion: "INTEGER DEFAULT 1" },
+    { nombre: "examen_id", definicion: "INTEGER REFERENCES examenes(id)" }
   ];
 
   for (const col of columnasPreguntas) {
@@ -586,6 +599,46 @@ async function iniciarBaseDeDatos() {
         }
         console.log(`✅ ¡Éxito! Se inyectaron ${preguntas2025.length} preguntas oficiales del ENURM 2025 en producción.`);
       }
+    }
+
+    // 📊 AUTO-ENLACE Y MIGRACIÓN DE EXÁMENES (Fase 3 - Etapa 1)
+    try {
+      // 1. Obtener todos los años únicos presentes en preguntas
+      const anosExistentes = await db.all(`SELECT DISTINCT ano_examen FROM preguntas WHERE ano_examen IS NOT NULL`);
+      
+      for (const { ano_examen } of anosExistentes) {
+        const nombreExamen = `ENURM ${ano_examen}`;
+        
+        // Insertar el examen si no existe
+        await db.run(
+          `INSERT OR IGNORE INTO examenes (nombre, ano, activo) VALUES (?, ?, 1)`,
+          [nombreExamen, ano_examen]
+        );
+        
+        // Obtener el id del examen recién insertado o existente
+        const examenObj = await db.get(`SELECT id FROM examenes WHERE ano = ?`, [ano_examen]);
+        if (examenObj) {
+          // Actualizar preguntas que correspondan a este año y que no tengan examen_id asignado
+          await db.run(
+            `UPDATE preguntas SET examen_id = ? WHERE ano_examen = ? AND examen_id IS NULL`,
+            [examenObj.id, ano_examen]
+          );
+        }
+      }
+      
+      // 2. Recalcular cantidad de preguntas activas por examen
+      const todosExamenes = await db.all(`SELECT id FROM examenes`);
+      for (const ex of todosExamenes) {
+        const countRow = await db.get(
+          `SELECT COUNT(*) as total FROM preguntas WHERE examen_id = ? AND (activo = 1 OR activo IS NULL)`,
+          [ex.id]
+        );
+        const cantidad = countRow ? countRow.total : 0;
+        await db.run(`UPDATE examenes SET cantidad_preguntas = ? WHERE id = ?`, [cantidad, ex.id]);
+      }
+      console.log("✅ Auto-enlace y conteo de exámenes completado de forma retrocompatible.");
+    } catch (errExamenes) {
+      console.error("Error al auto-enlazar preguntas con exámenes:", errExamenes);
     }
   } catch (err) {
     console.error("Error al inyectar banco inicial o ENURM 2025:", err);
@@ -1380,7 +1433,7 @@ app.put("/api/admin/reportes-error/:id/marcar-leido", autenticarToken, async (re
   }
 });
 
-// 4. Modificar una pregunta (Solo para Administrador)
+// 4. Modificar una pregunta (Solo para Administrador - Soporte FASE 3)
 app.put("/api/admin/preguntas/:id", autenticarToken, async (req, res) => {
   try {
     const preguntaId = req.params.id;
@@ -1391,7 +1444,11 @@ app.put("/api/admin/preguntas/:id", autenticarToken, async (req, res) => {
       return res.status(403).json({ error: "Acceso denegado. No eres administrador." });
     }
 
-    const { texto, opciones, correcta, tema, subtema, explicacion, fuente } = req.body;
+    const { 
+      texto, opciones, correcta, tema, subtema, microtema, 
+      especialidad, difficulty, explicacion, fuente, 
+      activo, examen_id, explicacion_correcta, explicacion_incorrecta, ano_examen
+    } = req.body;
 
     if (!texto || !opciones || correcta === undefined || !tema) {
       return res.status(400).json({ error: "Faltan campos requeridos." });
@@ -1399,12 +1456,43 @@ app.put("/api/admin/preguntas/:id", autenticarToken, async (req, res) => {
 
     const opcionesStr = Array.isArray(opciones) ? JSON.stringify(opciones) : opciones;
 
-    await db.run(
-      `UPDATE preguntas 
-       SET texto = ?, opciones = ?, correcta = ?, tema = ?, subtema = ?, explicacion = ?, fuente = ?
-       WHERE id = ?`,
-      [texto, opcionesStr, correcta, tema, subtema || "", explicacion || "", fuente || "", preguntaId]
-    );
+    const query = `
+      UPDATE preguntas 
+      SET texto = ?, opciones = ?, correcta = ?, tema = ?, subtema = ?, microtema = ?, 
+          especialidad = ?, difficulty = ?, explicacion = ?, fuente = ?, 
+          activo = ?, examen_id = ?, explicacion_correcta = ?, explicacion_incorrecta = ?, ano_examen = ?
+      WHERE id = ?
+    `;
+
+    await db.run(query, [
+      texto, 
+      opcionesStr, 
+      correcta, 
+      tema, 
+      subtema || "", 
+      microtema || "", 
+      especialidad || tema, 
+      difficulty !== undefined ? parseFloat(difficulty) : 0.5, 
+      explicacion || "", 
+      fuente || "", 
+      activo !== undefined ? (activo ? 1 : 0) : 1, 
+      examen_id !== undefined ? (examen_id ? parseInt(examen_id) : null) : null,
+      explicacion_correcta || "",
+      explicacion_incorrecta || "",
+      ano_examen !== undefined ? (ano_examen ? parseInt(ano_examen) : null) : null,
+      preguntaId
+    ]);
+
+    // Recalcular cantidad_preguntas en exámenes si corresponde
+    const todosExamenes = await db.all(`SELECT id FROM examenes`);
+    for (const ex of todosExamenes) {
+      const countRow = await db.get(
+        `SELECT COUNT(*) as total FROM preguntas WHERE examen_id = ? AND (activo = 1 OR activo IS NULL)`,
+        [ex.id]
+      );
+      const cantidad = countRow ? countRow.total : 0;
+      await db.run(`UPDATE examenes SET cantidad_preguntas = ? WHERE id = ?`, [cantidad, ex.id]);
+    }
 
     res.json({ mensaje: "Pregunta modificada con éxito." });
   } catch (error) {
@@ -1413,6 +1501,143 @@ app.put("/api/admin/preguntas/:id", autenticarToken, async (req, res) => {
   }
 });
 
+
+// === ENDPOINTS DE GESTIÓN DE EXÁMENES COMPLETOS (FASE 3 - ETAPA 1) ===
+
+// 1. Obtener todos los exámenes con conteo dinámico de preguntas activas
+app.get("/api/examenes", async (req, res) => {
+  try {
+    const filas = await db.all(`
+      SELECT e.*, COUNT(p.id) as cantidad_preguntas_real
+      FROM examenes e
+      LEFT JOIN preguntas p ON p.examen_id = e.id AND p.activo = 1
+      GROUP BY e.id
+      ORDER BY e.ano DESC
+    `);
+    
+    const examenes = filas.map(f => ({
+      id: f.id,
+      nombre: f.nombre,
+      ano: f.ano,
+      cantidad_preguntas: f.cantidad_preguntas_real || 0,
+      activo: f.activo
+    }));
+    
+    res.json(examenes);
+  } catch (error) {
+    console.error("Error al listar exámenes:", error);
+    res.status(500).json({ error: "Error al listar exámenes." });
+  }
+});
+
+// 2. Crear un nuevo examen oficial (Solo para Administrador)
+app.post("/api/admin/examenes", autenticarToken, async (req, res) => {
+  try {
+    const usuarioId = req.usuario.id;
+    const usuarioReal = await db.get(`SELECT rol FROM usuarios WHERE id = ?`, [usuarioId]);
+    if (!usuarioReal || usuarioReal.rol !== "admin") {
+      return res.status(403).json({ error: "Acceso denegado. No eres administrador." });
+    }
+
+    const { nombre, ano, activo } = req.body;
+    if (!nombre || !ano) {
+      return res.status(400).json({ error: "Faltan campos requeridos: nombre y año." });
+    }
+
+    const anoNum = parseInt(ano);
+    
+    const duplicado = await db.get(`SELECT id FROM examenes WHERE ano = ? OR nombre = ?`, [anoNum, nombre]);
+    if (duplicado) {
+      return res.status(400).json({ error: "Ya existe un examen con ese año o nombre." });
+    }
+
+    const result = await db.run(
+      `INSERT INTO examenes (nombre, ano, activo, cantidad_preguntas) VALUES (?, ?, ?, 0)`,
+      [nombre, anoNum, activo !== undefined ? activo : 1]
+    );
+
+    res.status(201).json({
+      mensaje: "Examen creado con éxito.",
+      id: result.lastID
+    });
+  } catch (error) {
+    console.error("Error al crear examen:", error);
+    res.status(500).json({ error: "Error interno del servidor al crear el examen." });
+  }
+});
+
+// 3. Editar nombre/año/estado activo de un examen (Solo para Administrador)
+app.put("/api/admin/examenes/:id", autenticarToken, async (req, res) => {
+  try {
+    const usuarioId = req.usuario.id;
+    const usuarioReal = await db.get(`SELECT rol FROM usuarios WHERE id = ?`, [usuarioId]);
+    if (!usuarioReal || usuarioReal.rol !== "admin") {
+      return res.status(403).json({ error: "Acceso denegado. No eres administrador." });
+    }
+
+    const examenId = req.params.id;
+    const { nombre, ano, activo } = req.body;
+
+    if (!nombre || !ano) {
+      return res.status(400).json({ error: "Faltan campos requeridos: nombre y año." });
+    }
+
+    const anoNum = parseInt(ano);
+
+    const duplicado = await db.get(
+      `SELECT id FROM examenes WHERE (ano = ? OR nombre = ?) AND id != ?`,
+      [anoNum, nombre, examenId]
+    );
+    if (duplicado) {
+      return res.status(400).json({ error: "Ya existe otro examen con ese año o nombre." });
+    }
+
+    await db.run(
+      `UPDATE examenes SET nombre = ?, ano = ?, activo = ? WHERE id = ?`,
+      [nombre, anoNum, activo !== undefined ? activo : 1, examenId]
+    );
+
+    res.json({ mensaje: "Examen actualizado con éxito." });
+  } catch (error) {
+    console.error("Error al actualizar examen:", error);
+    res.status(500).json({ error: "Error interno del servidor al actualizar el examen." });
+  }
+});
+
+// 4. Alternar estado activo de una pregunta (Solo para Administrador)
+app.put("/api/admin/preguntas/:id/toggle-activo", autenticarToken, async (req, res) => {
+  try {
+    const preguntaId = req.params.id;
+    const usuarioId = req.usuario.id;
+    const usuarioReal = await db.get(`SELECT rol FROM usuarios WHERE id = ?`, [usuarioId]);
+
+    if (!usuarioReal || usuarioReal.rol !== "admin") {
+      return res.status(403).json({ error: "Acceso denegado. No eres administrador." });
+    }
+
+    const pregunta = await db.get(`SELECT activo, examen_id FROM preguntas WHERE id = ?`, [preguntaId]);
+    if (!pregunta) {
+      return res.status(404).json({ error: "Pregunta no encontrada." });
+    }
+
+    const nuevoActivo = (pregunta.activo === 0) ? 1 : 0;
+    await db.run(`UPDATE preguntas SET activo = ? WHERE id = ?`, [nuevoActivo, preguntaId]);
+
+    if (pregunta.examen_id) {
+      const countRow = await db.get(
+        `SELECT COUNT(*) as total FROM preguntas WHERE examen_id = ? AND (activo = 1 OR activo IS NULL)`,
+        [pregunta.examen_id]
+      );
+      const cantidad = countRow ? countRow.total : 0;
+      await db.run(`UPDATE examenes SET cantidad_preguntas = ? WHERE id = ?`, [cantidad, pregunta.examen_id]);
+    }
+
+    res.json({ mensaje: "Estado activo modificado con éxito.", activo: nuevoActivo });
+  } catch (error) {
+    console.error("Error al alternar estado activo:", error);
+    res.status(500).json({ error: "Error interno al alternar estado activo." });
+  }
+});
 
 // === ENDPOINTS DE CONFIGURACIÓN DE EXAMEN (FASE 1) ===
 
