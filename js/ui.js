@@ -591,10 +591,11 @@ const ui = {
         metaEl.textContent = `${user.meta_semanal || 50} q.`;
       }
 
-      const [datosResumen, personalizadas, srEstados] = await Promise.all([
+      const [datosResumen, personalizadas, srEstados, diarioFlashcards] = await Promise.all([
         api.obtenerResumenDashboard(user.id),
         api.obtenerFlashcardsPersonalizadas(user.id).catch(() => []),
-        api.obtenerRepeticionEspaciada(user.id).catch(() => [])
+        api.obtenerRepeticionEspaciada(user.id).catch(() => []),
+        api.obtenerHistorialDiarioFlashcards(user.id).catch(() => [])
       ]);
       
       const pExamenes = document.getElementById("progreso-total-examenes");
@@ -648,6 +649,9 @@ const ui = {
 
       // Renderizar tabla de evaluaciones
       ui.renderizarTablaHistorial(historial);
+      
+      // Renderizar tabla de historial diario de flashcards
+      ui.renderizarTablaDiarioFlashcards(diarioFlashcards);
       
       // Analizar historial para analíticas de subtemas y debilidades
       const metricasAv = analytics.procesarMetricas(historial);
@@ -865,6 +869,63 @@ const ui = {
         });
       }
 
+      tablaCuerpo.appendChild(fila);
+    });
+  },
+
+  renderizarTablaDiarioFlashcards(historial) {
+    const tablaCuerpo = document.getElementById("tabla-diario-flashcards-cuerpo");
+    const tablaVacio = document.getElementById("tabla-diario-flashcards-vacio");
+    
+    if (!tablaCuerpo) return;
+
+    if (!historial || historial.length === 0) {
+      tablaCuerpo.innerHTML = "";
+      if (tablaVacio) tablaVacio.classList.remove("hidden");
+      return;
+    }
+
+    if (tablaVacio) tablaVacio.classList.add("hidden");
+    tablaCuerpo.innerHTML = "";
+
+    historial.forEach(registro => {
+      let fechaTxt = "Fecha desconocida";
+      if (registro.dia) {
+        try {
+          const partes = registro.dia.split('-');
+          if (partes.length === 3) {
+            fechaTxt = `${partes[2]}/${partes[1]}/${partes[0]}`;
+          } else {
+            fechaTxt = registro.dia;
+          }
+        } catch (e) {
+          fechaTxt = registro.dia;
+        }
+      }
+
+      const total = registro.total || 0;
+      const aciertos = registro.aciertos || 0;
+      const fallos = registro.fallos || 0;
+      const pctEficiencia = total > 0 ? Math.round((aciertos / total) * 100) : 0;
+
+      let colorNota = "var(--danger)";
+      if (pctEficiencia >= 75) {
+        colorNota = "var(--success)";
+      } else if (pctEficiencia >= 50) {
+        colorNota = "var(--warning)";
+      }
+
+      const fila = document.createElement("tr");
+      fila.className = "tr-history-row";
+      
+      fila.innerHTML = `
+        <td class="td-date" style="padding: 12px 16px;">${fechaTxt}</td>
+        <td class="td-questions" style="padding: 12px 16px; text-align: center;">${total}</td>
+        <td class="td-score" style="padding: 12px 16px; text-align: center; color: var(--success); font-weight: 600;">${aciertos}</td>
+        <td class="td-score" style="padding: 12px 16px; text-align: center; color: var(--danger); font-weight: 600;">${fallos}</td>
+        <td class="td-percentage" style="padding: 12px 16px; text-align: right; color: ${colorNota}; font-weight: bold;">${pctEficiencia}%</td>
+      `;
+      
       tablaCuerpo.appendChild(fila);
     });
   },

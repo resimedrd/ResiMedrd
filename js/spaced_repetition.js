@@ -88,6 +88,23 @@ const spacedRepetition = {
         lastReviewedDate: new Date().toLocaleDateString('en-CA')
       });
       
+      // 3.1. Registrar en el historial cronológico diario si es una flashcard
+      if (flashcardId) {
+        try {
+          const card = (typeof state !== "undefined" && state.mazoActualFlashcards && state.mazoActualFlashcards[state.indiceActualFlashcard]) || {};
+          const temaCard = card.tema || "General";
+          api.registrarHistorialFlashcard(
+            state.usuarioConectado.id,
+            flashcardId,
+            temaCard,
+            seLaSabia,
+            dificultadSubjetiva
+          ).catch(err => console.warn("Falla no crítica al registrar historial flashcard:", err));
+        } catch (errHist) {
+          console.warn("Falla no crítica al obtener tema para historial flashcard:", errHist);
+        }
+      }
+      
       return nuevoEstado;
     } catch (e) {
       console.error("Error al sincronizar repetición espaciada:", e);

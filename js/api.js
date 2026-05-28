@@ -107,6 +107,15 @@ const api = {
       body: JSON.stringify({ usuarioId, tema, pregunta, respuesta })
     }),
 
+  registrarHistorialFlashcard: (usuarioId, flashcardId, tema, seLaSabia, dificultad) =>
+    request("/api/flashcards/historial", {
+      method: "POST",
+      body: JSON.stringify({ usuarioId, flashcardId, tema, seLaSabia, dificultad })
+    }),
+
+  obtenerHistorialDiarioFlashcards: (usuarioId) =>
+    request(`/api/flashcards/historial-diario?usuarioId=${usuarioId}`),
+
   actualizarPerfil: (nombre, especialidadAspirada, metaSemanal) => 
     request("/api/usuario/actualizar", {
       method: "PUT",

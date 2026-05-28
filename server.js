@@ -132,6 +132,20 @@ async function iniciarBaseDeDatos() {
     )
   `);
 
+  // 5.1. Tabla de historial_flashcards (Registro cronológico de repasos diarios FASE 10)
+  await db.exec(`
+    CREATE TABLE IF NOT EXISTS historial_flashcards (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      usuario_id INTEGER NOT NULL,
+      flashcard_id TEXT NOT NULL,
+      tema TEXT NOT NULL,
+      se_la_sabia INTEGER NOT NULL,
+      dificultad INTEGER NOT NULL,
+      fecha TEXT DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
+    )
+  `);
+
   // 6. Tabla de reportes_error (SaaS Feedback Loop)
   await db.exec(`
     CREATE TABLE IF NOT EXISTS reportes_error (
@@ -1483,6 +1497,52 @@ app.post("/api/flashcards/personalizadas", autenticarToken, async (req, res) => 
     res.status(201).json({ mensaje: "Flashcard personalizada inyectada con éxito." });
   } catch (error) {
     res.status(500).json({ error: "Error al crear flashcard personalizada." });
+  }
+});
+
+/* ==========================================================================
+   📈 ENDPOINTS DE HISTORIAL DIARIO DE FLASHCARDS (FASE 10)
+   ========================================================================== */
+
+app.post("/api/flashcards/historial", autenticarToken, async (req, res) => {
+  try {
+    const { usuarioId, flashcardId, tema, seLaSabia, dificultad } = req.body;
+    if (parseInt(usuarioId) !== req.usuario.id) {
+      return res.status(403).json({ error: "Acceso no autorizado." });
+    }
+    await db.run(
+      `INSERT INTO historial_flashcards (usuario_id, flashcard_id, tema, se_la_sabia, dificultad) VALUES (?, ?, ?, ?, ?)`,
+      [usuarioId, flashcardId, tema || "General", seLaSabia ? 1 : 0, dificultad || 2]
+    );
+    res.status(201).json({ mensaje: "Historial de flashcard guardado con éxito." });
+  } catch (error) {
+    console.error("Error al registrar historial de flashcard:", error);
+    res.status(500).json({ error: "Error al registrar historial de flashcard." });
+  }
+});
+
+app.get("/api/flashcards/historial-diario", autenticarToken, async (req, res) => {
+  try {
+    const { usuarioId } = req.query;
+    if (parseInt(usuarioId) !== req.usuario.id) {
+      return res.status(403).json({ error: "Acceso no autorizado." });
+    }
+    const filas = await db.all(
+      `SELECT 
+         date(fecha, 'localtime') AS dia,
+         COUNT(*) AS total,
+         SUM(CASE WHEN se_la_sabia = 1 THEN 1 ELSE 0 END) AS aciertos,
+         SUM(CASE WHEN se_la_sabia = 0 THEN 1 ELSE 0 END) AS fallos
+       FROM historial_flashcards 
+       WHERE usuario_id = ?
+       GROUP BY dia
+       ORDER BY dia DESC`,
+      [usuarioId]
+    );
+    res.json(filas);
+  } catch (error) {
+    console.error("Error al obtener historial diario:", error);
+    res.status(500).json({ error: "Error al obtener historial diario de flashcards." });
   }
 });
 
