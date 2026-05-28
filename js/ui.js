@@ -1089,6 +1089,106 @@ const ui = {
     }
   },
 
+  async cargarExamenesAdministrador() {
+    const listaEl = document.getElementById("admin-examenes-lista");
+    const selectCrearPregunta = document.getElementById("admin-pregunta-examen-id");
+    const selectCorregirPregunta = document.getElementById("modal-corregir-examen-id");
+
+    if (!listaEl) return;
+
+    try {
+      const examenes = await api.obtenerExamenes();
+      
+      // 1. Población de la lista visual de gestión de exámenes
+      listaEl.innerHTML = "";
+      if (examenes.length === 0) {
+        listaEl.innerHTML = `<div class="history-empty" style="padding: 10px; font-size: 12px; color: var(--text-dim);">No hay exámenes oficiales registrados.</div>`;
+      } else {
+        examenes.forEach(ex => {
+          const item = document.createElement("div");
+          item.className = "review-item";
+          item.style.padding = "10px 14px";
+          item.style.display = "flex";
+          item.style.alignItems = "center";
+          item.style.justifyContent = "space-between";
+          item.style.background = "rgba(255, 255, 255, 0.01)";
+          item.style.border = "1px solid var(--border)";
+          item.style.borderRadius = "8px";
+          item.style.marginBottom = "4px";
+
+          const estaActivo = ex.activo === 1;
+
+          item.innerHTML = `
+            <div style="text-align: left;">
+              <span style="font-weight: 600; font-size: 13px; color: var(--text); display: block;">${ex.nombre}</span>
+              <span style="font-size: 11px; color: var(--text-dim);">Año: ${ex.ano} • Preguntas Activas: <strong style="color: var(--warning);">${ex.cantidad_preguntas}</strong></span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <!-- Toggle switch premium -->
+              <label class="switch" style="position: relative; display: inline-block; width: 34px; height: 18px; cursor: pointer;">
+                <input type="checkbox" class="chk-examen-activo" data-id="${ex.id}" ${estaActivo ? "checked" : ""} style="opacity: 0; width: 0; height: 0;">
+                <span class="slider round" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--border-strong); transition: .3s; border-radius: 18px;"></span>
+              </label>
+              <button class="btn btn-ghost btn-editar-examen" data-id="${ex.id}" style="padding: 4px 8px; font-size: 11px; min-width: auto;" type="button">✏️</button>
+            </div>
+          `;
+
+          // Vincular evento de toggle de activación
+          const chkActivo = item.querySelector(".chk-examen-activo");
+          if (chkActivo) {
+            chkActivo.addEventListener("change", async () => {
+              const nuevoEstado = chkActivo.checked ? 1 : 0;
+              try {
+                await api.editarExamen(ex.id, ex.nombre, ex.ano, nuevoEstado);
+                console.log(`Examen ${ex.nombre} cambiado a estado activo=${nuevoEstado}`);
+              } catch (err) {
+                chkActivo.checked = !chkActivo.checked; // restaurar estado visual si falla
+                alert("Error al alternar estado activo del examen: " + err.message);
+              }
+            });
+          }
+
+          // Vincular evento de edición interactiva
+          const btnEditar = item.querySelector(".btn-editar-examen");
+          if (btnEditar) {
+            btnEditar.addEventListener("click", () => {
+              const nuevoNombre = prompt("Editar Nombre del Examen:", ex.nombre);
+              if (nuevoNombre === null || nuevoNombre.trim() === "") return;
+              const nuevoAno = prompt("Editar Año del Examen:", ex.ano);
+              if (nuevoAno === null || nuevoAno.trim() === "") return;
+
+              api.editarExamen(ex.id, nuevoNombre.trim(), parseInt(nuevoAno), ex.activo)
+                .then(() => {
+                  alert("✓ Examen actualizado correctamente.");
+                  ui.cargarExamenesAdministrador();
+                })
+                .catch(err => {
+                  alert("✗ Error al editar examen: " + err.message);
+                });
+            });
+          }
+
+          listaEl.appendChild(item);
+        });
+      }
+
+      // 2. Población de los dropdowns de asociación a examen (Crear y Corregir)
+      [selectCrearPregunta, selectCorregirPregunta].forEach(sel => {
+        if (sel) {
+          sel.innerHTML = `<option value="">-- Banco General (Sin Examen) --</option>`;
+          examenes.forEach(ex => {
+            if (ex.activo === 1) {
+              sel.innerHTML += `<option value="${ex.id}">${ex.nombre} (Año: ${ex.ano})</option>`;
+            }
+          });
+        }
+      });
+
+    } catch (error) {
+      console.error("Error al cargar exámenes de administración:", error);
+    }
+  },
+
   abrirModalCorreccionPregunta(r) {
     const modal = document.getElementById("modal-corregir-pregunta");
     if (!modal) return;
@@ -1122,6 +1222,28 @@ const ui = {
     document.getElementById("modal-corregir-subtema").value = r.pregunta_subtema || "";
     document.getElementById("modal-corregir-explicacion").value = r.pregunta_explicacion || "";
     document.getElementById("modal-corregir-fuente").value = r.pregunta_fuente || "";
+
+    // Poblar nuevos campos FASE 3 (Examen y Dificultad)
+    const selectExamen = document.getElementById("modal-corregir-examen-id");
+    if (selectExamen) {
+      if (r.pregunta_examen_id) {
+        let existeOpcion = false;
+        for (let idxOpt = 0; idxOpt < selectExamen.options.length; idxOpt++) {
+          if (parseInt(selectExamen.options[idxOpt].value) === parseInt(r.pregunta_examen_id)) {
+            existeOpcion = true;
+            break;
+          }
+        }
+        if (!existeOpcion) {
+          selectExamen.innerHTML += `<option value="${r.pregunta_examen_id}">${r.pregunta_fuente || 'Examen asociado'}</option>`;
+        }
+      }
+      selectExamen.value = r.pregunta_examen_id || "";
+    }
+    const inputDificultad = document.getElementById("modal-corregir-dificultad");
+    if (inputDificultad) {
+      inputDificultad.value = r.pregunta_difficulty !== undefined ? r.pregunta_difficulty : 0.5;
+    }
 
     // Abrir Modal
     modal.classList.add("active");

@@ -161,6 +161,7 @@ const auth = {
     if (state.usuarioConectado.rol === "admin") {
       if (panelAdministrador) panelAdministrador.classList.remove("hidden");
       ui.cargarReportesAdministrador().catch(err => console.error("Error al cargar reportes admin:", err));
+      ui.cargarExamenesAdministrador().catch(err => console.error("Error al cargar exámenes admin:", err));
     } else {
       if (panelAdministrador) panelAdministrador.classList.add("hidden");
     }

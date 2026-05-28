@@ -113,10 +113,10 @@ const api = {
       body: JSON.stringify({ nombre, especialidadAspirada, metaSemanal })
     }),
 
-  guardarPregunta: (texto, opciones, correcta, tema, explicacion, fuente, usuarioId) => 
+  guardarPregunta: (texto, opciones, correcta, tema, explicacion, fuente, usuarioId, examen_id, difficulty) => 
     request("/api/preguntas", {
       method: "POST",
-      body: JSON.stringify({ texto, opciones, correcta, tema, explicacion, fuente, usuarioId })
+      body: JSON.stringify({ texto, opciones, correcta, tema, explicacion, fuente, usuarioId, examen_id, difficulty })
     }),
 
   cargarMasivo: (preguntas, usuarioId) => 
@@ -160,6 +160,27 @@ const api = {
     request("/api/exam-setup", {
       method: "POST",
       body: JSON.stringify({ tipo, valor, cantidad, subtema })
+    }),
+
+  // === FASE 3 - ETAPA 1: GESTIÓN DE EXÁMENES ===
+  obtenerExamenes: () =>
+    request("/api/examenes"),
+
+  guardarExamen: (nombre, ano, activo) =>
+    request("/api/admin/examenes", {
+      method: "POST",
+      body: JSON.stringify({ nombre, ano, activo })
+    }),
+
+  editarExamen: (id, nombre, ano, activo) =>
+    request(`/api/admin/examenes/${id}`, {
+      method: "PUT",
+      body: JSON.stringify({ nombre, ano, activo })
+    }),
+
+  toggleActivoPregunta: (id) =>
+    request(`/api/admin/preguntas/${id}/toggle-activo`, {
+      method: "PUT"
     })
 };
 

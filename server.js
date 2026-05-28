@@ -649,10 +649,10 @@ async function iniciarBaseDeDatos() {
    RUTAS DE ADMINISTRACIÓN PROTEGIDAS (REVISIÓN DE IDENTIDAD REAL)
    ========================================================================== */
 
-// 1. Guardar una sola pregunta de forma segura
+// 1. Guardar una sola pregunta de forma segura (Soporte FASE 3)
 app.post("/api/preguntas", async (req, res) => {
   try {
-    const { texto, opciones, correcta, tema, explicacion, fuente, usuarioId } = req.body;
+    const { texto, opciones, correcta, tema, explicacion, fuente, usuarioId, examen_id, difficulty } = req.body;
 
     // REVISIÓN INTEGRAL: En vez de creerle al texto "admin", le preguntamos directamente 
     // a la base de datos quién es este usuario usando su ID único de cuenta.
@@ -668,13 +668,48 @@ app.post("/api/preguntas", async (req, res) => {
 
     // Si la base de datos confirma que sí es administrador, guardamos la pregunta con su fuente
     const opcionesJSON = JSON.stringify(opciones);
+    
+    // Obtener año del examen si está asociado
+    let anoExamen = 2024;
+    let finalExamenId = null;
+    if (examen_id) {
+      finalExamenId = parseInt(examen_id);
+      const exObj = await db.get(`SELECT ano FROM examenes WHERE id = ?`, [finalExamenId]);
+      if (exObj) {
+        anoExamen = exObj.ano;
+      }
+    }
+
     await db.run(
-      `INSERT INTO preguntas (texto, opciones, correcta, tema, explicacion, fuente) VALUES (?, ?, ?, ?, ?, ?)`,
-      [texto, opcionesJSON, correcta, tema, explicacion, fuente || "ENURM Referencia Académica Oficial"]
+      `INSERT INTO preguntas (texto, opciones, correcta, tema, explicacion, fuente, especialidad, difficulty, activo, examen_id, ano_examen) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?)`,
+      [
+        texto, 
+        opcionesJSON, 
+        correcta, 
+        tema, 
+        explicacion, 
+        fuente || "ENURM Referencia Académica Oficial",
+        tema,
+        difficulty !== undefined ? parseFloat(difficulty) : 0.5,
+        finalExamenId,
+        anoExamen
+      ]
     );
+
+    // Recalcular cantidad de preguntas del examen
+    if (finalExamenId) {
+      const countRow = await db.get(
+        `SELECT COUNT(*) as total FROM preguntas WHERE examen_id = ? AND (activo = 1 OR activo IS NULL)`,
+        [finalExamenId]
+      );
+      const cantidad = countRow ? countRow.total : 0;
+      await db.run(`UPDATE examenes SET cantidad_preguntas = ? WHERE id = ?`, [cantidad, finalExamenId]);
+    }
 
     res.status(201).json({ mensaje: "Pregunta guardada con éxito por el administrador." });
   } catch (error) {
+    console.error("Error al guardar pregunta:", error);
     res.status(500).json({ error: "Error al guardar la pregunta." });
   }
 });
@@ -1399,6 +1434,7 @@ app.get("/api/admin/reportes-error", autenticarToken, async (req, res) => {
         p.opciones AS pregunta_opciones, p.correcta AS pregunta_correcta,
         p.subtema AS pregunta_subtema, p.explicacion AS pregunta_explicacion,
         p.fuente AS pregunta_fuente,
+        p.examen_id AS pregunta_examen_id, p.difficulty AS pregunta_difficulty,
         u.nombre AS usuario_nombre, u.email AS usuario_email
       FROM reportes_error r
       JOIN preguntas p ON r.pregunta_id = p.id

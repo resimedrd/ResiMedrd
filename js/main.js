@@ -393,6 +393,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         // Si el usuario reportante también es administrador, recargar en caliente
         if (state.usuarioConectado.rol === "admin") {
           await ui.cargarReportesAdministrador();
+          await ui.cargarExamenesAdministrador();
         }
       } catch (err) {
         alert("✗ Falla al enviar el reporte: " + err.message);
@@ -451,10 +452,12 @@ document.addEventListener("DOMContentLoaded", async () => {
       const subtema = document.getElementById("modal-corregir-subtema").value.trim();
       const explicacion = document.getElementById("modal-corregir-explicacion").value.trim();
       const fuente = document.getElementById("modal-corregir-fuente").value.trim();
+      const examen_id = document.getElementById("modal-corregir-examen-id").value;
+      const difficulty = document.getElementById("modal-corregir-dificultad").value;
 
       try {
         await api.editarPregunta(preguntaId, {
-          texto, opciones, correcta, tema, subtema, explicacion, fuente
+          texto, opciones, correcta, tema, subtema, explicacion, fuente, examen_id, difficulty
         });
 
         await api.resolverReporteError(reporteId);
@@ -464,6 +467,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         alert("✓ Pregunta académica corregida con éxito en el banco. El reporte ha sido resuelto automáticamente.");
 
         await ui.cargarReportesAdministrador();
+        await ui.cargarExamenesAdministrador();
       } catch (err) {
         alert("✗ Falla al guardar la corrección de la pregunta: " + err.message);
       }
@@ -491,6 +495,28 @@ document.addEventListener("DOMContentLoaded", async () => {
     btnAdminRefrescarReportes.addEventListener("click", async () => {
       if (state.usuarioConectado && state.usuarioConectado.rol === "admin") {
         await ui.cargarReportesAdministrador();
+        await ui.cargarExamenesAdministrador();
+      }
+    });
+  }
+
+  // === FORMULARIO NUEVO EXAMEN (FASE 3) ===
+  const formNuevoExamen = document.getElementById("form-nuevo-examen");
+  if (formNuevoExamen) {
+    formNuevoExamen.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!state.usuarioConectado || state.usuarioConectado.rol !== "admin") return;
+
+      const nombre = document.getElementById("admin-examen-nombre").value.trim();
+      const ano = parseInt(document.getElementById("admin-examen-ano").value);
+
+      try {
+        await api.guardarExamen(nombre, ano, 1);
+        formNuevoExamen.reset();
+        alert("✓ Examen creado con éxito en el banco.");
+        await ui.cargarExamenesAdministrador();
+      } catch (err) {
+        alert("✗ Falla al crear examen: " + err.message);
       }
     });
   }
@@ -589,6 +615,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       const tema = document.getElementById("admin-tema").value.trim();
       const explicacion = document.getElementById("admin-explicacion").value.trim();
       const fuente = document.getElementById("admin-fuente").value.trim();
+      const examen_id = document.getElementById("admin-pregunta-examen-id").value;
+      const difficulty = document.getElementById("admin-dificultad").value;
 
       if (adminMensaje) {
         adminMensaje.textContent = "Guardando pregunta en el banco...";
@@ -596,7 +624,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
 
       try {
-        await api.guardarPregunta(texto, opciones, correcta, tema, explicacion, fuente, state.usuarioConectado.id);
+        await api.guardarPregunta(texto, opciones, correcta, tema, explicacion, fuente, state.usuarioConectado.id, examen_id, difficulty);
         if (adminMensaje) {
           adminMensaje.textContent = "✓ Pregunta indexada al banco con éxito.";
           adminMensaje.style.color = "var(--success)";
