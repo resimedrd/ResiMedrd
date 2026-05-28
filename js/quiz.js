@@ -322,12 +322,24 @@ const quiz = {
         state.subtemaSeleccionado = "Todos";
       } else {
         const tipo = state.tipoSimulacroSeleccionado || "especialidad";
-        const valor = tipo === "especialidad" ? document.getElementById("especialidad").value : document.getElementById("selector-ano").value;
+        let valor = "";
+        let nombreParaEstado = "";
+        
+        if (tipo === "especialidad") {
+          valor = document.getElementById("especialidad").value;
+          nombreParaEstado = valor;
+        } else {
+          const selectAno = document.getElementById("selector-ano");
+          valor = selectAno.value;
+          const opcionSeleccionada = selectAno.options[selectAno.selectedIndex];
+          nombreParaEstado = valor === "Todos" ? "Todos" : (opcionSeleccionada ? opcionSeleccionada.textContent.split(" (")[0] : "Examen Oficial");
+        }
+        
         const selectorSub = document.getElementById("selector-subtema");
         const subtema = (tipo === "especialidad" && selectorSub) ? selectorSub.value : "Todos";
 
         // FASE 3: Guardar en el estado para consistencia visual premium
-        state.especialidadSeleccionada = valor;
+        state.especialidadSeleccionada = nombreParaEstado;
         state.subtemaSeleccionado = subtema;
 
         preguntas = await api.prepararExamen(tipo, valor, state.cantidadSolicitada, subtema);

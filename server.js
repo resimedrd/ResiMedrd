@@ -949,9 +949,9 @@ app.get("/api/preguntas", async (req, res) => {
     const maxPreguntas = parseInt(limite) || 10;
     let filas;
     if (!tema || tema.trim().toLowerCase() === "todos") {
-      filas = await db.all(`SELECT * FROM preguntas ORDER BY RANDOM() LIMIT ?`, [maxPreguntas]);
+      filas = await db.all(`SELECT * FROM preguntas WHERE (activo = 1 OR activo IS NULL) ORDER BY RANDOM() LIMIT ?`, [maxPreguntas]);
     } else {
-      filas = await db.all(`SELECT * FROM preguntas WHERE LOWER(TRIM(tema)) = LOWER(?) ORDER BY RANDOM() LIMIT ?`, [tema.trim(), maxPreguntas]);
+      filas = await db.all(`SELECT * FROM preguntas WHERE LOWER(TRIM(tema)) = LOWER(?) AND (activo = 1 OR activo IS NULL) ORDER BY RANDOM() LIMIT ?`, [tema.trim(), maxPreguntas]);
     }
     res.json(filas);
   } catch (error) {
@@ -1771,6 +1771,7 @@ app.post("/api/exam-setup", autenticarToken, async (req, res) => {
           `SELECT * FROM preguntas 
            WHERE (LOWER(TRIM(especialidad)) = LOWER(?) OR LOWER(TRIM(tema)) = LOWER(?)) 
              AND LOWER(TRIM(subtema)) = LOWER(?)
+             AND (activo = 1 OR activo IS NULL)
            ORDER BY RANDOM() LIMIT ?`,
           [valor.trim(), valor.trim(), subtema.trim(), maxPreguntas]
         );
@@ -1778,21 +1779,36 @@ app.post("/api/exam-setup", autenticarToken, async (req, res) => {
         preguntas = await db.all(
           `SELECT * FROM preguntas 
            WHERE (LOWER(TRIM(especialidad)) = LOWER(?) OR LOWER(TRIM(tema)) = LOWER(?)) 
+             AND (activo = 1 OR activo IS NULL)
            ORDER BY RANDOM() LIMIT ?`,
           [valor.trim(), valor.trim(), maxPreguntas]
         );
       }
     } else if (tipo === "ano" && !esTodos) {
-      const anoNum = parseInt(valor);
-      preguntas = await db.all(
-        `SELECT * FROM preguntas 
-         WHERE ano_examen = ? 
-         ORDER BY RANDOM() LIMIT ?`,
-        [anoNum, maxPreguntas]
-      );
+      const valorNum = parseInt(valor);
+      
+      // Intentar buscar por examen_id primero
+      const examenExiste = await db.get(`SELECT id FROM examenes WHERE id = ?`, [valorNum]);
+      if (examenExiste) {
+        preguntas = await db.all(
+          `SELECT * FROM preguntas 
+           WHERE examen_id = ? AND (activo = 1 OR activo IS NULL)
+           ORDER BY RANDOM() LIMIT ?`,
+          [valorNum, maxPreguntas]
+        );
+      } else {
+        // Fallback por año si es un año suelto (ej: 2024)
+        preguntas = await db.all(
+          `SELECT * FROM preguntas 
+           WHERE ano_examen = ? AND (activo = 1 OR activo IS NULL)
+           ORDER BY RANDOM() LIMIT ?`,
+          [valorNum, maxPreguntas]
+        );
+      }
     } else {
       preguntas = await db.all(
         `SELECT * FROM preguntas 
+         WHERE (activo = 1 OR activo IS NULL)
          ORDER BY RANDOM() LIMIT ?`,
         [maxPreguntas]
       );

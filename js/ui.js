@@ -330,26 +330,28 @@ const ui = {
 
   async cargarFiltrosAnos() {
     try {
-      const anos = await api.obtenerAnosExamen();
+      const examenes = await api.obtenerExamenes();
       const select = document.getElementById("selector-ano");
       if (!select) return;
       
       select.innerHTML = "";
       
-      if (anos.length === 0) {
-        select.innerHTML = '<option value="Todos" selected>No hay años registrados</option>';
+      const examenesActivos = examenes.filter(e => e.activo === 1);
+      
+      if (examenesActivos.length === 0) {
+        select.innerHTML = '<option value="Todos" selected>No hay exámenes oficiales registrados</option>';
         return;
       }
       
-      select.innerHTML = '<option value="Todos" selected>Todos los años disponibles</option>';
-      anos.forEach(ano => {
+      select.innerHTML = '<option value="Todos" selected>Todos los exámenes disponibles</option>';
+      examenesActivos.forEach(ex => {
         const opt = document.createElement("option");
-        opt.value = ano;
-        opt.textContent = `ENURM ${ano}`;
+        opt.value = ex.id;
+        opt.textContent = `${ex.nombre} (${ex.cantidad_preguntas} q.)`;
         select.appendChild(opt);
       });
     } catch (err) {
-      console.error("Error cargando años de examen:", err);
+      console.error("Error cargando exámenes oficiales:", err);
     }
   },
 
@@ -641,12 +643,37 @@ const ui = {
       });
 
       historial.forEach(sesion => {
-        const tema = sesion.tema;
-        const key = tema ? tema.trim().toLowerCase() : "";
-        if (conteoEspecialidades[key]) {
-          const correctasEnSesion = Math.round((sesion.porcentaje / 100) * sesion.cantidad_preguntas);
-          conteoEspecialidades[key].correctas += correctasEnSesion;
-          conteoEspecialidades[key].totales += sesion.cantidad_preguntas;
+        if (sesion.detalle) {
+          try {
+            const preguntas = JSON.parse(sesion.detalle);
+            if (Array.isArray(preguntas)) {
+              preguntas.forEach(p => {
+                const temaPregunta = (p.tema || sesion.tema || "").trim().toLowerCase();
+                if (conteoEspecialidades[temaPregunta]) {
+                  conteoEspecialidades[temaPregunta].totales += 1;
+                  if (p.seleccionada === p.correcta) {
+                    conteoEspecialidades[temaPregunta].correctas += 1;
+                  }
+                }
+              });
+            }
+          } catch (e) {
+            // Fallback si falla el parseo
+            const key = sesion.tema ? sesion.tema.trim().toLowerCase() : "";
+            if (conteoEspecialidades[key]) {
+              const correctasEnSesion = Math.round((sesion.porcentaje / 100) * sesion.cantidad_preguntas);
+              conteoEspecialidades[key].correctas += correctasEnSesion;
+              conteoEspecialidades[key].totales += sesion.cantidad_preguntas;
+            }
+          }
+        } else {
+          // Fallback para sesiones antiguas sin detalle
+          const key = sesion.tema ? sesion.tema.trim().toLowerCase() : "";
+          if (conteoEspecialidades[key]) {
+            const correctasEnSesion = Math.round((sesion.porcentaje / 100) * sesion.cantidad_preguntas);
+            conteoEspecialidades[key].correctas += correctasEnSesion;
+            conteoEspecialidades[key].totales += sesion.cantidad_preguntas;
+          }
         }
       });
 
