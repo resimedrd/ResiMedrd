@@ -433,12 +433,12 @@ const quiz = {
       // Ordenar temas con menor acierto (menor cobertura/rendimiento) para priorizarlos
       const debilidades = Object.keys(cobertura).sort((a, b) => {
         return cobertura[a].porcentaje - cobertura[b].porcentaje;
-      });
+      }).map(name => ui.normalizarTema(name));
       
       // Reordenar preguntas basándose en las debilidades del usuario
       return preguntas.sort((a, b) => {
-        const indexA = debilidades.indexOf(a.tema.trim().toLowerCase());
-        const indexB = debilidades.indexOf(b.tema.trim().toLowerCase());
+        const indexA = debilidades.indexOf(ui.normalizarTema(a.tema));
+        const indexB = debilidades.indexOf(ui.normalizarTema(b.tema));
         
         // Si el tema está en el mapa de debilidades (acierto bajo), va primero (menor índice es más débil)
         if (indexA !== -1 && indexB !== -1) {
