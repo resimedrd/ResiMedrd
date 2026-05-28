@@ -679,6 +679,23 @@ const ui = {
       if (seccionGraficos && seccionGraficos.classList.contains("activo")) {
         ui.renderizarGraficosAvanzados(historial, srEstados, personalizadas.length);
       }
+
+      // Vincular toggle del Cajón Desplegable del Historial de Evaluaciones
+      const btnToggleEval = document.getElementById("btn-toggle-evaluaciones");
+      if (btnToggleEval && !btnToggleEval.dataset.hasListener) {
+        btnToggleEval.dataset.hasListener = "true";
+        btnToggleEval.addEventListener("click", () => {
+          const seccionEval = document.getElementById("seccion-evaluaciones-desplegable");
+          if (seccionEval) {
+            const estaActivoEval = seccionEval.classList.toggle("activo");
+            btnToggleEval.classList.toggle("activo", estaActivoEval);
+            const iconoEval = document.getElementById("icono-toggle-evaluaciones");
+            if (iconoEval) {
+              iconoEval.textContent = estaActivoEval ? "▲" : "▼";
+            }
+          }
+        });
+      }
       
       // Analizar historial para analíticas de subtemas y debilidades
       const metricasAv = analytics.procesarMetricas(historial);

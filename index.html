@@ -524,35 +524,44 @@
               </div>
             </div>
 
-            <!-- FASE 2: Tabla Detallada de Progreso Histórico -->
-            <article class="panel" style="border-radius: 28px; padding: 32px; background: var(--panel); border: 1px solid var(--border); margin-top: 24px;">
-              <div class="panel-head" style="margin-bottom: 20px;">
-                <h3 style="color: var(--text); font-size: 20px; font-weight: 700;">Historial de Evaluaciones</h3>
-                <p style="font-size: 14px; color: var(--text-dim); margin-top: 4px;">Registro completo y cronológico de todas tus sesiones de estudio y simulacros.</p>
+            <!-- Historial de Evaluaciones Colapsable -->
+            <div id="contenedor-evaluaciones-acordeon" style="margin-top: 24px;">
+              <button id="btn-toggle-evaluaciones" class="btn btn-ghost" type="button" style="width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 14px 20px; border-radius: 14px; background: rgba(255,255,255,0.02); font-weight: 700; border: 1px solid var(--border); font-size: 14px; color: var(--primary); transition: all 0.3s ease; cursor: pointer;">
+                <span style="display: flex; align-items: center; gap: 8px;">📋 Ver Historial de Evaluaciones (Simulacros)</span>
+                <span id="icono-toggle-evaluaciones" style="transition: transform 0.3s ease; font-size: 14px;">▼</span>
+              </button>
+
+              <div id="seccion-evaluaciones-desplegable" style="max-height: 0; overflow: hidden; opacity: 0; transition: max-height 0.4s ease-out, opacity 0.3s ease; margin-top: 0;">
+                <article class="panel" style="border-radius: 28px; padding: 32px; background: var(--panel); border: 1px solid var(--border); margin-top: 20px;">
+                  <div class="panel-head" style="margin-bottom: 20px;">
+                    <h3 style="color: var(--text); font-size: 20px; font-weight: 700;">Historial de Evaluaciones</h3>
+                    <p style="font-size: 14px; color: var(--text-dim); margin-top: 4px;">Registro completo y cronológico de todas tus sesiones de estudio y simulacros.</p>
+                  </div>
+                  
+                  <div class="table-container" style="overflow-x: auto; margin-top: 16px;">
+                    <table id="tabla-progreso-historial" style="width: 100%; border-collapse: collapse; text-align: left; font-size: 14px;">
+                      <thead>
+                        <tr style="border-bottom: 2px solid var(--border-strong); color: var(--text-soft); font-weight: 600; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px;">
+                          <th style="padding: 12px 16px;">Fecha</th>
+                          <th style="padding: 12px 16px;">Especialidad / Tema</th>
+                          <th style="padding: 12px 16px;">Modalidad</th>
+                          <th style="padding: 12px 16px; text-align: center;">Preguntas</th>
+                          <th style="padding: 12px 16px; text-align: center;">Aciertos</th>
+                          <th style="padding: 12px 16px; text-align: right;">Nota</th>
+                          <th style="padding: 12px 16px; text-align: center;">Acción</th>
+                        </tr>
+                      </thead>
+                      <tbody id="tabla-progreso-cuerpo" style="color: var(--text-soft);">
+                        <!-- Cargado dinámicamente -->
+                      </tbody>
+                    </table>
+                    <div id="tabla-historial-vacio" class="history-empty hidden" style="margin-top: 16px; text-align: center; padding: 24px; color: var(--text-dim);">
+                      Aún no registras exámenes en tu cuenta.
+                    </div>
+                  </div>
+                </article>
               </div>
-              
-              <div class="table-container" style="overflow-x: auto; margin-top: 16px;">
-                <table id="tabla-progreso-historial" style="width: 100%; border-collapse: collapse; text-align: left; font-size: 14px;">
-                  <thead>
-                    <tr style="border-bottom: 2px solid var(--border-strong); color: var(--text-soft); font-weight: 600; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px;">
-                      <th style="padding: 12px 16px;">Fecha</th>
-                      <th style="padding: 12px 16px;">Especialidad / Tema</th>
-                      <th style="padding: 12px 16px;">Modalidad</th>
-                      <th style="padding: 12px 16px; text-align: center;">Preguntas</th>
-                      <th style="padding: 12px 16px; text-align: center;">Aciertos</th>
-                      <th style="padding: 12px 16px; text-align: right;">Nota</th>
-                      <th style="padding: 12px 16px; text-align: center;">Acción</th>
-                    </tr>
-                  </thead>
-                  <tbody id="tabla-progreso-cuerpo" style="color: var(--text-soft);">
-                    <!-- Cargado dinámicamente -->
-                  </tbody>
-                </table>
-                <div id="tabla-historial-vacio" class="history-empty hidden" style="margin-top: 16px; text-align: center; padding: 24px; color: var(--text-dim);">
-                  Aún no registras exámenes en tu cuenta.
-                </div>
-              </div>
-            </article>
+            </div>
 
             <!-- FASE 10: Tabla Detallada de Repasos Diarios de Flashcards -->
             <article class="panel" style="border-radius: 28px; padding: 32px; background: var(--panel); border: 1px solid var(--border); margin-top: 24px;">

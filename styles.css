@@ -2412,3 +2412,21 @@ body.dark-mode::-webkit-scrollbar-thumb:hover {
     grid-template-columns: 1fr !important;
   }
 }
+
+#seccion-evaluaciones-desplegable.activo {
+  max-height: 2000px !important;
+  opacity: 1 !important;
+  margin-top: 10px !important;
+}
+
+#btn-toggle-evaluaciones:hover {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-color: var(--primary) !important;
+  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.15) !important;
+}
+
+#btn-toggle-evaluaciones.activo #icono-toggle-evaluaciones {
+  transform: rotate(180deg);
+  color: var(--primary);
+}
+
