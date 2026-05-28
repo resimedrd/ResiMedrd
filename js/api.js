@@ -119,10 +119,10 @@ const api = {
       body: JSON.stringify({ texto, opciones, correcta, tema, explicacion, fuente, usuarioId, examen_id, difficulty })
     }),
 
-  cargarMasivo: (preguntas, usuarioId) => 
+  cargarMasivo: (preguntas, usuarioId, examen_id) => 
     request("/api/admin/cargar-masivo", {
       method: "POST",
-      body: JSON.stringify({ preguntas, usuarioId })
+      body: JSON.stringify({ preguntas, usuarioId, examen_id })
     }),
 
   guardarReporteError: (preguntaId, motivo, comentario) =>

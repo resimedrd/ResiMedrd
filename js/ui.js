@@ -1093,6 +1093,7 @@ const ui = {
     const listaEl = document.getElementById("admin-examenes-lista");
     const selectCrearPregunta = document.getElementById("admin-pregunta-examen-id");
     const selectCorregirPregunta = document.getElementById("modal-corregir-examen-id");
+    const selectCargaMasiva = document.getElementById("select-carga-masiva-examen-id");
 
     if (!listaEl) return;
 
@@ -1172,8 +1173,8 @@ const ui = {
         });
       }
 
-      // 2. Población de los dropdowns de asociación a examen (Crear y Corregir)
-      [selectCrearPregunta, selectCorregirPregunta].forEach(sel => {
+      // 2. Población de los dropdowns de asociación a examen (Crear, Corregir y Carga Masiva)
+      [selectCrearPregunta, selectCorregirPregunta, selectCargaMasiva].forEach(sel => {
         if (sel) {
           sel.innerHTML = `<option value="">-- Banco General (Sin Examen) --</option>`;
           examenes.forEach(ex => {

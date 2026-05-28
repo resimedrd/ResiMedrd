@@ -228,6 +228,13 @@
             <h3 style="color: var(--warning); margin-bottom: 8px;">Carga Masiva de Preguntas (Formato JSON)</h3>
             <p style="font-size: 13px; color: var(--text-soft); margin-bottom: 16px;">Selecciona tu archivo de texto con las preguntas ordenadas en bloque para indexarlas al instante.</p>
             
+            <div style="margin-bottom: 16px;">
+              <label class="admin-label" style="display: block; margin-bottom: 6px;">Asociar Lote a un Examen Oficial</label>
+              <select id="select-carga-masiva-examen-id" class="input">
+                <option value="">-- Banco General (Sin Examen) --</option>
+              </select>
+            </div>
+
             <input type="file" id="input-archivo-masivo" accept=".txt,.json" style="margin-bottom: 16px; display: block; color: var(--text);" />
             <button id="btn-subir-masivo" class="btn btn-primary" type="button" style="background: var(--warning); color: #000;">⚡ Procesar e Inyectar Banco</button>
             

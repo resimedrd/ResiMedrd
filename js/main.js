@@ -656,6 +656,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         return;
       }
 
+      const examen_id = document.getElementById("select-carga-masiva-examen-id").value;
+
       const lector = new FileReader();
       lector.onload = async (e) => {
         try {
@@ -669,7 +671,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             mensajeCargaMasiva.style.color = "var(--text-soft)";
           }
 
-          await api.cargarMasivo(preguntasArray, state.usuarioConectado.id);
+          await api.cargarMasivo(preguntasArray, state.usuarioConectado.id, examen_id);
           
           if (mensajeCargaMasiva) {
             mensajeCargaMasiva.textContent = `✓ Éxito: ${preguntasArray.length} preguntas importadas correctamente.`;
@@ -678,6 +680,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           inputArchivoMasivo.value = "";
           
           await ui.cargarFiltrosEspecialidad();
+          await ui.cargarExamenesAdministrador();
         } catch (err) {
           if (mensajeCargaMasiva) {
             mensajeCargaMasiva.textContent = "✗ Falla al procesar: " + err.message;

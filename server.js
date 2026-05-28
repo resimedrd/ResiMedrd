@@ -714,10 +714,10 @@ app.post("/api/preguntas", async (req, res) => {
   }
 });
 
-// 2. Cargar muchas preguntas en bloque de forma segura
+// 2. Cargar muchas preguntas en bloque de forma segura (Soporte FASE 3)
 app.post("/api/admin/cargar-masivo", async (req, res) => {
   try {
-    const { preguntas, usuarioId } = req.body;
+    const { preguntas, usuarioId, examen_id } = req.body;
 
     // Volvemos a preguntar a la base de datos si el ID realmente es un administrador
     if (!usuarioId) {
@@ -734,17 +734,79 @@ app.post("/api/admin/cargar-masivo", async (req, res) => {
       return res.status(400).json({ error: "El formato de los datos no es correcto." });
     }
 
-    // Si todo está bien, guardamos el bloque completo de preguntas con sus respectivas fuentes
+    let finalExamenId = null;
+    let anoExamen = 2024;
+    if (examen_id) {
+      finalExamenId = parseInt(examen_id);
+      const exObj = await db.get(`SELECT ano FROM examenes WHERE id = ?`, [finalExamenId]);
+      if (exObj) {
+        anoExamen = exObj.ano;
+      }
+    }
+
+    // Si todo está bien, guardamos el bloque completo de preguntas
     for (const p of preguntas) {
       const opcionesJSON = JSON.stringify(p.opciones);
+      
+      const subtema = p.subtema || "Evaluación Oficial";
+      const microtema = p.microtema || "Bloque de Reactivos";
+      const tags = p.tags || `${p.tema || "General"},ENURM`;
+      const difficulty = p.difficulty !== undefined ? parseFloat(p.difficulty) : 0.5;
+      const especialidad = p.especialidad || p.tema || "General";
+      const fuente = p.fuente || (finalExamenId ? `ENURM ${anoExamen}` : "ENURM Referencia Académica Oficial");
+
+      let explicacionCorrecta = "";
+      let explicacionIncorrecta = "";
+      if (p.explicacion_correcta || p.explicacion_incorrecta) {
+        explicacionCorrecta = p.explicacion_correcta || "";
+        explicacionIncorrecta = p.explicacion_incorrecta || "";
+      } else if (p.explicacion) {
+        const partes = p.explicacion.split("🚫 DESCARTE (Por qué NO):");
+        if (partes.length > 1) {
+          explicacionCorrecta = partes[0].replace("🔬 JUSTIFICACIÓN (Por qué SÍ):\n", "").trim();
+          explicacionIncorrecta = partes[1].trim();
+        } else {
+          explicacionCorrecta = p.explicacion;
+          explicacionIncorrecta = "No disponible.";
+        }
+      }
+
       await db.run(
-        `INSERT INTO preguntas (texto, opciones, correcta, tema, explicacion, fuente) VALUES (?, ?, ?, ?, ?, ?)`,
-        [p.texto, opcionesJSON, p.correcta, p.tema, p.explicacion, p.fuente || "ENURM Referencia Académica Oficial"]
+        `INSERT INTO preguntas (texto, opciones, correcta, explicacion, tema, subtema, microtema, tags, difficulty, fuente, especialidad, ano_examen, explicacion_correcta, explicacion_incorrecta, activo, examen_id) 
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?)`,
+        [
+          p.texto, 
+          opcionesJSON, 
+          p.correcta, 
+          p.explicacion || "", 
+          p.tema || "General", 
+          subtema, 
+          microtema, 
+          tags, 
+          difficulty, 
+          fuente, 
+          especialidad, 
+          anoExamen, 
+          explicacionCorrecta, 
+          explicacionIncorrecta,
+          finalExamenId
+        ]
       );
+    }
+
+    // Recalcular cantidad de preguntas del examen
+    if (finalExamenId) {
+      const countRow = await db.get(
+        `SELECT COUNT(*) as total FROM preguntas WHERE examen_id = ? AND (activo = 1 OR activo IS NULL)`,
+        [finalExamenId]
+      );
+      const cantidad = countRow ? countRow.total : 0;
+      await db.run(`UPDATE examenes SET cantidad_preguntas = ? WHERE id = ?`, [cantidad, finalExamenId]);
     }
 
     res.status(200).json({ mensaje: `¡Éxito! Se cargaron ${preguntas.length} preguntas correctamente.` });
   } catch (error) {
+    console.error("Error en la carga masiva:", error);
     res.status(500).json({ error: "Error en la carga masiva." });
   }
 });
