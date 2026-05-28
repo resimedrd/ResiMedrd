@@ -713,6 +713,23 @@ const ui = {
           }
         });
       }
+
+      // Vincular toggle del Cajón Desplegable de Historial Diario de Flashcards
+      const btnToggleDiario = document.getElementById("btn-toggle-diario");
+      if (btnToggleDiario && !btnToggleDiario.dataset.hasListener) {
+        btnToggleDiario.dataset.hasListener = "true";
+        btnToggleDiario.addEventListener("click", () => {
+          const seccionDiario = document.getElementById("seccion-diario-desplegable");
+          if (seccionDiario) {
+            const estaActivoDiario = seccionDiario.classList.toggle("activo");
+            btnToggleDiario.classList.toggle("activo", estaActivoDiario);
+            const iconoDiario = document.getElementById("icono-toggle-diario");
+            if (iconoDiario) {
+              iconoDiario.textContent = estaActivoDiario ? "▲" : "▼";
+            }
+          }
+        });
+      }
       
       // Analizar historial para analíticas de subtemas y debilidades
       const metricasAv = analytics.procesarMetricas(historial);

@@ -2447,4 +2447,22 @@ body.dark-mode::-webkit-scrollbar-thumb:hover {
   color: var(--primary);
 }
 
+#seccion-diario-desplegable.activo {
+  max-height: 2000px !important;
+  opacity: 1 !important;
+  margin-top: 10px !important;
+}
+
+#btn-toggle-diario:hover {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-color: var(--primary) !important;
+  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.15) !important;
+}
+
+#btn-toggle-diario.activo #icono-toggle-diario {
+  transform: rotate(180deg);
+  color: var(--primary);
+}
+
+
 
