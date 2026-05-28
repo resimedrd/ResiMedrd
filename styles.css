@@ -1,71 +1,71 @@
 :root {
-  --bg: #e2e8f0;
-  --bg-2: #cbd5e1;
+  --bg: hsl(210, 40%, 98%);
+  --bg-2: hsl(210, 40%, 95%);
   --panel: #ffffff;
   --panel-strong: #ffffff;
-  --panel-soft: #f1f5f9;
+  --panel-soft: hsl(210, 40%, 94%);
   --bg-card: #ffffff;
   --option-bg: #ffffff;
 
-  --border: #cbd5e1;
-  --border-strong: #94a3b8;
+  --border: hsl(214, 32%, 90%);
+  --border-strong: hsl(214, 25%, 80%);
 
-  --text: #020617;
-  --text-soft: #0f172a;
-  --text-dim: #475569;
+  --text: hsl(215, 47%, 15%);
+  --text-soft: hsl(215, 25%, 25%);
+  --text-dim: hsl(215, 20%, 45%);
 
-  --primary: #0A66C2;
-  --primary-2: #00509d;
-  --primary-soft: #e0f2fe;
+  --primary: hsl(217, 91%, 60%);
+  --primary-2: hsl(217, 91%, 50%);
+  --primary-soft: rgba(59, 130, 246, 0.08);
 
-  --success: #15803d;
-  --success-soft: #dcfce7;
+  --success: hsl(142, 71%, 45%);
+  --success-soft: rgba(34, 197, 94, 0.08);
 
-  --danger: #b91c1c;
-  --danger-soft: #fee2e2;
+  --danger: hsl(0, 84%, 60%);
+  --danger-soft: rgba(239, 68, 68, 0.08);
 
-  --warning: #ca8a04;
-  --warning-soft: #fef9c3;
+  --warning: hsl(38, 92%, 50%);
+  --warning-soft: rgba(245, 158, 11, 0.08);
 
-  --hero-bg: linear-gradient(135deg, #e0f2fe 0%, #ffffff 100%);
-  --hero-text: #020617;
-  --hero-text-soft: #1e293b;
-  --hero-border: #cbd5e1;
+  --hero-bg: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, #ffffff 100%);
+  --hero-text: hsl(215, 47%, 15%);
+  --hero-text-soft: hsl(215, 25%, 35%);
+  --hero-border: hsl(214, 32%, 90%);
 }
 
 body.dark-mode {
-  --bg: #000000;
-  --bg-2: #050505;
-  --panel: #0a0a0c;
-  --panel-strong: #020202;
+  --bg: hsl(222, 47%, 6%);
+  --bg-2: hsl(222, 47%, 8%);
+  --panel: rgba(15, 23, 42, 0.7);
+  --panel-strong: rgba(15, 23, 42, 0.85);
   --panel-soft: rgba(255, 255, 255, 0.03);
-  --bg-card: #08080a;
-  --option-bg: #070709;
+  --bg-card: rgba(30, 41, 59, 0.4);
+  --option-bg: rgba(30, 41, 59, 0.3);
 
-  --border: rgba(255, 255, 255, 0.05);
-  --border-strong: rgba(255, 255, 255, 0.10);
+  --border: rgba(255, 255, 255, 0.07);
+  --border-strong: rgba(255, 255, 255, 0.15);
 
-  --text: #f8fafc;
-  --text-soft: #cbd5e1;
-  --text-dim: #94a3b8;
+  --text: hsl(210, 40%, 98%);
+  --text-soft: hsl(215, 20%, 75%);
+  --text-dim: hsl(215, 16%, 55%);
 
-  --primary: #3b82f6;
-  --primary-2: #60a5fa;
+  --primary: hsl(217, 91%, 60%);
+  --primary-2: hsl(217, 91%, 70%);
   --primary-soft: rgba(59, 130, 246, 0.15);
 
-  --success: #22c55e;
+  --success: hsl(142, 71%, 45%);
   --success-soft: rgba(34, 197, 94, 0.15);
 
-  --danger: #ef4444;
+  --danger: hsl(0, 84%, 60%);
   --danger-soft: rgba(239, 68, 68, 0.15);
 
-  --warning: #f59e0b;
+  --warning: hsl(38, 92%, 50%);
   --warning-soft: rgba(245, 158, 11, 0.15);
 
-  --hero-bg: linear-gradient(135deg, #020202 0%, #0c0c0f 100%);
-  --hero-text: #f8fafc;
-  --hero-text-soft: #cbd5e1;
-  --hero-border: rgba(255, 255, 255, 0.05);
+  --hero-bg: linear-gradient(135deg, rgba(30, 41, 59, 0.4) 0%, rgba(15, 23, 42, 0.7) 100%);
+  --hero-text: hsl(210, 40%, 98%);
+  --hero-text-soft: hsl(215, 20%, 75%);
+  --hero-border: rgba(255, 255, 255, 0.07);
 }
 
 * {
@@ -272,6 +272,10 @@ body.dark-mode .app-bg {
   padding: 36px;
   display: flex;
   flex-direction: column;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .panel-head {
@@ -586,19 +590,19 @@ select.input option {
 }
 
 .option-btn:hover:not(:disabled) {
-  background: rgba(10, 102, 194, 0.05) !important;
-  border-color: #0A66C2 !important;
+  background: var(--primary-soft) !important;
+  border-color: var(--primary) !important;
   color: var(--text) !important;
-  box-shadow: 0 6px 16px rgba(10, 102, 194, 0.1) !important;
-  transform: translateY(-1.5px);
+  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.12) !important;
+  transform: translateY(-2px);
 }
 
 .option-btn.selected {
-  background: rgba(10, 102, 194, 0.08) !important;
-  border-color: #0A66C2 !important;
+  background: var(--primary-soft) !important;
+  border-color: var(--primary) !important;
   border-width: 2px !important;
   color: var(--text) !important;
-  box-shadow: 0 6px 20px rgba(10, 102, 194, 0.16) !important;
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.2) !important;
 }
 
 .option-btn.correct {
@@ -2462,6 +2466,51 @@ body.dark-mode::-webkit-scrollbar-thumb:hover {
 #btn-toggle-diario.activo #icono-toggle-diario {
   transform: rotate(180deg);
   color: var(--primary);
+}
+
+/* === FASE 3: GRID DE ANALÍTICAS AVANZADAS & TARJETAS PREMIUM === */
+.charts-dashboard-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)) !important;
+  gap: 20px !important;
+  padding-top: 20px !important;
+}
+
+.chart-card-premium {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.02) 0%, rgba(255, 255, 255, 0.00) 100%) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 20px !important;
+  padding: 24px !important;
+  min-height: 280px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.15) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.chart-card-premium:hover {
+  transform: translateY(-3px) !important;
+  box-shadow: 0 15px 30px -10px rgba(0, 0, 0, 0.3) !important;
+  border-color: var(--primary) !important;
+}
+
+/* === FASE 5: JERARQUÍA TIPOGRÁFICA DE ALTA SINERGIA (OUTFIT + INTER) === */
+.question-text {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+  font-weight: 600 !important;
+  font-size: 22px !important;
+  line-height: 1.65 !important;
+  letter-spacing: -0.01em !important;
+  color: var(--text) !important;
+}
+
+.feedback-explicacion {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+  font-size: 14.5px !important;
+  line-height: 1.6 !important;
+  color: var(--text-soft) !important;
 }
 
 
