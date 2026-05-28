@@ -696,6 +696,23 @@ const ui = {
           }
         });
       }
+
+      // Vincular toggle del Cajón Desplegable de Cobertura por Especialidad
+      const btnToggleEsp = document.getElementById("btn-toggle-especialidades");
+      if (btnToggleEsp && !btnToggleEsp.dataset.hasListener) {
+        btnToggleEsp.dataset.hasListener = "true";
+        btnToggleEsp.addEventListener("click", () => {
+          const seccionEsp = document.getElementById("seccion-especialidades-desplegable");
+          if (seccionEsp) {
+            const estaActivoEsp = seccionEsp.classList.toggle("activo");
+            btnToggleEsp.classList.toggle("activo", estaActivoEsp);
+            const iconoEsp = document.getElementById("icono-toggle-especialidades");
+            if (iconoEsp) {
+              iconoEsp.textContent = estaActivoEsp ? "▲" : "▼";
+            }
+          }
+        });
+      }
       
       // Analizar historial para analíticas de subtemas y debilidades
       const metricasAv = analytics.procesarMetricas(historial);

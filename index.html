@@ -518,9 +518,21 @@
                 </div>
               </div>
 
-              <h4 style="margin: 0 0 16px 0; font-size: 13px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px;">Rendimiento y Cobertura por Especialidad:</h4>
-              <div id="perfil-especialidades-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px;">
-                <!-- Cargado dinámicamente desde JS -->
+              <!-- Rendimiento y Cobertura por Especialidad Colapsable -->
+              <div id="contenedor-especialidades-acordeon" style="margin-top: 24px; border-top: 1px dashed var(--border-strong); padding-top: 20px;">
+                <button id="btn-toggle-especialidades" class="btn btn-ghost" type="button" style="width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 14px 20px; border-radius: 14px; background: rgba(255,255,255,0.02); font-weight: 700; border: 1px solid var(--border); font-size: 14px; color: var(--primary); transition: all 0.3s ease; cursor: pointer;">
+                  <span style="display: flex; align-items: center; gap: 8px;">🔍 Ver Cobertura y Nota por Especialidad</span>
+                  <span id="icono-toggle-especialidades" style="transition: transform 0.3s ease; font-size: 14px;">▼</span>
+                </button>
+
+                <div id="seccion-especialidades-desplegable" style="max-height: 0; overflow: hidden; opacity: 0; transition: max-height 0.4s ease-out, opacity 0.3s ease; margin-top: 0;">
+                  <div style="padding-top: 20px;">
+                    <h4 style="margin: 0 0 16px 0; font-size: 13px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px;">Rendimiento y Cobertura por Especialidad:</h4>
+                    <div id="perfil-especialidades-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px;">
+                      <!-- Cargado dinámicamente desde JS -->
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
