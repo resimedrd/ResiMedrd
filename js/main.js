@@ -28,29 +28,24 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
-  // 1. Inyectar botón interactivo del MODO INTENSIVO en el DOM de forma dinámica
-  const modeGrid = document.querySelector(".mode-grid");
-  if (modeGrid) {
-    const btnGuardiaExistente = document.getElementById("btn-modo-guardia");
-    if (!btnGuardiaExistente) {
-      const btnGuardia = document.createElement("button");
-      btnGuardia.id = "btn-modo-guardia";
-      btnGuardia.className = "mode-card";
-      btnGuardia.type = "button";
-      btnGuardia.style.borderColor = "var(--danger)";
-      btnGuardia.style.boxShadow = "0 4px 12px rgba(239, 68, 68, 0.1)";
-      
-      btnGuardia.innerHTML = `
-        <span class="mode-title" style="color: var(--danger); font-weight: 700;">Modo Intensivo</span>
-        <span class="mode-desc">Entrenamiento ultra-rápido e intensivo de 10 preguntas. 30 segundos por pregunta.</span>
-      `;
-      
-      modeGrid.appendChild(btnGuardia);
-      
-      btnGuardia.addEventListener("click", () => {
-        quiz.solicitarConfirmacionInicio("guardia");
-      });
-    }
+  // 1. Vincular botones interactivos de modalidades del panel principal (Modo Intensivo y Modo Batalla)
+  const btnGuardia = document.getElementById("btn-modo-guardia");
+  if (btnGuardia) {
+    btnGuardia.addEventListener("click", () => {
+      quiz.solicitarConfirmacionInicio("guardia");
+    });
+  }
+
+  const btnModoBatalla = document.getElementById("btn-modo-batalla");
+  if (btnModoBatalla) {
+    btnModoBatalla.addEventListener("click", () => {
+      // Ocultar botón Volver al inicio si está en perfil
+      const btnVerPerfil = document.getElementById("btn-ver-perfil");
+      if (btnVerPerfil) btnVerPerfil.innerHTML = "👤 Mi Perfil";
+
+      battle.mostrarPantallaBattle("battle");
+      battle.conectarWebSocket();
+    });
   }
 
   // 2. Vincular botones de cambio de pantalla Perfil e Inicio

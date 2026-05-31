@@ -43,15 +43,34 @@ function inicializarBatallas(server, db, JWT_SECRET) {
 
         // 1. Manejo exclusivo de Autenticación
         if (message.type === "auth") {
-          jwt.verify(message.token, JWT_SECRET, (err, decoded) => {
+          jwt.verify(message.token, JWT_SECRET, async (err, decoded) => {
             if (err) {
               wsConn.send(JSON.stringify({ type: "error", message: "Token inválido o expirado." }));
               wsConn.close();
             } else {
-              usuarioAutenticado = decoded;
-              wsConn.send(JSON.stringify({ type: "authenticated", user: { id: decoded.id, nombre: decoded.nombre } }));
-              // Sincronizar estadísticas competitivas iniciales
-              enviarEstadisticasBatalla(wsConn, decoded.id);
+              try {
+                // Recuperar el nombre real del usuario de la base de datos SQLite para evitar undefined
+                const userRow = await db.get("SELECT nombre FROM usuarios WHERE id = ?", [decoded.id]);
+                const nombreUsuario = userRow ? userRow.nombre : "Colega Médico";
+
+                usuarioAutenticado = {
+                  id: decoded.id,
+                  nombre: nombreUsuario,
+                  rol: decoded.rol
+                };
+
+                wsConn.send(JSON.stringify({ 
+                  type: "authenticated", 
+                  user: { id: decoded.id, nombre: nombreUsuario } 
+                }));
+
+                // Sincronizar estadísticas competitivas iniciales
+                enviarEstadisticasBatalla(wsConn, decoded.id);
+              } catch (dbErr) {
+                console.error("Error al autenticar usuario en WebSocket de batalla:", dbErr);
+                wsConn.send(JSON.stringify({ type: "error", message: "Error interno en el servidor." }));
+                wsConn.close();
+              }
             }
           });
           return;
@@ -125,6 +144,7 @@ function inicializarBatallas(server, db, JWT_SECRET) {
 
             broadcastToRoom(room, {
               type: "room_updated",
+              code: room.code,
               settings: room.settings,
               players: room.players.map(p => ({ id: p.id, nombre: p.nombre, isHost: p.id === room.hostId }))
             });
@@ -145,6 +165,7 @@ function inicializarBatallas(server, db, JWT_SECRET) {
 
             broadcastToRoom(room, {
               type: "room_updated",
+              code: room.code,
               settings: room.settings,
               players: room.players.map(p => ({ id: p.id, nombre: p.nombre, isHost: p.id === room.hostId }))
             });
@@ -326,6 +347,7 @@ function inicializarBatallas(server, db, JWT_SECRET) {
 
             broadcastToRoom(room, {
               type: "room_updated",
+              code: room.code,
               settings: room.settings,
               players: room.players.map(p => ({ id: p.id, nombre: p.nombre, isHost: p.id === room.hostId }))
             });

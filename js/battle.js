@@ -375,7 +375,7 @@ const battle = {
     // Si no somos el creador, podemos estar uniéndonos
     const userId = state.usuarioConectado ? state.usuarioConectado.id : null;
     const host = payload.players.find(p => p.isHost);
-    battle.isHost = host && host.id === userId;
+    battle.isHost = host && String(host.id) === String(userId);
 
     battle.abrirLobby({
       code: battle.salaCodigo || payload.code || document.getElementById("lobby-code-val").textContent,
