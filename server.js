@@ -55,6 +55,14 @@ async function iniciarBaseDeDatos() {
     driver: sqlite3.Database
   });
 
+  // Habilitar el modo de alta concurrencia Write-Ahead Logging
+  try {
+    await db.exec(`PRAGMA journal_mode = WAL;`);
+    await db.exec(`PRAGMA synchronous = NORMAL;`);
+  } catch (walErr) {
+    console.warn("Falla al activar modo WAL en SQLite:", walErr);
+  }
+
   // 0. Tabla de Exámenes (FASE 3)
   await db.exec(`
     CREATE TABLE IF NOT EXISTS examenes (
@@ -247,6 +255,8 @@ async function iniciarBaseDeDatos() {
     await db.exec(`CREATE INDEX IF NOT EXISTS idx_preguntas_tema ON preguntas(tema)`);
     await db.exec(`CREATE INDEX IF NOT EXISTS idx_preguntas_activo ON preguntas(activo)`);
     await db.exec(`CREATE INDEX IF NOT EXISTS idx_preguntas_ano_examen ON preguntas(ano_examen)`);
+    await db.exec(`CREATE INDEX IF NOT EXISTS idx_spaced_rep_usuario ON spaced_repetition(usuario_id)`);
+    await db.exec(`CREATE INDEX IF NOT EXISTS idx_spaced_rep_next_review ON spaced_repetition(next_review)`);
     console.log("📈 Índices de alto rendimiento creados con éxito en SQLite.");
   } catch (errIndexes) {
     console.error("Error al crear índices de rendimiento:", errIndexes);
@@ -1556,6 +1566,27 @@ app.get("/api/spaced-repetition", autenticarToken, async (req, res) => {
     res.json(filas);
   } catch (error) {
     res.status(500).json({ error: "Error al leer repetición espaciada." });
+  }
+});
+
+app.get("/api/spaced-repetition/individual", autenticarToken, async (req, res) => {
+  try {
+    const { usuarioId, preguntaId, flashcardId } = req.query;
+    if (parseInt(usuarioId) !== req.usuario.id) {
+      return res.status(403).json({ error: "Acceso no autorizado." });
+    }
+
+    let fila = null;
+    if (flashcardId) {
+      fila = await db.get(`SELECT * FROM spaced_repetition WHERE usuario_id = ? AND flashcard_id = ?`, [usuarioId, flashcardId]);
+    } else if (preguntaId) {
+      fila = await db.get(`SELECT * FROM spaced_repetition WHERE usuario_id = ? AND pregunta_id = ?`, [usuarioId, preguntaId]);
+    }
+
+    res.json(fila || null);
+  } catch (error) {
+    console.error("Error al leer repetición espaciada individual:", error);
+    res.status(500).json({ error: "Error al leer repetición espaciada individual." });
   }
 });
 

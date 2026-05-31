@@ -438,7 +438,16 @@ const battle = {
       const bubble = document.createElement("div");
       const esMio = state.usuarioConectado && sender === state.usuarioConectado.nombre;
       bubble.className = `chat-bubble ${esMio ? 'mine' : ''}`;
-      bubble.innerHTML = `<strong>${esMio ? 'Yo' : sender}:</strong> ${message}`;
+      
+      // Sanitizar inyecciones de código HTML (XSS)
+      const safeMessage = message
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+        
+      bubble.innerHTML = `<strong>${esMio ? 'Yo' : sender}:</strong> ${safeMessage}`;
       
       chatMsgBox.appendChild(bubble);
       chatMsgBox.scrollTop = chatMsgBox.scrollHeight; // Auto-scroll al final
@@ -619,9 +628,13 @@ const battle = {
       if (acertado) {
         feedEstado.textContent = "✓ ¡RESPUESTA CORRECTA!";
         feedEstado.className = "feedback-estado correct";
+        // Feedback háptico táctil para móviles ante aciertos
+        if (navigator.vibrate) navigator.vibrate([80, 50, 80]);
       } else {
         feedEstado.textContent = "✗ ¡RESPUESTA INCORRECTA!";
         feedEstado.className = "feedback-estado wrong";
+        // Feedback háptico táctil para móviles ante errores
+        if (navigator.vibrate) navigator.vibrate(250);
       }
 
       feedExp.innerHTML = payload.explicacion.replace(/\n/g, "<br/>");
@@ -677,6 +690,19 @@ const battle = {
           `;
         }
         podiumContainer.appendChild(col);
+      });
+      
+      // Disparar crecimiento progresivo elástico del podio 3D premium
+      requestAnimationFrame(() => {
+        setTimeout(() => {
+          const col1 = document.querySelector(".podium-column.podium-1");
+          const col2 = document.querySelector(".podium-column.podium-2");
+          const col3 = document.querySelector(".podium-column.podium-3");
+          
+          if (col1) col1.style.setProperty("height", "180px", "important");
+          if (col2) col2.style.setProperty("height", "130px", "important");
+          if (col3) col3.style.setProperty("height", "90px", "important");
+        }, 100);
       });
     }
 

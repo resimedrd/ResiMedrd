@@ -6,6 +6,7 @@ const activeRooms = new Map(); // code -> room
 let matchmakingQueue = [];     // Array de { id, nombre, ws, joinedAt }
 let matchmakingTimer = null;
 let queueTimeLeft = 30;         // Segundos para el temporizador de cola
+let dbInstance = null;         // Variable local para albergar la referencia a la base de datos
 
 // Nombres de médicos ficticios para bots (cuando no hay suficientes jugadores reales en cola)
 const BOT_NAMES = [
@@ -25,6 +26,7 @@ function generarCodigoSala() {
 
 function inicializarBatallas(server, db, JWT_SECRET) {
   const wss = new ws.Server({ noServer: true });
+  dbInstance = db;
 
   // Manejo de upgrade HTTP a WebSocket de forma segura
   server.on("upgrade", (request, socket, head) => {
@@ -64,8 +66,50 @@ function inicializarBatallas(server, db, JWT_SECRET) {
                   user: { id: decoded.id, nombre: nombreUsuario } 
                 }));
 
-                // Sincronizar estadísticas competitivas iniciales
+                 // Sincronizar estadísticas competitivas iniciales
                 enviarEstadisticasBatalla(wsConn, decoded.id);
+
+                // Buscar si este usuario pertenece a una sala activa jugando
+                for (const [code, r] of activeRooms.entries()) {
+                  const existingPlayer = r.players.find(p => p.id === decoded.id);
+                  if (existingPlayer) {
+                    existingPlayer.ws = wsConn;
+                    existingPlayer.isConnected = true;
+                    salaActualCodigo = code;
+                    
+                    wsConn.send(JSON.stringify({
+                      type: "reconnected",
+                      code: r.code,
+                      state: r.state,
+                      settings: r.settings,
+                      currentQuestionIndex: r.currentQuestionIndex,
+                      totalQuestions: r.questions.length,
+                      timePerQuestion: r.settings.timePerQuestion
+                    }));
+                    
+                    // Si la batalla está activa, enviarle la pregunta actual de inmediato
+                    if (r.state === "playing" && r.currentQuestionIndex >= 0) {
+                      const question = r.questions[r.currentQuestionIndex];
+                      wsConn.send(JSON.stringify({
+                        type: "new_question",
+                        questionIndex: r.currentQuestionIndex,
+                        totalQuestions: r.questions.length,
+                        texto: question.texto,
+                        opciones: question.opciones,
+                        tema: question.tema,
+                        timeLeft: r.settings.timePerQuestion
+                      }));
+                    }
+                    
+                    broadcastToRoom(r, {
+                      type: "room_updated",
+                      code: r.code,
+                      settings: r.settings,
+                      players: r.players.map(pl => ({ id: pl.id, nombre: pl.nombre, isHost: pl.id === r.hostId, isConnected: true }))
+                    });
+                    break;
+                  }
+                }
               } catch (dbErr) {
                 console.error("Error al autenticar usuario en WebSocket de batalla:", dbErr);
                 wsConn.send(JSON.stringify({ type: "error", message: "Error interno en el servidor." }));
@@ -96,7 +140,7 @@ function inicializarBatallas(server, db, JWT_SECRET) {
               modalidad: "amigos",
               settings: { totalQuestions: totalQ, timePerQuestion: timeP },
               hostId: userId,
-              players: [{ id: userId, nombre: userNombre, ws: wsConn, score: 0, answers: [] }],
+              players: [{ id: userId, nombre: userNombre, ws: wsConn, score: 0, answers: [], isConnected: true }],
               questions: [],
               currentQuestionIndex: -1,
               state: "lobby"
@@ -138,8 +182,9 @@ function inicializarBatallas(server, db, JWT_SECRET) {
               // Si se reconecta, actualizar socket
               const p = room.players.find(p => p.id === userId);
               p.ws = wsConn;
+              p.isConnected = true;
             } else {
-              room.players.push({ id: userId, nombre: userNombre, ws: wsConn, score: 0, answers: [] });
+              room.players.push({ id: userId, nombre: userNombre, ws: wsConn, score: 0, answers: [], isConnected: true });
             }
 
             salaActualCodigo = code;
@@ -335,27 +380,58 @@ function inicializarBatallas(server, db, JWT_SECRET) {
         const room = activeRooms.get(salaActualCodigo);
         if (room) {
           // Desconectar o marcar desconectado
-          room.players = room.players.filter(p => p.ws !== wsConn);
+          const player = room.players.find(p => p.ws === wsConn);
+          if (player) {
+            player.isConnected = false;
+            player.ws = null;
 
-          if (room.players.length === 0 || room.players.every(p => p.isBot)) {
-            // Si la sala queda vacía de humanos, eliminarla
-            if (room.timerInterval) clearInterval(room.timerInterval);
-            activeRooms.delete(salaActualCodigo);
-          } else {
-            // Si es sala privada y se va el host, reasignar host
-            if (room.modalidad === "amigos" && room.hostId === usuarioAutenticado.id) {
-              const nuevoHost = room.players.find(p => !p.isBot);
-              if (nuevoHost) {
-                room.hostId = nuevoHost.id;
+            // Si es la fase de juego, le damos 25s de gracia
+            if (room.state === "playing") {
+              setTimeout(() => {
+                const r = activeRooms.get(salaActualCodigo);
+                if (r) {
+                  const p = r.players.find(pl => pl.id === player.id);
+                  if (p && !p.isConnected) {
+                    // Si sigue desconectado tras 25s, purgar
+                    r.players = r.players.filter(pl => pl.id !== player.id);
+                    if (r.players.length === 0 || r.players.every(pl => pl.isBot)) {
+                      if (r.timerInterval) clearInterval(r.timerInterval);
+                      activeRooms.delete(salaActualCodigo);
+                    } else {
+                      // Si era el host, reasignar host
+                      if (r.modalidad === "amigos" && r.hostId === player.id) {
+                        const nuevoHost = r.players.find(pl => !pl.isBot);
+                        if (nuevoHost) r.hostId = nuevoHost.id;
+                      }
+                      broadcastToRoom(r, {
+                        type: "room_updated",
+                        code: r.code,
+                        settings: r.settings,
+                        players: r.players.map(pl => ({ id: pl.id, nombre: pl.nombre, isHost: pl.id === r.hostId, isConnected: pl.isConnected !== false }))
+                      });
+                    }
+                  }
+                }
+              }, 25000);
+            } else {
+              // Si está en lobby, purgar inmediatamente
+              room.players = room.players.filter(p => p.id !== player.id);
+              if (room.players.length === 0) {
+                if (room.timerInterval) clearInterval(room.timerInterval);
+                activeRooms.delete(salaActualCodigo);
+              } else {
+                if (room.modalidad === "amigos" && room.hostId === player.id) {
+                  const nuevoHost = room.players.find(p => !p.isBot);
+                  if (nuevoHost) room.hostId = nuevoHost.id;
+                }
+                broadcastToRoom(room, {
+                  type: "room_updated",
+                  code: room.code,
+                  settings: room.settings,
+                  players: room.players.map(p => ({ id: p.id, nombre: p.nombre, isHost: p.id === room.hostId, isConnected: true }))
+                });
               }
             }
-
-            broadcastToRoom(room, {
-              type: "room_updated",
-              code: room.code,
-              settings: room.settings,
-              players: room.players.map(p => ({ id: p.id, nombre: p.nombre, isHost: p.id === room.hostId }))
-            });
           }
         }
       }
@@ -375,14 +451,13 @@ function broadcastToRoom(room, payload) {
 async function enviarEstadisticasBatalla(clientWs, userId) {
   // Nota: Recuperamos el perfil competitivo independiente directo de SQLite
   try {
-    const db = require("./server.js").db; // Obtener db en caliente
-    if (db) {
-      const stats = await db.get(
+    if (dbInstance) {
+      const stats = await dbInstance.get(
         "SELECT battle_jugadas, battle_ganadas, battle_perdidas, battle_racha_actual, battle_racha_mejor FROM usuarios WHERE id = ?",
         [userId]
       );
       
-      const historial = await db.all(
+      const historial = await dbInstance.all(
         "SELECT modalidad, contrincantes, correctas, total_preguntas, posicion, fecha FROM batalla_historial WHERE usuario_id = ? ORDER BY id DESC LIMIT 10",
         [userId]
       );
@@ -695,8 +770,7 @@ async function finalizarBatalla(room) {
   });
 
   // Guardar en la base de datos local SQLite para los jugadores reales
-  const db = require("./server.js").db;
-  if (db) {
+  if (dbInstance) {
     for (const player of room.players) {
       if (player.isBot) continue;
 
@@ -710,10 +784,10 @@ async function finalizarBatalla(room) {
         .map(p => p.nombre);
 
       try {
-        await db.run("BEGIN TRANSACTION");
+        await dbInstance.run("BEGIN TRANSACTION");
 
         // 1. Guardar en el historial
-        await db.run(`
+        await dbInstance.run(`
           INSERT INTO batalla_historial (usuario_id, modalidad, contrincantes, correctas, total_preguntas, posicion)
           VALUES (?, ?, ?, ?, ?, ?)
         `, [
@@ -726,7 +800,7 @@ async function finalizarBatalla(room) {
         ]);
 
         // 2. Recuperar stats actuales
-        const user = await db.get(
+        const user = await dbInstance.get(
           "SELECT battle_jugadas, battle_ganadas, battle_perdidas, battle_racha_actual, battle_racha_mejor FROM usuarios WHERE id = ?",
           [player.id]
         );
@@ -746,7 +820,7 @@ async function finalizarBatalla(room) {
           const mejorRacha = Math.max(user.battle_racha_mejor || 0, nuevaRacha);
 
           // 3. Actualizar perfil competitivo independiente del usuario
-          await db.run(`
+          await dbInstance.run(`
             UPDATE usuarios 
             SET battle_jugadas = ?, battle_ganadas = ?, battle_perdidas = ?, battle_racha_actual = ?, battle_racha_mejor = ?
             WHERE id = ?
@@ -760,7 +834,7 @@ async function finalizarBatalla(room) {
           ]);
         }
 
-        await db.run("COMMIT");
+        await dbInstance.run("COMMIT");
         
         // Reconectar estadísticas actualizadas
         const updatedSocket = room.players.find(p => p.id === player.id).ws;
@@ -769,16 +843,22 @@ async function finalizarBatalla(room) {
         }
 
       } catch (dbErr) {
-        await db.run("ROLLBACK");
+        try {
+          await dbInstance.run("ROLLBACK");
+        } catch (rollbackErr) {
+          console.error("Falla al hacer rollback:", rollbackErr);
+        }
         console.error("Falla al registrar resultados de la batalla para el usuario:", player.id, dbErr);
       }
     }
   }
 
-  // Eliminar la sala después de un delay prudente (para permitir la revisión)
+  // Eliminar la sala después de un delay de gracia
   setTimeout(() => {
+    if (room.timerInterval) clearInterval(room.timerInterval);
     activeRooms.delete(room.code);
-  }, 10 * 60 * 1000); // 10 minutos activa en memoria para revisión pospartida
+    console.log(`🧹 Sala ${room.code} purgada con éxito de la memoria.`);
+  }, 5000); // 5 segundos activa en memoria para revisión pospartida
 }
 
 module.exports = {

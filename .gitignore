@@ -20,3 +20,7 @@ Thumbs.db
 .gemini/
 .idea/
 .vscode/
+
+# Archivos temporales de SQLite WAL
+*.db-shm
+*.db-wal

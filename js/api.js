@@ -91,6 +91,11 @@ const api = {
   obtenerRepeticionEspaciada: (usuarioId) => 
     request(`/api/spaced-repetition?usuarioId=${usuarioId}`),
 
+  obtenerRepeticionIndividual: (usuarioId, preguntaId, flashcardId) => {
+    const query = flashcardId ? `flashcardId=${flashcardId}` : `preguntaId=${preguntaId}`;
+    return request(`/api/spaced-repetition/individual?usuarioId=${usuarioId}&${query}`);
+  },
+
   guardarRepeticionEspaciada: (spacedData) => 
     request("/api/spaced-repetition", {
       method: "POST",

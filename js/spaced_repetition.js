@@ -61,15 +61,8 @@ const spacedRepetition = {
     if (!state.usuarioConectado) return;
     
     try {
-      // 1. Obtener estados actuales de la base de datos (o usar mazo de estado)
-      const todosEstados = await api.obtenerRepeticionEspaciada(state.usuarioConectado.id);
-      
-      let estadoActual = null;
-      if (flashcardId) {
-        estadoActual = todosEstados.find(e => e.flashcard_id === flashcardId);
-      } else if (preguntaId) {
-        estadoActual = todosEstados.find(e => e.pregunta_id === preguntaId);
-      }
+      // 1. Obtener estado actual individual de la base de datos de manera altamente eficiente
+      const estadoActual = await api.obtenerRepeticionIndividual(state.usuarioConectado.id, preguntaId, flashcardId);
       
       // 2. Procesar el nuevo estado con el algoritmo
       const nuevoEstado = spacedRepetition.procesarRepaso(estadoActual, seLaSabia, dificultadSubjetiva);

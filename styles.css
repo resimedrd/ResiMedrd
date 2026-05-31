@@ -2849,19 +2849,19 @@ body.dark-mode .battle-hero {
 }
 
 .podium-1 {
-  height: 180px;
+  height: 0px;
   background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
   border: 1px solid rgba(251, 191, 36, 0.2);
 }
 
 .podium-2 {
-  height: 130px;
+  height: 0px;
   background: linear-gradient(135deg, #cbd5e1 0%, #64748b 100%);
   border: 1px solid rgba(203, 213, 225, 0.2);
 }
 
 .podium-3 {
-  height: 90px;
+  height: 0px;
   background: linear-gradient(135deg, #b45309 0%, #78350f 100%);
   border: 1px solid rgba(180, 83, 9, 0.2);
 }
@@ -2930,6 +2930,17 @@ body:has(#pantalla-battle-quiz.active) .main-shell,
 body:has(#pantalla-quiz.active) .main-shell {
   padding-top: 0 !important;
   margin-top: 0 !important;
+}
+
+/* Animación Shake para error visual en opciones de respuesta */
+@keyframes shake {
+  0%, 100% { transform: translate(0, 0); }
+  20%, 60% { transform: translate(-6px, 0); }
+  40%, 80% { transform: translate(6px, 0); }
+}
+
+.option-btn.wrong.selected {
+  animation: shake 0.4s ease-in-out;
 }
 
 
