@@ -92,6 +92,9 @@ const auth = {
         auth.logout();
       });
     }
+
+    // Configurar temporizador de inactividad de 15 minutos
+    auth.configurarTemporizadorInactividad();
   },
 
   async restaurarSesion() {
@@ -194,6 +197,10 @@ const auth = {
   },
 
   logout() {
+    if (auth.inactivityTimeout) {
+      clearTimeout(auth.inactivityTimeout);
+      auth.inactivityTimeout = null;
+    }
     state.usuarioConectado = null;
     localStorage.removeItem("resiMed_session");
     localStorage.removeItem("resiMed_jwt_token");
@@ -217,6 +224,28 @@ const auth = {
     if (saludoUsuario) saludoUsuario.textContent = "Cargando entorno médico...";
 
     ui.mostrarPantalla("auth");
+  },
+
+  configurarTemporizadorInactividad() {
+    const eventos = ['mousemove', 'keydown', 'mousedown', 'touchstart', 'scroll', 'click'];
+    eventos.forEach(evt => {
+      window.addEventListener(evt, auth.resetearTemporizadorInactividad, { passive: true });
+    });
+    auth.resetearTemporizadorInactividad();
+  },
+
+  resetearTemporizadorInactividad() {
+    if (auth.inactivityTimeout) {
+      clearTimeout(auth.inactivityTimeout);
+    }
+    if (state.usuarioConectado) {
+      const quinceMinutos = 15 * 60 * 1000;
+      auth.inactivityTimeout = setTimeout(() => {
+        console.log("Sesión expirada por inactividad de 15 minutos.");
+        auth.logout();
+        alert("Tu sesión ha expirado por inactividad de 15 minutos. Inicia sesión de nuevo para proteger tu progreso.");
+      }, quinceMinutos);
+    }
   }
 };
 
