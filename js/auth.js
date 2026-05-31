@@ -110,6 +110,14 @@ const auth = {
       localStorage.removeItem("resiMed_session");
       localStorage.removeItem("resiMed_jwt_token");
       ui.mostrarPantalla("auth");
+    } finally {
+      // Ocultar y remover el Boot Loader con una transición suave y premium
+      const loader = document.getElementById("boot-loader");
+      if (loader) {
+        loader.style.opacity = "0";
+        loader.style.visibility = "hidden";
+        setTimeout(() => loader.remove(), 400);
+      }
     }
   },
 
