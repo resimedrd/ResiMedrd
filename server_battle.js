@@ -494,25 +494,10 @@ function iniciarMatchmakingLoop(db) {
         // Iniciar con los jugadores reales que tengamos
         iniciarBatallaAleatoria(db, matchmakingQueue.splice(0, matchmakingQueue.length));
       } else if (matchmakingQueue.length === 1) {
-        // ¡ PREMIUM TOUCH ! Auto-completamos con Bots para garantizar juego inmediato
-        const unicoJugadorReal = matchmakingQueue.shift();
-        const bots = [];
-        const numBots = 2 + Math.floor(Math.random() * 3); // 2 a 4 bots
-        
-        // Barajar nombres de bots de forma aleatoria
-        const nombresDisponibles = [...BOT_NAMES].sort(() => 0.5 - Math.random());
-        
-        for (let i = 0; i < numBots; i++) {
-          bots.push({
-            id: 9999 + i,
-            nombre: nombresDisponibles[i],
-            isBot: true,
-            score: 0,
-            answers: []
-          });
-        }
-
-        iniciarBatallaAleatoria(db, [unicoJugadorReal], bots);
+        // Resetear contador a 30s para seguir buscando médicos reales conectados en la red
+        queueTimeLeft = 30;
+        broadcastQueueStatus();
+        return; // Evitamos detener el bucle, seguimos buscando en segundo plano
       }
 
       // Detener bucle
