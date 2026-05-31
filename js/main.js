@@ -8,11 +8,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (tema === "dark") {
       document.body.classList.add("dark-mode");
       document.documentElement.classList.add("dark-mode");
-      if (btnToggleTheme) btnToggleTheme.textContent = "Modo Claro";
+      if (btnToggleTheme) btnToggleTheme.textContent = "☀️";
     } else {
       document.body.classList.remove("dark-mode");
       document.documentElement.classList.remove("dark-mode");
-      if (btnToggleTheme) btnToggleTheme.textContent = "Modo Oscuro";
+      if (btnToggleTheme) btnToggleTheme.textContent = "🌙";
     }
   };
 
