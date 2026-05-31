@@ -52,6 +52,7 @@ const ui = {
     const activa = document.getElementById(idReal);
     if (activa) {
       activa.classList.add("active");
+      window.scrollTo({ top: 0, behavior: 'instant' });
       
       // Aplicar una micro-animación de entrada (fade-in)
       activa.style.opacity = "0";

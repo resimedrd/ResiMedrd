@@ -32,6 +32,16 @@ const battle = {
       btnHomeIrBatalla.addEventListener("click", navegarABattleHub);
     }
 
+    const btnBattleBackToHome = document.getElementById("btn-battle-back-to-home");
+    if (btnBattleBackToHome) {
+      btnBattleBackToHome.addEventListener("click", () => {
+        if (battle.socket) {
+          battle.socket.close();
+        }
+        ui.mostrarPantalla("home");
+      });
+    }
+
     if (btnResultsReturn) {
       btnResultsReturn.addEventListener("click", () => {
         battle.mostrarPantallaBattle("battle");
@@ -187,6 +197,7 @@ const battle = {
     const target = document.getElementById(`pantalla-${pantallaId}`);
     if (target) {
       target.classList.add("active");
+      window.scrollTo({ top: 0, behavior: 'instant' });
       window.location.hash = pantallaId;
     }
   },

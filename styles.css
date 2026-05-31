@@ -2608,15 +2608,37 @@ body:not(.dark-mode) .modal-ia-overlay {
   background: linear-gradient(135deg, rgba(239, 68, 68, 0.08) 0%, rgba(15, 23, 42, 0.05) 100%) !important;
   border: 1px solid rgba(239, 68, 68, 0.15) !important;
   border-radius: 32px;
-  padding: 40px;
+  padding: 16px 28px !important; /* REDUCIDO A LA MITAD DE GROSOR */
   margin-bottom: 24px;
   display: grid;
   grid-template-columns: 1fr 360px;
-  gap: 40px;
+  gap: 20px !important;
   align-items: center;
   box-shadow: 0 12px 36px rgba(239, 68, 68, 0.03);
   overflow: hidden;
   backdrop-filter: blur(16px);
+}
+
+/* Modificar específicamente el contenido del battle-hero para hacerlo compacto */
+.battle-hero .hero-copy .eyebrow {
+  margin-bottom: 4px !important;
+  font-size: 12px !important;
+}
+
+.battle-hero .hero-copy h2 {
+  font-size: 24px !important;
+  margin-bottom: 8px !important;
+}
+
+.battle-hero .hero-copy p {
+  font-size: 13.5px !important;
+  margin-bottom: 12px !important;
+  line-height: 1.4 !important;
+}
+
+.battle-hero .badge {
+  padding: 4px 10px !important;
+  font-size: 11.5px !important;
 }
 
 .battle-hero::before {
@@ -3155,13 +3177,19 @@ select#battle-settings-time:focus {
   animation: shake 0.4s ease-in-out;
 }
 
-/* 🎯 Modo Dedicado - Ocultar Topbar durante el Quiz de Batalla y Simulacros */
+/* 🎯 Modo Dedicado - Ocultar Topbar durante el Modo Batalla y Simulacros */
+body:has(#pantalla-battle.active) .topbar,
+body:has(#pantalla-battle-lobby.active) .topbar,
 body:has(#pantalla-battle-quiz.active) .topbar,
+body:has(#pantalla-battle-results.active) .topbar,
 body:has(#pantalla-quiz.active) .topbar {
   display: none !important;
 }
 
+body:has(#pantalla-battle.active) .main-shell,
+body:has(#pantalla-battle-lobby.active) .main-shell,
 body:has(#pantalla-battle-quiz.active) .main-shell,
+body:has(#pantalla-battle-results.active) .main-shell,
 body:has(#pantalla-quiz.active) .main-shell {
   padding-top: 0 !important;
   margin-top: 0 !important;
