@@ -49,8 +49,16 @@ const battle = {
 
     if (btnBattleCreate) {
       btnBattleCreate.addEventListener("click", () => {
+        const qSelect = document.getElementById("battle-custom-questions");
+        const tSelect = document.getElementById("battle-custom-time");
+        const totalQ = qSelect ? parseInt(qSelect.value) : 15;
+        const timeP = tSelect ? parseInt(tSelect.value) : 60;
+
         if (battle.socket && battle.socket.readyState === WebSocket.OPEN) {
-          battle.socket.send(JSON.stringify({ type: "create_room" }));
+          battle.socket.send(JSON.stringify({ 
+            type: "create_room",
+            settings: { totalQuestions: totalQ, timePerQuestion: timeP }
+          }));
         } else {
           alert("Conexión perdida. Intentando reconectar...");
           battle.conectarWebSocket();
@@ -98,8 +106,16 @@ const battle = {
 
     if (btnQueueEnter) {
       btnQueueEnter.addEventListener("click", () => {
+        const qSelect = document.getElementById("battle-custom-questions");
+        const tSelect = document.getElementById("battle-custom-time");
+        const totalQ = qSelect ? parseInt(qSelect.value) : 15;
+        const timeP = tSelect ? parseInt(tSelect.value) : 60;
+
         if (battle.socket && battle.socket.readyState === WebSocket.OPEN) {
-          battle.socket.send(JSON.stringify({ type: "enter_queue" }));
+          battle.socket.send(JSON.stringify({ 
+            type: "enter_queue",
+            settings: { totalQuestions: totalQ, timePerQuestion: timeP }
+          }));
         } else {
           alert("Conexión perdida. Intentando reconectar...");
           battle.conectarWebSocket();
@@ -147,6 +163,20 @@ const battle = {
 
     if (setQuestions) setQuestions.addEventListener("change", enviarConfiguracion);
     if (setTime) setTime.addEventListener("change", enviarConfiguracion);
+
+    // 6. Botón de Abandono Rápido en la Arena de Batalla (Finalizar Batalla en caliente)
+    const btnBattleQuit = document.getElementById("btn-battle-quit");
+    if (btnBattleQuit) {
+      btnBattleQuit.addEventListener("click", () => {
+        if (confirm("¿Confirmas que deseas abandonar y finalizar esta batalla? Tu progreso actual en esta partida no se guardará.")) {
+          if (battle.socket) {
+            battle.socket.close();
+          }
+          battle.mostrarPantallaBattle("battle");
+          battle.conectarWebSocket(); // Reconectar de inmediato para estar listo para la siguiente batalla
+        }
+      });
+    }
   },
 
   mostrarPantallaBattle(pantallaId) {

@@ -840,6 +840,28 @@
               <p>Escoge tu desafío: compite con amigos en privado o entra en el emparejamiento global.</p>
             </div>
 
+            <!-- ⚙️ Configuración del Desafío -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; border-bottom: 1px dashed var(--border); padding-bottom: 24px;">
+              <div>
+                <label for="battle-custom-questions" style="font-size: 13px; font-weight: 600; color: var(--text-soft); display: block; margin-bottom: 6px;">Total de Preguntas</label>
+                <select id="battle-custom-questions" class="input">
+                  <option value="10">10 Preguntas</option>
+                  <option value="15" selected>15 Preguntas</option>
+                  <option value="20">20 Preguntas</option>
+                  <option value="30">30 Preguntas</option>
+                </select>
+              </div>
+              <div>
+                <label for="battle-custom-time" style="font-size: 13px; font-weight: 600; color: var(--text-soft); display: block; margin-bottom: 6px;">Tiempo por Pregunta</label>
+                <select id="battle-custom-time" class="input">
+                  <option value="30">30 Segundos</option>
+                  <option value="60" selected>60 Segundos (1 Minuto)</option>
+                  <option value="90">90 Segundos</option>
+                  <option value="120">120 Segundos (2 Minutos)</option>
+                </select>
+              </div>
+            </div>
+
             <div style="display: grid; grid-template-columns: 1fr; gap: 24px;">
               <!-- Tarjeta 1: Batalla con Amigos -->
               <div style="border: 1px solid var(--border); padding: 24px; border-radius: 20px; background: rgba(255,255,255,0.01);">
@@ -1014,11 +1036,14 @@
         <div class="battle-arena-shell">
           <!-- Columna Principal: Enunciado y Opciones de Pregunta -->
           <article class="quiz-shell" style="margin: 0; width: 100%; max-width: 100%;">
-            <div class="quiz-header" style="margin-bottom: 20px;">
+            <div class="quiz-header" style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; width: 100%;">
               <div>
                 <span class="chip" style="background: var(--danger-soft); color: var(--danger); font-weight: 700;">⚔️ Modo Batalla</span>
                 <span id="battle-chip-tema" class="chip chip-soft">Cargando Tema...</span>
               </div>
+              <button id="btn-battle-quit" class="btn btn-secondary" style="min-width: auto; padding: 6px 12px; font-size: 12px; border-color: rgba(239, 68, 68, 0.3); color: var(--danger); background: transparent;" type="button">
+                🚪 Finalizar Batalla
+              </button>
             </div>
             
             <div class="progress-wrap" style="margin-bottom: 24px;">

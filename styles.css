@@ -2920,5 +2920,17 @@ body.dark-mode .battle-hero {
   100% { transform: rotate(360deg); }
 }
 
+/* 🎯 Modo Dedicado - Ocultar Topbar durante el Quiz de Batalla y Simulacros */
+body:has(#pantalla-battle-quiz.active) .topbar,
+body:has(#pantalla-quiz.active) .topbar {
+  display: none !important;
+}
+
+body:has(#pantalla-battle-quiz.active) .main-shell,
+body:has(#pantalla-quiz.active) .main-shell {
+  padding-top: 0 !important;
+  margin-top: 0 !important;
+}
+
 
 

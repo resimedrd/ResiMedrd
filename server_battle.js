@@ -89,10 +89,12 @@ function inicializarBatallas(server, db, JWT_SECRET) {
           // --- MÓDULO 1: SALAS PRIVADAS (AMIGOS) ---
           case "create_room": {
             const roomCode = generarCodigoSala();
+            const totalQ = message.settings ? (parseInt(message.settings.totalQuestions) || 15) : 15;
+            const timeP = message.settings ? (parseInt(message.settings.timePerQuestion) || 60) : 60;
             const room = {
               code: roomCode,
               modalidad: "amigos",
-              settings: { totalQuestions: 15, timePerQuestion: 60 },
+              settings: { totalQuestions: totalQ, timePerQuestion: timeP },
               hostId: userId,
               players: [{ id: userId, nombre: userNombre, ws: wsConn, score: 0, answers: [] }],
               questions: [],
@@ -232,13 +234,16 @@ function inicializarBatallas(server, db, JWT_SECRET) {
 
           // --- MÓDULO 2: BATALLAS ALEATORIAS (MATCHMAKING) ---
           case "enter_queue": {
+            const totalQ = message.settings ? (parseInt(message.settings.totalQuestions) || 15) : 15;
+            const timeP = message.settings ? (parseInt(message.settings.timePerQuestion) || 60) : 60;
             // Evitar duplicados en cola
             if (!matchmakingQueue.some(p => p.id === userId)) {
               matchmakingQueue.push({
                 id: userId,
                 nombre: userNombre,
                 ws: wsConn,
-                joinedAt: Date.now()
+                joinedAt: Date.now(),
+                settings: { totalQuestions: totalQ, timePerQuestion: timeP }
               });
             }
 
@@ -460,10 +465,14 @@ function broadcastQueueStatus() {
 
 async function iniciarBatallaAleatoria(db, jugadoresReales, bots = []) {
   const roomCode = generarCodigoSala();
+  const firstPlayer = jugadoresReales[0];
+  const totalQ = firstPlayer && firstPlayer.settings ? (firstPlayer.settings.totalQuestions || 15) : 15;
+  const timeP = firstPlayer && firstPlayer.settings ? (firstPlayer.settings.timePerQuestion || 60) : 60;
+
   const room = {
     code: roomCode,
     modalidad: "aleatoria",
-    settings: { totalQuestions: 15, timePerQuestion: 60 },
+    settings: { totalQuestions: totalQ, timePerQuestion: timeP },
     hostId: null,
     players: [],
     questions: [],
@@ -494,21 +503,21 @@ async function iniciarBatallaAleatoria(db, jugadoresReales, bots = []) {
     j.ws.send(JSON.stringify({
       type: "battle_started",
       modalidad: "aleatoria",
-      totalQuestions: 15,
-      timePerQuestion: 60
+      totalQuestions: totalQ,
+      timePerQuestion: timeP
     }));
   }
 
-  // Extraer 15 preguntas aleatorias
+  // Extraer preguntas aleatorias
   try {
     const query = `
       SELECT id, texto, opciones, correcta, explicacion, fuente, tema 
       FROM preguntas 
       WHERE activo = 1 
       ORDER BY RANDOM() 
-      LIMIT 15
+      LIMIT ?
     `;
-    const rows = await db.all(query);
+    const rows = await db.all(query, [totalQ]);
 
     room.questions = rows.map(r => ({
       id: r.id,
@@ -639,53 +648,7 @@ function procesarAvancePregunta(room) {
   if (room.timerInterval) {
     clearInterval(room.timerInterval);
   }
-
-  const qIndex = room.currentQuestionIndex;
-  const question = room.questions[qIndex];
-
-  if (room.modalidad === "amigos") {
-    // ⚔️ Batalla Privada: Retroalimentación inmediata
-    const feedPayload = {
-      type: "question_feedback",
-      questionIndex: qIndex,
-      correcta: question.correcta,
-      explicacion: question.explicacion,
-      fuente: question.fuente,
-      results: room.players.map(p => {
-        const ans = p.answers.find(a => a.questionIndex === qIndex);
-        return {
-          id: p.id,
-          nombre: p.nombre,
-          answerIndex: ans ? ans.answerIndex : -1,
-          correct: ans ? ans.correct : false
-        };
-      })
-    };
-
-    broadcastToRoom(room, feedPayload);
-
-    // Esperar un delay corto o acción del host.
-    // Para simplificar la interactividad y hacerla fluida, daremos 10 segundos para ver la retroalimentación
-    // y luego avanzaremos de forma automática a la siguiente pregunta.
-    let feedbackTime = 12;
-    room.timerInterval = setInterval(() => {
-      feedbackTime -= 1;
-      
-      broadcastToRoom(room, {
-        type: "feedback_tick",
-        timeLeft: feedbackTime
-      });
-
-      if (feedbackTime <= 0) {
-        clearInterval(room.timerInterval);
-        avanzarSiguientePregunta(room);
-      }
-    }, 1000);
-
-  } else {
-    // ⚔️ Batalla Aleatoria: Flujo continuo sin retroalimentación
-    avanzarSiguientePregunta(room);
-  }
+  avanzarSiguientePregunta(room);
 }
 
 function avanzarSiguientePregunta(room) {
