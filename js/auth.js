@@ -95,6 +95,9 @@ const auth = {
 
     // Configurar temporizador de inactividad de 15 minutos
     auth.configurarTemporizadorInactividad();
+    
+    // Cargar estadísticas reales de la app en la Landing Page
+    auth.cargarEstadisticasPublicas().catch(err => console.warn("Error al cargar estadísticas:", err));
   },
 
   async restaurarSesion() {
@@ -245,6 +248,30 @@ const auth = {
         auth.logout();
         alert("Tu sesión ha expirado por inactividad de 15 minutos. Inicia sesión de nuevo para proteger tu progreso.");
       }, quinceMinutos);
+    }
+  },
+
+  async cargarEstadisticasPublicas() {
+    try {
+      const res = await fetch("/api/public-stats");
+      if (!res.ok) throw new Error("Falla al cargar estadísticas");
+      const data = await res.json();
+
+      const totalSesionesEl = document.getElementById("mock-stat-sesiones");
+      const totalContestadasEl = document.getElementById("mock-stat-contestadas");
+      const promedioEl = document.getElementById("mock-stat-promedio");
+      const totalPreguntasEl = document.getElementById("mock-stat-preguntas-banco");
+      
+      if (totalSesionesEl) totalSesionesEl.textContent = data.totalSesiones;
+      if (totalContestadasEl) {
+        totalContestadasEl.textContent = Number(data.totalContestadas).toLocaleString("es-ES");
+      }
+      if (promedioEl) promedioEl.textContent = `${data.promedioGeneral}%`;
+      if (totalPreguntasEl) {
+        totalPreguntasEl.textContent = `+${data.totalPreguntas}`;
+      }
+    } catch (err) {
+      console.warn("Falla al cargar estadísticas públicas del backend:", err);
     }
   }
 };

@@ -1040,6 +1040,33 @@ app.put("/api/usuario/actualizar", autenticarToken, async (req, res) => {
 });
 
 /* ==========================================================================
+   RUTAS PÚBLICAS DE ESTADÍSTICAS Y CAPTACIÓN
+   ========================================================================== */
+app.get("/api/public-stats", async (req, res) => {
+  try {
+    const totalPreguntasRow = await db.get("SELECT COUNT(*) as count FROM preguntas");
+    const totalSesionesRow = await db.get("SELECT COUNT(*) as count FROM sesiones");
+    const totalContestadasRow = await db.get("SELECT SUM(cantidad_preguntas) as sum FROM sesiones");
+    const promedioRow = await db.get("SELECT AVG(porcentaje) as avg FROM sesiones");
+
+    res.json({
+      totalPreguntas: totalPreguntasRow ? totalPreguntasRow.count : 470,
+      totalSesiones: totalSesionesRow ? totalSesionesRow.count : 20,
+      totalContestadas: totalContestadasRow && totalContestadasRow.sum ? totalContestadasRow.sum : 201,
+      promedioGeneral: promedioRow && promedioRow.avg ? Math.round(promedioRow.avg) : 29
+    });
+  } catch (err) {
+    console.error("Error al obtener estadísticas públicas:", err);
+    res.json({
+      totalPreguntas: 470,
+      totalSesiones: 20,
+      totalContestadas: 201,
+      promedioGeneral: 29
+    });
+  }
+});
+
+/* ==========================================================================
    RUTAS DE FUNCIONAMIENTO DE SIMULACROS
    ========================================================================== */
 app.get("/api/preguntas", async (req, res) => {
