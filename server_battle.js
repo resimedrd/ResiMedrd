@@ -281,7 +281,7 @@ function inicializarBatallas(server, db, JWT_SECRET) {
           // --- MÓDULO 2: BATALLAS ALEATORIAS (MATCHMAKING) ---
           case "enter_queue": {
             const totalQ = message.settings ? (parseInt(message.settings.totalQuestions) || 15) : 15;
-            const timeP = message.settings ? (parseInt(message.settings.timePerQuestion) || 60) : 60;
+            const timeP = 30; // Las salas aleatorias siempre duran 30 segundos por pregunta
             // Evitar duplicados en cola
             if (!matchmakingQueue.some(p => p.id === userId)) {
               matchmakingQueue.push({
@@ -532,7 +532,7 @@ async function iniciarBatallaAleatoria(db, jugadoresReales, bots = []) {
   const roomCode = generarCodigoSala();
   const firstPlayer = jugadoresReales[0];
   const totalQ = firstPlayer && firstPlayer.settings ? (firstPlayer.settings.totalQuestions || 15) : 15;
-  const timeP = firstPlayer && firstPlayer.settings ? (firstPlayer.settings.timePerQuestion || 60) : 60;
+  const timeP = 30; // Las salas aleatorias siempre duran 30 segundos por pregunta.
 
   const room = {
     code: roomCode,
@@ -748,7 +748,8 @@ async function finalizarBatalla(room) {
       nombre: p.nombre,
       score: p.score,
       posicion: rankingActual,
-      isBot: p.isBot || false
+      isBot: p.isBot || false,
+      answers: p.answers || []
     });
     scoreAnterior = p.score;
   }

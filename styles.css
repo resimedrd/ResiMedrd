@@ -818,6 +818,11 @@ select.input option {
   padding: 24px;
 }
 
+.review-item.review-wrong {
+  border-color: rgba(239, 68, 68, 0.2) !important;
+  background: rgba(239, 68, 68, 0.02) !important;
+}
+
 .review-q-text {
   font-size: 19px;
   font-weight: 700;

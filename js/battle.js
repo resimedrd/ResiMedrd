@@ -10,6 +10,7 @@ const battle = {
   timePerQuestion: 60,
   repasoBatallaPreguntas: [], // Almacén para revisión pospartida
   respuestasUsuarioBatalla: [], // Respuestas del usuario para reporte pospartida
+  jugadoresDeLaBatalla: [], // Jugadores activos en la partida actual
 
   inicializar() {
     // 1. Vincular botones de navegación superior y dashboard
@@ -110,14 +111,12 @@ const battle = {
     if (btnQueueEnter) {
       btnQueueEnter.addEventListener("click", () => {
         const qSelect = document.getElementById("battle-custom-questions");
-        const tSelect = document.getElementById("battle-custom-time");
         const totalQ = qSelect ? parseInt(qSelect.value) : 15;
-        const timeP = tSelect ? parseInt(tSelect.value) : 60;
 
         if (battle.socket && battle.socket.readyState === WebSocket.OPEN) {
           battle.socket.send(JSON.stringify({ 
             type: "enter_queue",
-            settings: { totalQuestions: totalQ, timePerQuestion: timeP }
+            settings: { totalQuestions: totalQ, timePerQuestion: 30 } // Forzado a 30 segundos
           }));
         } else {
           alert("Conexión perdida. Intentando reconectar...");
@@ -571,6 +570,17 @@ const battle = {
             oponentes.push({ nombre: p.nombre, id: p.id });
           }
         });
+      } else {
+        // En salas privadas (modalidad amigos) si no se tiene cargado jugadoresDeLaBatalla
+        const lobbyPlayers = document.querySelectorAll("#lobby-players-container .lobby-player-name");
+        if (lobbyPlayers.length > 0) {
+          lobbyPlayers.forEach(p => {
+            const rawName = p.textContent.replace("👨‍⚕️", "").replace("Creador", "").trim();
+            if (state.usuarioConectado && rawName !== state.usuarioConectado.nombre) {
+              oponentes.push({ nombre: rawName, id: Math.random() });
+            }
+          });
+        }
       }
 
       oponentes.forEach(op => {
@@ -753,6 +763,58 @@ const battle = {
           </td>
         `;
         tablaCuerpo.appendChild(tr);
+      });
+    }
+
+    // 2.2 Rellenar Matriz Comparativa de la Competencia preguntando en qué falló y en qué ganó
+    const matrixHeader = document.getElementById("battle-matrix-header");
+    const matrixCuerpo = document.getElementById("battle-matrix-cuerpo");
+    
+    if (matrixHeader && matrixCuerpo) {
+      matrixHeader.innerHTML = `<th style="padding: 12px 16px; width: 200px; text-align: left;">Médico</th>`;
+      
+      const numQuestions = battle.repasoBatallaPreguntas.length || (payload.questions ? payload.questions.length : 0) || 15;
+      
+      // Inyectar cabeceras P1, P2...
+      for (let i = 1; i <= numQuestions; i++) {
+        matrixHeader.innerHTML += `<th style="padding: 12px 16px; text-align: center;">P${i}</th>`;
+      }
+      matrixHeader.innerHTML += `<th style="padding: 12px 16px; text-align: center; width: 100px;">Nota</th>`;
+      
+      matrixCuerpo.innerHTML = "";
+      
+      payload.podio.forEach(p => {
+        const tr = document.createElement("tr");
+        tr.style.borderBottom = "1px solid var(--border)";
+        
+        const esMiUsuario = state.usuarioConectado && p.nombre === state.usuarioConectado.nombre;
+        
+        let rowHtml = `
+          <td style="padding: 12px 16px; font-weight: ${esMiUsuario ? 'bold' : 'normal'}; color: ${esMiUsuario ? 'var(--primary)' : 'var(--text-soft)'}; text-align: left;">
+            👨‍⚕️ ${p.nombre} ${esMiUsuario ? '(Tú)' : ''}
+          </td>
+        `;
+        
+        // Iterar por cada pregunta
+        for (let qIdx = 0; qIdx < numQuestions; qIdx++) {
+          const ans = p.answers ? p.answers.find(a => a.questionIndex === qIdx) : null;
+          let statusText = "⚪"; // Sin responder
+          
+          if (ans) {
+            statusText = ans.correct ? "✅" : "❌";
+          }
+          
+          rowHtml += `<td style="padding: 12px 16px; text-align: center; font-size: 15px;">${statusText}</td>`;
+        }
+        
+        rowHtml += `
+          <td style="padding: 12px 16px; text-align: center; font-weight: 700; color: var(--primary);">
+            ${p.score}/${numQuestions}
+          </td>
+        `;
+        
+        tr.innerHTML = rowHtml;
+        matrixCuerpo.appendChild(tr);
       });
     }
 
