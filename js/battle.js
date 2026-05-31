@@ -522,16 +522,26 @@ const battle = {
 
   actualizarTemporizadorArena(timeLeft) {
     const ring = document.getElementById("battle-temporizador-circular");
+    const radialFill = document.getElementById("radial-timer-fill");
+    
     if (ring) {
       ring.textContent = timeLeft < 10 ? `0${timeLeft}` : timeLeft;
       
-      // Cambiar a color rojo de advertencia si quedan menos de 10s
-      if (timeLeft <= 10) {
-        ring.style.color = "var(--danger)";
-        ring.style.borderColor = "var(--danger)";
-      } else {
-        ring.style.color = "var(--warning)";
-        ring.style.borderColor = "var(--border)";
+      // Sincronizar el trazo radial SVG (276.4 es el perímetro de r=44)
+      if (radialFill) {
+        const totalTime = battle.timePerQuestion || 60;
+        const pct = Math.max(0, Math.min(1, timeLeft / totalTime));
+        const offset = 276.4 * (1 - pct);
+        radialFill.style.strokeDashoffset = offset;
+        
+        // Cambiar color radial de advertencia si quedan menos de 10s
+        if (timeLeft <= 10) {
+          radialFill.style.stroke = "var(--danger)";
+          ring.style.color = "var(--danger)";
+        } else {
+          radialFill.style.stroke = "var(--warning)";
+          ring.style.color = "var(--warning)";
+        }
       }
     }
   },
@@ -571,7 +581,10 @@ const battle = {
               <div class="opponent-track-bar-fill" id="track-fill-${op.nombre.replace(/\s+/g, '')}"></div>
             </div>
           </div>
-          <span class="opponent-responded-indicator" id="track-check-${op.nombre.replace(/\s+/g, '')}" style="color: var(--text-dim); font-size: 12px; font-weight: bold;">⏳ Esperando</span>
+          <div class="opponent-responded-indicator" id="track-check-${op.nombre.replace(/\s+/g, '')}" style="color: var(--text-dim); font-size: 12px; font-weight: bold; display: flex; align-items: center; gap: 6px;">
+            <span class="opponent-pulse-dot" id="track-dot-${op.nombre.replace(/\s+/g, '')}"></span>
+            <span class="opponent-status-text" id="track-text-${op.nombre.replace(/\s+/g, '')}">Pensando</span>
+          </div>
         `;
         container.appendChild(row);
       });
@@ -580,13 +593,17 @@ const battle = {
 
   marcarJugadorRespondioLive(playerId) {
     // Encontrar al oponente correspondiente
-    // Puesto que playerId es numérico y renderizamos por nombre, el backend enviará señales seguras.
-    // Para simplificar, marcaremos de forma aleatoria o al primer oponente que esté esperando.
     const indicators = document.querySelectorAll(".opponent-responded-indicator");
     for (const ind of indicators) {
-      if (ind.textContent === "⏳ Esperando") {
-        ind.textContent = "✅ Listo";
-        ind.style.color = "var(--success)";
+      const statusText = ind.querySelector(".opponent-status-text");
+      if (statusText && statusText.textContent === "Pensando") {
+        statusText.textContent = "Listo";
+        statusText.style.color = "var(--success)";
+        
+        const pulseDot = ind.querySelector(".opponent-pulse-dot");
+        if (pulseDot) {
+          pulseDot.classList.add("ready");
+        }
         
         // Simular que su barra de progreso avanza un poco
         const barId = ind.id.replace("track-check-", "track-fill-");
