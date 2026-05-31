@@ -6,10 +6,13 @@ const sqlite3 = require("sqlite3");
 const { open } = require("sqlite");
 const jwt = require("jsonwebtoken");
 const os = require("os");
+const http = require("http");
+const ws = require("ws");
 
 const JWT_SECRET = "resiMed_secret_key_ultra_premium_amboss";
 
 const app = express();
+const server = http.createServer(app);
 const PORT = process.env.PORT || 3000;
 const DB_PATH = path.join(__dirname, "resimed.db");
 
@@ -167,6 +170,21 @@ async function iniciarBaseDeDatos() {
     )
   `);
 
+  // 7. Tabla de batalla_historial (Modo Batalla)
+  await db.exec(`
+    CREATE TABLE IF NOT EXISTS batalla_historial (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      usuario_id INTEGER NOT NULL,
+      modalidad TEXT NOT NULL,
+      contrincantes TEXT NOT NULL,
+      correctas INTEGER NOT NULL,
+      total_preguntas INTEGER NOT NULL,
+      posicion INTEGER NOT NULL,
+      fecha TEXT DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
+    )
+  `);
+
   // Migraciones retrocompatibles para la tabla usuarios
   const columnasUsuarios = [
     { nombre: "xp", definicion: "INTEGER DEFAULT 0" },
@@ -174,7 +192,12 @@ async function iniciarBaseDeDatos() {
     { nombre: "nivel", definicion: "INTEGER DEFAULT 1" },
     { nombre: "meta_semanal", definicion: "INTEGER DEFAULT 50" },
     { nombre: "last_active_date", definicion: "TEXT" },
-    { nombre: "especialidad_aspirada", definicion: "TEXT DEFAULT 'Ninguna'" }
+    { nombre: "especialidad_aspirada", definicion: "TEXT DEFAULT 'Ninguna'" },
+    { nombre: "battle_jugadas", definicion: "INTEGER DEFAULT 0" },
+    { nombre: "battle_ganadas", definicion: "INTEGER DEFAULT 0" },
+    { nombre: "battle_perdidas", definicion: "INTEGER DEFAULT 0" },
+    { nombre: "battle_racha_actual", definicion: "INTEGER DEFAULT 0" },
+    { nombre: "battle_racha_mejor", definicion: "INTEGER DEFAULT 0" }
   ];
 
   for (const col of columnasUsuarios) {
@@ -2042,7 +2065,12 @@ function obtenerDireccionIPLocal() {
 
 async function arrancar() {
   await iniciarBaseDeDatos();
-  app.listen(PORT, () => {
+  
+  // Inicializar servidor de batallas multijugador en tiempo real
+  const { inicializarBatallas } = require("./server_battle.js");
+  inicializarBatallas(server, db, JWT_SECRET);
+
+  server.listen(PORT, () => {
     const ipLocal = obtenerDireccionIPLocal();
     console.log(`\n======================================================`);
     console.log(`🚀 Servidor ResiMed Activo:`);

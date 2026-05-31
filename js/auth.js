@@ -125,7 +125,9 @@ const auth = {
     if (saludoUsuario) {
       saludoUsuario.textContent = `Sesión activa: ${state.usuarioConectado.nombre}`;
     }
+    const btnIrBatalla = document.getElementById("btn-ir-batalla");
     if (btnIrInicio) btnIrInicio.classList.remove("hidden");
+    if (btnIrBatalla) btnIrBatalla.classList.remove("hidden");
     if (btnVerPerfil) {
       btnVerPerfil.classList.remove("hidden");
       btnVerPerfil.innerHTML = "👤 Mi Perfil";
@@ -195,11 +197,13 @@ const auth = {
     }
 
     const btnIrInicio = document.getElementById("btn-ir-inicio");
+    const btnIrBatalla = document.getElementById("btn-ir-batalla");
     const btnVerPerfil = document.getElementById("btn-ver-perfil");
     const btnCerrarSesion = document.getElementById("btn-cerrar-sesion");
     const saludoUsuario = document.getElementById("saludo-usuario");
 
     if (btnIrInicio) btnIrInicio.classList.add("hidden");
+    if (btnIrBatalla) btnIrBatalla.classList.add("hidden");
     if (btnVerPerfil) btnVerPerfil.classList.add("hidden");
     if (btnCerrarSesion) btnCerrarSesion.classList.add("hidden");
     if (saludoUsuario) saludoUsuario.textContent = "Cargando entorno médico...";

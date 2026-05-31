@@ -33,6 +33,7 @@
       <div class="topbar-actions">
         <button id="btn-toggle-theme" class="btn btn-ghost" type="button" style="min-width: auto; padding: 10px 16px; font-size: 13.5px; font-weight: 600;" title="Cambiar de tema">Modo Oscuro</button>
         <button id="btn-ir-inicio" class="btn btn-ghost hidden" type="button">Inicio</button>
+        <button id="btn-ir-batalla" class="btn btn-ghost hidden" type="button">⚔️ Modo Batalla</button>
         <button id="btn-ver-perfil" class="btn btn-ghost hidden" type="button">Mi Perfil</button>
         <button id="btn-cerrar-sesion" class="btn btn-ghost hidden" style="border-color: var(--danger); color: var(--danger);" type="button">Cerrar Sesión</button>
       </div>
@@ -89,9 +90,14 @@
               <span class="badge">Análisis Estadístico</span>
               <span class="badge">Separación de Roles</span>
             </div>
-            <button id="btn-ir-flashcards" class="btn btn-primary" style="background: linear-gradient(135deg, var(--warning) 0%, #d97706 100%); color: #000; font-weight: bold; border: none; box-shadow: 0 4px 14px rgba(245, 158, 11, 0.35); gap: 8px;" type="button">
-              Estudiar Flashcards ENURM
-            </button>
+            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+              <button id="btn-ir-flashcards" class="btn btn-primary" style="background: linear-gradient(135deg, var(--warning) 0%, #d97706 100%); color: #000; font-weight: bold; border: none; box-shadow: 0 4px 14px rgba(245, 158, 11, 0.35); gap: 8px;" type="button">
+                Estudiar Flashcards ENURM
+              </button>
+              <button id="btn-home-ir-batalla" class="btn btn-primary" style="background: linear-gradient(135deg, var(--danger) 0%, #dc2626 100%) !important; color: #fff; font-weight: bold; border: none; box-shadow: 0 4px 14px rgba(239, 68, 68, 0.35); gap: 8px;" type="button">
+                ⚔️ Entrar a Modo Batalla
+              </button>
+            </div>
           </div>
           <div class="hero-stats">
             <div class="stat-card">
@@ -791,6 +797,322 @@
         </div>
       </section>
 
+      <!-- ==========================================================================
+           ⚔️ MODO BATALLA - PANTALLAS DE LA INTERFAZ DE COMPETENCIA MULTIJUGADOR
+           ========================================================================== -->
+
+      <!-- 1. PANTALLA LANDING / PANEL PRINCIPAL DEL MODO BATALLA -->
+      <section id="pantalla-battle" class="screen">
+        <!-- Hero del Modo Batalla -->
+        <article class="battle-hero">
+          <div class="hero-copy">
+            <span class="eyebrow" style="color: var(--danger);">Competencia Médica Live</span>
+            <h2>Arena del Modo Batalla</h2>
+            <p>Mide tus destrezas diagnósticas frente a tus colegas en tiempo real. **Nota:** Las respuestas realizadas en batallas no interfieren en tus simulacros o estadísticas académicas generales.</p>
+            <div class="hero-badges">
+              <span class="badge" style="border-color: rgba(239, 68, 68, 0.2); color: var(--danger);">WebSocket Real-Time</span>
+              <span class="badge" style="border-color: rgba(239, 68, 68, 0.2); color: var(--danger);">Matchmaking en Vivo</span>
+              <span class="badge" style="border-color: rgba(239, 68, 68, 0.2); color: var(--danger);">Aislamiento de Perfil</span>
+            </div>
+          </div>
+          <!-- Cola de Búsqueda Integrada HUD (Oculto inicialmente) -->
+          <div id="battle-queue-hud" class="hidden" style="background: rgba(15,23,42,0.85); border: 2px solid var(--danger); padding: 24px; border-radius: 20px; text-align: center; box-shadow: 0 10px 30px rgba(239,68,68,0.2);">
+            <div class="spinner-ia" style="border-top-color: var(--danger) !important; margin: 0 auto 16px auto; width: 44px; height: 44px;"></div>
+            <h4 style="color: var(--danger); font-size: 15px; margin-bottom: 6px;">Buscando Médicos Conectados...</h4>
+            <p style="font-size: 12.5px; color: var(--text-soft); margin-bottom: 12px;">Tiempo de cola: <strong id="queue-timer-val">30s</strong></p>
+            <p style="font-size: 11.5px; color: var(--text-dim); margin-bottom: 16px;">Jugadores en espera: <strong id="queue-players-count">1</strong>/5</p>
+            <button id="btn-battle-queue-leave" class="btn btn-secondary" style="min-width: auto; padding: 8px 16px; font-size: 12px; width: 100%; border-color: rgba(255,255,255,0.1);" type="button">Cancelar Búsqueda</button>
+          </div>
+        </article>
+
+        <div class="home-grid">
+          <!-- Columna Izquierda: Opciones de Juego (Amigos vs Aleatoria) -->
+          <article class="panel">
+            <div class="panel-head" style="border-bottom: 1px solid var(--border); padding-bottom: 16px; margin-bottom: 24px;">
+              <h3>Modalidades de Combate</h3>
+              <p>Escoge tu desafío: compite con amigos en privado o entra en el emparejamiento global.</p>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr; gap: 24px;">
+              <!-- Tarjeta 1: Batalla con Amigos -->
+              <div style="border: 1px solid var(--border); padding: 24px; border-radius: 20px; background: rgba(255,255,255,0.01);">
+                <h4 style="font-size: 16px; color: var(--text); font-weight: 700; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">
+                  <span>👥</span> Batalla con Amigos (Sala Privada)
+                </h4>
+                <p style="font-size: 13px; color: var(--text-dim); line-height: 1.4; margin-bottom: 16px;">Crea una sala de 2 a 5 jugadores, configura el número de preguntas y el tiempo, y comparte el código alfanumérico para competir.</p>
+                
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                  <div style="flex: 1; min-width: 160px; position: relative;">
+                    <input type="text" id="battle-join-code" class="input" style="text-align: center; text-transform: uppercase; padding: 10px 12px; font-size: 14px; font-weight: 700; letter-spacing: 2px;" placeholder="CÓDIGO SALA" maxlength="6" />
+                  </div>
+                  <button id="btn-battle-join" class="btn btn-primary" style="min-width: auto; padding: 10px 20px; font-size: 13.5px;" type="button">Unirse</button>
+                </div>
+                
+                <div style="display: flex; align-items: center; justify-content: center; margin: 12px 0; font-size: 12px; color: var(--text-dim); font-weight: 600;">— Ó —</div>
+                
+                <button id="btn-battle-create" class="btn btn-secondary" style="width: 100%; font-size: 13.5px; border-color: rgba(239, 68, 68, 0.2); color: var(--danger); padding: 10px 20px;" type="button">
+                  ➕ Crear Nueva Sala Privada
+                </button>
+              </div>
+
+              <!-- Tarjeta 2: Batalla Aleatoria -->
+              <div style="border: 1px solid var(--border); padding: 24px; border-radius: 20px; background: rgba(255,255,255,0.01);">
+                <h4 style="font-size: 16px; color: var(--text); font-weight: 700; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">
+                  <span>🌐</span> Batalla Aleatoria (Matchmaking Global)
+                </h4>
+                <p style="font-size: 13px; color: var(--text-dim); line-height: 1.4; margin-bottom: 16px;">Compite en igualdad de condiciones contra médicos de la comunidad. Partida fija de 15 preguntas con 60s de tiempo. Flujo continuo sin interrupciones y revisión final pospartida.</p>
+                <button id="btn-battle-queue-enter" class="btn btn-primary" style="width: 100%; font-size: 14px; padding: 12px 24px; background: linear-gradient(135deg, var(--danger) 0%, #dc2626 100%) !important; box-shadow: 0 6px 16px rgba(220, 38, 38, 0.25) !important;" type="button">
+                  ⚔️ Entrar a la Cola de Búsqueda
+                </button>
+              </div>
+            </div>
+          </article>
+
+          <!-- Columna Derecha: Perfil Competitivo Aislado e Historial -->
+          <div class="side-panel-container">
+            <article class="panel">
+              <div class="panel-head" style="border-bottom: 1px solid var(--border); padding-bottom: 16px; margin-bottom: 24px;">
+                <h3>🛡️ Historial Competitivo</h3>
+                <p>Métricas competitivas aisladas registradas exclusivamente para tu Modo Batalla.</p>
+              </div>
+
+              <!-- Grid de Stats Competitivas -->
+              <div class="battle-stats-grid" style="margin-bottom: 24px;">
+                <div class="battle-stat-card">
+                  <span class="dashboard-label">Jugadas</span>
+                  <span id="battle-stats-jugadas" class="battle-stat-val">0</span>
+                </div>
+                <div class="battle-stat-card">
+                  <span class="dashboard-label">Victorias</span>
+                  <span id="battle-stats-ganadas" class="battle-stat-val" style="color: var(--success);">0</span>
+                </div>
+                <div class="battle-stat-card">
+                  <span class="dashboard-label">Derrotas</span>
+                  <span id="battle-stats-perdidas" class="battle-stat-val" style="color: var(--danger);">0</span>
+                </div>
+                <div class="battle-stat-card">
+                  <span class="dashboard-label">Racha</span>
+                  <span id="battle-stats-racha" class="battle-stat-val" style="color: var(--warning);">0</span>
+                </div>
+              </div>
+
+              <!-- Record Máximo -->
+              <div style="background: var(--panel-soft); padding: 12px 20px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; font-size: 13.5px;">
+                <span style="font-weight: 600; color: var(--text-soft);">🏆 Mejor Racha de Victorias:</span>
+                <strong id="battle-stats-mejor-racha" style="color: var(--warning); font-size: 16px;">0 Victorias</strong>
+              </div>
+
+              <!-- Lista de Últimas Batallas -->
+              <h4 style="font-size: 12px; color: var(--text-soft); text-transform: uppercase; margin-bottom: 12px; letter-spacing: 0.5px;">Tus Últimos Combates:</h4>
+              <div id="battle-historial-lista" class="history-list" style="max-height: 280px; overflow-y: auto; padding-right: 4px;">
+                <!-- Cargado dinámicamente -->
+              </div>
+              <div id="battle-historial-vacio" class="history-empty" style="padding: 20px; font-size: 12.5px; border-color: var(--border);">
+                Aún no has combatido en la plataforma.
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. PANTALLA DE LOBBY / SALA DE ESPERA PRIVADA -->
+      <section id="pantalla-battle-lobby" class="screen">
+        <article class="lobby-box">
+          <!-- Columna Izquierda: Integrantes y Chat en Vivo -->
+          <div>
+            <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: 16px; margin-bottom: 24px;">
+              <div>
+                <h2 style="margin: 0; font-size: 24px; font-weight: 800; display: flex; align-items: center; gap: 8px;">
+                  👥 Sala de Combate
+                </h2>
+                <p style="margin: 0; font-size: 13px; color: var(--text-dim); margin-top: 4px;">Esperando que se unan los demás contrincantes (2 - 5 jugadores).</p>
+              </div>
+              <!-- Código Compartir -->
+              <div style="text-align: right; background: var(--panel-soft); padding: 8px 16px; border-radius: 12px; border: 1px dashed var(--border-strong);">
+                <span style="font-size: 11px; color: var(--text-dim); display: block; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">Código de Sala</span>
+                <strong id="lobby-code-val" style="font-size: 20px; font-family: monospace; color: var(--danger); letter-spacing: 1px;">XXXXXX</strong>
+              </div>
+            </div>
+
+            <!-- Lista de Integrantes Conectados -->
+            <h4 style="font-size: 12px; color: var(--text-soft); text-transform: uppercase; margin-bottom: 12px; letter-spacing: 0.5px;">Jugadores en la Sala:</h4>
+            <div id="lobby-players-container" class="lobby-players-list" style="margin-bottom: 24px;">
+              <!-- Cargado dinámicamente -->
+            </div>
+
+            <!-- Módulo del Chat de la Sala -->
+            <h4 style="font-size: 12px; color: var(--text-soft); text-transform: uppercase; margin-bottom: 12px; letter-spacing: 0.5px;">Chat de la Sala:</h4>
+            <div class="chat-container">
+              <div id="lobby-chat-messages" class="chat-messages">
+                <!-- Mensajes dinámicos -->
+              </div>
+              <form id="lobby-chat-form" class="chat-input-row">
+                <input type="text" id="lobby-chat-input" class="input" placeholder="Escribe un mensaje de combate..." autocomplete="off" />
+                <button type="submit" class="btn btn-primary" style="min-width: auto; padding: 12px 20px; border-radius: 0;">Enviar</button>
+              </form>
+            </div>
+          </div>
+
+          <!-- Columna Derecha: Configuración de la Batalla -->
+          <div style="border-left: 1px solid var(--border); padding-left: 32px; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <div class="panel-head" style="margin-bottom: 24px;">
+                <h3>Ajustar Parámetros</h3>
+                <p>Solo el anfitrión puede modificar estas variables de combate.</p>
+              </div>
+
+              <!-- Selector de Preguntas -->
+              <div class="form-block">
+                <label for="battle-settings-questions">Número de Reactivos</label>
+                <select id="battle-settings-questions" class="input">
+                  <option value="10">10 Preguntas</option>
+                  <option value="15" selected>15 Preguntas</option>
+                  <option value="20">20 Preguntas</option>
+                  <option value="25">25 Preguntas</option>
+                  <option value="30">30 Preguntas</option>
+                </select>
+              </div>
+
+              <!-- Selector de Tiempo -->
+              <div class="form-block">
+                <label for="battle-settings-time">Límite por Pregunta</label>
+                <select id="battle-settings-time" class="input">
+                  <option value="30">30 Segundos</option>
+                  <option value="60" selected>60 Segundos (1 Minuto)</option>
+                  <option value="90">90 Segundos</option>
+                  <option value="120">120 Segundos (2 Minutos)</option>
+                  <option value="150">150 Segundos (2.5 Minutos)</option>
+                </select>
+              </div>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 32px;">
+              <!-- Botón Comenzar -->
+              <button id="btn-battle-start" class="btn btn-primary" style="width: 100%; display: none; background: linear-gradient(135deg, var(--success) 0%, #16a34a 100%) !important; box-shadow: 0 6px 16px rgba(22, 163, 74, 0.25) !important;" type="button">
+                🚀 Iniciar Batalla
+              </button>
+              <div id="lobby-wait-msg" class="history-empty" style="padding: 12px; font-size: 13px; font-weight: 600; text-align: center; border-color: var(--border);">
+                ⏳ Esperando que el anfitrión inicie...
+              </div>
+              <button id="btn-battle-lobby-leave" class="btn btn-secondary" style="width: 100%; padding: 12px;" type="button">
+                Salir de la Sala
+              </button>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <!-- 3. PANTALLA DE LA ARENA DE BATALLA (SIMULADOR EN TIEMPO REAL) -->
+      <section id="pantalla-battle-quiz" class="screen">
+        <div class="battle-arena-shell">
+          <!-- Columna Principal: Enunciado y Opciones de Pregunta -->
+          <article class="quiz-shell" style="margin: 0; width: 100%; max-width: 100%;">
+            <div class="quiz-header" style="margin-bottom: 20px;">
+              <div>
+                <span class="chip" style="background: var(--danger-soft); color: var(--danger); font-weight: 700;">⚔️ Modo Batalla</span>
+                <span id="battle-chip-tema" class="chip chip-soft">Cargando Tema...</span>
+              </div>
+            </div>
+            
+            <div class="progress-wrap" style="margin-bottom: 24px;">
+              <div class="progress-track"><div id="battle-progress-fill" class="progress-fill" style="background: linear-gradient(90deg, var(--danger) 0%, #ef4444 100%);"></div></div>
+            </div>
+            
+            <div class="question-card">
+              <h3 id="battle-pregunta-texto" class="question-text">Cargando caso clínico multijugador...</h3>
+              <div id="battle-opciones-container" class="options-grid"></div>
+            </div>
+
+            <!-- Caja de Feedback Inmediato (Amigos únicamente) -->
+            <div id="battle-feedback-box" class="feedback-box hidden" style="border-color: rgba(239, 68, 68, 0.15); background: rgba(239, 68, 68, 0.01);">
+              <div id="battle-feedback-estado" class="feedback-estado"></div>
+              <p id="battle-feedback-explicacion" class="feedback-explicacion"></p>
+              
+              <!-- Reloj de cuenta regresiva para avanzar -->
+              <div style="margin-top: 16px; border-top: 1px dashed var(--border); padding-top: 12px; font-size: 13px; color: var(--text-dim); display: flex; justify-content: space-between; align-items: center;">
+                <span>Siguiente pregunta en: <strong id="battle-feedback-timer">10</strong>s</span>
+                <span id="battle-feedback-fuente" style="font-style: italic;">Nelson, 21 ed</span>
+              </div>
+            </div>
+          </article>
+
+          <!-- Columna Derecha: Estado de los Contrincantes en Vivo y Temporizador Circular -->
+          <aside style="display: flex; flex-direction: column; gap: 24px;">
+            <!-- Panel Temporizador Gigante -->
+            <div class="battle-timer-container">
+              <span id="battle-contador-pregunta" class="quiz-counter" style="font-weight: 700;">Pregunta -- de --</span>
+              <div id="battle-temporizador-circular" class="battle-timer-circular">00</div>
+              <span style="font-size: 11px; text-transform: uppercase; color: var(--text-dim); font-weight: 700; letter-spacing: 0.5px;">Tiempo Restante</span>
+            </div>
+
+            <!-- Panel de Seguimiento de Oponentes en Vivo -->
+            <div class="opponents-track-panel">
+              <h4 style="font-size: 12.5px; color: var(--text-soft); text-transform: uppercase; margin: 0; letter-spacing: 0.5px; border-bottom: 1px solid var(--border); padding-bottom: 8px;">
+                Contrincantes en Vivo
+              </h4>
+              <div id="battle-opponents-track-container" style="display: flex; flex-direction: column; gap: 16px;">
+                <!-- Cargado dinámicamente -->
+              </div>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <!-- 4. PANTALLA DE RESULTADOS DE LA BATALLA (PODIO Y REVISIÓN) -->
+      <section id="pantalla-battle-results" class="screen">
+        <article class="results-shell">
+          <div class="results-header" style="margin-bottom: 24px;">
+            <span class="eyebrow" style="color: var(--danger);">¡Combate Terminado!</span>
+            <h2>Resultado de la Arena</h2>
+          </div>
+
+          <!-- Podio 3D Premium de Ganadores -->
+          <div id="battle-podium-container" class="podium-section">
+            <!-- Renderizado dinámicamente desde JS -->
+          </div>
+
+          <!-- Clasificación Completa Detallada -->
+          <div class="review-head" style="margin-top: 40px; margin-bottom: 16px; border-bottom: 1px solid var(--border); padding-bottom: 12px;">
+            <h3>📊 Clasificación Detallada</h3>
+            <p>Resumen final de las puntuaciones obtenidas por cada médico de la batalla.</p>
+          </div>
+          
+          <div class="table-container" style="overflow-x: auto; margin-bottom: 40px;">
+            <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 14px;">
+              <thead>
+                <tr style="border-bottom: 2px solid var(--border-strong); color: var(--text-soft); font-weight: 600; text-transform: uppercase; font-size: 11px;">
+                  <th style="padding: 12px 16px; text-align: center; width: 80px;">Posición</th>
+                  <th style="padding: 12px 16px;">Médico Competidor</th>
+                  <th style="padding: 12px 16px; text-align: center; width: 120px;">Aciertos</th>
+                  <th style="padding: 12px 16px; text-align: center; width: 100px;">Resultado</th>
+                </tr>
+              </thead>
+              <tbody id="battle-tabla-resultados-cuerpo" style="color: var(--text-soft);">
+                <!-- Cargado dinámicamente -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Módulo de Revisión Pospartida (Batalla Aleatoria) -->
+          <div id="battle-review-section" class="hidden">
+            <div class="review-head" style="margin-bottom: 20px;">
+              <h3>🔬 Revisión Académica Pospartida</h3>
+              <p>Examina de forma detallada cada una de las preguntas de la batalla y consolida tus conocimientos.</p>
+            </div>
+            
+            <div id="battle-review-questions-container" class="review-list" style="margin-bottom: 40px;">
+              <!-- Cargado dinámicamente -->
+            </div>
+          </div>
+
+          <div class="results-actions" style="margin-top: 32px; border-top: 1px solid var(--border); padding-top: 24px;">
+            <button id="btn-battle-results-return" class="btn btn-primary" style="width: 100%; justify-content: center; background: linear-gradient(135deg, var(--danger) 0%, #dc2626 100%) !important; box-shadow: 0 6px 16px rgba(220, 38, 38, 0.25) !important;" type="button">
+              Regresar al Panel de Batalla
+            </button>
+          </div>
+        </article>
+      </section>
+
     </main>
   </div>
 
@@ -1072,6 +1394,7 @@
   <script src="js/auth.js?v=1.5.0"></script>
   <script src="js/quiz.js?v=1.5.0"></script>
   <script src="js/flashcards.js?v=1.5.0"></script>
+  <script src="js/battle.js?v=1.5.0"></script>
   <script src="js/main.js?v=1.5.0"></script>
 </body>
 </html>

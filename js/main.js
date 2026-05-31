@@ -170,6 +170,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   auth.inicializar();
   quiz.inicializar();
   flashcards.inicializar();
+  battle.inicializar();
 
   // 4. Modal del Tutor IA - Vincular Cerrar e interactividad de fondo
   const modalTutorIA = document.getElementById("modal-tutor-ia");
