@@ -9,6 +9,7 @@ const battle = {
   preguntaActualIndex: 0,
   timePerQuestion: 60,
   repasoBatallaPreguntas: [], // Almacén para revisión pospartida
+  respuestasUsuarioBatalla: [], // Respuestas del usuario para reporte pospartida
 
   inicializar() {
     // 1. Vincular botones de navegación superior y dashboard
@@ -284,6 +285,8 @@ const battle = {
       // --- MÓDULO 4: ARENA DE JUEGO MULTIJUGADOR ---
       case "battle_started":
         battle.modalidadActual = payload.modalidad;
+        battle.jugadoresDeLaBatalla = payload.players || [];
+        battle.respuestasUsuarioBatalla = []; // Resetear respuestas
         battle.mostrarPantallaBattle("battle-quiz");
         // Ocultar HUD de cola de matchmaking
         const hud = document.getElementById("battle-queue-hud");
@@ -459,6 +462,11 @@ const battle = {
     battle.preguntaActualIndex = payload.questionIndex;
     battle.timePerQuestion = payload.timeLeft;
 
+    // Inicializar respuesta del usuario para esta pregunta en null
+    if (battle.respuestasUsuarioBatalla[payload.questionIndex] === undefined) {
+      battle.respuestasUsuarioBatalla[payload.questionIndex] = null;
+    }
+
     // Resetear feedback
     const feedbackBox = document.getElementById("battle-feedback-box");
     if (feedbackBox) feedbackBox.classList.add("hidden");
@@ -502,6 +510,9 @@ const battle = {
             b.disabled = true;
           });
           btn.classList.add("selected");
+
+          // Guardar selección del usuario
+          battle.respuestasUsuarioBatalla[payload.questionIndex] = index;
 
           // Enviar respuesta
           if (battle.socket && battle.socket.readyState === WebSocket.OPEN) {
@@ -548,27 +559,18 @@ const battle = {
   },
 
   actualizarLiveTrackOponentes(customPlayers) {
-    // Al iniciar una batalla o durante el matchmaking, el servidor no puede enviar WS concurrentes de track.
-    // Nosotros construiremos la barra lateral usando las conexiones de la sala
     const container = document.getElementById("battle-opponents-track-container");
     if (container) {
       container.innerHTML = "";
       
-      // Nota: Si no hay contrincantes cargados en payload, el motor los renderizará desde el lobby local
-      // Para mayor robustez, recuperamos los nombres de los oponentes de la sala actual
-      const lobbyPlayers = document.querySelectorAll("#lobby-players-container .lobby-player-name");
       const oponentes = [];
 
-      if (lobbyPlayers.length > 0) {
-        lobbyPlayers.forEach(p => {
-          const rawName = p.textContent.replace("👨‍⚕️", "").replace("Creador", "").trim();
-          if (state.usuarioConectado && rawName !== state.usuarioConectado.nombre) {
-            oponentes.push({ nombre: rawName, id: Math.random() });
+      if (battle.jugadoresDeLaBatalla && battle.jugadoresDeLaBatalla.length > 0) {
+        battle.jugadoresDeLaBatalla.forEach(p => {
+          if (state.usuarioConectado && p.nombre !== state.usuarioConectado.nombre) {
+            oponentes.push({ nombre: p.nombre, id: p.id });
           }
         });
-      } else {
-        // Fallback de Bots o contrincantes en batalla aleatoria
-        oponentes.push({ nombre: "Dra. Castillo (Live)", id: 1 }, { nombre: "Dr. Almonte (Live)", id: 2 });
       }
 
       oponentes.forEach(op => {
@@ -766,38 +768,73 @@ const battle = {
         
         // Renderizar cada pregunta fallada o acertada en el módulo de revisión pospartida
         battle.repasoBatallaPreguntas.forEach((q, qIdx) => {
-          const card = document.createElement("article");
-          card.className = "feedback-box";
-          card.style.borderColor = "var(--border)";
-          card.style.background = "var(--panel-soft)";
+          const div = document.createElement("div");
+          div.className = "review-item";
+          
+          const seleccion = battle.respuestasUsuarioBatalla[qIdx];
+          const esCorrecta = seleccion === q.correcta;
+          
+          if (!esCorrecta) {
+            div.classList.add("review-wrong");
+          }
 
           const letras = ["A", "B", "C", "D"];
-          let opcsHtml = "";
+          let opcionesHtml = "";
           
           q.opciones.forEach((opc, opcIdx) => {
-            const esCorrecta = opcIdx === q.correcta;
-            opcsHtml += `
-              <div style="padding: 10px 14px; border-radius: 8px; border: 1px solid ${esCorrecta ? 'var(--success)' : 'var(--border)'}; background: ${esCorrecta ? 'var(--success-soft)' : 'transparent'}; margin-bottom: 6px; font-size: 13.5px; display: flex; align-items: center; gap: 8px;">
-                <strong style="color: ${esCorrecta ? 'var(--success)' : 'var(--text-dim)'};">${letras[opcIdx]})</strong>
-                <span style="color: ${esCorrecta ? 'var(--success)' : 'var(--text-soft)'};">${opc}</span>
-              </div>
-            `;
+            let claseOpt = "";
+            if (opcIdx === q.correcta) claseOpt = "correct";
+            if (opcIdx === seleccion && seleccion !== q.correcta) claseOpt = "wrong";
+            
+            let oLimpia = opc;
+            const regexPrefijo = /^[a-d](?:\)|\.-|\.\s|\s-\s)\s*/i;
+            oLimpia = oLimpia.replace(regexPrefijo, "");
+            
+            opcionesHtml += `<div class="review-opt ${claseOpt}"><strong>${letras[opcIdx]}.</strong> ${oLimpia}</div>`;
           });
 
-          card.innerHTML = `
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-              <span class="chip chip-primary" style="font-size: 10px;">Pregunta ${qIdx + 1}</span>
-              <span style="font-size: 12px; color: var(--text-dim); font-style: italic;">Fuente: ${q.fuente}</span>
+          let botonesAccionHtml = `<div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px;">`;
+          const textoEscapado = q.texto.replace(/"/g, "&quot;");
+          const explicacionEscapada = (q.explicacion || "Sin desglose.").replace(/"/g, "&quot;");
+          const temaEscapado = (q.tema || "General").replace(/"/g, "&quot;");
+
+          if (seleccion !== q.correcta) {
+            const seleccionText = (seleccion !== null && seleccion !== undefined && q.opciones[seleccion]) 
+              ? q.opciones[seleccion].replace(/"/g, "&quot;") 
+              : "Sin responder";
+            botonesAccionHtml += `
+              <button class="btn-ia btn-consultar-tutor" data-texto="${textoEscapado}" data-seleccion="${seleccionText}" type="button">Consultar Tutor IA</button>
+              <button class="btn btn-primary btn-auto-flashcard" data-tema="${temaEscapado}" data-pregunta="${textoEscapado}" data-respuesta="${explicacionEscapada}" style="background: var(--warning); color:#000; font-size:12px; padding:6px 12px; border:none;" type="button">Crear Flashcard</button>
+            `;
+          }
+          
+          botonesAccionHtml += `
+            <button class="btn btn-reportar-pregunta" data-id="${q.id}" type="button">Reportar Error</button>
+          </div>`;
+
+          let statusChipHtml = "";
+          if (seleccion === null || seleccion === undefined) {
+            statusChipHtml = `<span class="chip chip-soft" style="color: var(--text-dim); border-color: var(--border);">⏱️ SIN RESPONDER</span>`;
+          } else if (esCorrecta) {
+            statusChipHtml = `<span class="chip chip-soft" style="color: var(--success); border-color: var(--success); background: var(--success-soft);">✓ RESPUESTA CORRECTA</span>`;
+          } else {
+            statusChipHtml = `<span class="chip chip-soft" style="color: var(--danger); border-color: var(--danger); background: var(--danger-soft);">✗ RESPUESTA INCORRECTA</span>`;
+          }
+
+          div.innerHTML = `
+            <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+              <div style="font-size: 11px; color: var(--text-dim);">
+                Materia: <strong>${q.tema || "General"}</strong>
+              </div>
+              ${statusChipHtml}
             </div>
-            <h4 style="font-size: 15px; font-weight: 700; line-height: 1.5; margin-bottom: 16px; color: var(--text);">${q.texto}</h4>
-            <div style="margin-bottom: 16px;">${opcsHtml}</div>
-            <div style="border-top: 1px dashed var(--border); padding-top: 12px; font-size: 13.5px; line-height: 1.5; color: var(--text-soft);">
-              <strong>🔬 EXPLICACIÓN ACADÉMICA:</strong><br/>
-              <p style="margin-top: 6px;">${q.explicacion.replace(/\n/g, "<br/>")}</p>
-            </div>
+            <div class="review-q-text">${qIdx + 1}. ${q.texto}</div>
+            <div class="review-options">${opcionesHtml}</div>
+            <div class="review-exp-container">${ui.formatearExplicacionClinica(q.explicacion, q.fuente)}</div>
+            ${botonesAccionHtml}
           `;
           
-          reviewContainer.appendChild(card);
+          reviewContainer.appendChild(div);
         });
       } else {
         reviewSection.classList.add("hidden");

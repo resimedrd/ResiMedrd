@@ -266,7 +266,8 @@ function inicializarBatallas(server, db, JWT_SECRET) {
                 type: "battle_started",
                 modalidad: "amigos",
                 totalQuestions: room.settings.totalQuestions,
-                timePerQuestion: room.settings.timePerQuestion
+                timePerQuestion: room.settings.timePerQuestion,
+                players: room.players.map(p => ({ id: p.id, nombre: p.nombre }))
               });
 
               enviarPreguntaSincronizada(room);
@@ -568,7 +569,8 @@ async function iniciarBatallaAleatoria(db, jugadoresReales, bots = []) {
       type: "battle_started",
       modalidad: "aleatoria",
       totalQuestions: totalQ,
-      timePerQuestion: timeP
+      timePerQuestion: timeP,
+      players: room.players.map(p => ({ id: p.id, nombre: p.nombre }))
     }));
   }
 
