@@ -7,15 +7,37 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=1.4.0" />
+  <link rel="stylesheet" href="styles.css?v=1.5.0" />
+  <style>
+    /* Evitar parpadeo de pantallas no deseadas antes de cargar el CSS/JS (FOUC) */
+    .screen {
+      display: none !important;
+    }
+    .screen.active {
+      display: block !important;
+    }
+    
+    /* Configuración de color inmediata del cargador inicial para evitar parpadeo blanco/transparente */
+    #boot-loader {
+      background: #f8fafc !important; /* Claro por defecto */
+    }
+    
+    /* Si el usuario tiene tema oscuro guardado, aplicar de forma inmediata */
+    .dark-mode #boot-loader,
+    html.dark-mode #boot-loader {
+      background: #0b0f19 !important; /* Premium Slate-950 */
+    }
+  </style>
 </head>
 <body>
   <script>
     (function() {
       const theme = localStorage.getItem("resiMed_theme") || "light";
       if (theme === "dark") {
-        document.body.classList.add("dark-mode");
         document.documentElement.classList.add("dark-mode");
+        if (document.body) {
+          document.body.classList.add("dark-mode");
+        }
       }
     })();
   </script>
