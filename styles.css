@@ -3177,19 +3177,11 @@ select#battle-settings-time:focus {
   animation: shake 0.4s ease-in-out;
 }
 
-/* 🎯 Modo Dedicado - Ocultar Topbar durante el Modo Batalla y Simulacros */
-body:has(#pantalla-battle.active) .topbar,
-body:has(#pantalla-battle-lobby.active) .topbar,
-body:has(#pantalla-battle-quiz.active) .topbar,
-body:has(#pantalla-battle-results.active) .topbar,
+/* 🎯 Modo Dedicado - Ocultar Topbar durante el Simulacro Normal */
 body:has(#pantalla-quiz.active) .topbar {
   display: none !important;
 }
 
-body:has(#pantalla-battle.active) .main-shell,
-body:has(#pantalla-battle-lobby.active) .main-shell,
-body:has(#pantalla-battle-quiz.active) .main-shell,
-body:has(#pantalla-battle-results.active) .main-shell,
 body:has(#pantalla-quiz.active) .main-shell {
   padding-top: 0 !important;
   margin-top: 0 !important;

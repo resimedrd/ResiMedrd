@@ -32,15 +32,7 @@ const battle = {
       btnHomeIrBatalla.addEventListener("click", navegarABattleHub);
     }
 
-    const btnBattleBackToHome = document.getElementById("btn-battle-back-to-home");
-    if (btnBattleBackToHome) {
-      btnBattleBackToHome.addEventListener("click", () => {
-        if (battle.socket) {
-          battle.socket.close();
-        }
-        ui.mostrarPantalla("home");
-      });
-    }
+
 
     if (btnResultsReturn) {
       btnResultsReturn.addEventListener("click", () => {
@@ -258,6 +250,13 @@ const battle = {
       case "queue_left": {
         const hud = document.getElementById("battle-queue-hud");
         if (hud) hud.classList.add("hidden");
+        break;
+      }
+
+      case "matchmaking_failed": {
+        const hud = document.getElementById("battle-queue-hud");
+        if (hud) hud.classList.add("hidden");
+        alert(payload.message || "No se encontraron contrincantes disponibles. Por favor, intenta de nuevo.");
         break;
       }
 

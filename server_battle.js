@@ -494,10 +494,14 @@ function iniciarMatchmakingLoop(db) {
         // Iniciar con los jugadores reales que tengamos
         iniciarBatallaAleatoria(db, matchmakingQueue.splice(0, matchmakingQueue.length));
       } else if (matchmakingQueue.length === 1) {
-        // Resetear contador a 30s para seguir buscando médicos reales conectados en la red
-        queueTimeLeft = 30;
-        broadcastQueueStatus();
-        return; // Evitamos detener el bucle, seguimos buscando en segundo plano
+        // Cancelar búsqueda si no hay contrincantes y notificar al jugador
+        const unicoJugadorReal = matchmakingQueue.shift();
+        if (unicoJugadorReal && unicoJugadorReal.ws && unicoJugadorReal.ws.readyState === ws.OPEN) {
+          unicoJugadorReal.ws.send(JSON.stringify({
+            type: "matchmaking_failed",
+            message: "No se encontraron contrincantes disponibles en este momento. Por favor, intenta de nuevo o crea una sala privada con amigos."
+          }));
+        }
       }
 
       // Detener bucle
