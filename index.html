@@ -74,42 +74,337 @@
     <main class="main-shell">
       
       <section id="pantalla-auth" class="screen">
-        <article class="auth-shell">
-          <div class="auth-tabs">
-            <button id="tab-login" class="auth-tab active" type="button">Iniciar Sesión</button>
-            <button id="tab-registro" class="auth-tab" type="button">Crear Cuenta</button>
+        <div class="landing-container" style="max-width: 1200px; margin: 0 auto; padding: 40px 24px; display: flex; flex-direction: column; gap: 80px; font-family: 'Inter', sans-serif;">
+          
+          <!-- HEADER INICIAL DE LANDING -->
+          <header class="landing-header" style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 20px; border-bottom: 1px solid var(--border-strong);">
+            <div class="brand" style="display: flex; align-items: center; gap: 10px;">
+              <div class="brand-mark-premium" style="width: 42px; height: 42px; background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); color: #fff; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 800; font-family: 'Outfit', sans-serif; box-shadow: 0 4px 14px rgba(59, 130, 246, 0.4);">R</div>
+              <div>
+                <span style="font-size: 22px; font-weight: 800; font-family: 'Outfit', sans-serif; color: var(--text); display: block; line-height: 1.1;">ResiMed</span>
+                <span style="font-size: 11px; font-weight: 600; color: var(--text-dim); display: block; letter-spacing: 0.3px;">Prepárate. Simula. Destaca.</span>
+              </div>
+            </div>
+            <div>
+              <span class="badge" style="background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.2); color: var(--primary); padding: 6px 14px; border-radius: 100px; font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Plataforma #1 para el ENURM en RD 🇩🇴</span>
+            </div>
+          </header>
+
+          <!-- COLUMNAS PRINCIPALES (HERO + FORMULARIO CARD) -->
+          <div class="landing-hero-grid" style="display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 48px; align-items: start;">
+            
+            <!-- COLUMNA IZQUIERDA: HERO COPY & BENEFICIOS -->
+            <div class="landing-hero-copy" style="display: flex; flex-direction: column; gap: 28px; padding-top: 10px;">
+              <div style="display: flex; flex-direction: column; gap: 14px;">
+                <h1 style="font-size: 46px; font-weight: 800; font-family: 'Outfit', sans-serif; color: var(--text); line-height: 1.15; letter-spacing: -1px; margin: 0;">
+                  Prepárate para el ENURM con <span style="background: linear-gradient(90deg, #3b82f6 0%, #60a5fa 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800;">simulaciones inteligentes</span>.
+                </h1>
+                <p style="font-size: 16px; line-height: 1.6; color: var(--text-soft); font-weight: 500; margin: 0; max-width: 520px;">
+                  Miles de médicos en República Dominicana confían en ResiMed para dominar su examen de residencia y alcanzar su plaza soñada.
+                </p>
+              </div>
+
+              <!-- LISTA DE CARACTERÍSTICAS Sleek -->
+              <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 16px;">
+                <li style="display: flex; align-items: center; gap: 14px;">
+                  <div style="width: 32px; height: 32px; background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.15); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--primary); font-size: 14px;">📁</div>
+                  <span style="font-size: 14.5px; font-weight: 600; color: var(--text);">+10,000 preguntas actualizadas</span>
+                </li>
+                <li style="display: flex; align-items: center; gap: 14px;">
+                  <div style="width: 32px; height: 32px; background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.15); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--success); font-size: 14px;">📋</div>
+                  <span style="font-size: 14.5px; font-weight: 600; color: var(--text);">Simulacros tipo ENURM oficiales</span>
+                </li>
+                <li style="display: flex; align-items: center; gap: 14px;">
+                  <div style="width: 32px; height: 32px; background: rgba(139, 92, 246, 0.08); border: 1px solid rgba(139, 92, 246, 0.15); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #8b5cf6; font-size: 14px;">📊</div>
+                  <span style="font-size: 14.5px; font-weight: 600; color: var(--text);">Estadísticas y análisis avanzado de debilidades</span>
+                </li>
+                <li style="display: flex; align-items: center; gap: 14px;">
+                  <div style="width: 32px; height: 32px; background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.15); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--warning); font-size: 14px;">⏱️</div>
+                  <span style="font-size: 14.5px; font-weight: 600; color: var(--text);">Modo examen real con cronómetro estricto</span>
+                </li>
+              </ul>
+
+              <!-- BOTONES DE ACCION DIRECTA -->
+              <div style="display: flex; gap: 14px; flex-wrap: wrap; margin-top: 10px;">
+                <button onclick="document.getElementById('login-email').focus();" class="btn btn-primary" style="padding: 14px 28px; font-size: 14.5px; font-weight: 700; background: linear-gradient(135deg, var(--primary) 0%, #1d4ed8 100%); color: #fff; border: none; border-radius: 14px; box-shadow: 0 10px 24px rgba(59, 130, 246, 0.3); display: flex; align-items: center; gap: 8px; cursor: pointer; transition: all 0.2s;">
+                  Comenzar ahora <span style="font-size: 16px;">→</span>
+                </button>
+                <button onclick="document.getElementById('tab-registro').click(); document.getElementById('reg-nombre').focus();" class="btn btn-ghost" style="padding: 14px 28px; font-size: 14.5px; font-weight: 700; border: 1px solid var(--border-strong); border-radius: 14px; background: rgba(255,255,255,0.01); color: var(--text); display: flex; align-items: center; gap: 8px; cursor: pointer; transition: all 0.2s;">
+                  Ver demo <span style="font-size: 16px;">▷</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- COLUMNA DERECHA: CARD DE AUTENTICACION -->
+            <article class="auth-shell" style="max-width: 100%; margin: 0; background: var(--panel-strong); border: 1px solid var(--border-strong); border-radius: 28px; padding: 36px; box-shadow: 0 20px 48px rgba(0,0,0,0.18); position: relative; overflow: hidden;">
+              
+              <!-- App icon top header -->
+              <div style="display: flex; flex-direction: column; align-items: center; gap: 12px; margin-bottom: 24px; text-align: center;">
+                <div style="width: 52px; height: 52px; background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%); color: #fff; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 900; font-family: 'Outfit', sans-serif;">R</div>
+                <h2 style="font-size: 22px; font-weight: 800; font-family: 'Outfit', sans-serif; color: var(--text); margin: 0;">ResiMed</h2>
+                <p style="font-size: 13px; color: var(--text-dim); margin: 0;">Inicia sesión para continuar</p>
+              </div>
+
+              <div class="auth-tabs" style="margin-bottom: 24px;">
+                <button id="tab-login" class="auth-tab active" type="button">Iniciar Sesión</button>
+                <button id="tab-registro" class="auth-tab" type="button">Crear Cuenta</button>
+              </div>
+
+              <!-- FORMULARIO DE INICIO DE SESIÓN -->
+              <form id="form-login" class="auth-form" style="display: flex; flex-direction: column; gap: 16px;">
+                <div class="form-block">
+                  <label style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-dim); display: block; margin-bottom: 6px; letter-spacing: 0.5px;">Correo Electrónico</label>
+                  <div style="position: relative;">
+                    <span style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text-dim); font-size: 14px;">✉</span>
+                    <input type="email" id="login-email" class="input" style="padding-left: 44px !important;" placeholder="ejemplo@correo.com" required />
+                  </div>
+                </div>
+                
+                <div class="form-block">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                    <label style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-dim); display: block; letter-spacing: 0.5px; margin: 0;">Contraseña</label>
+                    <a href="#" onclick="alert('Funcionalidad de recuperación de contraseña disponible en producción oficial.'); return false;" style="font-size: 11.5px; font-weight: 600; color: var(--primary); text-decoration: none;">¿Olvidaste tu contraseña?</a>
+                  </div>
+                  <div style="position: relative;">
+                    <span style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text-dim); font-size: 14px;">🔒</span>
+                    <input type="password" id="login-password" class="input" style="padding-left: 44px !important;" placeholder="••••••••" required />
+                  </div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 14px; font-size: 14px; font-weight: 700; background: #2563eb !important; border: none; border-radius: 12px; margin-top: 6px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                  Ingresar al Sistema <span>→</span>
+                </button>
+              </form>
+
+              <!-- FORMULARIO DE REGISTRO -->
+              <form id="form-registro" class="auth-form hidden" style="display: flex; flex-direction: column; gap: 16px;">
+                <div class="form-block">
+                  <label style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-dim); display: block; margin-bottom: 6px; letter-spacing: 0.5px;">Nombre Completo</label>
+                  <div style="position: relative;">
+                    <span style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text-dim); font-size: 14px;">👨‍⚕️</span>
+                    <input type="text" id="reg-nombre" class="input" style="padding-left: 44px !important;" placeholder="Dr. / Dra. Apellido" required />
+                  </div>
+                </div>
+                
+                <div class="form-block">
+                  <label style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-dim); display: block; margin-bottom: 6px; letter-spacing: 0.5px;">Correo Electrónico</label>
+                  <div style="position: relative;">
+                    <span style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text-dim); font-size: 14px;">✉</span>
+                    <input type="email" id="reg-email" class="input" style="padding-left: 44px !important;" placeholder="medico@correo.com" required />
+                  </div>
+                </div>
+                
+                <div class="form-block">
+                  <label style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-dim); display: block; margin-bottom: 6px; letter-spacing: 0.5px;">Contraseña de Estudio</label>
+                  <div style="position: relative;">
+                    <span style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text-dim); font-size: 14px;">🔒</span>
+                    <input type="password" id="reg-password" class="input" style="padding-left: 44px !important;" placeholder="Mínimo 6 caracteres" required />
+                  </div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 14px; font-size: 14px; font-weight: 700; background: #2563eb !important; border: none; border-radius: 12px; margin-top: 6px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                  Registrar nueva cuenta <span>→</span>
+                </button>
+              </form>
+
+              <p id="auth-mensaje" class="auth-msg" style="margin-top: 14px; margin-bottom: 0;"></p>
+
+              <!-- Social logins divider -->
+              <div style="display: flex; align-items: center; gap: 12px; margin: 20px 0;">
+                <div style="flex-grow: 1; height: 1px; background: var(--border);"></div>
+                <span style="font-size: 11px; font-weight: 600; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px;">o continúa con</span>
+                <div style="flex-grow: 1; height: 1px; background: var(--border);"></div>
+              </div>
+
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <button class="btn btn-ghost" type="button" onclick="alert('Inicio de sesión con Google disponible en producción oficial.');" style="padding: 10px; font-size: 13px; font-weight: 600; border: 1px solid var(--border-strong); border-radius: 10px; background: rgba(255,255,255,0.01); display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; color: var(--text);">
+                  Google
+                </button>
+                <button class="btn btn-ghost" type="button" onclick="alert('Inicio de sesión con Apple disponible en producción oficial.');" style="padding: 10px; font-size: 13px; font-weight: 600; border: 1px solid var(--border-strong); border-radius: 10px; background: rgba(255,255,255,0.01); display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; color: var(--text);">
+                  Apple
+                </button>
+              </div>
+
+              <div style="display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 20px; font-size: 11.5px; color: var(--text-dim); font-weight: 600;">
+                <span style="color: var(--success);">✓</span> Seguro, confiable y hecho para médicos
+              </div>
+
+            </article>
           </div>
 
-          <form id="form-login" class="auth-form">
-            <div class="form-block">
-              <label>Correo Electrónico</label>
-              <input type="email" id="login-email" class="input" placeholder="ejemplo@correo.com" required />
+          <!-- SECCIÓN INTERMEDIA: TODO LO QUE NECESITAS -->
+          <div style="display: flex; flex-direction: column; gap: 32px; border-top: 1px dashed var(--border-strong); padding-top: 60px;">
+            <div style="text-align: center; display: flex; flex-direction: column; gap: 8px;">
+              <h2 style="font-size: 28px; font-weight: 800; font-family: 'Outfit', sans-serif; color: var(--text); margin: 0;">Todo lo que necesitas para tu residencia</h2>
+              <div style="width: 40px; height: 3px; background: var(--primary); border-radius: 10px; margin: 0 auto;"></div>
             </div>
-            <div class="form-block">
-              <label>Contraseña</label>
-              <input type="password" id="login-password" class="input" placeholder="••••••••" required />
-            </div>
-            <button type="submit" class="btn btn-primary" style="width: 100%;">Ingresar al Sistema</button>
-          </form>
 
-          <form id="form-registro" class="auth-form hidden">
-            <div class="form-block">
-              <label>Nombre Completo</label>
-              <input type="text" id="reg-nombre" class="input" placeholder="Dr. / Dra. Apellido" required />
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px;">
+              <!-- Card 1 -->
+              <div style="background: var(--panel); border: 1px solid var(--border); border-radius: 20px; padding: 24px; display: flex; flex-direction: column; gap: 12px; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);">
+                <div style="width: 44px; height: 44px; background: rgba(59, 130, 246, 0.08); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; color: var(--primary);">🎓</div>
+                <h3 style="font-size: 14.5px; font-weight: 700; color: var(--text); margin: 0;">Banco de Preguntas Especializado</h3>
+                <p style="font-size: 12.5px; color: var(--text-soft); line-height: 1.4; margin: 0;">Preguntas actualizadas basadas en el ENURM real y clasificadas por especialidad médica.</p>
+              </div>
+              <!-- Card 2 -->
+              <div style="background: var(--panel); border: 1px solid var(--border); border-radius: 20px; padding: 24px; display: flex; flex-direction: column; gap: 12px; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);">
+                <div style="width: 44px; height: 44px; background: rgba(16, 185, 129, 0.08); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; color: var(--success);">🎯</div>
+                <h3 style="font-size: 14.5px; font-weight: 700; color: var(--text); margin: 0;">Simulacros Realistas</h3>
+                <p style="font-size: 12.5px; color: var(--text-soft); line-height: 1.4; margin: 0;">Simula el examen real en tiempo real con tiempos estrictos, ambiente controlado y puntuación precisa.</p>
+              </div>
+              <!-- Card 3 -->
+              <div style="background: var(--panel); border: 1px solid var(--border); border-radius: 20px; padding: 24px; display: flex; flex-direction: column; gap: 12px; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);">
+                <div style="width: 44px; height: 44px; background: rgba(139, 92, 246, 0.08); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; color: #8b5cf6;">📈</div>
+                <h3 style="font-size: 14.5px; font-weight: 700; color: var(--text); margin: 0;">Estadísticas Avanzadas</h3>
+                <p style="font-size: 12.5px; color: var(--text-soft); line-height: 1.4; margin: 0;">Analiza tu rendimiento histórico global, mide tu curva de retención y mejora al instante tus debilidades.</p>
+              </div>
+              <!-- Card 4 -->
+              <div style="background: var(--panel); border: 1px solid var(--border); border-radius: 20px; padding: 24px; display: flex; flex-direction: column; gap: 12px; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);">
+                <div style="width: 44px; height: 44px; background: rgba(239, 68, 68, 0.08); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; color: var(--danger);">🔥</div>
+                <h3 style="font-size: 14.5px; font-weight: 700; color: var(--text); margin: 0;">Rachas y Motivación</h3>
+                <p style="font-size: 12.5px; color: var(--text-soft); line-height: 1.4; margin: 0;">Mantén tu racha diaria de estudio activa, desbloquea metas y compite con otros médicos en la plataforma.</p>
+              </div>
             </div>
-            <div class="form-block">
-              <label>Correo Electrónico</label>
-              <input type="email" id="reg-email" class="input" placeholder="medico@correo.com" required />
-            </div>
-            <div class="form-block">
-              <label>Contraseña de Estudio</label>
-              <input type="password" id="reg-password" class="input" placeholder="Mínimo 6 caracteres" required />
-            </div>
-            <button type="submit" class="btn btn-primary" style="width: 100%;">Registrar nueva cuenta</button>
-          </form>
+          </div>
 
-          <p id="auth-mensaje" class="auth-msg"></p>
-        </article>
+          <!-- SECCIÓN DE MOCK DASHBOARD INTEGRADO DE PREVISUALIZACIÓN -->
+          <div style="display: flex; flex-direction: column; gap: 28px; border-top: 1px dashed var(--border-strong); padding-top: 60px; margin-bottom: 20px;">
+            <div style="text-align: center;">
+              <span style="font-size: 11px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">Previsualización de la Plataforma</span>
+              <h2 style="font-size: 26px; font-weight: 800; font-family: 'Outfit', sans-serif; color: var(--text); margin: 0;">Explora el Dashboard Premium de ResiMed</h2>
+            </div>
+
+            <!-- EL DASHBOARD MOCK CON ESTILO PREMIUM COMPLETO (Copiar exactamente el diseño de la imagen) -->
+            <div class="mock-dashboard-wrapper" style="background: #08080c; border: 1px solid var(--border-strong); border-radius: 24px; padding: 18px; box-shadow: 0 30px 60px rgba(0,0,0,0.3); overflow: hidden; display: grid; grid-template-columns: 180px 1fr; gap: 16px; min-height: 480px; position: relative; text-align: left;">
+              
+              <!-- SIDEBAR DE MOCK -->
+              <aside style="border-right: 1px solid var(--border); padding-right: 16px; display: flex; flex-direction: column; gap: 18px;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <div style="width: 24px; height: 24px; background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%); color: #fff; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800;">R</div>
+                  <span style="font-size: 13px; font-weight: 800; color: var(--text);">ResiMed</span>
+                </div>
+                
+                <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 4px;">
+                  <li style="padding: 8px 12px; background: rgba(59, 130, 246, 0.08); border-radius: 8px; font-size: 11.5px; font-weight: 700; color: var(--primary); display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                    <span>🏠</span> Inicio
+                  </li>
+                  <li style="padding: 8px 12px; border-radius: 8px; font-size: 11.5px; font-weight: 600; color: var(--text-dim); display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                    <span>⏱️</span> Simulacros
+                  </li>
+                  <li style="padding: 8px 12px; border-radius: 8px; font-size: 11.5px; font-weight: 600; color: var(--text-dim); display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                    <span>📁</span> Preguntas
+                  </li>
+                  <li style="padding: 8px 12px; border-radius: 8px; font-size: 11.5px; font-weight: 600; color: var(--text-dim); display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                    <span>📈</span> Estadísticas
+                  </li>
+                  <li style="padding: 8px 12px; border-radius: 8px; font-size: 11.5px; font-weight: 600; color: var(--text-dim); display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                    <span>📋</span> Historial
+                  </li>
+                  <li style="padding: 8px 12px; border-radius: 8px; font-size: 11.5px; font-weight: 600; color: var(--text-dim); display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                    <span>👑</span> Ranking
+                  </li>
+                  <li style="padding: 8px 12px; border-radius: 8px; font-size: 11.5px; font-weight: 600; color: var(--text-dim); display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                    <span>⚙️</span> Ajustes
+                  </li>
+                </ul>
+              </aside>
+
+              <!-- MAIN AREA DE MOCK -->
+              <main style="display: flex; flex-direction: column; gap: 20px;">
+                
+                <!-- Mock Header bar -->
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+                  <div>
+                    <h3 style="font-size: 16px; font-weight: 800; color: var(--text); margin: 0;">¡Hola, Dr. Martínez! 👋</h3>
+                    <p style="font-size: 11px; color: var(--text-dim); margin: 2px 0 0 0;">Vamos a por esa residencia.</p>
+                  </div>
+                  
+                  <div style="display: flex; align-items: center; gap: 8px; background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.15); padding: 6px 12px; border-radius: 100px;">
+                    <span style="font-size: 12px;">🔥</span>
+                    <span style="font-size: 11px; font-weight: 700; color: var(--warning);">Racha: 12 días</span>
+                  </div>
+                </div>
+
+                <!-- Mock Key Cards row -->
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
+                  <div style="background: rgba(255,255,255,0.01); border: 1px solid var(--border); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 4px;">
+                    <span style="font-size: 9.5px; font-weight: 600; color: var(--text-dim); text-transform: uppercase;">Simulacros</span>
+                    <span style="font-size: 18px; font-weight: 800; color: var(--text);">24</span>
+                  </div>
+                  <div style="background: rgba(255,255,255,0.01); border: 1px solid var(--border); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 4px;">
+                    <span style="font-size: 9.5px; font-weight: 600; color: var(--text-dim); text-transform: uppercase;">Respondidas</span>
+                    <span style="font-size: 18px; font-weight: 800; color: var(--text);">1,248</span>
+                  </div>
+                  <div style="background: rgba(255,255,255,0.01); border: 1px solid var(--border); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 4px;">
+                    <span style="font-size: 9.5px; font-weight: 600; color: var(--text-dim); text-transform: uppercase;">Promedio</span>
+                    <span style="font-size: 18px; font-weight: 800; color: var(--success);">78%</span>
+                  </div>
+                  <div style="background: rgba(255,255,255,0.01); border: 1px solid var(--border); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 4px;">
+                    <span style="font-size: 9.5px; font-weight: 600; color: var(--text-dim); text-transform: uppercase;">Percentil</span>
+                    <span style="font-size: 18px; font-weight: 800; color: var(--primary);">82</span>
+                  </div>
+                </div>
+
+                <!-- Bottom Grid of mock: Progress and Specialty score -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                  <!-- Progress tracking widget mock -->
+                  <div style="background: rgba(255,255,255,0.01); border: 1px solid var(--border); border-radius: 16px; padding: 16px; display: flex; flex-direction: column; justify-content: space-between;">
+                    <div>
+                      <span style="font-size: 10px; font-weight: 700; color: var(--success); text-transform: uppercase; letter-spacing: 0.5px;">Tu Progreso Semanal</span>
+                      <span style="font-size: 20px; font-weight: 800; color: var(--text); display: block; margin-top: 6px;">+12% aciertos</span>
+                    </div>
+                    <div style="margin-top: 12px;">
+                      <div style="height: 6px; background: var(--panel-soft); border-radius: 100px; overflow: hidden; margin-bottom: 6px;">
+                        <div style="height: 100%; width: 75%; background: var(--success); border-radius: 100px;"></div>
+                      </div>
+                      <span style="font-size: 10px; color: var(--text-dim);">¡Buen trabajo! Sigue así 🩺</span>
+                    </div>
+                  </div>
+
+                  <!-- Specialty scores mock -->
+                  <div style="background: rgba(255,255,255,0.01); border: 1px solid var(--border); border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 10px;">
+                    <span style="font-size: 10px; font-weight: 700; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px;">Rendimiento por Especialidad</span>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                      <!-- Specialty 1 -->
+                      <div>
+                        <div style="display: flex; justify-content: space-between; font-size: 10.5px; font-weight: 600; color: var(--text); margin-bottom: 2px;">
+                          <span>Pediatría</span>
+                          <span style="color: var(--success);">85%</span>
+                        </div>
+                        <div style="height: 4px; background: var(--panel-soft); border-radius: 100px; overflow: hidden;">
+                          <div style="height: 100%; width: 85%; background: var(--success); border-radius: 100px;"></div>
+                        </div>
+                      </div>
+                      <!-- Specialty 2 -->
+                      <div>
+                        <div style="display: flex; justify-content: space-between; font-size: 10.5px; font-weight: 600; color: var(--text); margin-bottom: 2px;">
+                          <span>Medicina Interna</span>
+                          <span style="color: var(--primary);">78%</span>
+                        </div>
+                        <div style="height: 4px; background: var(--panel-soft); border-radius: 100px; overflow: hidden;">
+                          <div style="height: 100%; width: 78%; background: var(--primary); border-radius: 100px;"></div>
+                        </div>
+                      </div>
+                      <!-- Specialty 3 -->
+                      <div>
+                        <div style="display: flex; justify-content: space-between; font-size: 10.5px; font-weight: 600; color: var(--text); margin-bottom: 2px;">
+                          <span>Cirugía General</span>
+                          <span style="color: var(--warning);">67%</span>
+                        </div>
+                        <div style="height: 4px; background: var(--panel-soft); border-radius: 100px; overflow: hidden;">
+                          <div style="height: 100%; width: 67%; background: var(--warning); border-radius: 100px;"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+              </main>
+            </div>
+          </div>
+
+        </div>
       </section>
 
       <section id="pantalla-home" class="screen">

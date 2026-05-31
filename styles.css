@@ -3384,3 +3384,25 @@ select.input:focus {
   box-shadow: 0 16px 36px -12px rgba(100, 116, 139, 0.08) !important;
 }
 
+/* 🚪 Landing Screen Premium & Hiding Topbar during Auth */
+body:has(#pantalla-auth.active) .topbar {
+  display: none !important;
+}
+body:has(#pantalla-auth.active) .main-shell {
+  padding-top: 0 !important;
+  margin-top: 0 !important;
+  max-width: 100% !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+@media (max-width: 850px) {
+  .landing-hero-grid {
+    grid-template-columns: 1fr !important;
+    gap: 32px !important;
+  }
+  .mock-dashboard-wrapper {
+    grid-template-columns: 1fr !important;
+  }
+}
+
