@@ -515,6 +515,57 @@
                 </button>
 
                 <div id="seccion-graficos-desplegable" style="max-height: 0; overflow: hidden; opacity: 0; transition: max-height 0.4s ease-out, opacity 0.3s ease; margin-top: 0;">
+                  
+                  <!-- Tarjetas Analíticas Superiores de Pronóstico ENURM -->
+                  <div id="seccion-graficos-metricas-header" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-top: 20px;">
+                    <!-- Pronóstico ENURM -->
+                    <div class="analytic-widget-card" style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.08) 0%, rgba(29, 78, 216, 0.02) 100%); border: 1px solid var(--border); border-radius: 16px; padding: 18px; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between;">
+                      <div>
+                        <span style="font-size: 11px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">Pronóstico ENURM</span>
+                        <div style="display: flex; align-items: baseline; gap: 6px;">
+                          <span id="metric-predict-score" style="font-size: 28px; font-weight: 800; font-family: 'Outfit', sans-serif; color: var(--text);">--%</span>
+                          <span id="metric-predict-label" style="font-size: 12px; font-weight: 600; color: var(--text-dim);">Est.</span>
+                        </div>
+                      </div>
+                      <div style="margin-top: 10px;">
+                        <div style="height: 6px; background: var(--panel-soft); border: 1px solid var(--border); border-radius: 100px; overflow: hidden; margin-bottom: 6px;">
+                          <div id="metric-predict-bar" style="height: 100%; width: 0%; background: var(--primary); border-radius: 100px; transition: width 0.8s ease;"></div>
+                        </div>
+                        <span id="metric-predict-advice" style="font-size: 11px; color: var(--text-dim); display: block; line-height: 1.3;">Basado en historial ponderado.</span>
+                      </div>
+                    </div>
+
+                    <!-- Especialidad Líder -->
+                    <div class="analytic-widget-card" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(4, 120, 87, 0.02) 100%); border: 1px solid var(--border); border-radius: 16px; padding: 18px; display: flex; flex-direction: column; justify-content: space-between;">
+                      <div>
+                        <span style="font-size: 11px; font-weight: 700; color: var(--success); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">Especialidad Fuerte</span>
+                        <span id="metric-leader-name" style="font-size: 15px; font-weight: 700; color: var(--text); display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 4px;">--</span>
+                        <span id="metric-leader-score" style="font-size: 13px; font-weight: 600; color: var(--success); display: block; margin-top: 2px;">--% de precisión</span>
+                      </div>
+                      <span style="font-size: 11px; color: var(--text-dim); display: block; margin-top: 10px; border-top: 1px dashed var(--border); padding-top: 6px;">Tu área de mayor solidez.</span>
+                    </div>
+
+                    <!-- Especialidad Crítica -->
+                    <div class="analytic-widget-card" style="background: linear-gradient(135deg, rgba(239, 68, 68, 0.08) 0%, rgba(185, 28, 28, 0.02) 100%); border: 1px solid var(--border); border-radius: 16px; padding: 18px; display: flex; flex-direction: column; justify-content: space-between;">
+                      <div>
+                        <span style="font-size: 11px; font-weight: 700; color: var(--danger); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">Especialidad Crítica</span>
+                        <span id="metric-critical-name" style="font-size: 15px; font-weight: 700; color: var(--text); display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 4px;">--</span>
+                        <span id="metric-critical-score" style="font-size: 13px; font-weight: 600; color: var(--danger); display: block; margin-top: 2px;">--% de precisión</span>
+                      </div>
+                      <span style="font-size: 11px; color: var(--text-dim); display: block; margin-top: 10px; border-top: 1px dashed var(--border); padding-top: 6px;">Priorizar en tus repasos.</span>
+                    </div>
+
+                    <!-- Consistencia -->
+                    <div class="analytic-widget-card" style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.08) 0%, rgba(180, 83, 9, 0.02) 100%); border: 1px solid var(--border); border-radius: 16px; padding: 18px; display: flex; flex-direction: column; justify-content: space-between;">
+                      <div>
+                        <span style="font-size: 11px; font-weight: 700; color: var(--warning); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">Consistencia Académica</span>
+                        <span id="metric-consistency-label" style="font-size: 18px; font-weight: 800; font-family: 'Outfit', sans-serif; color: var(--text); display: block; margin-top: 4px;">--</span>
+                        <span id="metric-consistency-detail" style="font-size: 12px; color: var(--text-dim); display: block; margin-top: 2px;">--% Desviación</span>
+                      </div>
+                      <span style="font-size: 11px; color: var(--text-dim); display: block; margin-top: 10px; border-top: 1px dashed var(--border); padding-top: 6px;">Variación de tus notas.</span>
+                    </div>
+                  </div>
+
                   <div class="charts-dashboard-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; padding-top: 20px;">
                     <!-- Gráfico 1: Curva de Aprendizaje -->
                     <div class="chart-card-premium" style="background: rgba(255,255,255,0.01); border: 1px solid var(--border); border-radius: 16px; padding: 20px; min-height: 280px; display: flex; flex-direction: column;">

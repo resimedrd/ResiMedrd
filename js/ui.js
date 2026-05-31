@@ -1082,107 +1082,74 @@ const ui = {
     });
   },
 
-  renderizarGraficosAvanzados(historial, srEstados, totalPersonalizadas = 0) {
+  renderizarGraficosAvanzados(historial, srEstados = [], totalPersonalizadas = 0) {
     if (typeof Chart === "undefined") {
       console.warn("Chart.js aún no se ha cargado.");
       return;
     }
 
-    // 1. Destruir de forma segura instancias de gráficos previas
-    if (!window.resiMedCharts) {
-      window.resiMedCharts = { line: null, bar: null, doughnut: null };
-    }
-    if (window.resiMedCharts.line) window.resiMedCharts.line.destroy();
-    if (window.resiMedCharts.bar) window.resiMedCharts.bar.destroy();
-    if (window.resiMedCharts.doughnut) window.resiMedCharts.doughnut.destroy();
-
-    // 2. Extraer datos para el Gráfico 1: Curva de Rendimiento Académico (Line Chart)
-    const ultimasSesiones = [...historial]
-      .filter(s => s.porcentaje !== undefined && s.fecha)
-      .sort((a, b) => new Date(a.fecha) - new Date(b.fecha))
-      .slice(-7);
-
-    const labelsLinea = ultimasSesiones.map(s => {
-      try {
-        const d = new Date(s.fecha);
-        return d.toLocaleDateString("es-ES", { day: "2-digit", month: "2-digit" });
-      } catch (e) {
-        return "q.";
-      }
-    });
-    const dataLinea = ultimasSesiones.map(s => s.porcentaje);
-
-    // Si no hay datos, mostrar placeholders elegantes
-    const lineLabels = labelsLinea.length > 0 ? labelsLinea : ["Vacío"];
-    const lineData = dataLinea.length > 0 ? dataLinea : [0];
-
-    // Gráfico 1: Line Chart
-    const ctxLinea = document.getElementById('chart-rendimiento-linea');
-    if (ctxLinea) {
-      const isDark = document.body.classList.contains("dark-mode");
-      const textColor = isDark ? '#94a3b8' : '#475569';
-      const gridColor = isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)';
-
-      const ctx = ctxLinea.getContext('2d');
-      const gradient = ctx.createLinearGradient(0, 0, 0, 200);
-      gradient.addColorStop(0, isDark ? 'rgba(59, 130, 246, 0.25)' : 'rgba(10, 102, 194, 0.25)');
-      gradient.addColorStop(1, 'rgba(59, 130, 246, 0.0)');
-
-      window.resiMedCharts.line = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: lineLabels,
-          datasets: [{
-            label: 'Precisión (%)',
-            data: lineData,
-            borderColor: isDark ? '#3b82f6' : '#0A66C2',
-            borderWidth: 3,
-            backgroundColor: gradient,
-            fill: true,
-            tension: 0.35,
-            pointBackgroundColor: isDark ? '#60a5fa' : '#0A66C2',
-            pointBorderColor: isDark ? '#0f172a' : '#ffffff',
-            pointBorderWidth: 2,
-            pointRadius: 5,
-            pointHoverRadius: 7
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { display: false },
-            tooltip: {
-              backgroundColor: isDark ? '#1e293b' : '#ffffff',
-              titleColor: isDark ? '#f8fafc' : '#0f172a',
-              bodyColor: isDark ? '#cbd5e1' : '#334155',
-              borderColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)',
-              borderWidth: 1,
-              callbacks: {
-                label: (context) => `Nota: ${context.raw}%`
-              }
-            }
-          },
-          scales: {
-            x: {
-              grid: { display: false },
-              ticks: { color: textColor, font: { size: 11 } }
-            },
-            y: {
-              min: 0,
-              max: 100,
-              grid: { color: gridColor },
-              ticks: { color: textColor, font: { size: 11 }, stepSize: 20 }
-            }
-          }
+    // ==========================================
+    // ⚙️ FASE 1: CALCULOS ANALÍTICOS AVANZADOS ENURM
+    // ==========================================
+    
+    // A. Pronóstico Ponderado de Nota ENURM
+    let predictionScore = 0;
+    let predictionAdvice = "Realiza simulacros para proyectar tu nota oficial.";
+    let countValid = 0;
+    
+    if (historial && historial.length > 0) {
+      const sorted = [...historial]
+        .filter(s => s.porcentaje !== undefined && s.fecha)
+        .sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
+      
+      if (sorted.length > 0) {
+        let weightedSum = 0;
+        let weightTotal = 0;
+        sorted.forEach((sesion, index) => {
+          // Incrementa el peso de exámenes más recientes exponencialmente
+          const weight = 1 + (index / sorted.length) * 1.5;
+          weightedSum += sesion.porcentaje * weight;
+          weightTotal += weight;
+        });
+        predictionScore = Math.round(weightedSum / weightTotal);
+        countValid = sorted.length;
+        
+        if (predictionScore < 60) {
+          predictionAdvice = "Crítico: Requiere priorizar tu Especialidad Crítica.";
+        } else if (predictionScore < 75) {
+          predictionAdvice = "Intermedio: A las puertas del éxito. ¡Refuerza debilidades!";
+        } else {
+          predictionAdvice = "¡Competitivo! Tu perfil está listo para adjudicar plaza.";
         }
-      });
+      }
     }
 
-    // 3. Extraer datos para el Gráfico 2: Cobertura por Especialidad (Horizontal Bar)
+    // Actualizar Widgets en DOM
+    const scoreEl = document.getElementById("metric-predict-score");
+    const barEl = document.getElementById("metric-predict-bar");
+    const adviceEl = document.getElementById("metric-predict-advice");
+    if (scoreEl) scoreEl.textContent = countValid > 0 ? `${predictionScore}%` : "--%";
+    if (barEl) {
+      barEl.style.width = countValid > 0 ? `${predictionScore}%` : "0%";
+      if (predictionScore >= 75) {
+        barEl.style.backgroundColor = "var(--success)";
+      } else if (predictionScore >= 55) {
+        barEl.style.backgroundColor = "var(--warning)";
+      } else {
+        barEl.style.backgroundColor = "var(--danger)";
+      }
+    }
+    if (adviceEl) adviceEl.textContent = predictionAdvice;
+
+    // B. Especialidad Líder y Crítica
     const conteoEspecialidades = {};
     state.LISTA_ESPECIALIDADES.forEach(esp => {
-      conteoEspecialidades[esp.nombre.trim().toLowerCase()] = { correctas: 0, totales: 0 };
+      conteoEspecialidades[esp.nombre.trim().toLowerCase()] = { 
+        correctas: 0, 
+        totales: 0, 
+        emoji: esp.emoji || "🔬", 
+        nombre: esp.nombre 
+      };
     });
 
     historial.forEach(sesion => {
@@ -1218,54 +1185,167 @@ const ui = {
       }
     });
 
-    const labelsBar = [];
-    const dataBar = [];
-    const colorsBar = [];
+    let leaderName = "--";
+    let leaderScore = 0;
+    let leaderEmoji = "🏆";
+    
+    let criticalName = "--";
+    let criticalScore = 101;
+    let criticalEmoji = "🚨";
+    
+    let hasValidSpecData = false;
 
-    state.LISTA_ESPECIALIDADES.forEach(esp => {
-      const info = conteoEspecialidades[esp.nombre.trim().toLowerCase()];
-      if (info && info.totales > 0) {
-        labelsBar.push(esp.emoji + " " + esp.nombre.split(" ")[0]);
+    Object.keys(conteoEspecialidades).forEach(key => {
+      const info = conteoEspecialidades[key];
+      if (info.totales > 0) {
+        hasValidSpecData = true;
         const pct = Math.round((info.correctas / info.totales) * 100);
-        dataBar.push(pct);
-        
-        if (pct >= 75) colorsBar.push('rgba(34, 197, 94, 0.7)');
-        else if (pct >= 50) colorsBar.push('rgba(245, 158, 11, 0.7)');
-        else colorsBar.push('rgba(239, 68, 68, 0.7)');
+        if (pct > leaderScore) {
+          leaderScore = pct;
+          leaderName = info.nombre;
+          leaderEmoji = info.emoji;
+        }
+        if (pct < criticalScore) {
+          criticalScore = pct;
+          criticalName = info.nombre;
+          criticalEmoji = info.emoji;
+        }
       }
     });
 
-    if (labelsBar.length === 0) {
-      state.LISTA_ESPECIALIDADES.slice(0, 5).forEach(esp => {
-        labelsBar.push(esp.emoji + " " + esp.nombre.split(" ")[0]);
-        dataBar.push(0);
-        colorsBar.push('rgba(148, 163, 184, 0.3)');
-      });
+    if (criticalScore === 101) criticalScore = 0;
+
+    // Actualizar Widgets Especialidades
+    const leaderNameEl = document.getElementById("metric-leader-name");
+    const leaderScoreEl = document.getElementById("metric-leader-score");
+    if (leaderNameEl) leaderNameEl.textContent = hasValidSpecData ? `${leaderEmoji} ${leaderName}` : "Ninguna aún";
+    if (leaderScoreEl) leaderScoreEl.textContent = hasValidSpecData ? `${leaderScore}% de precisión` : "Sin datos";
+
+    const criticalNameEl = document.getElementById("metric-critical-name");
+    const criticalScoreEl = document.getElementById("metric-critical-score");
+    if (criticalNameEl) {
+      criticalNameEl.textContent = hasValidSpecData 
+        ? `${criticalEmoji} ${criticalName}` 
+        : "Ninguna aún";
+    }
+    if (criticalScoreEl) {
+      criticalScoreEl.textContent = hasValidSpecData ? `${criticalScore}% de precisión` : "Sin datos";
     }
 
-    const ctxBarras = document.getElementById('chart-especialidad-barras');
-    if (ctxBarras) {
-      const isDark = document.body.classList.contains("dark-mode");
-      const textColor = isDark ? '#94a3b8' : '#475569';
-      const gridColor = isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)';
+    // C. Consistencia Académica (Desviación Estándar)
+    let consistencyLabel = "Estableciendo...";
+    let consistencyDetail = "0% Desviación";
+    if (historial && historial.length > 1) {
+      const scores = historial.filter(s => s.porcentaje !== undefined).map(s => s.porcentaje);
+      if (scores.length > 1) {
+        const sum = scores.reduce((a, b) => a + b, 0);
+        const mean = sum / scores.length;
+        const squareDiffs = scores.map(s => Math.pow(s - mean, 2));
+        const avgSquareDiff = squareDiffs.reduce((a, b) => a + b, 0) / squareDiffs.length;
+        const stdDev = Math.round(Math.sqrt(avgSquareDiff));
+        
+        consistencyDetail = `Desviación de ±${stdDev}%`;
+        if (stdDev <= 6) {
+          consistencyLabel = "Excelente (Estable)";
+        } else if (stdDev <= 14) {
+          consistencyLabel = "Consistente";
+        } else {
+          consistencyLabel = "Inconstante / Variable";
+        }
+      }
+    }
 
-      window.resiMedCharts.bar = new Chart(ctxBarras, {
-        type: 'bar',
+    const consistencyLabelEl = document.getElementById("metric-consistency-label");
+    const consistencyDetailEl = document.getElementById("metric-consistency-detail");
+    if (consistencyLabelEl) consistencyLabelEl.textContent = consistencyLabel;
+    if (consistencyDetailEl) consistencyDetailEl.textContent = consistencyDetail;
+
+    // ==========================================
+    // 📊 FASE 2: CONSTRUCCIÓN DE GRÁFICOS PREMIUM
+    // ==========================================
+
+    // Destruir instancias previas
+    if (!window.resiMedCharts) {
+      window.resiMedCharts = { line: null, bar: null, doughnut: null };
+    }
+    if (window.resiMedCharts.line) window.resiMedCharts.line.destroy();
+    if (window.resiMedCharts.bar) window.resiMedCharts.bar.destroy();
+    if (window.resiMedCharts.doughnut) window.resiMedCharts.doughnut.destroy();
+
+    const isDark = document.body.classList.contains("dark-mode");
+    const textColor = isDark ? '#94a3b8' : '#475569';
+    const gridColor = isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)';
+
+    // GRÁFICO 1: Curva de Aprendizaje y Meta Competitiva (Spline Line Chart)
+    const ultimasSesiones = [...historial]
+      .filter(s => s.porcentaje !== undefined && s.fecha)
+      .sort((a, b) => new Date(a.fecha) - new Date(b.fecha))
+      .slice(-8);
+
+    const labelsLinea = ultimasSesiones.map(s => {
+      try {
+        const d = new Date(s.fecha);
+        return d.toLocaleDateString("es-ES", { day: "2-digit", month: "2-digit" });
+      } catch (e) {
+        return "Ex.";
+      }
+    });
+    const dataLinea = ultimasSesiones.map(s => s.porcentaje);
+
+    const lineLabels = labelsLinea.length > 0 ? labelsLinea : ["Inicio"];
+    const lineData = dataLinea.length > 0 ? dataLinea : [0];
+
+    const ctxLinea = document.getElementById('chart-rendimiento-linea');
+    if (ctxLinea) {
+      const ctx = ctxLinea.getContext('2d');
+      const gradient = ctx.createLinearGradient(0, 0, 0, 200);
+      gradient.addColorStop(0, isDark ? 'rgba(59, 130, 246, 0.22)' : 'rgba(10, 102, 194, 0.22)');
+      gradient.addColorStop(1, 'rgba(59, 130, 246, 0.0)');
+
+      window.resiMedCharts.line = new Chart(ctx, {
+        type: 'line',
         data: {
-          labels: labelsBar,
-          datasets: [{
-            data: dataBar,
-            backgroundColor: colorsBar,
-            borderRadius: 6,
-            barThickness: 16
-          }]
+          labels: lineLabels,
+          datasets: [
+            {
+              label: 'Tu Rendimiento (%)',
+              data: lineData,
+              borderColor: isDark ? '#3b82f6' : '#0A66C2',
+              borderWidth: 3.5,
+              backgroundColor: gradient,
+              fill: true,
+              tension: 0.38,
+              pointBackgroundColor: isDark ? '#60a5fa' : '#0A66C2',
+              pointBorderColor: isDark ? '#0f172a' : '#ffffff',
+              pointBorderWidth: 2.5,
+              pointRadius: 5.5,
+              pointHoverRadius: 8
+            },
+            {
+              label: 'Meta Adjudicación (75%)',
+              data: Array(lineLabels.length).fill(75),
+              borderColor: isDark ? 'rgba(245, 158, 11, 0.65)' : 'rgba(217, 119, 6, 0.65)',
+              borderWidth: 2,
+              borderDash: [6, 4],
+              fill: false,
+              pointRadius: 0,
+              pointHoverRadius: 0
+            }
+          ]
         },
         options: {
-          indexAxis: 'y',
           responsive: true,
           maintainAspectRatio: false,
           plugins: {
-            legend: { display: false },
+            legend: {
+              display: true,
+              position: 'top',
+              labels: {
+                color: textColor,
+                boxWidth: 12,
+                font: { size: 10.5, family: 'Inter', weight: '600' }
+              }
+            },
             tooltip: {
               backgroundColor: isDark ? '#1e293b' : '#ffffff',
               titleColor: isDark ? '#f8fafc' : '#0f172a',
@@ -1273,7 +1353,127 @@ const ui = {
               borderColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)',
               borderWidth: 1,
               callbacks: {
-                label: (context) => `Precisión: ${context.raw}%`
+                label: (context) => `${context.dataset.label}: ${context.raw}%`
+              }
+            }
+          },
+          scales: {
+            x: {
+              grid: { display: false },
+              ticks: { color: textColor, font: { size: 10.5 } }
+            },
+            y: {
+              min: 0,
+              max: 100,
+              grid: { color: gridColor },
+              ticks: { color: textColor, font: { size: 10.5 }, stepSize: 20 }
+            }
+          }
+        }
+      });
+    }
+
+    // GRÁFICO 2: Rendimiento Actual vs. Meta de Especialidad (Grouped Bar Chart)
+    const labelsBar = [];
+    const dataBar = [];
+    const dataMeta = [];
+    const colorsBar = [];
+
+    const META_MINIMA = {
+      "pediatría": 70,
+      "ginecología": 65,
+      "ginecología y obstetricia": 65,
+      "cirugía": 75,
+      "cirugía general": 75,
+      "medicina interna": 68,
+      "psiquiatría": 60,
+      "cardiología": 72
+    };
+
+    state.LISTA_ESPECIALIDADES.forEach(esp => {
+      const key = esp.nombre.trim().toLowerCase();
+      const info = conteoEspecialidades[key];
+      if (info && info.totales > 0) {
+        labelsBar.push(info.emoji + " " + info.nombre.split(" ")[0]);
+        const pct = Math.round((info.correctas / info.totales) * 100);
+        dataBar.push(pct);
+        
+        // Asignar meta específica o por defecto (68)
+        const metaVal = META_MINIMA[key] || 68;
+        dataMeta.push(metaVal);
+
+        // Color según rendimiento contra meta
+        if (pct >= metaVal) {
+          colorsBar.push('rgba(34, 197, 94, 0.85)'); // Supera la meta (Verde)
+        } else if (pct >= metaVal - 12) {
+          colorsBar.push('rgba(245, 158, 11, 0.85)'); // Cerca de la meta (Amber)
+        } else {
+          colorsBar.push('rgba(239, 68, 68, 0.85)'); // Crítico (Rojo)
+        }
+      }
+    });
+
+    // Placeholders si está vacío
+    if (labelsBar.length === 0) {
+      state.LISTA_ESPECIALIDADES.slice(0, 5).forEach(esp => {
+        labelsBar.push((esp.emoji || "🔬") + " " + esp.nombre.split(" ")[0]);
+        dataBar.push(0);
+        dataMeta.push(META_MINIMA[esp.nombre.trim().toLowerCase()] || 68);
+        colorsBar.push('rgba(148, 163, 184, 0.3)');
+      });
+    }
+
+    const ctxBarras = document.getElementById('chart-especialidad-barras');
+    if (ctxBarras) {
+      window.resiMedCharts.bar = new Chart(ctxBarras, {
+        type: 'bar',
+        data: {
+          labels: labelsBar,
+          datasets: [
+            {
+              label: 'Tu Rendimiento (%)',
+              data: dataBar,
+              backgroundColor: colorsBar,
+              borderRadius: 5,
+              barThickness: 9,
+              categoryPercentage: 0.8,
+              barPercentage: 0.9
+            },
+            {
+              label: 'Meta Mínima Competitiva',
+              data: dataMeta,
+              backgroundColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)',
+              borderColor: isDark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.15)',
+              borderWidth: 1,
+              borderRadius: 5,
+              barThickness: 9,
+              categoryPercentage: 0.8,
+              barPercentage: 0.9
+            }
+          ]
+        },
+        options: {
+          indexAxis: 'y',
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: true,
+              position: 'top',
+              labels: {
+                color: textColor,
+                boxWidth: 12,
+                font: { size: 10, family: 'Inter', weight: '600' }
+              }
+            },
+            tooltip: {
+              backgroundColor: isDark ? '#1e293b' : '#ffffff',
+              titleColor: isDark ? '#f8fafc' : '#0f172a',
+              bodyColor: isDark ? '#cbd5e1' : '#334155',
+              borderColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)',
+              borderWidth: 1,
+              callbacks: {
+                label: (context) => `${context.dataset.label}: ${context.raw}%`
               }
             }
           },
@@ -1293,7 +1493,7 @@ const ui = {
       });
     }
 
-    // 4. Extraer datos para el Gráfico 3: Estado de Repetición Espaciada (Doughnut Chart)
+    // GRÁFICO 3: Estado de Repetición Espaciada y Fuerza de Retención (Doughnut Chart con Plugin Central)
     const totalRepasos = srEstados.filter(e => e.flashcard_id);
     const dominadas = totalRepasos.filter(e => e.interval > 0).length;
     const criticas = totalRepasos.filter(e => e.interval === 0).length;
@@ -1304,9 +1504,6 @@ const ui = {
 
     const ctxDona = document.getElementById('chart-repeticion-dona');
     if (ctxDona) {
-      const isDark = document.body.classList.contains("dark-mode");
-      const textColor = isDark ? '#f8fafc' : '#0f172a';
-
       window.resiMedCharts.doughnut = new Chart(ctxDona, {
         type: 'doughnut',
         data: {
@@ -1314,24 +1511,25 @@ const ui = {
           datasets: [{
             data: [dominadas, criticas, sinRepasar],
             backgroundColor: [
-              'rgba(16, 185, 129, 0.8)',
-              'rgba(239, 68, 68, 0.8)',
-              'rgba(59, 130, 246, 0.8)'
+              'rgba(16, 185, 129, 0.85)', // Emerald
+              'rgba(239, 68, 68, 0.85)',  // Neon red
+              'rgba(59, 130, 246, 0.85)'   // Sapphire blue
             ],
-            borderWidth: isDark ? 2 : 1,
-            borderColor: isDark ? '#08080a' : '#ffffff',
-            hoverOffset: 4
+            borderWidth: isDark ? 2.5 : 1,
+            borderColor: isDark ? '#0b0f19' : '#ffffff',
+            hoverOffset: 6
           }]
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
+          cutout: '72%',
           plugins: {
             legend: {
               position: 'right',
               labels: {
-                color: isDark ? '#94a3b8' : '#475569',
-                font: { size: 11, weight: '600' },
+                color: textColor,
+                font: { size: 10.5, family: 'Inter', weight: '600' },
                 boxWidth: 10,
                 padding: 10
               }
@@ -1343,9 +1541,29 @@ const ui = {
               borderColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)',
               borderWidth: 1
             }
-          },
-          cutout: '65%'
-        }
+          }
+        },
+        plugins: [{
+          id: 'centerText',
+          afterDraw(chart) {
+            const { ctx, chartArea: { top, bottom, left, right, width, height } } = chart;
+            ctx.save();
+            const active = chart.data.datasets[0].data[0]; // Dominadas
+            const total = chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+            const pct = total > 0 ? Math.round((active / total) * 100) : 0;
+            
+            ctx.font = 'bold 22px Outfit, sans-serif';
+            ctx.fillStyle = isDark ? '#f8fafc' : '#0f172a';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(`${pct}%`, left + width / 2, top + height / 2 - 8);
+            
+            ctx.font = '700 9px Inter, sans-serif';
+            ctx.fillStyle = isDark ? '#94a3b8' : '#475569';
+            ctx.fillText('RETENCIÓN', left + width / 2, top + height / 2 + 12);
+            ctx.restore();
+          }
+        }]
       });
     }
   },
