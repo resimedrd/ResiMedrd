@@ -51,6 +51,16 @@
   --gold-gradient: linear-gradient(135deg, #ffe066 0%, #f59e0b 50%, #d97706 100%);
   --silver-gradient: linear-gradient(135deg, #f1f5f9 0%, #cbd5e1 50%, #64748b 100%);
   --bronze-gradient: linear-gradient(135deg, #ffedd5 0%, #b45309 50%, #78350f 100%);
+
+  /* Temas y Resplandores de Modalidad */
+  --estudio-color: hsl(217, 91%, 60%);
+  --estudio-glow: rgba(37, 99, 235, 0.05);
+  --simulacro-color: hsl(271, 91%, 65%);
+  --simulacro-glow: rgba(139, 92, 246, 0.05);
+  --intensivo-color: hsl(0, 84%, 60%);
+  --intensivo-glow: rgba(239, 68, 68, 0.05);
+  --batalla-color: hsl(38, 92%, 50%);
+  --batalla-glow: rgba(245, 158, 11, 0.05);
 }
 
 body.dark-mode {
@@ -93,6 +103,16 @@ body.dark-mode {
   --text-modal-dim: hsl(215, 20%, 75%);
   --border-modal: rgba(255, 255, 255, 0.08);
   --overlay-modal: rgba(15, 23, 42, 0.65);
+
+  /* Temas y Resplandores de Modalidad */
+  --estudio-color: hsl(217, 91%, 60%);
+  --estudio-glow: rgba(37, 99, 235, 0.15);
+  --simulacro-color: hsl(271, 91%, 65%);
+  --simulacro-glow: rgba(139, 92, 246, 0.15);
+  --intensivo-color: hsl(0, 84%, 60%);
+  --intensivo-glow: rgba(239, 68, 68, 0.15);
+  --batalla-color: hsl(38, 92%, 50%);
+  --batalla-glow: rgba(245, 158, 11, 0.15);
 }
 
 * {
@@ -3191,3 +3211,180 @@ body:has(#pantalla-quiz.active) .main-shell {
   padding-top: 0 !important;
   margin-top: 0 !important;
 }
+
+/* ☀️ Premium Micro-Interacciones & Efectos Táctiles */
+
+/* Pestañas tipo Pill Selector Premium */
+#pantalla-home .btn-ghost {
+  border-radius: 12px !important;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+#pantalla-home .btn-ghost.active {
+  background: var(--primary) !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 14px var(--primary-soft) !important;
+  font-weight: 700;
+}
+
+/* Custom Dropdown select inputs */
+select.input {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='rgb(100, 116, 139)' stroke-width='2.5'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19.5 8.25l-7.5 7.5-7.5-7.5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  background-size: 16px;
+  padding-right: 44px !important;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+select.input:focus {
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 4px var(--primary-soft) !important;
+}
+
+/* Tarjetas de Modalidad Premium */
+.mode-grid .mode-card {
+  position: relative;
+  border: 1px solid var(--border) !important;
+  background: var(--panel) !important;
+  border-radius: 20px !important;
+  padding: 20px 24px !important;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.01) !important;
+  overflow: hidden;
+}
+
+/* Micro-Badge Interno */
+.mode-card .mode-badge {
+  align-self: flex-start;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 3px 8px;
+  border-radius: 8px;
+  background: var(--panel-soft);
+  color: var(--text-dim);
+  margin-bottom: 4px;
+  transition: all 0.3s ease;
+}
+
+/* Emojis Grandes y Modernos */
+.mode-card .mode-title {
+  font-size: 14.5px;
+  font-weight: 800;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mode-card .mode-desc {
+  font-size: 11.5px;
+  color: var(--text-dim);
+  line-height: 1.4;
+  margin-top: 2px;
+}
+
+/* Hover Glows Individuales */
+.mode-card#btn-modo-estudio:hover {
+  border-color: var(--estudio-color) !important;
+  box-shadow: 0 12px 30px -10px var(--estudio-glow) !important;
+  transform: translateY(-2px);
+}
+.mode-card#btn-modo-estudio:hover .mode-badge {
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+
+.mode-card#btn-modo-simulacro:hover {
+  border-color: var(--simulacro-color) !important;
+  box-shadow: 0 12px 30px -10px var(--simulacro-glow) !important;
+  transform: translateY(-2px);
+}
+.mode-card#btn-modo-simulacro:hover .mode-badge {
+  background: rgba(139, 92, 246, 0.1);
+  color: var(--simulacro-color);
+}
+
+.mode-card#btn-modo-guardia:hover {
+  border-color: var(--intensivo-color) !important;
+  box-shadow: 0 12px 30px -10px var(--intensivo-glow) !important;
+  transform: translateY(-2px);
+}
+.mode-card#btn-modo-guardia:hover .mode-badge {
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+
+.mode-card#btn-modo-batalla:hover {
+  border-color: var(--batalla-color) !important;
+  box-shadow: 0 12px 30px -10px var(--batalla-glow) !important;
+  transform: translateY(-2px);
+}
+.mode-card#btn-modo-batalla:hover .mode-badge {
+  background: var(--warning-soft);
+  color: var(--warning);
+}
+
+/* Clic Físico (Bouncing) */
+.mode-card:active, .btn:active, .panel:active {
+  transform: scale(0.975) !important;
+  transition: transform 0.1s ease !important;
+}
+
+/* Blinking Live Badge */
+@keyframes pulse-live {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+.badge-live-pulse {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--danger-soft) !important;
+  color: var(--danger) !important;
+  animation: pulse-live 1.5s infinite ease-in-out;
+}
+
+/* Estilos Premium Hero y Métricas */
+.hero-card {
+  background: var(--hero-bg) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 28px !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.01), 0 16px 36px -12px rgba(100, 116, 139, 0.08) !important;
+  padding: 40px !important;
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 32px;
+}
+.stat-card {
+  background: var(--panel) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 20px !important;
+  padding: 20px 24px !important;
+  box-shadow: 0 8px 24px -8px rgba(100, 116, 139, 0.06) !important;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 36px -12px rgba(100, 116, 139, 0.1) !important;
+}
+.dashboard-metric {
+  background: var(--panel) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 20px !important;
+  padding: 20px 24px !important;
+  box-shadow: 0 8px 24px -8px rgba(100, 116, 139, 0.06) !important;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.dashboard-metric:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 36px -12px rgba(100, 116, 139, 0.08) !important;
+}
+
