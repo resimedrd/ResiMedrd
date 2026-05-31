@@ -42,12 +42,8 @@ const ui = {
       window.history.pushState({ pantalla: nombrePantalla }, "", "#" + nombrePantalla);
     }
 
-    const pantallas = ["pantalla-auth", "pantalla-home", "pantalla-perfil", "pantalla-flashcards", "pantalla-quiz", "pantalla-resultados"];
-    
-    pantallas.forEach(pId => {
-      const el = document.getElementById(pId);
-      if (el) el.classList.remove("active");
-    });
+    // Ocultar todas las pantallas del sistema de forma dinámica y robusta
+    document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
 
     const activa = document.getElementById(idReal);
     if (activa) {

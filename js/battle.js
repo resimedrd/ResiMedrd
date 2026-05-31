@@ -190,16 +190,7 @@ const battle = {
   },
 
   mostrarPantallaBattle(pantallaId) {
-    // Ocultar todas las pantallas del sistema
-    document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
-    
-    // Mostrar la pantalla correspondiente
-    const target = document.getElementById(`pantalla-${pantallaId}`);
-    if (target) {
-      target.classList.add("active");
-      window.scrollTo({ top: 0, behavior: 'instant' });
-      window.location.hash = pantallaId;
-    }
+    ui.mostrarPantalla(pantallaId, true);
   },
 
   conectarWebSocket() {
