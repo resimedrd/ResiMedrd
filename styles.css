@@ -1,22 +1,22 @@
 :root {
-  --bg: hsl(30, 24%, 98%);
-  --bg-2: hsl(30, 20%, 95%);
-  --panel: rgba(255, 255, 255, 0.75);
-  --panel-strong: rgba(255, 255, 255, 0.90);
-  --panel-soft: hsl(30, 16%, 93%);
-  --bg-card: rgba(255, 255, 255, 0.65);
-  --option-bg: rgba(255, 255, 255, 0.50);
+  --bg: hsl(210, 40%, 98%);
+  --bg-2: hsl(210, 40%, 95%);
+  --panel: #ffffff;
+  --panel-strong: #ffffff;
+  --panel-soft: hsl(210, 40%, 94%);
+  --bg-card: #ffffff;
+  --option-bg: #ffffff;
 
-  --border: rgba(255, 255, 255, 0.65);
-  --border-strong: hsl(30, 12%, 84%);
+  --border: hsl(214, 32%, 90%);
+  --border-strong: hsl(214, 25%, 80%);
 
-  --text: hsl(220, 45%, 12%);
-  --text-soft: hsl(220, 30%, 22%);
-  --text-dim: hsl(220, 16%, 42%);
+  --text: hsl(215, 47%, 15%);
+  --text-soft: hsl(215, 25%, 25%);
+  --text-dim: hsl(215, 20%, 45%);
 
-  --primary: hsl(221, 88%, 56%);
-  --primary-2: hsl(221, 88%, 46%);
-  --primary-soft: rgba(37, 99, 235, 0.06);
+  --primary: hsl(217, 91%, 60%);
+  --primary-2: hsl(217, 91%, 50%);
+  --primary-soft: rgba(59, 130, 246, 0.08);
 
   --success: hsl(142, 71%, 45%);
   --success-soft: rgba(34, 197, 94, 0.08);
@@ -27,16 +27,16 @@
   --warning: hsl(38, 92%, 50%);
   --warning-soft: rgba(245, 158, 11, 0.08);
 
-  --hero-bg: linear-gradient(135deg, rgba(37, 99, 235, 0.03) 0%, rgba(255, 255, 255, 0.8) 100%);
-  --hero-text: hsl(220, 45%, 12%);
-  --hero-text-soft: hsl(220, 30%, 32%);
-  --hero-border: rgba(255, 255, 255, 0.65);
+  --hero-bg: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, #ffffff 100%);
+  --hero-text: hsl(215, 47%, 15%);
+  --hero-text-soft: hsl(215, 25%, 35%);
+  --hero-border: hsl(214, 32%, 90%);
 
   /* Variables de Modales - Modo Claro */
   --bg-modal: rgba(255, 255, 255, 0.90);
-  --text-modal: hsl(220, 45%, 12%);
-  --text-modal-dim: hsl(220, 16%, 42%);
-  --border-modal: rgba(255, 255, 255, 0.65);
+  --text-modal: hsl(215, 47%, 15%);
+  --text-modal-dim: hsl(215, 20%, 45%);
+  --border-modal: hsl(214, 32%, 90%);
   --overlay-modal: rgba(15, 23, 42, 0.25);
 
   /* Neon Fire & Battle Theme & Glassmorphism Presets */
@@ -47,7 +47,7 @@
   --glass-bg-dark: rgba(15, 23, 42, 0.55);
   --glass-border: rgba(255, 255, 255, 0.08);
   --glass-border-dark: rgba(255, 255, 255, 0.05);
-  --glass-shadow: 0 1px 3px rgba(0, 0, 0, 0.01), 0 10px 30px -10px rgba(100, 116, 139, 0.08), 0 16px 40px -16px rgba(100, 116, 139, 0.06);
+  --glass-shadow: 0 16px 32px 0 rgba(31, 38, 135, 0.06);
   --gold-gradient: linear-gradient(135deg, #ffe066 0%, #f59e0b 50%, #d97706 100%);
   --silver-gradient: linear-gradient(135deg, #f1f5f9 0%, #cbd5e1 50%, #64748b 100%);
   --bronze-gradient: linear-gradient(135deg, #ffedd5 0%, #b45309 50%, #78350f 100%);
@@ -93,8 +93,6 @@ body.dark-mode {
   --text-modal-dim: hsl(215, 20%, 75%);
   --border-modal: rgba(255, 255, 255, 0.08);
   --overlay-modal: rgba(15, 23, 42, 0.65);
-
-  --glass-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.4), 0 1px 3px rgba(255, 255, 255, 0.01);
 }
 
 * {
@@ -124,13 +122,13 @@ h1, h2, h3, h4, h5, h6, .brand-mark, .flashcard-q, .mode-title, .quiz-timer, .re
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: linear-gradient(135deg, var(--bg) 0%, var(--bg-2) 100%) !important;
+  background: linear-gradient(135deg, hsl(210, 40%, 98%) 0%, hsl(210, 30%, 94%) 100%) !important;
   z-index: -1;
   transition: background 0.3s ease;
 }
 
 body.dark-mode .app-bg {
-  background: var(--bg) !important;
+  background: hsl(222, 47%, 6%) !important;
 }
 
 .layout {
@@ -296,15 +294,21 @@ body.dark-mode .app-bg {
 
 .panel {
   background: var(--panel);
-  border: 1px solid var(--border);
+  border: 1px solid rgba(10, 102, 194, 0.05);
   border-radius: 32px;
   padding: 36px;
   display: flex;
   flex-direction: column;
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  box-shadow: var(--glass-shadow);
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+  box-shadow: 0 4px 20px -2px rgba(10, 102, 194, 0.03), 
+              0 12px 40px -8px rgba(0, 0, 0, 0.02);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+body.dark-mode .panel {
+  border: 1px solid var(--border) !important;
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.3) !important;
 }
 
 .panel-head {
@@ -3186,31 +3190,4 @@ body:has(#pantalla-quiz.active) .topbar {
 body:has(#pantalla-quiz.active) .main-shell {
   padding-top: 0 !important;
   margin-top: 0 !important;
-}
-
-/* ☀️ Premium Micro-Interacciones & Efectos Táctiles */
-.panel:hover {
-  transform: translateY(-2px);
-  box-shadow: 
-    0 12px 32px -4px rgba(100, 116, 139, 0.08),
-    0 20px 48px -8px rgba(100, 116, 139, 0.06) !important;
-}
-
-body.dark-mode .panel:hover {
-  transform: translateY(-2px);
-  box-shadow: 
-    0 12px 32px -4px rgba(0, 0, 0, 0.4),
-    0 20px 48px -8px rgba(0, 0, 0, 0.3) !important;
-}
-
-/* Efecto de clic físico interactivo (Active state scaling) */
-.btn:active, .option-btn:active, .panel:active {
-  transform: scale(0.985);
-  transition: transform 0.1s ease;
-}
-
-.btn-primary {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-2) 100%) !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
 }
