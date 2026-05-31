@@ -373,7 +373,7 @@
   },
   {
     "texto": "Paciente de 10 años diagnosticada con cólera grave con heces con apariencia de agua de arroz. ¿Qué volumen de pérdidas por heces fecales se debería esperar?",
-    "opciones": "[]",
+    "opciones": "[\"a) > 10 ml/kg/hora\",\"b) < 5 ml/kg/hora\",\"c) > 20 ml/kg/hora\",\"d) < 1 ml/kg/hora\"]",
     "correcta": 0,
     "tema": "Pediatría",
     "fuente": "Nelson, Tratado de Pediatría, 21st edición: Cap. 228 pág. 1516",

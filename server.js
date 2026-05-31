@@ -229,6 +229,21 @@ async function iniciarBaseDeDatos() {
     console.error("Error al crear índices de rendimiento:", errIndexes);
   }
 
+  // 🏥 Parche de migración automática: Corregir pregunta de Cólera si está vacía
+  try {
+    const checkColera = await db.get(`SELECT id FROM preguntas WHERE (opciones = '[]' OR opciones = '' OR opciones IS NULL) AND texto LIKE '%Paciente de 10 años diagnosticada con cólera grave%'`);
+    if (checkColera) {
+      await db.run(`
+        UPDATE preguntas 
+        SET opciones = '["a) > 10 ml/kg/hora","b) < 5 ml/kg/hora","c) > 20 ml/kg/hora","d) < 1 ml/kg/hora"]'
+        WHERE id = ?
+      `, [checkColera.id]);
+      console.log("🩹 Parche aplicado con éxito: Pregunta de cólera (ID: " + checkColera.id + ") actualizada con opciones oficiales.");
+    }
+  } catch (errColeraPatch) {
+    console.error("Error al aplicar parche de cólera:", errColeraPatch);
+  }
+
   // Cargar banco inicial premium de 14 especialidades si está vacío o con explicaciones antiguas
   try {
     let totalPreguntas = await db.get(`SELECT COUNT(*) as total FROM preguntas`);
