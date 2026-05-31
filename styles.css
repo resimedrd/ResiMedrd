@@ -3332,11 +3332,7 @@ select.input:focus {
   color: var(--warning);
 }
 
-/* Clic Físico (Bouncing) */
-.mode-card:active, .btn:active, .panel:active {
-  transform: scale(0.975) !important;
-  transition: transform 0.1s ease !important;
-}
+/* Clic Físico removido */
 
 /* Blinking Live Badge */
 @keyframes pulse-live {

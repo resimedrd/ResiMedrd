@@ -192,23 +192,23 @@
               <label>Modalidad de Examen</label>
               <div class="mode-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 8px;">
                 <button id="btn-modo-estudio" class="mode-card" type="button">
-                  <span class="mode-badge">📖 Paso a Paso</span>
-                  <span class="mode-title">📖 Modo Estudio</span>
+                  <span class="mode-badge">Paso a Paso</span>
+                  <span class="mode-title">Modo Estudio</span>
                   <span class="mode-desc">Retroalimentación analítica y justificación médica por pregunta.</span>
                 </button>
                 <button id="btn-modo-simulacro" class="mode-card" type="button">
-                  <span class="mode-badge">⏱️ Simulador</span>
-                  <span class="mode-title">⏱️ Modo Simulacro</span>
+                  <span class="mode-badge">Simulador</span>
+                  <span class="mode-title">Modo Simulacro</span>
                   <span class="mode-desc">Evaluación con cronómetro estricto y resultados al finalizar.</span>
                 </button>
                 <button id="btn-modo-guardia" class="mode-card" type="button">
-                  <span class="mode-badge" style="background: var(--danger-soft); color: var(--danger);">⚡ SPRINT</span>
-                  <span class="mode-title">🔥 Modo Intensivo</span>
+                  <span class="mode-badge" style="background: var(--danger-soft); color: var(--danger);">SPRINT</span>
+                  <span class="mode-title">Modo Intensivo</span>
                   <span class="mode-desc">Entrenamiento ultra-rápido de 10 preguntas. 30s por pregunta.</span>
                 </button>
                 <button id="btn-modo-batalla" class="mode-card" type="button">
-                  <span class="mode-badge badge-live-pulse">🔴 LIVE</span>
-                  <span class="mode-title">⚔️ Modo Batalla</span>
+                  <span class="mode-badge badge-live-pulse">LIVE</span>
+                  <span class="mode-title">Modo Batalla</span>
                   <span class="mode-desc">Desafía a otros médicos en tiempo real y mide tus conocimientos.</span>
                 </button>
               </div>
@@ -219,7 +219,7 @@
             
             <article id="panel-administrador" class="panel hidden" style="border-color: var(--warning); margin-bottom: 24px;">
               <div class="panel-head">
-                <h3 style="color: var(--warning);">⚡ Panel de Gestión del Banco</h3>
+                <h3 style="color: var(--warning);">Panel de Gestión del Banco</h3>
                 <p>Módulo administrativo exclusivo para inyección de casos clínicos.</p>
               </div>
               <form id="form-nueva-pregunta" style="display: flex; flex-direction: column; gap: 12px;">
@@ -291,7 +291,7 @@
           <!-- FASE 3: GESTIÓN DE EXÁMENES OFICIALES (ENURM) -->
           <div class="admin-box" style="margin-top: 24px; padding: 20px; border: 1px solid var(--border-strong); border-radius: 12px; background: var(--panel-soft);">
             <h3 style="color: var(--warning); margin-bottom: 8px; font-size: 15px; display: flex; align-items: center; gap: 8px;">
-              📊 Gestión de Exámenes Oficiales
+              Gestión de Exámenes Oficiales
             </h3>
             <p style="font-size: 12.5px; color: var(--text-soft); margin-bottom: 16px;">
               Crea, edita y administra los exámenes oficiales del ENURM por año de forma consolidada.
@@ -299,7 +299,7 @@
 
             <!-- Formulario nuevo examen integrado -->
             <form id="form-nuevo-examen" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; padding: 12px; border: 1px dashed var(--border-strong); border-radius: 8px;">
-              <h4 style="font-size: 12px; margin: 0; color: var(--text);">➕ Agregar Nuevo Examen</h4>
+              <h4 style="font-size: 12px; margin: 0; color: var(--text);">Agregar Nuevo Examen</h4>
               <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
                 <input type="text" id="admin-examen-nombre" class="input" placeholder="Nombre (ej: ENURM 2023)" required />
                 <input type="number" id="admin-examen-ano" class="input" placeholder="Año (ej: 2023)" required />
@@ -317,10 +317,10 @@
           <div class="admin-box" style="margin-top: 24px; padding: 20px; border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 12px; background: rgba(239, 68, 68, 0.02);">
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 8px;">
               <h3 style="color: var(--danger); margin: 0; display: flex; align-items: center; gap: 8px; font-size: 15px;">
-                🚨 Reportes de Error de la Comunidad
+                Reportes de Error de la Comunidad
                 <span id="admin-reportes-badge" class="admin-badge-count hidden">0</span>
               </h3>
-              <button id="btn-admin-refrescar-reportes" class="btn btn-ghost" style="padding: 4px 8px; font-size: 11px; border-color: rgba(239,68,68,0.2); color: var(--danger); min-width: auto;" type="button">🔄 Refrescar</button>
+              <button id="btn-admin-refrescar-reportes" class="btn btn-ghost" style="padding: 4px 8px; font-size: 11px; border-color: rgba(239,68,68,0.2); color: var(--danger); min-width: auto;" type="button">Refrescar</button>
             </div>
             <p style="font-size: 12.5px; color: var(--text-soft); margin-bottom: 16px;">Revisa y resuelve las fallas en preguntas reportadas por los estudiantes en tiempo real.</p>
             
