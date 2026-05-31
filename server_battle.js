@@ -342,8 +342,8 @@ function inicializarBatallas(server, db, JWT_SECRET) {
                 playerId: userId
               });
 
-              // Evaluar si todos los jugadores reales han respondido
-              const reales = room.players.filter(p => !p.isBot);
+              // Evaluar si todos los jugadores reales conectados han respondido
+              const reales = room.players.filter(p => !p.isBot && p.isConnected !== false);
               const todosRespondieron = reales.every(p => p.answers.some(ans => ans.questionIndex === qIndex));
 
               if (todosRespondieron) {
@@ -699,7 +699,7 @@ function simularRespuestasDeBots(room, qIndex) {
         }
 
         // Evaluar si todos respondieron tras el click del bot
-        const reales = room.players.filter(p => !p.isBot);
+        const reales = room.players.filter(p => !p.isBot && p.isConnected !== false);
         const todosRespondieron = reales.every(p => p.answers.some(ans => ans.questionIndex === qIndex));
 
         if (todosRespondieron) {
