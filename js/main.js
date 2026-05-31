@@ -60,14 +60,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   if (btnVerPerfil) {
     btnVerPerfil.addEventListener("click", () => {
-      const pantallaPerfil = document.getElementById("pantalla-perfil");
-      if (pantallaPerfil && pantallaPerfil.classList.contains("active")) {
-        ui.mostrarPantalla("home");
-        btnVerPerfil.innerHTML = "👤 Mi Perfil";
-      } else {
-        ui.mostrarPantalla("perfil");
-        btnVerPerfil.innerHTML = "🏠 Volver al Inicio";
-      }
+      ui.mostrarPantalla("perfil");
     });
   }
 
@@ -89,15 +82,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       const pantallaDestino = state.pantallaDeRetorno || "home";
       ui.mostrarPantalla(pantallaDestino);
       state.pantallaDeRetorno = null;
-      
-      const btnVerPerfil = document.getElementById("btn-ver-perfil");
-      if (btnVerPerfil) {
-        if (pantallaDestino === "home") {
-          btnVerPerfil.innerHTML = "👤 Mi Perfil";
-        } else {
-          btnVerPerfil.innerHTML = "🏠 Volver al Inicio";
-        }
-      }
     });
   }
 
@@ -107,9 +91,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     brandLogo.addEventListener("click", () => {
       if (state.usuarioConectado) {
         ui.mostrarPantalla("home");
-        if (btnVerPerfil) {
-          btnVerPerfil.innerHTML = "👤 Mi Perfil";
-        }
       }
     });
   }
