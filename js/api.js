@@ -1,12 +1,7 @@
 // ====== CENTRAL DE PETICIONES HTTP (api.js) ======
 
-// Detecta automáticamente si el frontend se ejecuta de forma local o en un servidor estático (como GitHub Pages)
-const BASE_URL = window.location.hostname === "localhost" || 
-                 window.location.hostname === "127.0.0.1" || 
-                 window.location.hostname.startsWith("192.168.") || 
-                 window.location.hostname.startsWith("10.")
-  ? "" 
-  : "https://resimedrd-production.up.railway.app";
+// Resolución dinámica universal (relative path) para evitar problemas de CORS, subdominios de Railway o pérdida de sesión en recarga
+const BASE_URL = "";
 
 // Helper centralizado para inyectar token JWT de forma automática
 async function request(url, options = {}) {
