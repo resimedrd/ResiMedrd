@@ -3635,4 +3635,50 @@ body.dark-mode #btn-key-info.active, body.dark-mode #btn-attending-tip.active {
   color: #60a5fa !important;
 }
 
+/* ⚡ Fase 4: Estilos Premium y Animación para Anillo y Racha 🔥 */
+@keyframes flamePulse {
+  0% {
+    transform: scale(1);
+    filter: drop-shadow(0 2px 4px rgba(245, 158, 11, 0.4));
+  }
+  100% {
+    transform: scale(1.18);
+    filter: drop-shadow(0 4px 10px rgba(245, 158, 11, 0.8));
+  }
+}
+
+.premium-metrics-panel {
+  background: var(--panel) !important;
+  border-radius: 24px !important;
+  padding: 24px !important;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.metrics-visual-wrapper {
+  transition: border-color 0.3s ease, background-color 0.3s ease;
+}
+
+.streak-badge-premium, .xp-badge-premium {
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+}
+
+.streak-badge-premium:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(245, 158, 11, 0.15);
+}
+
+.xp-badge-premium:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.15);
+}
+
+.banner-predictivo:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px -8px rgba(239, 68, 68, 0.15);
+}
+
+body.dark-mode .premium-metrics-panel {
+  box-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.45) !important;
+}
+
 

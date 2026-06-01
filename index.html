@@ -678,23 +678,77 @@
           </div>
             </article>
 
-            <article class="panel">
-              <div class="panel-head">
-                <h3>Métricas de Rendimiento</h3>
-                <p>Tus datos históricos individuales en esta PC.</p>
+            <!-- CARD DE EVOLUCIÓN CLÍNICA PREMIUM Y GAMIFICADA -->
+            <article class="panel premium-metrics-panel" style="overflow: hidden; position: relative;">
+              <div class="panel-head" style="margin-bottom: 16px;">
+                <h3 style="display: flex; align-items: center; gap: 8px;">
+                  ⚡ Evolución Clínica
+                </h3>
+                <p>Tu diagnóstico y racha académica en tiempo real.</p>
               </div>
+
+              <!-- Anillo Concéntrico y Racha Flame (Gamificación Visual) -->
+              <div class="metrics-visual-wrapper" style="display: flex; align-items: center; justify-content: space-around; gap: 16px; background: rgba(255,255,255,0.01); border: 1px solid var(--border-strong); padding: 18px; border-radius: 20px; margin-bottom: 20px;">
+                <!-- Anillo Circular Progress SVG -->
+                <div class="circular-progress-container" style="position: relative; width: 84px; height: 84px; display: flex; align-items: center; justify-content: center;" title="Precisión Promedio Global">
+                  <svg width="84" height="84" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="40" stroke="var(--border-strong)" stroke-width="8" fill="transparent"></circle>
+                    <circle id="circular-progress-ring" cx="50" cy="50" r="40" stroke="var(--primary)" stroke-width="8" fill="transparent" stroke-dasharray="251.2" stroke-dashoffset="251.2" stroke-linecap="round" style="transition: stroke-dashoffset 1s ease-out; transform: rotate(-90deg); transform-origin: 50% 50%;"></circle>
+                  </svg>
+                  <div style="position: absolute; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                    <span id="dashboard-accuracy-circle-value" style="font-size: 16px; font-weight: 800; font-family: 'Outfit', sans-serif; color: var(--text);">0%</span>
+                    <span style="font-size: 8px; color: var(--text-dim); text-transform: uppercase; font-weight: bold; letter-spacing: 0.5px;">Nota Prom</span>
+                  </div>
+                </div>
+
+                <!-- Racha e XP (Gamificación Duolingo Style) -->
+                <div style="display: flex; flex-direction: column; gap: 8px; flex-grow: 1;">
+                  <div class="streak-badge-premium" style="display: flex; align-items: center; gap: 8px; background: linear-gradient(135deg, rgba(245, 158, 11, 0.12) 0%, rgba(217, 119, 6, 0.03) 100%); border: 1px solid rgba(245, 158, 11, 0.25); padding: 6px 12px; border-radius: 12px;">
+                    <span style="font-size: 18px; filter: drop-shadow(0 2px 4px rgba(245, 158, 11, 0.4)); animation: flamePulse 1.5s infinite alternate; display: inline-block;">🔥</span>
+                    <div>
+                      <span id="dashboard-racha-valor" style="font-size: 13.5px; font-weight: 800; color: var(--warning); display: block; line-height: 1.1;">0 Días</span>
+                      <span style="font-size: 9px; color: var(--text-dim); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">Racha Activa</span>
+                    </div>
+                  </div>
+                  <div class="xp-badge-premium" style="display: flex; align-items: center; gap: 8px; background: linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(4, 120, 87, 0.03) 100%); border: 1px solid rgba(16, 185, 129, 0.25); padding: 6px 12px; border-radius: 12px;">
+                    <span style="font-size: 16px;">💎</span>
+                    <div>
+                      <span id="dashboard-xp-valor" style="font-size: 13.5px; font-weight: 800; color: var(--success); display: block; line-height: 1.1;">0 XP</span>
+                      <span style="font-size: 9px; color: var(--text-dim); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">Nivel <span id="dashboard-nivel-valor">1</span></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Grid de Métricas Principales (Record y Respondidas) -->
               <div class="dashboard-grid" style="margin-bottom: 20px;">
-                <div class="dashboard-metric">
-                  <span class="dashboard-label">Record Personal</span>
-                  <span id="dashboard-mejor-porcentaje" class="dashboard-value">0%</span>
+                <div class="dashboard-metric" style="display: flex; align-items: center; gap: 12px; padding: 14px 18px !important;">
+                  <div style="font-size: 20px; background: rgba(59, 130, 246, 0.1); width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--primary);">🏆</div>
+                  <div>
+                    <span class="dashboard-label" style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;">Récord Max</span>
+                    <span id="dashboard-mejor-porcentaje" class="dashboard-value" style="font-size: 18px; margin-top: 2px;">0%</span>
+                  </div>
                 </div>
-                <div class="dashboard-metric">
-                  <span class="dashboard-label">Preguntas Vistas</span>
-                  <span id="dashboard-total-preguntas" class="dashboard-value">0</span>
+                <div class="dashboard-metric" style="display: flex; align-items: center; gap: 12px; padding: 14px 18px !important;">
+                  <div style="font-size: 20px; background: rgba(139, 92, 246, 0.1); width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #8b5cf6;">🩺</div>
+                  <div>
+                    <span class="dashboard-label" style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;">Resueltas</span>
+                    <span id="dashboard-total-preguntas" class="dashboard-value" style="font-size: 18px; margin-top: 2px;">0</span>
+                  </div>
                 </div>
               </div>
-              <div class="panel-head" style="margin-bottom: 12px;">
-                <h3>Últimos Simulacros</h3>
+
+              <!-- Pronóstico de Especialidad Crítica (Análisis IA/Estadístico en vivo) -->
+              <div id="dashboard-especialidad-critica-banner" class="banner-predictivo" style="display: flex; flex-direction: column; gap: 4px; background: linear-gradient(135deg, rgba(239, 68, 68, 0.08) 0%, rgba(185, 28, 28, 0.02) 100%); border: 1px solid rgba(239, 68, 68, 0.2); padding: 14px 18px; border-radius: 16px; margin-bottom: 20px; transition: all 0.3s ease;">
+                <div style="display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; color: var(--danger); text-transform: uppercase; letter-spacing: 0.5px;">
+                  <span>⚠️</span> Foco Crítico Detectado
+                </div>
+                <span id="dashboard-especialidad-critica-nombre" style="font-size: 13.5px; font-weight: 700; color: var(--text);">Analizando datos...</span>
+                <span style="font-size: 11px; color: var(--text-dim);">Entrena esta materia hoy para subir tu promedio.</span>
+              </div>
+
+              <div class="panel-head" style="margin-bottom: 12px; padding-top: 8px; border-top: 1px dashed var(--border-strong);">
+                <h3 style="font-size: 14px;">📋 Últimos Simulacros</h3>
               </div>
               <div id="historial-lista" class="history-list"></div>
             </article>
