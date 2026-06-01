@@ -74,7 +74,7 @@ const ui = {
       } else if (nombrePantalla === "perfil") {
         const tabErrores = document.getElementById("tab-perfil-errores");
         if (tabErrores && tabErrores.classList.contains("active")) {
-          targetSelector = '.sidebar-item[data-target="errores"]';
+          targetSelector = '.sidebar-item[data-target="historial"]';
         } else {
           targetSelector = '.sidebar-item[data-target="estadisticas"]';
         }

@@ -891,7 +891,7 @@
           <!-- TABS DEL PERFIL (NUEVO CON DOS SECCIONES) -->
           <div class="auth-tabs" style="margin-bottom: 0;">
             <button id="tab-perfil-progreso" class="auth-tab active" type="button" style="border-radius: 12px 12px 0 0;">📈 Estadísticas y Métricas</button>
-            <button id="tab-perfil-errores" class="auth-tab" type="button" style="border-radius: 12px 12px 0 0;">🚨 Banco de Errores</button>
+            <button id="tab-perfil-errores" class="auth-tab" type="button" style="border-radius: 12px 12px 0 0;">📋 Historial y Banco de Errores</button>
           </div>
 
           <!-- CONTENIDO: MI PROGRESO -->
@@ -1038,6 +1038,29 @@
               </div>
             </div>
 
+            
+
+          <!-- CONTENIDO: BANCO DE ERRORES -->
+          <div id="perfil-contenido-errores" class="perfil-seccion-tab hidden" style="margin-top: 20px;">
+            <article class="panel" style="border-radius: 28px; padding: 32px; background: var(--panel); border: 1px solid var(--border);">
+              <div class="panel-head" style="margin-bottom: 20px;">
+                <h3 style="color: var(--text); font-size: 20px; font-weight: 700;">🚨 Mi Banco de Errores</h3>
+                <p style="font-size: 14px; color: var(--text-dim); margin-top: 4px;">Recopilación automática de todas las preguntas que has fallado en tus simulacros.</p>
+              </div>
+              
+              <div id="banco-errores-lista" class="review-list" style="margin-top: 16px;">
+                <!-- Inyectado dinámicamente desde JS -->
+              </div>
+              <div id="banco-errores-vacio" class="history-empty hidden" style="margin-top: 16px; text-align: center; padding: 24px; color: var(--text-dim);">
+                ¡Felicidades! No tienes errores registrados en tu cuenta actualmente.
+              </div>
+            </article>
+          </div>
+
+
+
+        
+
             <!-- Historial de Evaluaciones Colapsable -->
             <div id="contenedor-evaluaciones-acordeon" style="margin-top: 24px;">
               <button id="btn-toggle-evaluaciones" class="btn btn-ghost" type="button" style="width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 14px 20px; border-radius: 14px; background: rgba(255,255,255,0.02); font-weight: 700; border: 1px solid var(--border); font-size: 14px; color: var(--primary); transition: all 0.3s ease; cursor: pointer;">
@@ -1135,27 +1158,7 @@
               </div>
             </div>
           </div>
-
-          <!-- CONTENIDO: BANCO DE ERRORES -->
-          <div id="perfil-contenido-errores" class="perfil-seccion-tab hidden" style="margin-top: 20px;">
-            <article class="panel" style="border-radius: 28px; padding: 32px; background: var(--panel); border: 1px solid var(--border);">
-              <div class="panel-head" style="margin-bottom: 20px;">
-                <h3 style="color: var(--text); font-size: 20px; font-weight: 700;">🚨 Mi Banco de Errores</h3>
-                <p style="font-size: 14px; color: var(--text-dim); margin-top: 4px;">Recopilación automática de todas las preguntas que has fallado en tus simulacros.</p>
-              </div>
-              
-              <div id="banco-errores-lista" class="review-list" style="margin-top: 16px;">
-                <!-- Inyectado dinámicamente desde JS -->
-              </div>
-              <div id="banco-errores-vacio" class="history-empty hidden" style="margin-top: 16px; text-align: center; padding: 24px; color: var(--text-dim);">
-                ¡Felicidades! No tienes errores registrados en tu cuenta actualmente.
-              </div>
-            </article>
           </div>
-
-
-
-        </div>
       </section>
 
       <!-- FASE 3: MÓDULO INTERACTIVO DE FLASHCARDS ENURM -->

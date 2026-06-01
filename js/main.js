@@ -260,8 +260,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         }, 300);
       } else if (target === "historial") {
         ui.mostrarPantalla("perfil");
-        const tabProgreso = document.getElementById("tab-perfil-progreso");
-        if (tabProgreso) tabProgreso.click();
+        const tabErrores = document.getElementById("tab-perfil-errores");
+        if (tabErrores) tabErrores.click();
         
         // Auto expandir historial
         const seccionEval = document.getElementById("seccion-evaluaciones-desplegable");
