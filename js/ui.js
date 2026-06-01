@@ -74,7 +74,7 @@ const ui = {
       } else if (nombrePantalla === "perfil") {
         const tabErrores = document.getElementById("tab-perfil-errores");
         if (tabErrores && tabErrores.classList.contains("active")) {
-          targetSelector = '.sidebar-item[data-target="historial"]';
+          targetSelector = '.sidebar-item[data-target="errores"]';
         } else {
           targetSelector = '.sidebar-item[data-target="estadisticas"]';
         }
@@ -498,115 +498,10 @@ const ui = {
       state.usuarioConectado.streak = datos.streak;
       state.usuarioConectado.metaSemanal = datos.metaSemanal;
       localStorage.setItem("resiMed_session", JSON.stringify(state.usuarioConectado));
-
       document.getElementById("resumen-total-sesiones").textContent = datos.totalSesiones;
       document.getElementById("resumen-promedio-general").textContent = datos.promedioGeneral + "%";
       document.getElementById("dashboard-mejor-porcentaje").textContent = datos.mejorPorcentaje + "%";
       document.getElementById("dashboard-total-preguntas").textContent = datos.totalPreguntasRespondidas;
-
-      // Nuevos campos gamificados en la barra lateral del Home
-      const rachaValorEl = document.getElementById("dashboard-racha-valor");
-      if (rachaValorEl) {
-        rachaValorEl.textContent = `${datos.streak} ${datos.streak === 1 ? 'Día' : 'Días'}`;
-      }
-      
-      const xpValorEl = document.getElementById("dashboard-xp-valor");
-      if (xpValorEl) {
-        xpValorEl.textContent = `${datos.xp} XP`;
-      }
-
-      const nivelValorEl = document.getElementById("dashboard-nivel-valor");
-      if (nivelValorEl) {
-        nivelValorEl.textContent = datos.nivel;
-      }
-
-      const accuracyCircleEl = document.getElementById("dashboard-accuracy-circle-value");
-      if (accuracyCircleEl) {
-        accuracyCircleEl.textContent = `${datos.promedioGeneral}%`;
-      }
-
-      const progressRingEl = document.getElementById("circular-progress-ring");
-      if (progressRingEl) {
-        const radius = 40;
-        const circumference = 2 * Math.PI * radius; // 251.2
-        const offset = circumference - (datos.promedioGeneral / 100) * circumference;
-        progressRingEl.style.strokeDashoffset = offset;
-      }
-
-      // Banner de Especialidad Crítica (Análisis IA/Estadístico en vivo)
-      try {
-        const historial = await api.obtenerHistorialCompleto(user.id);
-        const bannerCritica = document.getElementById("dashboard-especialidad-critica-banner");
-        const nombreCriticaEl = document.getElementById("dashboard-especialidad-critica-nombre");
-        
-        if (historial && historial.length > 0 && typeof analytics !== "undefined") {
-          const metricasAv = analytics.procesarMetricas(historial);
-          if (metricasAv && metricasAv.debilidadesDetectadas && metricasAv.debilidadesDetectadas.length > 0) {
-            // Hay al menos una debilidad < 60%
-            const debilidadPrincipal = metricasAv.debilidadesDetectadas[0];
-            
-            // Buscar emoji en la lista de especialidades
-            const espInfo = state.LISTA_ESPECIALIDADES.find(e => e.nombre.trim().toLowerCase() === debilidadPrincipal.tema.trim().toLowerCase() || ui.normalizarTema(e.nombre) === ui.normalizarTema(debilidadPrincipal.tema));
-            const emojiStr = espInfo ? espInfo.emoji + " " : "🩺 ";
-            
-            if (nombreCriticaEl) {
-              nombreCriticaEl.textContent = `${emojiStr}${debilidadPrincipal.tema} (${debilidadPrincipal.porcentaje}% acierto)`;
-            }
-            if (bannerCritica) {
-              bannerCritica.style.display = "flex";
-              bannerCritica.style.background = "linear-gradient(135deg, rgba(239, 68, 68, 0.08) 0%, rgba(185, 28, 28, 0.02) 100%)";
-              bannerCritica.style.borderColor = "rgba(239, 68, 68, 0.2)";
-              const alertHeader = bannerCritica.querySelector("div");
-              if (alertHeader) {
-                alertHeader.innerHTML = "<span>⚠️</span> Foco Crítico Detectado";
-                alertHeader.style.color = "var(--danger)";
-              }
-              const adviceText = bannerCritica.querySelector("span:last-child");
-              if (adviceText) {
-                adviceText.textContent = "Entrena esta materia hoy para subir tu promedio.";
-              }
-            }
-          } else {
-            // No hay debilidades < 60%
-            if (nombreCriticaEl) {
-              nombreCriticaEl.textContent = "✅ ¡Sin debilidades críticas activas!";
-            }
-            if (bannerCritica) {
-              bannerCritica.style.background = "linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(4, 120, 87, 0.02) 100%)";
-              bannerCritica.style.borderColor = "rgba(16, 185, 129, 0.2)";
-              const alertHeader = bannerCritica.querySelector("div");
-              if (alertHeader) {
-                alertHeader.innerHTML = "<span>✨</span> Estado Académico Excelente";
-                alertHeader.style.color = "var(--success)";
-              }
-              const adviceText = bannerCritica.querySelector("span:last-child");
-              if (adviceText) {
-                adviceText.textContent = "Mantienes precisión por encima del 60% en todas las áreas.";
-              }
-            }
-          }
-        } else {
-          // No hay historial aún
-          if (nombreCriticaEl) {
-            nombreCriticaEl.textContent = "🔍 Sin simulacros suficientes";
-          }
-          if (bannerCritica) {
-            bannerCritica.style.background = "rgba(255,255,255,0.01)";
-            bannerCritica.style.borderColor = "var(--border)";
-            const alertHeader = bannerCritica.querySelector("div");
-            if (alertHeader) {
-              alertHeader.innerHTML = "<span>💡</span> Consejo de Iniciación";
-              alertHeader.style.color = "var(--text-dim)";
-            }
-            const adviceText = bannerCritica.querySelector("span:last-child");
-            if (adviceText) {
-              adviceText.textContent = "Realiza tu primer simulacro para perfilar tu diagnóstico.";
-            }
-          }
-        }
-      } catch (err) {
-        console.warn("No se pudo cargar la debilidad del dashboard:", err);
-      }
 
       ui.actualizarWidgetGamificacion();
     } catch (err) {

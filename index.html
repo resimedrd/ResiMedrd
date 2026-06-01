@@ -57,11 +57,7 @@
   <div class="layout">
     <header class="topbar">
       <div style="display: flex; align-items: center; gap: 8px;">
-        <button id="btn-toggle-sidebar" class="btn btn-ghost hidden" type="button" style="min-width: auto; padding: 8px 12px; font-size: 20px; border-radius: 50%;" title="Menú lateral">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="sidebar-toggle-chevron">
-            <polyline points="15 18 9 12 15 6"></polyline>
-          </svg>
-        </button>
+        <button id="btn-toggle-sidebar" class="btn btn-ghost hidden" type="button" style="min-width: auto; padding: 8px 12px; font-size: 20px; border-radius: 50%;" title="Menú lateral">☰</button>
         <div class="brand">
           <div class="brand-mark">R</div>
           <div class="brand-copy">
@@ -683,76 +679,23 @@
             </article>
 
             <!-- CARD DE EVOLUCIÓN CLÍNICA PREMIUM Y GAMIFICADA -->
-            <article class="panel premium-metrics-panel" style="overflow: hidden; position: relative;">
-              <div class="panel-head" style="margin-bottom: 16px;">
-                <h3 style="display: flex; align-items: center; gap: 8px;">
-                  ⚡ Evolución Clínica
-                </h3>
-                <p>Tu diagnóstico y racha académica en tiempo real.</p>
+            <article class="panel">
+              <div class="panel-head">
+                <h3>Métricas de Rendimiento</h3>
+                <p>Tus datos históricos individuales en esta PC.</p>
               </div>
-
-              <!-- Anillo Concéntrico y Racha Flame (Gamificación Visual) -->
-              <div class="metrics-visual-wrapper" style="display: flex; align-items: center; justify-content: space-around; gap: 16px; background: rgba(255,255,255,0.01); border: 1px solid var(--border-strong); padding: 18px; border-radius: 20px; margin-bottom: 20px;">
-                <!-- Anillo Circular Progress SVG -->
-                <div class="circular-progress-container" style="position: relative; width: 84px; height: 84px; display: flex; align-items: center; justify-content: center;" title="Precisión Promedio Global">
-                  <svg width="84" height="84" viewBox="0 0 100 100">
-                    <circle cx="50" cy="50" r="40" stroke="var(--border-strong)" stroke-width="8" fill="transparent"></circle>
-                    <circle id="circular-progress-ring" cx="50" cy="50" r="40" stroke="var(--primary)" stroke-width="8" fill="transparent" stroke-dasharray="251.2" stroke-dashoffset="251.2" stroke-linecap="round" style="transition: stroke-dashoffset 1s ease-out; transform: rotate(-90deg); transform-origin: 50% 50%;"></circle>
-                  </svg>
-                  <div style="position: absolute; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                    <span id="dashboard-accuracy-circle-value" style="font-size: 16px; font-weight: 800; font-family: 'Outfit', sans-serif; color: var(--text);">0%</span>
-                    <span style="font-size: 8px; color: var(--text-dim); text-transform: uppercase; font-weight: bold; letter-spacing: 0.5px;">Nota Prom</span>
-                  </div>
-                </div>
-
-                <!-- Racha e XP (Gamificación Duolingo Style) -->
-                <div style="display: flex; flex-direction: column; gap: 8px; flex-grow: 1;">
-                  <div class="streak-badge-premium" style="display: flex; align-items: center; gap: 8px; background: linear-gradient(135deg, rgba(245, 158, 11, 0.12) 0%, rgba(217, 119, 6, 0.03) 100%); border: 1px solid rgba(245, 158, 11, 0.25); padding: 6px 12px; border-radius: 12px;">
-                    <span style="font-size: 18px; filter: drop-shadow(0 2px 4px rgba(245, 158, 11, 0.4)); animation: flamePulse 1.5s infinite alternate; display: inline-block;">🔥</span>
-                    <div>
-                      <span id="dashboard-racha-valor" style="font-size: 13.5px; font-weight: 800; color: var(--warning); display: block; line-height: 1.1;">0 Días</span>
-                      <span style="font-size: 9px; color: var(--text-dim); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">Racha Activa</span>
-                    </div>
-                  </div>
-                  <div class="xp-badge-premium" style="display: flex; align-items: center; gap: 8px; background: linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(4, 120, 87, 0.03) 100%); border: 1px solid rgba(16, 185, 129, 0.25); padding: 6px 12px; border-radius: 12px;">
-                    <span style="font-size: 16px;">💎</span>
-                    <div>
-                      <span id="dashboard-xp-valor" style="font-size: 13.5px; font-weight: 800; color: var(--success); display: block; line-height: 1.1;">0 XP</span>
-                      <span style="font-size: 9px; color: var(--text-dim); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">Nivel <span id="dashboard-nivel-valor">1</span></span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Grid de Métricas Principales (Record y Respondidas) -->
               <div class="dashboard-grid" style="margin-bottom: 20px;">
-                <div class="dashboard-metric" style="display: flex; align-items: center; gap: 12px; padding: 14px 18px !important;">
-                  <div style="font-size: 20px; background: rgba(59, 130, 246, 0.1); width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--primary);">🏆</div>
-                  <div>
-                    <span class="dashboard-label" style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;">Récord Max</span>
-                    <span id="dashboard-mejor-porcentaje" class="dashboard-value" style="font-size: 18px; margin-top: 2px;">0%</span>
-                  </div>
+                <div class="dashboard-metric">
+                  <span class="dashboard-label">Record Personal</span>
+                  <span id="dashboard-mejor-porcentaje" class="dashboard-value">0%</span>
                 </div>
-                <div class="dashboard-metric" style="display: flex; align-items: center; gap: 12px; padding: 14px 18px !important;">
-                  <div style="font-size: 20px; background: rgba(139, 92, 246, 0.1); width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #8b5cf6;">🩺</div>
-                  <div>
-                    <span class="dashboard-label" style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;">Resueltas</span>
-                    <span id="dashboard-total-preguntas" class="dashboard-value" style="font-size: 18px; margin-top: 2px;">0</span>
-                  </div>
+                <div class="dashboard-metric">
+                  <span class="dashboard-label">Preguntas Vistas</span>
+                  <span id="dashboard-total-preguntas" class="dashboard-value">0</span>
                 </div>
               </div>
-
-              <!-- Pronóstico de Especialidad Crítica (Análisis IA/Estadístico en vivo) -->
-              <div id="dashboard-especialidad-critica-banner" class="banner-predictivo" style="display: flex; flex-direction: column; gap: 4px; background: linear-gradient(135deg, rgba(239, 68, 68, 0.08) 0%, rgba(185, 28, 28, 0.02) 100%); border: 1px solid rgba(239, 68, 68, 0.2); padding: 14px 18px; border-radius: 16px; margin-bottom: 20px; transition: all 0.3s ease;">
-                <div style="display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; color: var(--danger); text-transform: uppercase; letter-spacing: 0.5px;">
-                  <span>⚠️</span> Foco Crítico Detectado
-                </div>
-                <span id="dashboard-especialidad-critica-nombre" style="font-size: 13.5px; font-weight: 700; color: var(--text);">Analizando datos...</span>
-                <span style="font-size: 11px; color: var(--text-dim);">Entrena esta materia hoy para subir tu promedio.</span>
-              </div>
-
-              <div class="panel-head" style="margin-bottom: 12px; padding-top: 8px; border-top: 1px dashed var(--border-strong);">
-                <h3 style="font-size: 14px;">📋 Últimos Simulacros</h3>
+              <div class="panel-head" style="margin-bottom: 12px;">
+                <h3>Últimos Simulacros</h3>
               </div>
               <div id="historial-lista" class="history-list"></div>
             </article>
@@ -891,7 +834,7 @@
           <!-- TABS DEL PERFIL (NUEVO CON DOS SECCIONES) -->
           <div class="auth-tabs" style="margin-bottom: 0;">
             <button id="tab-perfil-progreso" class="auth-tab active" type="button" style="border-radius: 12px 12px 0 0;">📈 Estadísticas y Métricas</button>
-            <button id="tab-perfil-errores" class="auth-tab" type="button" style="border-radius: 12px 12px 0 0;">📋 Historial y Banco de Errores</button>
+            <button id="tab-perfil-errores" class="auth-tab" type="button" style="border-radius: 12px 12px 0 0;">🚨 Banco de Errores</button>
           </div>
 
           <!-- CONTENIDO: MI PROGRESO -->
@@ -1097,30 +1040,7 @@
                   </div>
                 </div>
               </div>
-            </div>
-
             
-
-          <!-- CONTENIDO: BANCO DE ERRORES -->
-          <div id="perfil-contenido-errores" class="perfil-seccion-tab hidden" style="margin-top: 20px;">
-            <article class="panel" style="border-radius: 28px; padding: 32px; background: var(--panel); border: 1px solid var(--border);">
-              <div class="panel-head" style="margin-bottom: 20px;">
-                <h3 style="color: var(--text); font-size: 20px; font-weight: 700;">🚨 Mi Banco de Errores</h3>
-                <p style="font-size: 14px; color: var(--text-dim); margin-top: 4px;">Recopilación automática de todas las preguntas que has fallado en tus simulacros.</p>
-              </div>
-              
-              <div id="banco-errores-lista" class="review-list" style="margin-top: 16px;">
-                <!-- Inyectado dinámicamente desde JS -->
-              </div>
-              <div id="banco-errores-vacio" class="history-empty hidden" style="margin-top: 16px; text-align: center; padding: 24px; color: var(--text-dim);">
-                ¡Felicidades! No tienes errores registrados en tu cuenta actualmente.
-              </div>
-            </article>
-          </div>
-
-
-
-        
 
             <!-- Historial de Evaluaciones Colapsable -->
             <div id="contenedor-evaluaciones-acordeon" style="margin-top: 24px;">
@@ -1220,6 +1140,32 @@
             </div>
           </div>
           </div>
+
+            
+
+          <!-- CONTENIDO: BANCO DE ERRORES -->
+          <div id="perfil-contenido-errores" class="perfil-seccion-tab hidden" style="margin-top: 20px;">
+            <article class="panel" style="border-radius: 28px; padding: 32px; background: var(--panel); border: 1px solid var(--border);">
+              <div class="panel-head" style="margin-bottom: 20px;">
+                <h3 style="color: var(--text); font-size: 20px; font-weight: 700;">🚨 Mi Banco de Errores</h3>
+                <p style="font-size: 14px; color: var(--text-dim); margin-top: 4px;">Recopilación automática de todas las preguntas que has fallado en tus simulacros.</p>
+              </div>
+              
+              <div id="banco-errores-lista" class="review-list" style="margin-top: 16px;">
+                <!-- Inyectado dinámicamente desde JS -->
+              </div>
+              <div id="banco-errores-vacio" class="history-empty hidden" style="margin-top: 16px; text-align: center; padding: 24px; color: var(--text-dim);">
+                ¡Felicidades! No tienes errores registrados en tu cuenta actualmente.
+              </div>
+            </article>
+          </div>
+
+
+
+        
+
+            
+          </div>
       </section>
 
       <!-- FASE 3: MÓDULO INTERACTIVO DE FLASHCARDS ENURM -->
@@ -1250,37 +1196,7 @@
           </article>
 
           <!-- DASHBOARD GLOBAL DE SPACED REPETITION (Fase 9) -->
-          <div id="flashcards-global-stats-dashboard" class="panel" style="margin: 24px 0 16px 0; padding: 20px; border-radius: 20px; border: 1px solid var(--border); background: var(--panel-soft); display: flex; flex-direction: column; gap: 16px; transition: all 0.3s ease;">
-            <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px dashed var(--border-strong); padding-bottom: 12px; flex-wrap: wrap; gap: 8px;">
-              <h3 style="margin: 0; font-size: 13.5px; color: var(--text); font-weight: 700; display: flex; align-items: center; gap: 8px;">
-                <span>🧠</span> Estado Global de Retención (Algoritmo SM-2)
-              </h3>
-              <span class="badge" style="background: rgba(139, 92, 246, 0.1); border: 1px solid rgba(139, 92, 246, 0.2); color: #8b5cf6; padding: 4px 10px; border-radius: 100px; font-size: 11px; font-weight: 700; letter-spacing: 0.5px;">Sincronizado</span>
-            </div>
-            
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; text-align: center;">
-              <!-- Tarjetas Totales -->
-              <div class="dashboard-metric" style="padding: 12px !important; border-radius: 14px !important;">
-                <span class="dashboard-label" style="font-size: 10.5px; text-transform: uppercase;">Tarjetas Totales</span>
-                <span id="fc-global-totales" class="dashboard-value" style="font-size: 20px; color: var(--text); margin-top: 4px;">0</span>
-              </div>
-              <!-- Por Repasar Hoy -->
-              <div class="dashboard-metric" style="padding: 12px !important; border-radius: 14px !important; border-left: 3px solid var(--warning) !important;">
-                <span class="dashboard-label" style="font-size: 10.5px; text-transform: uppercase;">Por Repasar Hoy</span>
-                <span id="fc-global-pendientes" class="dashboard-value" style="font-size: 20px; color: var(--warning); margin-top: 4px;">0</span>
-              </div>
-              <!-- En Aprendizaje -->
-              <div class="dashboard-metric" style="padding: 12px !important; border-radius: 14px !important; border-left: 3px solid var(--primary) !important;">
-                <span class="dashboard-label" style="font-size: 10.5px; text-transform: uppercase;">En Aprendizaje</span>
-                <span id="fc-global-aprendizaje" class="dashboard-value" style="font-size: 20px; color: var(--primary); margin-top: 4px;">0</span>
-              </div>
-              <!-- Dominadas (Largo Plazo) -->
-              <div class="dashboard-metric" style="padding: 12px !important; border-radius: 14px !important; border-left: 3px solid var(--success) !important;">
-                <span class="dashboard-label" style="font-size: 10.5px; text-transform: uppercase;">Dominadas</span>
-                <span id="fc-global-dominadas" class="dashboard-value" style="font-size: 20px; color: var(--success); margin-top: 4px;">0</span>
-              </div>
-            </div>
-          </div>
+          
 
           <!-- Selector de Modalidad de Flashcards -->
           <div style="display: flex; justify-content: center; gap: 12px; margin: 24px 0 16px 0; flex-wrap: wrap;">
