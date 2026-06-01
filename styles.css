@@ -3681,4 +3681,65 @@ body.dark-mode .premium-metrics-panel {
   box-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.45) !important;
 }
 
+/* 🧱 Fase 6: Botón Flotante Lateral Centrado y Chevron Dinámico */
+@media (min-width: 851px) {
+  #btn-toggle-sidebar {
+    position: fixed !important;
+    left: max(228px, calc(50vw - 377px)) !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    width: 28px !important;
+    height: 56px !important;
+    background: var(--panel) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 0 12px 12px 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    z-index: 1005 !important;
+    transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    box-shadow: 4px 0 16px rgba(0, 0, 0, 0.12) !important;
+    color: var(--text-soft) !important;
+    padding: 0 !important;
+    min-width: auto !important;
+    border-left: none !important;
+  }
+
+  #btn-toggle-sidebar:hover {
+    background: var(--panel-soft) !important;
+    color: var(--primary) !important;
+    box-shadow: 4px 0 20px rgba(59, 130, 246, 0.18) !important;
+    transform: translateY(-50%) scale(1.05) !important;
+    width: 32px !important; /* expands slightly to the right on hover */
+  }
+
+  /* When the sidebar is collapsed */
+  body:has(#app-sidebar.collapsed) #btn-toggle-sidebar {
+    left: 12px !important;
+    border-left: 1px solid var(--border) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12) !important;
+  }
+}
+
+/* Rotación dinámica del Chevron basada en el estado de colapso */
+.sidebar-toggle-chevron {
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: rotate(0deg);
+}
+
+body:has(#app-sidebar.collapsed) .sidebar-toggle-chevron {
+  transform: rotate(180deg) !important;
+}
+
+@media (max-width: 850px) {
+  .sidebar-toggle-chevron {
+    transform: rotate(180deg); /* default points right to show it is hidden */
+  }
+  body:has(#app-sidebar.active-mobile) .sidebar-toggle-chevron {
+    transform: rotate(0deg) !important; /* points left to show it can be closed */
+  }
+}
+
 
