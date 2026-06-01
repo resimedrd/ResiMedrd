@@ -3601,4 +3601,38 @@ body:has(#pantalla-auth.active) .sidebar-backdrop {
   }
 }
 
+/* ==========================================================================
+   🧠 AMBOSS STUDY TOOLS & KEY INFO CLINICAL HIGHLIGHTING
+   ========================================================================== */
+
+.key-info-highlight {
+  background-color: rgba(59, 130, 246, 0.14) !important;
+  border-bottom: 2px dotted #3b82f6 !important;
+  padding: 0 4px !important;
+  border-radius: 4px !important;
+  color: var(--text) !important;
+  font-weight: 600 !important;
+  display: inline !important;
+  transition: all 0.25s ease !important;
+}
+
+body.dark-mode .key-info-highlight {
+  background-color: rgba(59, 130, 246, 0.22) !important;
+  border-bottom: 2px dotted #60a5fa !important;
+  color: #fff !important;
+}
+
+#btn-key-info.active, #btn-attending-tip.active {
+  background-color: rgba(59, 130, 246, 0.08) !important;
+  border-color: var(--primary) !important;
+  color: var(--primary) !important;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1) !important;
+}
+
+body.dark-mode #btn-key-info.active, body.dark-mode #btn-attending-tip.active {
+  background-color: rgba(59, 130, 246, 0.15) !important;
+  border-color: #60a5fa !important;
+  color: #60a5fa !important;
+}
+
 

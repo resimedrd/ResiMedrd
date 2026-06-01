@@ -716,6 +716,12 @@
                 <h3 id="pregunta-texto" class="question-text">Cargando caso clínico...</h3>
                 <div id="opciones-container" class="options-grid"></div>
               </div>
+              <div id="socratic-tip-box" class="feedback-box hidden" style="border-color: rgba(59, 130, 246, 0.2); background: rgba(59, 130, 246, 0.02); margin-top: 16px;">
+                <div style="display: flex; align-items: center; gap: 8px; font-weight: 700; color: var(--primary); font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;">
+                  <span>🧠</span> Consejo del Tutor (Método Socrático)
+                </div>
+                <p id="socratic-tip-texto" style="font-size: 13.5px; color: var(--text-soft); line-height: 1.5; margin: 8px 0 0 0;"></p>
+              </div>
               <div id="feedback-box" class="feedback-box hidden">
                 <div id="feedback-estado" class="feedback-estado"></div>
                 <p id="feedback-explicacion" class="feedback-explicacion"></p>
@@ -739,6 +745,21 @@
               <div id="simulacro-navigation-map" class="hidden" style="margin-top: 8px; width: 100%;">
                 <p style="font-size: 11px; color: var(--text-dim); margin-bottom: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Mapa del Examen</p>
                 <div id="grid-preguntas-container"></div>
+              </div>
+            </div>
+
+            <!-- Panel de Herramientas de Estudio AMBOSS (Solo en Modo Estudio) -->
+            <div id="study-tools-card" class="sidebar-unified-card-v2 hidden" style="margin-top: 16px;">
+              <p style="font-size: 11px; color: var(--text-dim); margin-bottom: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 6px;">
+                <span>🛠️</span> Herramientas de Estudio
+              </p>
+              <div style="display: flex; flex-direction: column; gap: 8px;">
+                <button id="btn-key-info" class="btn btn-ghost" type="button" style="width: 100%; font-size: 12.5px; font-weight: 600; padding: 10px 14px; border-radius: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s;" title="Resalta datos clínicos clave">
+                  <span>💡</span> Datos Clave (Key Info)
+                </button>
+                <button id="btn-attending-tip" class="btn btn-ghost" type="button" style="width: 100%; font-size: 12.5px; font-weight: 600; padding: 10px 14px; border-radius: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s;" title="Pide una pista socrática de IA">
+                  <span>🧠</span> Consejo del Tutor
+                </button>
               </div>
             </div>
           </aside>

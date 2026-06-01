@@ -9,6 +9,43 @@ function safeParseOpciones(opciones) {
 }
 
 const quiz = {
+  keyInfoActivo: false,
+
+  obtenerTextoConClaves(texto) {
+    if (!texto) return "";
+    let modificado = texto;
+    
+    // 1. Demográficos (edad/sexo)
+    const regexDemo = /(?:paciente|femenina|masculino|niño|niña|lactante|embarazada|recién nacido|rn|adolescente|anciano|anciana)\s+(?:de\s+)?(?:\d+\s*(?:años|meses|días|semanas))/gi;
+    modificado = modificado.replace(regexDemo, match => `<span class="key-info-highlight">${match}</span>`);
+    
+    // 2. Signos vitales y laboratorio
+    const regexVitals = /(?:\d+(?:\.\d+)?\s*(?:°C|bpm|lpm|mmHg|g\/dL|mg\/dL|mEq\/L|U\/L|segundos|seg|minutos|min))/gi;
+    modificado = modificado.replace(regexVitals, match => `<span class="key-info-highlight">${match}</span>`);
+    
+    // 3. Síntomas clínicos de alta frecuencia
+    const regexSintomas = /(dolor abdominal|fiebre|disnea|tos productiva|cefalea|ictericia|cianosis|hematuria|oliguria|poliuria|polidipsia|polifagia|prurito|vómitos|nauseas|diarrea|estreñimiento|palpitaciones|síncope|rigidez de nuca|signo de Brudzinski|signo de Kernig|soplo|edema|adenopatías|esplenomegalia|hepatomegalia|masa palpable)/gi;
+    modificado = modificado.replace(regexSintomas, match => `<span class="key-info-highlight">${match}</span>`);
+    
+    return modificado;
+  },
+
+  obtenerConsejoSocratico(p) {
+    const sub = p.subtema || p.tema || "General";
+    const sintomasEncontrados = [];
+    const sintomas = ["fiebre", "dolor", "disnea", "ictericia", "rigidez de nuca", "cefalea", "diarrea", "soplo", "vómitos", "tos"];
+    sintomas.forEach(s => {
+      if (p.texto.toLowerCase().includes(s)) sintomasEncontrados.push(s);
+    });
+    
+    let consejo = `Este caso clínico evalúa conceptos clave de **${sub}**. `;
+    if (sintomasEncontrados.length > 0) {
+      consejo += `Presta especial atención a la presencia de **${sintomasEncontrados.join(", ")}** en el paciente. `;
+    }
+    consejo += `Analiza si los hallazgos sugieren una etiología infecciosa, inflamatoria o mecánica, y descarta las opciones que no coincidan con la velocidad de instauración del cuadro.`;
+    return consejo;
+  },
+
   guardarEstadoExamenActivo() {
     if (state.preguntasCargadas && state.preguntasCargadas.length > 0) {
       localStorage.setItem("resiMed_examen_activo", JSON.stringify({
@@ -94,6 +131,17 @@ const quiz = {
 
       // Iniciar UI
       quiz.ocultarFeedback();
+
+      // Mostrar u ocultar herramientas de estudio AMBOSS según el modo (Solo en Modo Estudio)
+      const cardEstudio = document.getElementById("study-tools-card");
+      if (cardEstudio) {
+        if (state.modoActual === "estudio") {
+          cardEstudio.classList.remove("hidden");
+        } else {
+          cardEstudio.classList.add("hidden");
+        }
+      }
+
       ui.mostrarPantalla("quiz", false);
 
       // Re-arrancar cronómetros
@@ -287,6 +335,65 @@ const quiz = {
         parent.normalize();
       }
     });
+
+    // 💡 DATOS CLAVE (KEY INFO) EVENT LISTENER
+    const btnKeyInfo = document.getElementById("btn-key-info");
+    if (btnKeyInfo) {
+      btnKeyInfo.addEventListener("click", () => {
+        const p = state.preguntasCargadas[state.indiceActual];
+        if (!p) return;
+        
+        quiz.keyInfoActivo = !quiz.keyInfoActivo;
+        btnKeyInfo.classList.toggle("active", quiz.keyInfoActivo);
+        
+        const pTexto = document.getElementById("pregunta-texto");
+        if (pTexto) {
+          if (quiz.keyInfoActivo) {
+            btnKeyInfo.style.background = "rgba(59, 130, 246, 0.12)";
+            btnKeyInfo.style.borderColor = "var(--primary)";
+            pTexto.innerHTML = quiz.obtenerTextoConClaves(p.texto);
+          } else {
+            btnKeyInfo.style.background = "";
+            btnKeyInfo.style.borderColor = "";
+            pTexto.innerHTML = p.texto;
+          }
+          
+          // Re-aplicar clase de marcado si la pregunta está marcada (flagged)
+          if (state.preguntasMarcadas[state.indiceActual]) {
+            pTexto.classList.add("flagged-question");
+          } else {
+            pTexto.classList.remove("flagged-question");
+          }
+        }
+      });
+    }
+
+    // 🧠 CONSEJO DEL TUTOR EVENT LISTENER
+    const btnAttendingTip = document.getElementById("btn-attending-tip");
+    if (btnAttendingTip) {
+      btnAttendingTip.addEventListener("click", () => {
+        const p = state.preguntasCargadas[state.indiceActual];
+        if (!p) return;
+        
+        const tipBox = document.getElementById("socratic-tip-box");
+        const tipTexto = document.getElementById("socratic-tip-texto");
+        
+        if (tipBox && tipTexto) {
+          const estaOculto = tipBox.classList.toggle("hidden");
+          btnAttendingTip.classList.toggle("active", !estaOculto);
+          
+          if (!estaOculto) {
+            btnAttendingTip.style.background = "rgba(59, 130, 246, 0.12)";
+            btnAttendingTip.style.borderColor = "var(--primary)";
+            tipTexto.textContent = quiz.obtenerConsejoSocratico(p);
+          } else {
+            btnAttendingTip.style.background = "";
+            btnAttendingTip.style.borderColor = "";
+            tipTexto.textContent = "";
+          }
+        }
+      });
+    }
   },
 
   // ⏱️ INICIAR SESIÓN (CON ADAPTIVE LEARNING & MODO GUARDIA)
@@ -389,6 +496,17 @@ const quiz = {
       if (mapEl) mapEl.classList.remove("hidden");
 
       quiz.ocultarFeedback();
+
+      // Mostrar u ocultar herramientas de estudio AMBOSS según el modo (Solo en Modo Estudio)
+      const cardEstudio = document.getElementById("study-tools-card");
+      if (cardEstudio) {
+        if (modo === "estudio") {
+          cardEstudio.classList.remove("hidden");
+        } else {
+          cardEstudio.classList.add("hidden");
+        }
+      }
+
       ui.mostrarPantalla("quiz");
 
       // 3. Configuración de Tiempos
@@ -519,6 +637,29 @@ const quiz = {
 
   renderizarPreguntaActual() {
     quiz.ocultarFeedback();
+
+    // Resetear las herramientas de estudio AMBOSS
+    quiz.keyInfoActivo = false;
+    const btnKeyInfo = document.getElementById("btn-key-info");
+    if (btnKeyInfo) {
+      btnKeyInfo.classList.remove("active");
+      btnKeyInfo.style.background = "";
+      btnKeyInfo.style.borderColor = "";
+    }
+
+    const tipBox = document.getElementById("socratic-tip-box");
+    if (tipBox) {
+      tipBox.classList.add("hidden");
+      const tipTexto = document.getElementById("socratic-tip-texto");
+      if (tipTexto) tipTexto.textContent = "";
+    }
+
+    const btnAttendingTip = document.getElementById("btn-attending-tip");
+    if (btnAttendingTip) {
+      btnAttendingTip.classList.remove("active");
+      btnAttendingTip.style.background = "";
+      btnAttendingTip.style.borderColor = "";
+    }
     const btnSiguiente = document.getElementById("btn-siguiente");
     const btnFinalizar = document.getElementById("btn-finalizar");
     const contadorPregunta = document.getElementById("contador-pregunta");
