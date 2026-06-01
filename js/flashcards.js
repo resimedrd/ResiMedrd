@@ -359,13 +359,46 @@ const flashcards = {
         filtrados = mazoCompleto.filter(c => c.tema.trim().toLowerCase() === filtroTema);
       }
 
-      // 4. Integrar con Spaced Repetition (Filtro de Enfriamiento por Dominio)
+      // 4. Integrar con Spaced Repetition (Filtro de Enfriamiento por Dominio y Dashboard Estadístico)
       let estados = {};
       if (state.usuarioConectado) {
         const srEstados = await api.obtenerRepeticionEspaciada(state.usuarioConectado.id);
+        
+        let totalTarjetas = 0;
+        let pendientesHoy = 0;
+        let enAprendizaje = 0;
+        let dominadas = 0;
+        const ahora = new Date();
+
         srEstados.forEach(e => {
-          if (e.flashcard_id) estados[e.flashcard_id] = e;
+          if (e.flashcard_id) {
+            totalTarjetas++;
+            
+            const nextReviewDate = e.next_review ? new Date(e.next_review) : ahora;
+            if (e.interval >= 7) {
+              dominadas++;
+            } else if (e.interval > 0) {
+              enAprendizaje++;
+            }
+            
+            if (nextReviewDate <= ahora) {
+              pendientesHoy++;
+            }
+            
+            estados[e.flashcard_id] = e;
+          }
         });
+
+        // Actualizar la UI del cuadro de retención global de Flashcards
+        const fcTotalesEl = document.getElementById("fc-global-totales");
+        const fcPendientesEl = document.getElementById("fc-global-pendientes");
+        const fcAprendizajeEl = document.getElementById("fc-global-aprendizaje");
+        const fcDominadasEl = document.getElementById("fc-global-dominadas");
+
+        if (fcTotalesEl) fcTotalesEl.textContent = totalTarjetas;
+        if (fcPendientesEl) fcPendientesEl.textContent = pendientesHoy;
+        if (fcAprendizajeEl) fcAprendizajeEl.textContent = enAprendizaje;
+        if (fcDominadasEl) fcDominadasEl.textContent = dominadas;
       }
 
       // Segmentar en dos bloques en caliente: prioritario (interval === 0) y enfriamiento (interval > 0)

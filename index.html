@@ -1185,6 +1185,39 @@
             </div>
           </article>
 
+          <!-- DASHBOARD GLOBAL DE SPACED REPETITION (Fase 9) -->
+          <div id="flashcards-global-stats-dashboard" class="panel" style="margin: 24px 0 16px 0; padding: 20px; border-radius: 20px; border: 1px solid var(--border); background: var(--panel-soft); display: flex; flex-direction: column; gap: 16px; transition: all 0.3s ease;">
+            <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px dashed var(--border-strong); padding-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+              <h3 style="margin: 0; font-size: 13.5px; color: var(--text); font-weight: 700; display: flex; align-items: center; gap: 8px;">
+                <span>🧠</span> Estado Global de Retención (Algoritmo SM-2)
+              </h3>
+              <span class="badge" style="background: rgba(139, 92, 246, 0.1); border: 1px solid rgba(139, 92, 246, 0.2); color: #8b5cf6; padding: 4px 10px; border-radius: 100px; font-size: 11px; font-weight: 700; letter-spacing: 0.5px;">Sincronizado</span>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; text-align: center;">
+              <!-- Tarjetas Totales -->
+              <div class="dashboard-metric" style="padding: 12px !important; border-radius: 14px !important;">
+                <span class="dashboard-label" style="font-size: 10.5px; text-transform: uppercase;">Tarjetas Totales</span>
+                <span id="fc-global-totales" class="dashboard-value" style="font-size: 20px; color: var(--text); margin-top: 4px;">0</span>
+              </div>
+              <!-- Por Repasar Hoy -->
+              <div class="dashboard-metric" style="padding: 12px !important; border-radius: 14px !important; border-left: 3px solid var(--warning) !important;">
+                <span class="dashboard-label" style="font-size: 10.5px; text-transform: uppercase;">Por Repasar Hoy</span>
+                <span id="fc-global-pendientes" class="dashboard-value" style="font-size: 20px; color: var(--warning); margin-top: 4px;">0</span>
+              </div>
+              <!-- En Aprendizaje -->
+              <div class="dashboard-metric" style="padding: 12px !important; border-radius: 14px !important; border-left: 3px solid var(--primary) !important;">
+                <span class="dashboard-label" style="font-size: 10.5px; text-transform: uppercase;">En Aprendizaje</span>
+                <span id="fc-global-aprendizaje" class="dashboard-value" style="font-size: 20px; color: var(--primary); margin-top: 4px;">0</span>
+              </div>
+              <!-- Dominadas (Largo Plazo) -->
+              <div class="dashboard-metric" style="padding: 12px !important; border-radius: 14px !important; border-left: 3px solid var(--success) !important;">
+                <span class="dashboard-label" style="font-size: 10.5px; text-transform: uppercase;">Dominadas</span>
+                <span id="fc-global-dominadas" class="dashboard-value" style="font-size: 20px; color: var(--success); margin-top: 4px;">0</span>
+              </div>
+            </div>
+          </div>
+
           <!-- Selector de Modalidad de Flashcards -->
           <div style="display: flex; justify-content: center; gap: 12px; margin: 24px 0 16px 0; flex-wrap: wrap;">
             <button id="btn-flashcard-mode-classic" class="btn btn-ghost active" type="button" style="min-width: auto; padding: 12px 20px; font-size: 13.5px; font-weight: 600; border-radius: 12px; transition: all 0.2s;">
