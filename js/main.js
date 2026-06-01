@@ -167,6 +167,121 @@ document.addEventListener("DOMContentLoaded", async () => {
   flashcards.inicializar();
   battle.inicializar();
 
+  // === INICIALIZACIÓN DE LA BARRA LATERAL (SIDEBAR NAVIGATION) ===
+  const btnToggleSidebar = document.getElementById("btn-toggle-sidebar");
+  const appSidebar = document.getElementById("app-sidebar");
+  const sidebarBackdrop = document.getElementById("sidebar-backdrop");
+
+  if (btnToggleSidebar && appSidebar) {
+    btnToggleSidebar.addEventListener("click", () => {
+      if (window.innerWidth <= 850) {
+        appSidebar.classList.toggle("active-mobile");
+        sidebarBackdrop?.classList.toggle("active");
+      } else {
+        appSidebar.classList.toggle("collapsed");
+      }
+    });
+  }
+
+  if (sidebarBackdrop && appSidebar) {
+    sidebarBackdrop.addEventListener("click", () => {
+      appSidebar.classList.remove("active-mobile");
+      sidebarBackdrop.classList.remove("active");
+    });
+  }
+
+  const sidebarItems = document.querySelectorAll(".sidebar-item");
+  sidebarItems.forEach(item => {
+    item.addEventListener("click", () => {
+      // Remover clase active de todos los items
+      sidebarItems.forEach(i => i.classList.remove("active"));
+      item.classList.add("active");
+      
+      // Auto colapsar en móvil al pulsar una opción
+      if (window.innerWidth <= 850 && appSidebar) {
+        appSidebar.classList.remove("active-mobile");
+        sidebarBackdrop?.classList.remove("active");
+      }
+      
+      const target = item.dataset.target;
+      if (target === "home") {
+        ui.mostrarPantalla("home");
+      } else if (target === "simulacros") {
+        ui.mostrarPantalla("home");
+        // Scroll suave al selector de simulacro
+        setTimeout(() => {
+          const configSection = document.getElementById("tab-sim-especialidad");
+          if (configSection) {
+            configSection.scrollIntoView({ behavior: "smooth", block: "center" });
+          }
+        }, 100);
+      } else if (target === "preguntas") {
+        ui.mostrarPantalla("flashcards");
+      } else if (target === "estadisticas") {
+        ui.mostrarPantalla("perfil");
+        // Hacer clic en pestaña de progreso
+        const tabProgreso = document.getElementById("tab-perfil-progreso");
+        if (tabProgreso) tabProgreso.click();
+        
+        // Auto expandir gráficos si está colapsado
+        const seccionGraficos = document.getElementById("seccion-graficos-desplegable");
+        if (seccionGraficos && !seccionGraficos.classList.contains("activo")) {
+          const btnToggle = document.getElementById("btn-toggle-graficos");
+          if (btnToggle) btnToggle.click();
+        }
+        // Auto expandir cobertura
+        const seccionEsp = document.getElementById("seccion-especialidades-desplegable");
+        if (seccionEsp && !seccionEsp.classList.contains("activo")) {
+          const btnToggleEsp = document.getElementById("btn-toggle-especialidades");
+          if (btnToggleEsp) btnToggleEsp.click();
+        }
+        
+        setTimeout(() => {
+          const scrollTarget = document.getElementById("contenedor-graficos-acordeon");
+          if (scrollTarget) scrollTarget.scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 300);
+      } else if (target === "historial") {
+        ui.mostrarPantalla("perfil");
+        const tabProgreso = document.getElementById("tab-perfil-progreso");
+        if (tabProgreso) tabProgreso.click();
+        
+        // Auto expandir historial
+        const seccionEval = document.getElementById("seccion-evaluaciones-desplegable");
+        if (seccionEval && !seccionEval.classList.contains("activo")) {
+          const btnToggleEval = document.getElementById("btn-toggle-evaluaciones");
+          if (btnToggleEval) btnToggleEval.click();
+        }
+        // Auto expandir diario
+        const seccionDiario = document.getElementById("seccion-diario-desplegable");
+        if (seccionDiario && !seccionDiario.classList.contains("activo")) {
+          const btnToggleDiario = document.getElementById("btn-toggle-diario");
+          if (btnToggleDiario) btnToggleDiario.click();
+        }
+        
+        setTimeout(() => {
+          const scrollTarget = document.getElementById("contenedor-evaluaciones-acordeon");
+          if (scrollTarget) scrollTarget.scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 300);
+      } else if (target === "errores") {
+        ui.mostrarPantalla("perfil");
+        const tabErrores = document.getElementById("tab-perfil-errores");
+        if (tabErrores) tabErrores.click();
+        
+        setTimeout(() => {
+          const scrollTarget = document.getElementById("banco-errores-lista");
+          if (scrollTarget) scrollTarget.scrollIntoView({ behavior: "smooth", block: "center" });
+        }, 300);
+      } else if (target === "ranking") {
+        battle.mostrarPantallaBattle("battle");
+        battle.conectarWebSocket();
+      } else if (target === "ajustes") {
+        ui.mostrarPantalla("perfil");
+        const btnPerfilEditar = document.getElementById("btn-perfil-editar");
+        if (btnPerfilEditar) btnPerfilEditar.click();
+      }
+    });
+  });
+
   // 4. Modal del Tutor IA - Vincular Cerrar e interactividad de fondo
   const modalTutorIA = document.getElementById("modal-tutor-ia");
   const modalIABody = document.getElementById("modal-ia-body");

@@ -61,6 +61,31 @@ const ui = {
       });
     }
 
+    // Sincronizar item activo del menú lateral
+    const sidebarItems = document.querySelectorAll(".sidebar-item");
+    if (sidebarItems.length > 0) {
+      sidebarItems.forEach(i => i.classList.remove("active"));
+      
+      let targetSelector = '.sidebar-item[data-target="home"]'; // Por defecto
+      if (nombrePantalla === "home" || nombrePantalla === "quiz" || nombrePantalla === "resultados") {
+        targetSelector = '.sidebar-item[data-target="home"]';
+      } else if (nombrePantalla === "flashcards") {
+        targetSelector = '.sidebar-item[data-target="preguntas"]';
+      } else if (nombrePantalla === "perfil") {
+        const tabErrores = document.getElementById("tab-perfil-errores");
+        if (tabErrores && tabErrores.classList.contains("active")) {
+          targetSelector = '.sidebar-item[data-target="errores"]';
+        } else {
+          targetSelector = '.sidebar-item[data-target="estadisticas"]';
+        }
+      } else if (nombrePantalla.startsWith("battle")) {
+        targetSelector = '.sidebar-item[data-target="ranking"]';
+      }
+      
+      const targetItem = document.querySelector(targetSelector);
+      if (targetItem) targetItem.classList.add("active");
+    }
+
     // Refrescar analíticas y gamificación al cambiar al Home o Perfil
     if (nombrePantalla === "home") {
       ui.cargarDashboardHome();

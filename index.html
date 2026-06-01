@@ -56,11 +56,14 @@
 
   <div class="layout">
     <header class="topbar">
-      <div class="brand">
-        <div class="brand-mark">R</div>
-        <div class="brand-copy">
-          <h1>ResiMed</h1>
-          <p id="saludo-usuario">Cargando entorno médico...</p>
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <button id="btn-toggle-sidebar" class="btn btn-ghost hidden" type="button" style="min-width: auto; padding: 8px 12px; font-size: 20px; border-radius: 50%;" title="Menú lateral">☰</button>
+        <div class="brand">
+          <div class="brand-mark">R</div>
+          <div class="brand-copy">
+            <h1>ResiMed</h1>
+            <p id="saludo-usuario">Cargando entorno médico...</p>
+          </div>
         </div>
       </div>
       <div class="topbar-actions">
@@ -71,7 +74,50 @@
       </div>
     </header>
 
-    <main class="main-shell">
+    <div class="app-container">
+      <aside id="app-sidebar" class="app-sidebar hidden">
+        <div class="sidebar-brand">
+          <div class="brand-mark-premium" style="width: 32px; height: 32px; background: linear-gradient(135deg, var(--primary) 0%, #3b82f6 100%); color: #fff; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 800; font-family: 'Outfit', sans-serif; box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);">R</div>
+          <span class="sidebar-brand-text">ResiMed</span>
+        </div>
+        
+        <ul class="sidebar-menu">
+          <li class="sidebar-item active" data-target="home">
+            <span class="sidebar-icon">🏠</span>
+            <span class="sidebar-label">Inicio</span>
+          </li>
+          <li class="sidebar-item" data-target="simulacros">
+            <span class="sidebar-icon">⏱️</span>
+            <span class="sidebar-label">Simulacros</span>
+          </li>
+          <li class="sidebar-item" data-target="preguntas">
+            <span class="sidebar-icon">📁</span>
+            <span class="sidebar-label">Preguntas</span>
+          </li>
+          <li class="sidebar-item" data-target="estadisticas">
+            <span class="sidebar-icon">📈</span>
+            <span class="sidebar-label">Estadísticas</span>
+          </li>
+          <li class="sidebar-item" data-target="historial">
+            <span class="sidebar-icon">📋</span>
+            <span class="sidebar-label">Historial</span>
+          </li>
+          <li class="sidebar-item" data-target="errores">
+            <span class="sidebar-icon">🚨</span>
+            <span class="sidebar-label">Banco de Errores</span>
+          </li>
+          <li class="sidebar-item" data-target="ranking">
+            <span class="sidebar-icon">👑</span>
+            <span class="sidebar-label">Ranking</span>
+          </li>
+          <li class="sidebar-item" data-target="ajustes">
+            <span class="sidebar-icon">⚙️</span>
+            <span class="sidebar-label">Ajustes</span>
+          </li>
+        </ul>
+      </aside>
+
+      <main class="main-shell">
       
       <section id="pantalla-auth" class="screen">
         <div class="landing-container" style="max-width: 1200px; margin: 0 auto; padding: 40px 24px; display: flex; flex-direction: column; gap: 80px; font-family: 'Inter', sans-serif;">
@@ -1513,7 +1559,9 @@
       </section>
 
     </main>
-  </div>
+  </div> <!-- Fin de app-container -->
+  <div id="sidebar-backdrop" class="sidebar-backdrop"></div>
+</div> <!-- Fin de layout -->
 
   <!-- MODAL TUTOR IA (FASE 5) -->
   <div id="modal-tutor-ia" class="modal-ia-overlay">

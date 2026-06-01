@@ -140,12 +140,22 @@ const auth = {
       saludoUsuario.textContent = `Sesión activa: ${state.usuarioConectado.nombre}`;
     }
     const btnIrBatalla = document.getElementById("btn-ir-batalla");
-    if (btnIrInicio) btnIrInicio.classList.remove("hidden");
-    if (btnIrBatalla) btnIrBatalla.classList.remove("hidden");
-    if (btnVerPerfil) {
-      btnVerPerfil.classList.remove("hidden");
-      btnVerPerfil.innerHTML = "👤 Mi Perfil";
+    const btnToggleSidebar = document.getElementById("btn-toggle-sidebar");
+    const appSidebar = document.getElementById("app-sidebar");
+    
+    if (btnToggleSidebar) btnToggleSidebar.classList.remove("hidden");
+    if (appSidebar) {
+      appSidebar.classList.remove("hidden");
+      const sidebarItems = appSidebar.querySelectorAll(".sidebar-item");
+      sidebarItems.forEach(i => i.classList.remove("active"));
+      const homeItem = appSidebar.querySelector('.sidebar-item[data-target="home"]');
+      if (homeItem) homeItem.classList.add("active");
     }
+    
+    // Dejar ocultos los botones redundantes del header
+    if (btnIrInicio) btnIrInicio.classList.add("hidden");
+    if (btnVerPerfil) btnVerPerfil.classList.add("hidden");
+    if (btnIrBatalla) btnIrBatalla.classList.remove("hidden");
     if (btnCerrarSesion) btnCerrarSesion.classList.remove("hidden");
 
     // Decidir inmediatamente la pantalla de destino en primer plano para un inicio instantáneo (Non-blocking Boot)
@@ -214,11 +224,13 @@ const auth = {
       quiz.limpiarEstadoExamenActivo();
     }
 
-    const btnIrInicio = document.getElementById("btn-ir-inicio");
-    const btnIrBatalla = document.getElementById("btn-ir-batalla");
-    const btnVerPerfil = document.getElementById("btn-ver-perfil");
-    const btnCerrarSesion = document.getElementById("btn-cerrar-sesion");
-    const saludoUsuario = document.getElementById("saludo-usuario");
+    const btnToggleSidebar = document.getElementById("btn-toggle-sidebar");
+    const appSidebar = document.getElementById("app-sidebar");
+    if (btnToggleSidebar) btnToggleSidebar.classList.add("hidden");
+    if (appSidebar) {
+      appSidebar.classList.add("hidden");
+      appSidebar.classList.remove("collapsed");
+    }
 
     if (btnIrInicio) btnIrInicio.classList.add("hidden");
     if (btnIrBatalla) btnIrBatalla.classList.add("hidden");
