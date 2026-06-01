@@ -148,12 +148,12 @@ const auth = {
       appSidebar.classList.remove("hidden");
       const sidebarItems = appSidebar.querySelectorAll(".sidebar-item");
       sidebarItems.forEach(i => i.classList.remove("active"));
-      const homeItem = appSidebar.querySelector('.sidebar-item[data-target="home"]');
-      if (homeItem) homeItem.classList.add("active");
+      const simItem = appSidebar.querySelector('.sidebar-item[data-target="simulacros"]');
+      if (simItem) simItem.classList.add("active");
     }
     
-    // Dejar ocultos los botones redundantes del header
-    if (btnIrInicio) btnIrInicio.classList.add("hidden");
+    // Mostrar Inicio en el header y ocultar Mi Perfil (pues se accede de forma profunda)
+    if (btnIrInicio) btnIrInicio.classList.remove("hidden");
     if (btnVerPerfil) btnVerPerfil.classList.add("hidden");
     if (btnIrBatalla) btnIrBatalla.classList.remove("hidden");
     if (btnCerrarSesion) btnCerrarSesion.classList.remove("hidden");

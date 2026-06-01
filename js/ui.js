@@ -66,9 +66,9 @@ const ui = {
     if (sidebarItems.length > 0) {
       sidebarItems.forEach(i => i.classList.remove("active"));
       
-      let targetSelector = '.sidebar-item[data-target="home"]'; // Por defecto
+      let targetSelector = '.sidebar-item[data-target="simulacros"]'; // Por defecto
       if (nombrePantalla === "home" || nombrePantalla === "quiz" || nombrePantalla === "resultados") {
-        targetSelector = '.sidebar-item[data-target="home"]';
+        targetSelector = '.sidebar-item[data-target="simulacros"]';
       } else if (nombrePantalla === "flashcards") {
         targetSelector = '.sidebar-item[data-target="preguntas"]';
       } else if (nombrePantalla === "perfil") {
