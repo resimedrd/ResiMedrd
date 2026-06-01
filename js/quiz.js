@@ -737,8 +737,7 @@ const quiz = {
       });
 
       boton.addEventListener("click", async () => {
-        // En Modo Guardia y Simulacro, solo permite responder una vez
-        if (state.modoActual === "estudio") {
+        if (state.modoActual === "estudio" && state.retroalimentacionInmediata) {
           const botones = opcionesContainer.querySelectorAll(".option-btn");
           const marcadores = opcionesContainer.querySelectorAll(".btn-marcar-respuesta");
           botones.forEach(b => b.disabled = true);
@@ -763,6 +762,7 @@ const quiz = {
           quiz.renderizarMapaNavegacion();
           quiz.guardarEstadoExamenActivo();
         } else {
+          // Modo Guardia, Simulacro, o Modo Estudio con respuestas al finalizar (retroalimentación inmediata inactiva)
           const botones = opcionesContainer.querySelectorAll(".option-btn");
           botones.forEach(b => b.classList.remove("selected"));
           boton.classList.add("selected");
@@ -782,19 +782,27 @@ const quiz = {
     // Si ya fue respondida en Modo Estudio
     if (state.modoActual === "estudio" && state.respuestasUsuario[state.indiceActual] !== null) {
       const botones = opcionesContainer.querySelectorAll(".option-btn");
-      const marcadores = opcionesContainer.querySelectorAll(".btn-marcar-respuesta");
-      botones.forEach(b => b.disabled = true);
-      marcadores.forEach(bm => bm.classList.add("hidden"));
-      
       const yaRespondida = state.respuestasUsuario[state.indiceActual];
-      if (yaRespondida !== -1) {
-        if (yaRespondida === p.correcta) {
-          botones[yaRespondida].classList.add("correct");
-          quiz.mostrarFeedback(true, p.explicacion);
-        } else {
-          botones[yaRespondida].classList.add("wrong");
-          botones[p.correcta].classList.add("correct");
-          quiz.mostrarFeedback(false, p.explicacion);
+      
+      if (state.retroalimentacionInmediata) {
+        const marcadores = opcionesContainer.querySelectorAll(".btn-marcar-respuesta");
+        botones.forEach(b => b.disabled = true);
+        marcadores.forEach(bm => bm.classList.add("hidden"));
+        
+        if (yaRespondida !== -1) {
+          if (yaRespondida === p.correcta) {
+            botones[yaRespondida].classList.add("correct");
+            quiz.mostrarFeedback(true, p.explicacion);
+          } else {
+            botones[yaRespondida].classList.add("wrong");
+            botones[p.correcta].classList.add("correct");
+            quiz.mostrarFeedback(false, p.explicacion);
+          }
+        }
+      } else {
+        // Respuestas al finalizar: solo destacar la opción seleccionada sin bloquear ni revelar
+        if (yaRespondida !== null && yaRespondida !== undefined && yaRespondida !== -1) {
+          botones[yaRespondida].classList.add("selected");
         }
       }
       quiz.chequearBotonesNavegacion();
