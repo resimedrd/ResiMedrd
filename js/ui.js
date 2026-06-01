@@ -1616,36 +1616,17 @@ const ui = {
     }
   },
 
-  // BANCO DE ERRORES DINÁMICO & ANÁLISIS DE DEBILIDADES
+  // BANCO DE ERRORES DINÁMICO & ANÁLISIS DE DEBILIDADES (PREMIUM)
   renderizarBancoDeErrores(historial, metricas) {
     const listaEl = document.getElementById("banco-errores-lista");
     const vacioEl = document.getElementById("banco-errores-vacio");
+    const debilidadesCard = document.getElementById("debilidades-clinicas-card");
+    const debilidadesListaEl = document.getElementById("debilidades-clinicas-lista");
+    const selectEl = document.getElementById("filtro-materia-errores");
+
     if (!listaEl) return;
-    
-    listaEl.innerHTML = "";
-    
-    // Inyectar sección de Debilidades Críticas en la cabecera si existen
-    if (metricas.debilidadesDetectadas.length > 0) {
-      const alertDebilidad = document.createElement("div");
-      alertDebilidad.style.background = "rgba(239, 68, 68, 0.08)";
-      alertDebilidad.style.border = "1px solid rgba(239, 68, 68, 0.25)";
-      alertDebilidad.style.borderRadius = "14px";
-      alertDebilidad.style.padding = "16px";
-      alertDebilidad.style.marginBottom = "24px";
-      
-      let debilidadesHtml = "";
-      metricas.debilidadesDetectadas.forEach(d => {
-        debilidadesHtml += `<li><strong>${d.tema}</strong>: Precisión del ${d.porcentaje}% (${d.totales} preguntas analizadas).</li>`;
-      });
 
-      alertDebilidad.innerHTML = `
-        <h4 style="color: var(--danger); margin:0 0 8px 0; font-size:14px; font-weight:bold; display:flex; align-items:center; gap:8px;">⚠️ Debilidades Clínicas Detectadas (Sección Adaptativa)</h4>
-        <p style="font-size:12.5px; color: var(--text-soft); margin:0 0 10px 0;">El algoritmo analítico estima que requieres repasar prioritariamente los siguientes temas:</p>
-        <ul style="font-size:12.5px; color: var(--text); padding-left:20px; margin:0;">${debilidadesHtml}</ul>
-      `;
-      listaEl.appendChild(alertDebilidad);
-    }
-
+    // 1. Extraer preguntas falladas únicas
     const preguntasFalladasMap = new Map();
     historial.forEach(sesion => {
       if (sesion.detalle) {
@@ -1663,9 +1644,10 @@ const ui = {
                   explicacion: p.explicacion,
                   explicacion_correcta: p.explicacion_correcta,
                   explicacion_incorrecta: p.explicacion_incorrecta,
-                  tema: p.tema || sesion.tema,
-                  subtema: p.subtema || "Varios",
-                  microtema: p.microtema || "Varios"
+                  fuente: p.fuente || "ResiMed ENURM",
+                  tema: (p.tema || sesion.tema || "General").trim(),
+                  subtema: (p.subtema || "Varios").trim(),
+                  microtema: (p.microtema || "Varios").trim()
                 });
               }
             });
@@ -1675,54 +1657,245 @@ const ui = {
         }
       }
     });
-    
-    if (preguntasFalladasMap.size === 0) {
+
+    const preguntasFalladas = Array.from(preguntasFalladasMap.values());
+
+    if (preguntasFalladas.length === 0) {
+      listaEl.innerHTML = "";
       if (vacioEl) vacioEl.classList.remove("hidden");
+      if (debilidadesCard) debilidadesCard.classList.add("hidden");
+      if (selectEl) {
+        selectEl.innerHTML = '<option value="">Todas las materias</option>';
+        selectEl.disabled = true;
+      }
       return;
     }
-    
-    if (vacioEl) vacioEl.classList.add("hidden");
-    
-    let idx = 0;
-    preguntasFalladasMap.forEach(p => {
-      idx++;
-      const opcionesArray = p.opciones;
-      const seleccion = p.seleccionada;
-      
-      let opcionesHtml = "";
-      opcionesArray.forEach((o, oIdx) => {
-        let claseOpt = "";
-        if (oIdx === p.correcta) claseOpt = "correct";
-        if (oIdx === seleccion) claseOpt = "wrong";
-        opcionesHtml += `<div class="review-opt ${claseOpt}"><strong>${String.fromCharCode(65 + oIdx)}.</strong> ${o}</div>`;
-      });
 
-      const textoEscapado = p.texto.replace(/"/g, "&quot;");
-      const explicacionEscapada = (p.explicacion || "Sin desglose.").replace(/"/g, "&quot;");
-      const temaEscapado = (p.tema || "General").replace(/"/g, "&quot;");
+    if (vacioEl) vacioEl.classList.add("hidden");
+    if (selectEl) selectEl.disabled = false;
+
+    // 2. Renderizar Debilidades Clínicas (IA Diagnostics)
+    if (debilidadesCard && debilidadesListaEl) {
+      if (metricas.debilidadesDetectadas.length > 0) {
+        debilidadesCard.classList.remove("hidden");
+        debilidadesListaEl.innerHTML = "";
+
+        metricas.debilidadesDetectadas.forEach(d => {
+          const severityText = d.porcentaje < 40 ? "🚨 Crítico" : "⚠️ Alerta";
+          const severityClass = d.porcentaje < 40 ? "critico" : "urgente";
+          const fillClass = d.porcentaje < 40 ? "red" : "orange";
+
+          const card = document.createElement("div");
+          card.className = "debilidad-card";
+          card.innerHTML = `
+            <div>
+              <div class="debilidad-card-header">
+                <span class="debilidad-title">${d.tema}</span>
+                <span class="debilidad-severity ${severityClass}">${severityText}</span>
+              </div>
+              <div class="debilidad-stat-row">
+                <span class="debilidad-stat-label">Tasa de Aciertos</span>
+                <span class="debilidad-stat-value">${d.porcentaje}%</span>
+              </div>
+              <div class="debilidad-progress-container">
+                <div class="debilidad-progress-fill ${fillClass}" style="width: ${d.porcentaje}%"></div>
+              </div>
+              <div class="debilidad-stat-row" style="margin-bottom: 12px;">
+                <span class="debilidad-stat-label">Preguntas analizadas</span>
+                <span class="debilidad-stat-value">${d.totales} fallos</span>
+              </div>
+            </div>
+            <div class="debilidad-action-plan">
+              <div class="debilidad-action-title">Plan de Acción IA</div>
+              <div class="debilidad-action-buttons">
+                <button class="btn-debilidad-action primary btn-debilidad-filtrar" data-tema="${d.tema}" type="button">
+                  🔍 Filtrar
+                </button>
+                <button class="btn-debilidad-action btn-debilidad-flashcards" data-tema="${d.tema}" type="button">
+                  ⚡ Mazo
+                </button>
+                <button class="btn-debilidad-action btn-debilidad-quiz" data-tema="${d.tema}" type="button">
+                  📝 Quiz
+                </button>
+              </div>
+            </div>
+          `;
+          debilidadesListaEl.appendChild(card);
+        });
+
+        // Registrar listener de clicks en debilidades (una sola vez)
+        if (!debilidadesListaEl.dataset.listenerSet) {
+          debilidadesListaEl.dataset.listenerSet = "true";
+          debilidadesListaEl.addEventListener("click", async (e) => {
+            const btnFiltrar = e.target.closest(".btn-debilidad-filtrar");
+            const btnFlashcard = e.target.closest(".btn-debilidad-flashcards");
+            const btnQuiz = e.target.closest(".btn-debilidad-quiz");
+
+            if (btnFiltrar) {
+              const tema = btnFiltrar.getAttribute("data-tema");
+              if (selectEl) {
+                selectEl.value = tema;
+                selectEl.dispatchEvent(new Event("change"));
+                const errorListHeader = selectEl.closest(".panel");
+                if (errorListHeader) {
+                  errorListHeader.scrollIntoView({ behavior: "smooth" });
+                }
+              }
+            }
+
+            if (btnFlashcard) {
+              const tema = btnFlashcard.getAttribute("data-tema");
+              const selectorFlash = document.getElementById("flashcard-filtro-tema");
+              if (selectorFlash) {
+                let matchingOption = "";
+                Array.from(selectorFlash.options).forEach(opt => {
+                  if (opt.value.trim().toLowerCase() === tema.trim().toLowerCase()) {
+                    matchingOption = opt.value;
+                  }
+                });
+                if (matchingOption) {
+                  selectorFlash.value = matchingOption;
+                } else {
+                  const newOpt = new Option(tema, tema);
+                  selectorFlash.add(newOpt);
+                  selectorFlash.value = tema;
+                }
+                selectorFlash.dispatchEvent(new Event("change"));
+                if (window.flashcards && typeof window.flashcards.inicializarMazo === "function") {
+                  await window.flashcards.inicializarMazo();
+                }
+              }
+              ui.mostrarPantalla("flashcards");
+            }
+
+            if (btnQuiz) {
+              const tema = btnQuiz.getAttribute("data-tema");
+              const selectEspecialidad = document.getElementById("especialidad");
+              if (selectEspecialidad) {
+                const tabSimEsp = document.getElementById("tab-sim-especialidad");
+                if (tabSimEsp) {
+                  tabSimEsp.click();
+                }
+                let matchingOption = "";
+                Array.from(selectEspecialidad.options).forEach(opt => {
+                  if (opt.textContent.trim().toLowerCase().includes(tema.trim().toLowerCase()) || 
+                      opt.value.trim().toLowerCase().includes(tema.trim().toLowerCase())) {
+                    matchingOption = opt.value;
+                  }
+                });
+                if (matchingOption) {
+                  selectEspecialidad.value = matchingOption;
+                  selectEspecialidad.dispatchEvent(new Event("change"));
+                }
+              }
+              ui.mostrarPantalla("home");
+              setTimeout(() => {
+                const configPanel = document.getElementById("especialidad")?.closest(".panel");
+                if (configPanel) {
+                  configPanel.scrollIntoView({ behavior: "smooth" });
+                }
+              }, 300);
+            }
+          });
+        }
+      } else {
+        debilidadesCard.classList.add("hidden");
+      }
+    }
+
+    // 3. Poblar Filtro de Materias
+    if (selectEl) {
+      const valorPrevio = selectEl.value;
+      const materiasUnicas = [...new Set(preguntasFalladas.map(p => p.tema))].sort();
+
+      let optionsHtml = '<option value="">Todas las materias</option>';
+      materiasUnicas.forEach(m => {
+        optionsHtml += `<option value="${m}">${m}</option>`;
+      });
+      selectEl.innerHTML = optionsHtml;
+
+      // Intentar restaurar valor seleccionado previo
+      if (materiasUnicas.includes(valorPrevio)) {
+        selectEl.value = valorPrevio;
+      }
+
+      if (!selectEl.dataset.listenerSet) {
+        selectEl.dataset.listenerSet = "true";
+        selectEl.addEventListener("change", () => {
+          filtrarYMostrarPreguntas();
+        });
+      }
+    }
+
+    // 4. Helper para filtrar y renderizar preguntas
+    const filtrarYMostrarPreguntas = () => {
+      listaEl.innerHTML = "";
+      const filtroMateria = selectEl ? selectEl.value : "";
       
-      const seleccionText = (seleccion !== null && opcionesArray[seleccion]) 
-        ? opcionesArray[seleccion].replace(/"/g, "&quot;") 
-        : "Sin responder";
-      
-      const div = document.createElement("div");
-      div.className = "review-item";
-      div.innerHTML = `
-        <div class="error-bank-header">
-          <span class="chip chip-soft error-bank-chip">Materia: ${p.tema || "General"}</span>
-          <span class="chip chip-soft" style="font-size:11px;">Subtema: ${p.subtema || "Varios"}</span>
-        </div>
-        <div class="review-q-text error-bank-q-text">${idx}. ${p.texto}</div>
-        <div class="review-options">${opcionesHtml}</div>
-        <div class="review-exp-container">${ui.formatearExplicacionClinica(p.explicacion, p.fuente, p.explicacion_correcta, p.explicacion_incorrecta)}</div>
-        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top: 10px;">
-          <button class="btn-ia btn-consultar-tutor" data-texto="${textoEscapado}" data-seleccion="${seleccionText}" type="button">Consultar Tutor IA</button>
-          <button class="btn btn-primary btn-auto-flashcard" data-tema="${temaEscapado}" data-pregunta="${textoEscapado}" data-respuesta="${explicacionEscapada}" style="background: var(--warning); color:#000; font-size:12px; padding:6px 12px; border:none;" type="button">Crear Flashcard</button>
-          <button class="btn btn-reportar-pregunta" data-id="${p.id}" type="button">Reportar Error</button>
-        </div>
-      `;
-      listaEl.appendChild(div);
-    });
+      const preguntasFiltradas = filtroMateria
+        ? preguntasFalladas.filter(p => p.tema === filtroMateria)
+        : preguntasFalladas;
+
+      if (preguntasFiltradas.length === 0) {
+        if (vacioEl) vacioEl.classList.remove("hidden");
+        return;
+      }
+
+      if (vacioEl) vacioEl.classList.add("hidden");
+
+      let idx = 0;
+      preguntasFiltradas.forEach(p => {
+        idx++;
+        const opcionesArray = p.opciones;
+        const seleccion = p.seleccionada;
+
+        let opcionesHtml = "";
+        opcionesArray.forEach((o, oIdx) => {
+          let claseOpt = "";
+          if (oIdx === p.correcta) claseOpt = "correct";
+          if (oIdx === seleccion) claseOpt = "wrong";
+          opcionesHtml += `<div class="review-opt ${claseOpt}"><strong>${String.fromCharCode(65 + oIdx)}.</strong> ${o}</div>`;
+        });
+
+        const textoEscapado = p.texto.replace(/"/g, "&quot;");
+        const explicacionEscapada = (p.explicacion || "Sin desglose.").replace(/"/g, "&quot;");
+        const temaEscapado = (p.tema || "General").replace(/"/g, "&quot;");
+
+        const seleccionText = (seleccion !== null && opcionesArray[seleccion])
+          ? opcionesArray[seleccion].replace(/"/g, "&quot;")
+          : "Sin responder";
+
+        const div = document.createElement("div");
+        div.className = "review-item";
+        div.style.opacity = "0";
+        div.style.transform = "translateY(10px)";
+        div.style.transition = "opacity 0.25s ease, transform 0.25s ease";
+
+        div.innerHTML = `
+          <div class="error-bank-header">
+            <span class="chip chip-soft error-bank-chip">Materia: ${p.tema}</span>
+            <span class="chip chip-soft" style="font-size:11px;">Subtema: ${p.subtema}</span>
+          </div>
+          <div class="review-q-text error-bank-q-text">${idx}. ${p.texto}</div>
+          <div class="review-options">${opcionesHtml}</div>
+          <div class="review-exp-container">${ui.formatearExplicacionClinica(p.explicacion, p.fuente, p.explicacion_correcta, p.explicacion_incorrecta)}</div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top: 14px; border-top: 1px solid var(--border); padding-top: 12px;">
+            <button class="btn-ia btn-consultar-tutor" data-texto="${textoEscapado}" data-seleccion="${seleccionText}" type="button">Consultar Tutor IA</button>
+            <button class="btn btn-primary btn-auto-flashcard" data-tema="${temaEscapado}" data-pregunta="${textoEscapado}" data-respuesta="${explicacionEscapada}" style="background: var(--warning); color:#000; font-size:12px; padding:6px 12px; border:none;" type="button">Crear Flashcard</button>
+            <button class="btn btn-reportar-pregunta" data-id="${p.id}" type="button">Reportar Error</button>
+          </div>
+        `;
+        listaEl.appendChild(div);
+
+        setTimeout(() => {
+          div.style.opacity = "1";
+          div.style.transform = "translateY(0)";
+        }, idx * 25);
+      });
+    };
+
+    // Ejecución inicial de renderizado de preguntas
+    filtrarYMostrarPreguntas();
   },
 
 

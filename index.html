@@ -1138,19 +1138,48 @@
 
           <!-- CONTENIDO: BANCO DE ERRORES -->
           <div id="perfil-contenido-errores" class="perfil-seccion-tab hidden" style="margin-top: 20px;">
-            <article class="panel" style="border-radius: 28px; padding: 32px; background: var(--panel); border: 1px solid var(--border);">
-              <div class="panel-head" style="margin-bottom: 20px;">
-                <h3 style="color: var(--text); font-size: 20px; font-weight: 700;">🚨 Mi Banco de Errores</h3>
-                <p style="font-size: 14px; color: var(--text-dim); margin-top: 4px;">Recopilación automática de todas las preguntas que has fallado en tus simulacros.</p>
-              </div>
+            <div class="banco-errores-grid" style="display: flex; flex-direction: column; gap: 24px;">
               
-              <div id="banco-errores-lista" class="review-list" style="margin-top: 16px;">
-                <!-- Inyectado dinámicamente desde JS -->
+              <!-- DIAGNÓSTICO DE DEBILIDADES CLÍNICAS (IA) -->
+              <div id="debilidades-clinicas-card" class="panel hidden" style="border-radius: 28px; padding: 32px; background: var(--panel); border: 1px solid var(--border);">
+                <div class="panel-head" style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+                  <div>
+                    <h3 style="color: var(--text); font-size: 20px; font-weight: 700; display: flex; align-items: center; gap: 10px;">
+                      <span class="ai-glow-dot"></span> Diagnóstico de Debilidades Clínicas
+                    </h3>
+                    <p style="font-size: 14px; color: var(--text-dim); margin-top: 4px;">Análisis adaptativo en tiempo real de áreas que requieren atención urgente.</p>
+                  </div>
+                  <span class="debilidad-badge-ia">🩺 Diagnóstico IA Activo</span>
+                </div>
+                <div id="debilidades-clinicas-lista" class="debilidades-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px;">
+                  <!-- Inyectado dinámicamente -->
+                </div>
               </div>
-              <div id="banco-errores-vacio" class="history-empty hidden" style="margin-top: 16px; text-align: center; padding: 24px; color: var(--text-dim);">
-                ¡Felicidades! No tienes errores registrados en tu cuenta actualmente.
-              </div>
-            </article>
+
+              <!-- LISTADO DE PREGUNTAS FALLADAS -->
+              <article class="panel" style="border-radius: 28px; padding: 32px; background: var(--panel); border: 1px solid var(--border);">
+                <div class="panel-head" style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+                  <div>
+                    <h3 style="color: var(--text); font-size: 20px; font-weight: 700; display: flex; align-items: center; gap: 8px;">🚨 Preguntas en Revisión</h3>
+                    <p style="font-size: 14px; color: var(--text-dim); margin-top: 4px;">Historial interactivo de casos clínicos fallados.</p>
+                  </div>
+                  <div style="display: flex; gap: 10px; align-items: center;">
+                    <label for="filtro-materia-errores" style="font-size: 13.5px; font-weight: 600; color: var(--text-dim); white-space: nowrap;">Filtrar por Materia:</label>
+                    <select id="filtro-materia-errores" class="input" style="width: 220px; font-size: 13.5px; padding: 8px 12px; margin: 0; cursor: pointer; border-radius: 12px; height: auto; background: rgba(255,255,255,0.02); border: 1px solid var(--border); color: var(--text);">
+                      <option value="">Todas las materias</option>
+                    </select>
+                  </div>
+                </div>
+                
+                <div id="banco-errores-lista" class="review-list" style="margin-top: 16px;">
+                  <!-- Inyectado dinámicamente desde JS -->
+                </div>
+                <div id="banco-errores-vacio" class="history-empty hidden" style="margin-top: 16px; text-align: center; padding: 24px; color: var(--text-dim);">
+                  ¡Felicidades! No tienes errores registrados en tu cuenta actualmente.
+                </div>
+              </article>
+              
+            </div>
           </div>
 
 

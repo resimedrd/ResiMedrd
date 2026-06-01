@@ -3765,6 +3765,273 @@ body.dark-mode .premium-metrics-panel {
   box-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.45) !important;
 }
 
+/* ==========================================================================
+   NUEVOS ESTILOS BANCO DE ERRORES PREMIUM Y DEBILIDADES CLÍNICAS (IA)
+   ========================================================================== */
+
+/* LED Clínico Pulsante de Diagnóstico IA */
+.ai-glow-dot {
+  width: 10px;
+  height: 10px;
+  background-color: var(--danger);
+  border-radius: 50%;
+  display: inline-block;
+  box-shadow: 0 0 10px var(--danger);
+  animation: pulse-glow-red 2s infinite ease-in-out;
+}
+
+@keyframes pulse-glow-red {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 8px rgba(239, 68, 68, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+  }
+}
+
+/* Badge IA Diagnóstico */
+.debilidad-badge-ia {
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  color: var(--danger);
+  padding: 6px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+/* Tarjeta de Debilidad Clínica */
+.debilidad-card {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.04) 0%, rgba(239, 68, 68, 0.01) 100%);
+  border: 1px solid rgba(239, 68, 68, 0.12);
+  border-radius: 20px;
+  padding: 20px;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.debilidad-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(239, 68, 68, 0.25);
+  box-shadow: 0 8px 24px rgba(239, 68, 68, 0.04);
+}
+
+.debilidad-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.debilidad-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.debilidad-severity {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 6px;
+  text-transform: uppercase;
+}
+
+.debilidad-severity.critico {
+  background: rgba(239, 68, 68, 0.12);
+  color: #ef4444;
+}
+
+.debilidad-severity.urgente {
+  background: rgba(249, 115, 22, 0.12);
+  color: #f97316;
+}
+
+.debilidad-stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 10px 0 6px 0;
+  font-size: 12.5px;
+}
+
+.debilidad-stat-label {
+  color: var(--text-dim);
+}
+
+.debilidad-stat-value {
+  font-weight: 700;
+  color: var(--text);
+}
+
+/* Barra de Progreso Lineal */
+.debilidad-progress-container {
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.debilidad-progress-fill {
+  height: 100%;
+  border-radius: 10px;
+  transition: width 0.6s ease-out;
+}
+
+.debilidad-progress-fill.red {
+  background: linear-gradient(90deg, #b91c1c, #ef4444);
+}
+
+.debilidad-progress-fill.orange {
+  background: linear-gradient(90deg, #c2410c, #f97316);
+}
+
+/* Plan de Acción Contextual */
+.debilidad-action-plan {
+  border-top: 1px dashed var(--border);
+  padding-top: 12px;
+  margin-top: 4px;
+}
+
+.debilidad-action-title {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.debilidad-action-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.btn-debilidad-action {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border);
+  color: var(--text-soft);
+  font-size: 12px;
+  padding: 6px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.btn-debilidad-action:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--text-soft);
+  color: var(--text);
+}
+
+.btn-debilidad-action.primary {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #f87171;
+}
+
+.btn-debilidad-action.primary:hover {
+  background: rgba(239, 68, 68, 0.16);
+  border-color: #ef4444;
+  color: #ffffff;
+}
+
+/* Modernización de Preguntas Falladas */
+.review-item {
+  background: rgba(255, 255, 255, 0.015);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 28px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  transition: all 0.2s;
+}
+
+.review-item:hover {
+  border-color: var(--border-strong);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+}
+
+.error-bank-chip {
+  background: rgba(239, 68, 68, 0.08) !important;
+  color: var(--danger) !important;
+  border: 1px solid rgba(239, 68, 68, 0.15) !important;
+  font-weight: 700 !important;
+}
+
+.error-bank-header {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+.error-bank-q-text {
+  font-size: 18px !important;
+  line-height: 1.6 !important;
+  color: var(--text);
+}
+
+.review-opt {
+  transition: all 0.2s;
+  cursor: default;
+}
+
+.review-opt:hover {
+  border-color: var(--border-strong);
+}
+
+.btn-ia {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  color: #fff;
+  border: none;
+  font-size: 12px;
+  padding: 6px 12px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-ia:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.btn-reportar-pregunta {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  color: var(--text-soft);
+  font-size: 12px;
+  padding: 6px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-reportar-pregunta:hover {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: var(--danger);
+}
+
 
 
 
