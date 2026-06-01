@@ -83,6 +83,18 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
+  // Vincular click en el logo/brand de ResiMed en la Topbar y en la Sidebar para ir a Inicio (Home)
+  const topbarBrand = document.getElementById("topbar-brand-home");
+  const sidebarBrand = document.getElementById("sidebar-brand-home");
+
+  [topbarBrand, sidebarBrand].forEach(brand => {
+    if (brand) {
+      brand.addEventListener("click", () => {
+        ui.mostrarPantalla("home");
+      });
+    }
+  });
+
   if (btnPerfilRegresar) {
     btnPerfilRegresar.addEventListener("click", () => {
       ui.mostrarPantalla("home");
