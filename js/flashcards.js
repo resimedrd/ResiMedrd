@@ -153,7 +153,10 @@ const flashcards = {
         btnClassic.classList.add("active");
         btnActive.classList.remove("active");
         if (inputActiveBox) inputActiveBox.classList.add("hidden");
-        if (comparisonBox) comparisonBox.classList.add("hidden");
+        if (comparisonBox) {
+          comparisonBox.classList.add("hidden");
+          comparisonBox.classList.remove("good-match", "mid-match", "bad-match");
+        }
         if (flashcardClickTrigger) {
           flashcardClickTrigger.classList.remove("active-mode-card");
           flashcardClickTrigger.style.pointerEvents = "auto";
@@ -166,7 +169,10 @@ const flashcards = {
         btnActive.classList.add("active");
         btnClassic.classList.remove("active");
         if (inputActiveBox) inputActiveBox.classList.remove("hidden");
-        if (comparisonBox) comparisonBox.classList.add("hidden");
+        if (comparisonBox) {
+          comparisonBox.classList.add("hidden");
+          comparisonBox.classList.remove("good-match", "mid-match", "bad-match");
+        }
         if (flashcardClickTrigger) {
           flashcardClickTrigger.classList.add("active-mode-card");
           flashcardClickTrigger.style.pointerEvents = "none";
@@ -233,7 +239,16 @@ const flashcards = {
           }
         }
 
-        if (comparisonBox) comparisonBox.classList.remove("hidden");
+        if (comparisonBox) {
+          comparisonBox.classList.remove("hidden", "good-match", "mid-match", "bad-match");
+          if (resultado.colorClass === "success") {
+            comparisonBox.classList.add("good-match");
+          } else if (resultado.colorClass === "warning") {
+            comparisonBox.classList.add("mid-match");
+          } else {
+            comparisonBox.classList.add("bad-match");
+          }
+        }
 
         // Voltear automáticamente la tarjeta para revelar el reverso
         if (flashcardClickTrigger) {
@@ -450,7 +465,10 @@ const flashcards = {
     if (txtRespuesta) txtRespuesta.value = "";
     
     const comparisonBox = document.getElementById("flashcard-active-comparison-box");
-    if (comparisonBox) comparisonBox.classList.add("hidden");
+    if (comparisonBox) {
+      comparisonBox.classList.add("hidden");
+      comparisonBox.classList.remove("good-match", "mid-match", "bad-match");
+    }
 
     const inputActiveBox = document.getElementById("flashcard-active-input-box");
     if (inputActiveBox) {
