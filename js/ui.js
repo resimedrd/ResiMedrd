@@ -123,7 +123,7 @@ const ui = {
       
       card.innerHTML = `
         <div class="specialty-analytics-header">
-          <span class="specialty-analytics-title">${esp.emoji} ${esp.nombre}</span>
+          <span class="specialty-analytics-title">${esp.nombre}</span>
           <div class="specialty-analytics-score-label">Nota: <span id="porcentaje-${esp.id}" class="specialty-analytics-score-val">0%</span></div>
         </div>
         <!-- Barra de Nota -->
@@ -138,7 +138,7 @@ const ui = {
         <div class="specialty-analytics-coverage-bar-bg">
           <div id="cobertura-barra-${esp.id}" class="specialty-analytics-coverage-bar-fill"></div>
         </div>
-        <div style="font-size: 11px; text-align: center; color: var(--primary); margin-top: 4px; font-weight: 600;">🔍 Ver debilidades y libros</div>
+        <div style="font-size: 11px; text-align: center; color: var(--primary); margin-top: 4px; font-weight: 600;">Ver análisis de temas y bibliografía</div>
       `;
       
       card.addEventListener("click", () => {
@@ -155,7 +155,7 @@ const ui = {
 
     // Poblar título y métricas iniciales desde el perfil
     const tituloEl = document.getElementById("modal-debilidades-titulo");
-    if (tituloEl) tituloEl.textContent = `${esp.emoji} Análisis: ${esp.nombre}`;
+    if (tituloEl) tituloEl.textContent = `Análisis: ${esp.nombre}`;
 
     const notaEl = document.getElementById(`porcentaje-${esp.id}`);
     const coberturaEl = document.getElementById(`cobertura-texto-${esp.id}`);
@@ -186,25 +186,25 @@ const ui = {
       let feedbackColor = "";
 
       if (vistas === 0) {
-        feedbackBadge = "⚪ Sin Datos";
+        feedbackBadge = "Sin Datos";
         feedbackText = "Aún no has respondido preguntas de esta especialidad en tus simulacros. ¡Inicia un entrenamiento para evaluar tu nivel!";
         feedbackBg = "rgba(255,255,255,0.02)";
         feedbackBorder = "1px solid var(--border)";
         feedbackColor = "var(--text-soft)";
       } else if (score >= 85) {
-        feedbackBadge = "🏆 Sobresaliente";
+        feedbackBadge = "Sobresaliente";
         feedbackText = "¡Rendimiento excepcional! Tu precisión y dominio conceptual en esta especialidad son sobresalientes. Sigue así y afianza repasando flashcards complejas.";
         feedbackBg = "rgba(34, 197, 94, 0.04)";
         feedbackBorder = "1px solid rgba(34, 197, 94, 0.2)";
         feedbackColor = "var(--success)";
       } else if (score >= 70) {
-        feedbackBadge = "✅ Buen Nivel";
+        feedbackBadge = "Buen Nivel";
         feedbackText = "Buen rendimiento general. Demuestras bases sólidas en esta materia, pero te sugerimos revisar las debilidades listadas abajo para pulir tu precisión.";
         feedbackBg = "rgba(16, 185, 129, 0.03)";
         feedbackBorder = "1px solid rgba(16, 185, 129, 0.15)";
         feedbackColor = "#10b981";
       } else {
-        feedbackBadge = "⚠️ Debe Mejorar";
+        feedbackBadge = "Debe Mejorar";
         feedbackText = "Requieres reforzar esta materia de forma prioritaria. Te recomendamos revisar detalladamente las explicaciones de tus simulacros y la bibliografía oficial indicada abajo.";
         feedbackBg = "rgba(245, 158, 11, 0.03)";
         feedbackBorder = "1px solid rgba(245, 158, 11, 0.2)";
@@ -222,10 +222,15 @@ const ui = {
       `;
     }
 
-    // Calcular debilidades reales
+    // Calcular debilidades y fortalezas reales
     const listaTemasEl = document.getElementById("modal-debilidades-lista-temas");
+    const listaFortalezasEl = document.getElementById("modal-fortalezas-lista-temas");
+    
     if (listaTemasEl) {
       listaTemasEl.innerHTML = '<div style="color: var(--text-dim); font-size:13px; font-style:italic;">Analizando historial académico...</div>';
+    }
+    if (listaFortalezasEl) {
+      listaFortalezasEl.innerHTML = '<div style="color: var(--text-dim); font-size:13px; font-style:italic;">Analizando historial académico...</div>';
     }
 
     try {
@@ -233,7 +238,10 @@ const ui = {
         api.obtenerHistorialCompleto(state.usuarioConectado.id),
         api.obtenerMapeoTemas().catch(() => ({}))
       ]);
+      
       const fallosPorSubtema = {};
+      const aciertosPorSubtema = {};
+      const totalesPorSubtema = {};
 
       historial.forEach(sesion => {
         if (sesion.detalle) {
@@ -241,7 +249,6 @@ const ui = {
             const preguntas = JSON.parse(sesion.detalle);
             if (Array.isArray(preguntas)) {
               preguntas.forEach(p => {
-                // Resolver el tema y subtema real de forma robusta cruzándolo con la base de datos
                 let temaReal = p.tema;
                 let subtemaReal = p.subtema;
 
@@ -253,9 +260,15 @@ const ui = {
 
                 const espIdPregunta = ui.normalizarTema(temaReal);
 
-                if (espIdPregunta === esp.id && p.seleccionada !== p.correcta && p.seleccionada !== null) {
+                if (espIdPregunta === esp.id) {
                   const subtema = (subtemaReal || "Conceptos Generales").trim();
-                  fallosPorSubtema[subtema] = (fallosPorSubtema[subtema] || 0) + 1;
+                  totalesPorSubtema[subtema] = (totalesPorSubtema[subtema] || 0) + 1;
+
+                  if (p.seleccionada === p.correcta) {
+                    aciertosPorSubtema[subtema] = (aciertosPorSubtema[subtema] || 0) + 1;
+                  } else if (p.seleccionada !== null) {
+                    fallosPorSubtema[subtema] = (fallosPorSubtema[subtema] || 0) + 1;
+                  }
                 }
               });
             }
@@ -265,21 +278,55 @@ const ui = {
         }
       });
 
-      const subtemasOrdenados = Object.keys(fallosPorSubtema).map(key => ({
-        nombre: key,
-        conteo: fallosPorSubtema[key]
-      })).sort((a, b) => b.conteo - a.conteo);
+      // Procesar temas fallados (debilidades)
+      const subtemasMalos = [];
+      Object.keys(totalesPorSubtema).forEach(subtema => {
+        const totales = totalesPorSubtema[subtema];
+        const fallos = fallosPorSubtema[subtema] || 0;
+        const aciertos = aciertosPorSubtema[subtema] || 0;
+        const porcentaje = Math.round((aciertos / totales) * 100);
+        
+        if (fallos > 0) {
+          subtemasMalos.push({
+            nombre: subtema,
+            totales: totales,
+            fallos: fallos,
+            porcentaje: porcentaje
+          });
+        }
+      });
+      subtemasMalos.sort((a, b) => b.fallos - a.fallos || a.porcentaje - b.porcentaje);
 
+      // Procesar temas buenos (fortalezas)
+      const subtemasBuenos = [];
+      Object.keys(totalesPorSubtema).forEach(subtema => {
+        const totales = totalesPorSubtema[subtema];
+        const fallos = fallosPorSubtema[subtema] || 0;
+        const aciertos = aciertosPorSubtema[subtema] || 0;
+        const porcentaje = Math.round((aciertos / totales) * 100);
+        
+        if (porcentaje >= 70) {
+          subtemasBuenos.push({
+            nombre: subtema,
+            totales: totales,
+            aciertos: aciertos,
+            porcentaje: porcentaje
+          });
+        }
+      });
+      subtemasBuenos.sort((a, b) => b.porcentaje - a.porcentaje || b.totales - a.totales);
+
+      // Inyectar Temas Fallados (Debilidades)
       if (listaTemasEl) {
         listaTemasEl.innerHTML = "";
-        if (subtemasOrdenados.length === 0) {
+        if (subtemasMalos.length === 0) {
           listaTemasEl.innerHTML = `
             <div style="background: rgba(34, 197, 94, 0.04); border: 1px solid rgba(34,197,94,0.15); padding: 12px; border-radius: 12px; font-size:12.5px; color: var(--success); display:flex; align-items:center; gap:8px;">
-              <strong>¡Excelente rendimiento! No tienes fallas registradas en esta materia.</strong>
+              <strong>Excelente rendimiento. No tienes fallas registradas en esta materia.</strong>
             </div>
           `;
         } else {
-          const topDebilidades = subtemasOrdenados.slice(0, 3);
+          const topDebilidades = subtemasMalos.slice(0, 3);
           topDebilidades.forEach((d, index) => {
             const row = document.createElement("div");
             row.style.display = "flex";
@@ -294,16 +341,51 @@ const ui = {
                 <span style="width: 20px; height: 20px; background: rgba(239,68,68,0.1); color: var(--danger); border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:11px;">${index + 1}</span>
                 <span style="font-weight: 600; color: var(--text);">${d.nombre}</span>
               </div>
-              <span class="chip chip-soft" style="border-color: rgba(239,68,68,0.2); color: var(--danger); font-size:11px; padding:2px 8px; margin:0;">${d.conteo} fallos</span>
+              <span class="chip chip-soft" style="border-color: rgba(239,68,68,0.2); color: var(--danger); font-size:11px; padding:2px 8px; margin:0; font-weight:700;">${d.fallos} fallos (${d.porcentaje}% acierto)</span>
             `;
             listaTemasEl.appendChild(row);
           });
         }
       }
+
+      // Inyectar Temas Dominados (Fortalezas)
+      if (listaFortalezasEl) {
+        listaFortalezasEl.innerHTML = "";
+        if (subtemasBuenos.length === 0) {
+          listaFortalezasEl.innerHTML = `
+            <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border); padding: 12px; border-radius: 12px; font-size:12.5px; color: var(--text-soft); display:flex; align-items:center; gap:8px;">
+              Aún no registras temas con alta precisión en esta materia. ¡Sigue practicando!
+            </div>
+          `;
+        } else {
+          const topFortalezas = subtemasBuenos.slice(0, 3);
+          topFortalezas.forEach((d, index) => {
+            const row = document.createElement("div");
+            row.style.display = "flex";
+            row.style.alignItems = "center";
+            row.style.justifyContent = "space-between";
+            row.style.background = "rgba(255,255,255,0.02)";
+            row.style.border = "1px solid var(--border)";
+            row.style.padding = "10px 14px";
+            row.style.borderRadius = "10px";
+            row.innerHTML = `
+              <div style="display:flex; align-items:center; gap:8px; font-size:13px;">
+                <span style="width: 20px; height: 20px; background: rgba(52,211,153,0.1); color: var(--success); border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:11px;">${index + 1}</span>
+                <span style="font-weight: 600; color: var(--text);">${d.nombre}</span>
+              </div>
+              <span class="chip chip-soft" style="border-color: rgba(52,211,153,0.2); color: var(--success); font-size:11px; padding:2px 8px; margin:0; font-weight:700;">${d.porcentaje}% acierto (${d.aciertos} aciertos)</span>
+            `;
+            listaFortalezasEl.appendChild(row);
+          });
+        }
+      }
     } catch (err) {
-      console.error("Falla al analizar debilidades:", err);
+      console.error("Falla al analizar rendimiento de especialidades:", err);
       if (listaTemasEl) {
-        listaTemasEl.innerHTML = '<div style="color: var(--danger); font-size:13px;">✗ Error al cargar el análisis de rendimiento.</div>';
+        listaTemasEl.innerHTML = '<div style="color: var(--danger); font-size:13px;">Error al cargar el análisis de rendimiento.</div>';
+      }
+      if (listaFortalezasEl) {
+        listaFortalezasEl.innerHTML = '<div style="color: var(--danger); font-size:13px;">Error al cargar el análisis de rendimiento.</div>';
       }
     }
 
@@ -314,7 +396,7 @@ const ui = {
     let recLibro = {
       titulo: "Harrison's Principles of Internal Medicine, 21.ª Edición",
       desc: "Harrison es la referencia oficial principal de Medicina Interna para el ENURM. Enfócate en fisiopatología y esquemas terapéuticos.",
-      cover: "🫁"
+      cover: "Harrison"
     };
 
     const espNombreLower = esp.nombre.trim().toLowerCase();
@@ -323,25 +405,25 @@ const ui = {
       recLibro = {
         titulo: "Nelson Textbook of Pediatrics, 21.ª Edición",
         desc: "Nelson es la biblia pediátrica del ENURM. Repasa a fondo el Capítulo de Enfermedades Respiratorias, Infectología y el esquema de vacunación oficial.",
-        cover: "👶"
+        cover: "Nelson"
       };
     } else if (espNombreLower === "gineco-obstetricia") {
       recLibro = {
         titulo: "Williams Obstetrics, 26.ª Edición & Novak's Gynecology, 16.ª Edición",
         desc: "Williams y Novak son las guías de oro para Gineco-Obstetricia en el ENURM. Dedica tiempo a repasar hemorragias de la gestación y endocrinología ginecológica.",
-        cover: "🤰"
+        cover: "Williams"
       };
     } else if (espNombreLower === "cirugía general" || espNombreLower.includes("trauma")) {
       recLibro = {
         titulo: "Schwartz's Principles of Surgery, 11.ª Edición",
         desc: "Schwartz es la referencia quirúrgica por excelencia del ENURM. Repasa abdomen agudo, trauma hepático/esplénico y patología vesicular de elección.",
-        cover: "🥼"
+        cover: "Schwartz"
       };
     } else if (espNombreLower.includes("básicas")) {
       recLibro = {
         titulo: "Guyton & Hall Tratado de Fisiología Médica, 14.ª Edición",
         desc: "Guyton & Hall proporciona los cimientos moleculares para el bloque de Ciencias Básicas. Te ayudará a razonar de forma científica los descartes clínicos.",
-        cover: "🧬"
+        cover: "Guyton"
       };
     }
 

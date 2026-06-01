@@ -1020,7 +1020,7 @@
               <!-- Rendimiento y Cobertura por Especialidad Colapsable -->
               <div id="contenedor-especialidades-acordeon" style="margin-top: 24px; border-top: 1px dashed var(--border-strong); padding-top: 20px;">
                 <button id="btn-toggle-especialidades" class="btn btn-ghost" type="button" style="width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 14px 20px; border-radius: 14px; background: rgba(255,255,255,0.02); font-weight: 700; border: 1px solid var(--border); font-size: 14px; color: var(--primary); transition: all 0.3s ease; cursor: pointer;">
-                  <span style="display: flex; align-items: center; gap: 8px;">🔍 Ver Cobertura y Nota por Especialidad</span>
+                  <span style="display: flex; align-items: center; gap: 8px;">Ver Cobertura y Nota por Especialidad</span>
                   <span id="icono-toggle-especialidades" style="transition: transform 0.3s ease; font-size: 14px;">▼</span>
                 </button>
 
@@ -1798,7 +1798,6 @@
     <div class="modal-ia-container" style="max-width: 520px;">
       <div class="modal-ia-header">
         <div class="modal-ia-title">
-          <span style="font-size: 24px;">📊</span>
           <h3 id="modal-debilidades-titulo">Análisis Académico</h3>
         </div>
         <button id="btn-modal-debilidades-cerrar" class="modal-ia-close" type="button">&times;</button>
@@ -1819,21 +1818,32 @@
         <!-- Retroalimentación Académica Adaptativa (Fase 2) -->
         <div id="modal-debilidades-retroalimentacion" style="margin-bottom: 8px;"></div>
 
-        <!-- Lista de fallos más comunes -->
-        <div>
-          <h4 style="font-size: 12px; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px;">🔍 Temas con Mayor Tasa de Error:</h4>
-          <div id="modal-debilidades-lista-temas" style="display: flex; flex-direction: column; gap: 8px;">
-            <!-- Inyectado dinámicamente -->
+        <!-- Lista de fallos más comunes y temas buenos -->
+        <div style="display: flex; flex-direction: column; gap: 18px;">
+          <!-- Temas fallados -->
+          <div>
+            <h4 style="font-size: 12.5px; color: #f87171; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; font-weight: 700;">Temas a Reforzar (Bajo Rendimiento):</h4>
+            <div id="modal-debilidades-lista-temas" style="display: flex; flex-direction: column; gap: 8px;">
+              <!-- Inyectado dinámicamente -->
+            </div>
+          </div>
+          
+          <!-- Temas dominados -->
+          <div>
+            <h4 style="font-size: 12.5px; color: #34d399; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; font-weight: 700;">Temas Dominados (Buen Rendimiento):</h4>
+            <div id="modal-fortalezas-lista-temas" style="display: flex; flex-direction: column; gap: 8px;">
+              <!-- Inyectado dinámicamente -->
+            </div>
           </div>
         </div>
 
         <!-- Caja de recomendaciones de libros oficiales ENURM -->
         <div class="book-rec-box" style="border: 1px solid rgba(245, 158, 11, 0.2); background: rgba(245, 158, 11, 0.02); border-radius: 16px; padding: 16px; display: flex; gap: 16px; align-items: center; margin-top: 8px;">
-          <div id="modal-debilidades-libro-cover" style="font-size: 32px; padding: 8px; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid var(--border); width: 60px; height: 72px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.2); flex-shrink: 0;">
-            📚
+          <div id="modal-debilidades-libro-cover" style="font-size: 12px; font-weight: 800; color: var(--text-dim); background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid var(--border); width: 60px; height: 72px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.2); flex-shrink: 0;">
+            Manual
           </div>
           <div style="flex: 1;">
-            <span style="font-size: 10px; color: var(--warning); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 2px;">📖 Bibliografía Oficial ENURM</span>
+            <span style="font-size: 10px; color: var(--warning); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 2px;">Bibliografía Oficial ENURM</span>
             <h4 id="modal-debilidades-libro-titulo" style="font-size: 14px; font-weight: 700; color: var(--text); margin: 0 0 2px 0;">Harrison's Principles of Internal Medicine</h4>
             <p id="modal-debilidades-libro-desc" style="font-size: 11.5px; color: var(--text-dim); margin: 0; line-height: 1.4;">Para superar estos temas débiles, te recomendamos revisar detalladamente la última actualización en esta área específica.</p>
           </div>
