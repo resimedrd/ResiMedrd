@@ -1018,8 +1018,8 @@ select.input option {
   perspective: 1200px;
   width: 100%;
   max-width: 580px;
-  height: 360px;
-  margin: 20px auto;
+  height: 270px;
+  margin: 16px auto;
   cursor: pointer;
 }
 
@@ -1042,8 +1042,8 @@ select.input option {
   height: 100%;
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
-  border-radius: 28px;
-  padding: 40px;
+  border-radius: 24px;
+  padding: 24px 28px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -1077,7 +1077,7 @@ select.input option {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1px;
-  margin-bottom: 24px;
+  margin-bottom: 12px;
 }
 
 .flashcard-tag.back-tag {
@@ -1104,7 +1104,7 @@ select.input option {
 .flashcard-hint {
   font-size: 12px;
   color: var(--text-dim);
-  margin-top: 24px;
+  margin-top: 12px;
   display: flex;
   align-items: center;
   gap: 6px;
