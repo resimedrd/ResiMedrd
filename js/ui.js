@@ -1259,6 +1259,29 @@ const ui = {
     const barEl = document.getElementById("metric-predict-bar");
     const adviceEl = document.getElementById("metric-predict-advice");
     if (scoreEl) scoreEl.textContent = countValid > 0 ? `${predictionScore}%` : "--%";
+
+    // Actualizar Módulo Competitivo PrepMed (Fase 13)
+    const pmUserPct = document.getElementById("prepmed-user-pct");
+    const pmUserBar = document.getElementById("prepmed-user-bar");
+    const pmPercentile = document.getElementById("prepmed-percentile");
+    
+    if (pmUserPct) pmUserPct.textContent = countValid > 0 ? `${predictionScore}%` : "--%";
+    if (pmUserBar) pmUserBar.style.width = countValid > 0 ? `${predictionScore}%` : "0%";
+    
+    if (pmPercentile) {
+      if (countValid === 0) {
+        pmPercentile.textContent = "--";
+      } else {
+        // Cálculo de percentil proyectado frente a la media nacional
+        let percentile = 50;
+        if (predictionScore > 68) {
+          percentile = Math.round(50 + ((predictionScore - 68) / (100 - 68)) * 49);
+        } else if (predictionScore < 68) {
+          percentile = Math.round(10 + (predictionScore / 68) * 40);
+        }
+        pmPercentile.textContent = `${percentile}°`;
+      }
+    }
     if (barEl) {
       barEl.style.width = countValid > 0 ? `${predictionScore}%` : "0%";
       if (predictionScore >= 75) {
