@@ -340,6 +340,7 @@ const quiz = {
     const btnKeyInfo = document.getElementById("btn-key-info");
     if (btnKeyInfo) {
       btnKeyInfo.addEventListener("click", () => {
+        if (state.modoActual !== "estudio") return;
         const p = state.preguntasCargadas[state.indiceActual];
         if (!p) return;
         
@@ -372,6 +373,7 @@ const quiz = {
     const btnAttendingTip = document.getElementById("btn-attending-tip");
     if (btnAttendingTip) {
       btnAttendingTip.addEventListener("click", () => {
+        if (state.modoActual !== "estudio") return;
         const p = state.preguntasCargadas[state.indiceActual];
         if (!p) return;
         
