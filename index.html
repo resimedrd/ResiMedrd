@@ -943,10 +943,24 @@
                     </div>
 
                     <!-- Gráfico 3: Estado de Repetición Espaciada -->
-                    <div class="chart-card-premium" style="background: rgba(255,255,255,0.01); border: 1px solid var(--border); border-radius: 16px; padding: 20px; min-height: 280px; display: flex; flex-direction: column;">
+                    <div class="chart-card-premium" style="background: rgba(255,255,255,0.01); border: 1px solid var(--border); border-radius: 16px; padding: 20px; min-height: 340px; display: flex; flex-direction: column;">
                       <h4 style="margin: 0 0 16px 0; font-size: 13.5px; color: var(--text); font-weight: 700; display: flex; align-items: center; gap: 6px;">Memorización y Repetición Espaciada</h4>
-                      <div style="position: relative; flex-grow: 1; height: 220px;">
+                      <div style="position: relative; height: 180px;">
                         <canvas id="chart-repeticion-dona"></canvas>
+                      </div>
+                      <div style="margin-top: 14px; display: flex; flex-direction: column; gap: 8px; font-size: 11px; color: var(--text-soft); line-height: 1.4; border-top: 1px solid var(--border); padding-top: 12px;">
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                          <span style="width: 8px; height: 8px; background: rgba(16, 185, 129, 0.85); border-radius: 50%; flex-shrink: 0;"></span>
+                          <span><strong>Dominadas (Memoria):</strong> Conceptos clínicos recordados con éxito (intervalo de repaso largo).</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                          <span style="width: 8px; height: 8px; background: rgba(239, 68, 68, 0.85); border-radius: 50%; flex-shrink: 0;"></span>
+                          <span><strong>Críticas (En Repaso):</strong> Conceptos fallados recientemente o que requieren memorización inmediata hoy.</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                          <span style="width: 8px; height: 8px; background: rgba(59, 130, 246, 0.85); border-radius: 50%; flex-shrink: 0;"></span>
+                          <span><strong>No Estudiadas:</strong> Flashcards cargadas en el banco oficial que aún no has comenzado a repasar.</span>
+                        </div>
                       </div>
                     </div>
                   <!-- Panel de Fortalezas Clínicas y Dominio de Materias (Fase 13 - Reemplazo Positivo) -->

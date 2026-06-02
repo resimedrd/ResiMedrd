@@ -1655,7 +1655,7 @@ const ui = {
       window.resiMedCharts.doughnut = new Chart(ctxDona, {
         type: 'doughnut',
         data: {
-          labels: ['Dominadas', 'Críticas', 'Sin Repasar'],
+          labels: ['Dominadas (Memoria)', 'Críticas (En Repaso)', 'No Estudiadas'],
           datasets: [{
             data: [dominadas, criticas, sinRepasar],
             backgroundColor: [
