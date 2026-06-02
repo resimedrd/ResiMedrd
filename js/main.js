@@ -296,11 +296,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         ui.mostrarPantalla("perfil");
         const tabErrores = document.getElementById("tab-perfil-errores");
         if (tabErrores) tabErrores.click();
-        
-        setTimeout(() => {
-          const scrollTarget = document.getElementById("banco-errores-lista");
-          if (scrollTarget) scrollTarget.scrollIntoView({ behavior: "smooth", block: "center" });
-        }, 300);
       } else if (target === "ranking") {
         battle.mostrarPantallaBattle("battle");
         battle.conectarWebSocket();

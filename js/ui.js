@@ -1885,19 +1885,25 @@ const ui = {
       }
     }
 
-    // 3. Poblar Filtro de Materias
+    // 3. Poblar Filtro de Materias (Temas Específicos)
     if (selectEl) {
       const valorPrevio = selectEl.value;
-      const materiasUnicas = [...new Set(preguntasFalladas.map(p => p.tema))].sort();
+      const temasUnicos = [...new Set(preguntasFalladas.map(p => {
+        let sub = (p.subtema || "").trim();
+        if (!sub || sub.toLowerCase() === "varios" || sub.toLowerCase() === "general" || sub.toLowerCase() === "generalidades") {
+          return p.tema;
+        }
+        return sub;
+      }))].sort();
 
-      let optionsHtml = '<option value="">Todas las materias</option>';
-      materiasUnicas.forEach(m => {
-        optionsHtml += `<option value="${m}">${m}</option>`;
+      let optionsHtml = '<option value="">Todos los temas</option>';
+      temasUnicos.forEach(t => {
+        optionsHtml += `<option value="${t}">${t}</option>`;
       });
       selectEl.innerHTML = optionsHtml;
 
       // Intentar restaurar valor seleccionado previo
-      if (materiasUnicas.includes(valorPrevio)) {
+      if (temasUnicos.includes(valorPrevio)) {
         selectEl.value = valorPrevio;
       }
 
@@ -1912,10 +1918,16 @@ const ui = {
     // 4. Helper para filtrar y renderizar preguntas
     const filtrarYMostrarPreguntas = () => {
       listaEl.innerHTML = "";
-      const filtroMateria = selectEl ? selectEl.value : "";
+      const filtroTema = selectEl ? selectEl.value : "";
       
-      const preguntasFiltradas = filtroMateria
-        ? preguntasFalladas.filter(p => p.tema === filtroMateria)
+      const preguntasFiltradas = filtroTema
+        ? preguntasFalladas.filter(p => {
+            let sub = (p.subtema || "").trim();
+            if (!sub || sub.toLowerCase() === "varios" || sub.toLowerCase() === "general" || sub.toLowerCase() === "generalidades") {
+              return p.tema === filtroTema;
+            }
+            return sub === filtroTema;
+          })
         : preguntasFalladas;
 
       if (preguntasFiltradas.length === 0) {
