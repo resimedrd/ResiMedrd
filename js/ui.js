@@ -1698,17 +1698,13 @@ const ui = {
     }
   },
 
-  // BANCO DE ERRORES DINÁMICO & ANÁLISIS DE DEBILIDADES (PREMIUM)
-  renderizarBancoDeErrores(historial, metricas) {
-    const listaEl = document.getElementById("banco-errores-lista");
+  // RENDIMIENTO, COBERTURA Y BANCO DE ERRORES UNIFICADO POR ESPECIALIDAD (OBVIANDO IA)
+  async renderizarBancoDeErrores(historial, metricas) {
+    const containerEl = document.getElementById("banco-errores-especialidades-container");
     const vacioEl = document.getElementById("banco-errores-vacio");
-    const debilidadesCard = document.getElementById("debilidades-clinicas-card");
-    const debilidadesListaEl = document.getElementById("debilidades-clinicas-lista");
-    const selectEl = document.getElementById("filtro-materia-errores");
+    if (!containerEl) return;
 
-    if (!listaEl) return;
-
-    // 1. Extraer preguntas falladas únicas
+    // 1. Extraer preguntas falladas únicas agrupadas por especialidad
     const preguntasFalladasMap = new Map();
     historial.forEach(sesion => {
       if (sesion.detalle) {
@@ -1743,253 +1739,355 @@ const ui = {
     const preguntasFalladas = Array.from(preguntasFalladasMap.values());
 
     if (preguntasFalladas.length === 0) {
-      listaEl.innerHTML = "";
+      containerEl.innerHTML = "";
       if (vacioEl) vacioEl.classList.remove("hidden");
-      if (debilidadesCard) debilidadesCard.classList.add("hidden");
-      if (selectEl) {
-        selectEl.innerHTML = '<option value="">Todas las materias</option>';
-        selectEl.disabled = true;
-      }
-      return;
+    } else {
+      if (vacioEl) vacioEl.classList.add("hidden");
     }
 
-    if (vacioEl) vacioEl.classList.add("hidden");
-    if (selectEl) selectEl.disabled = false;
+    // 2. Calcular rendimiento general y subtemas por especialidad
+    const conteoEspecialidades = {};
+    state.LISTA_ESPECIALIDADES.forEach(esp => {
+      conteoEspecialidades[esp.id] = {
+        id: esp.id,
+        nombre: esp.nombre,
+        emoji: esp.emoji,
+        correctas: 0,
+        totales: 0,
+        subtemas: {} // { "subtemaName": { correctas, totales, historialRespuestas: [] } }
+      };
+    });
 
-    // 2. Renderizar Debilidades Clínicas (IA Diagnostics)
-    if (debilidadesCard && debilidadesListaEl) {
-      if (metricas.debilidadesDetectadas.length > 0) {
-        debilidadesCard.classList.remove("hidden");
-        debilidadesListaEl.innerHTML = "";
+    // Procesar todo el historial en orden cronológico (copia invertida)
+    const historialCronologico = [...historial].reverse();
+    
+    historialCronologico.forEach(sesion => {
+      if (sesion.detalle) {
+        try {
+          const preguntas = JSON.parse(sesion.detalle);
+          if (Array.isArray(preguntas)) {
+            preguntas.forEach(p => {
+              const materiaRaw = (p.tema || sesion.tema || "General").trim();
+              
+              // Buscar especialidad correspondiente
+              let espInfo = null;
+              state.LISTA_ESPECIALIDADES.forEach(esp => {
+                if (esp.nombre.toLowerCase() === materiaRaw.toLowerCase() || 
+                    esp.id.toLowerCase() === materiaRaw.toLowerCase()) {
+                  espInfo = conteoEspecialidades[esp.id];
+                }
+              });
 
-        metricas.debilidadesDetectadas.forEach(d => {
-          const severityText = d.porcentaje < 40 ? "🚨 Crítico" : "⚠️ Alerta";
-          const severityClass = d.porcentaje < 40 ? "critico" : "urgente";
-          const fillClass = d.porcentaje < 40 ? "red" : "orange";
+              if (!espInfo) {
+                // Matching aproximado
+                const espCoincidente = state.LISTA_ESPECIALIDADES.find(e => 
+                  e.nombre.toLowerCase().includes(materiaRaw.toLowerCase()) || 
+                  materiaRaw.toLowerCase().includes(e.nombre.toLowerCase())
+                );
+                if (espCoincidente) {
+                  espInfo = conteoEspecialidades[espCoincidente.id];
+                }
+              }
 
-          const card = document.createElement("div");
-          card.className = "debilidad-card";
-          card.innerHTML = `
-            <div>
-              <div class="debilidad-card-header">
-                <span class="debilidad-title">${d.tema}</span>
-                <span class="debilidad-severity ${severityClass}">${severityText}</span>
+              if (espInfo) {
+                const esCorrecta = p.seleccionada === p.correcta;
+                espInfo.totales += 1;
+                if (esCorrecta) {
+                  espInfo.correctas += 1;
+                }
+
+                // Subtemas específicos
+                let sub = (p.subtema || "").trim();
+                if (!sub || sub.toLowerCase() === "varios" || sub.toLowerCase() === "general" || sub.toLowerCase() === "generalidades") {
+                  sub = espInfo.nombre;
+                }
+
+                if (!espInfo.subtemas[sub]) {
+                  espInfo.subtemas[sub] = { correctas: 0, totales: 0, historialRespuestas: [] };
+                }
+                espInfo.subtemas[sub].totales += 1;
+                if (esCorrecta) {
+                  espInfo.subtemas[sub].correctas += 1;
+                }
+                espInfo.subtemas[sub].historialRespuestas.push(esCorrecta);
+              }
+            });
+          }
+        } catch (err) {
+          console.warn("Falla al acumular historial por especialidades:", err);
+        }
+      }
+    });
+
+    // Obtener Coberturas reales del Banco de Preguntas
+    let datosCobertura = {};
+    if (state.usuarioConectado && state.usuarioConectado.id) {
+      try {
+        datosCobertura = await api.obtenerCobertura(state.usuarioConectado.id);
+      } catch (err) {
+        console.warn("No se pudo obtener coberturas de especialidades en errores:", err);
+      }
+    }
+
+    // Limpiar contenedor de especialidades
+    containerEl.innerHTML = "";
+
+    // 3. Renderizar cada Especialidad con su desglose académico y banco de errores particular
+    state.LISTA_ESPECIALIDADES.forEach(esp => {
+      const info = conteoEspecialidades[esp.id];
+      
+      // Filtrar las preguntas falladas de esta especialidad
+      const preguntasEsp = preguntasFalladas.filter(p => {
+        const pMateria = p.tema.trim().toLowerCase();
+        const espNombre = esp.nombre.trim().toLowerCase();
+        return pMateria === espNombre || pMateria === esp.id.toLowerCase() || 
+               pMateria.includes(espNombre) || espNombre.includes(pMateria);
+      });
+
+      const totalRespondidas = info.totales;
+      const totalCorrectas = info.correctas;
+      const nota = totalRespondidas > 0 ? Math.round((totalCorrectas / totalRespondidas) * 100) : 0;
+
+      // Obtener cobertura
+      const nombreBuscar = esp.nombre.trim().toLowerCase();
+      let dataCob = { totalBanco: 0, respondidas: 0, porcentaje: 0 };
+      const claveReal = Object.keys(datosCobertura).find(k => k.trim().toLowerCase() === nombreBuscar);
+      if (claveReal) {
+        dataCob = datosCobertura[claveReal];
+      }
+
+      // Colores de semáforo de nota
+      let colorNota = "var(--text-dim)";
+      let notaTexto = "Sin Datos";
+      if (totalRespondidas > 0) {
+        notaTexto = `${nota}%`;
+        if (nota >= 75) {
+          colorNota = "var(--success)";
+        } else if (nota >= 50) {
+          colorNota = "var(--warning)";
+        } else {
+          colorNota = "var(--danger)";
+        }
+      }
+
+      const coberturaTexto = `Estudiado: ${dataCob.respondidas} de ${dataCob.totalBanco} preguntas (${dataCob.porcentaje}%)`;
+
+      // Clasificar subtemas en Dominados vs A Reforzar (Obviando IA)
+      const temasDominados = [];
+      const temasAReforzar = [];
+
+      Object.keys(info.subtemas).forEach(subtemaName => {
+        const subData = info.subtemas[subtemaName];
+        const subTotales = subData.totales;
+        const subCorrectas = subData.correctas;
+        const subPorcentaje = subTotales > 0 ? Math.round((subCorrectas / subTotales) * 100) : 0;
+
+        // Motor Adaptativo de Auto-Superación
+        const historialRespuestas = subData.historialRespuestas || [];
+        const ultimas = historialRespuestas.slice(-5);
+        const correctasRecientes = ultimas.filter(r => r === true).length;
+        const totalesRecientes = ultimas.length;
+        const porcentajeReciente = totalesRecientes > 0 ? Math.round((correctasRecientes / totalesRecientes) * 100) : 0;
+
+        const superadoPorRacha = ultimas.length >= 3 && ultimas.slice(-3).every(r => r === true);
+        const superadoPorPrecision = totalesRecientes >= 3 && porcentajeReciente >= 75;
+
+        if (subPorcentaje >= 70 || superadoPorRacha || superadoPorPrecision) {
+          temasDominados.push({ nombre: subtemaName, porcentaje: subPorcentaje, totales: subTotales });
+        } else if (subCorrectas < subTotales) {
+          temasAReforzar.push({ nombre: subtemaName, porcentaje: subPorcentaje, totales: subTotales });
+        }
+      });
+
+      // Ordenar listados
+      temasDominados.sort((a, b) => b.porcentaje - a.porcentaje);
+      temasAReforzar.sort((a, b) => a.porcentaje - b.porcentaje);
+
+      // Generar HTML de subtemas
+      let temasDominadosHtml = '<li style="color: var(--text-dim); font-style: italic; list-style: none; margin-left: -18px;">Aún no posees temas consolidados.</li>';
+      if (temasDominados.length > 0) {
+        temasDominadosHtml = temasDominados.map(t => 
+          `<li><strong>${t.nombre}</strong> <span style="color: var(--success); font-weight:600; margin-left:6px;">(${t.porcentaje}% de aciertos)</span></li>`
+        ).join("");
+      }
+
+      let temasAReforzarHtml = '<li style="color: var(--text-dim); font-style: italic; list-style: none; margin-left: -18px;">¡Excelente! No tienes temas a reforzar en este momento.</li>';
+      if (temasAReforzar.length > 0) {
+        temasAReforzarHtml = temasAReforzar.map(t => 
+          `<li><strong>${t.nombre}</strong> <span style="color: var(--danger); font-weight:600; margin-left:6px;">(${t.porcentaje}% de precisión, ${t.totales} preguntas vistas)</span></li>`
+        ).join("");
+      }
+
+      // Generar HTML de preguntas falladas
+      let preguntasHtml = "";
+      if (preguntasEsp.length === 0) {
+        preguntasHtml = `<div style="text-align: center; color: var(--text-dim); font-size: 13px; font-style: italic; padding: 12px; background: rgba(255,255,255,0.01); border-radius: 8px;">No posees preguntas falladas en esta especialidad actualmente.</div>`;
+      } else {
+        let idx = 0;
+        preguntasEsp.forEach(p => {
+          idx++;
+          const opcionesArray = p.opciones;
+          const seleccion = p.seleccionada;
+
+          let opcionesHtml = "";
+          opcionesArray.forEach((o, oIdx) => {
+            let claseOpt = "";
+            if (oIdx === p.correcta) claseOpt = "correct";
+            if (oIdx === seleccion) claseOpt = "wrong";
+            opcionesHtml += `<div class="review-opt ${claseOpt}"><strong>${String.fromCharCode(65 + oIdx)}.</strong> ${o}</div>`;
+          });
+
+          const textoEscapado = p.texto.replace(/"/g, "&quot;");
+          const explicacionEscapada = (p.explicacion || "Sin desglose.").replace(/"/g, "&quot;");
+          const temaEscapado = (p.tema || "General").replace(/"/g, "&quot;");
+
+          const seleccionText = (seleccion !== null && opcionesArray[seleccion])
+            ? opcionesArray[seleccion].replace(/"/g, "&quot;")
+            : "Sin responder";
+
+          preguntasHtml += `
+            <div class="review-item" style="border: 1px solid var(--border); border-radius: 16px; padding: 18px; background: var(--panel); margin-bottom: 12px; text-align: left;">
+              <div class="error-bank-header" style="display:flex; justify-content:space-between; gap:10px; margin-bottom: 12px;">
+                <span class="chip chip-soft" style="font-size:11px; padding:4px 10px;">Tema: ${p.subtema}</span>
               </div>
-              <div class="debilidad-stat-row">
-                <span class="debilidad-stat-label">Tasa de Aciertos</span>
-                <span class="debilidad-stat-value">${d.porcentaje}%</span>
-              </div>
-              <div class="debilidad-progress-container">
-                <div class="debilidad-progress-fill ${fillClass}" style="width: ${d.porcentaje}%"></div>
-              </div>
-              <div class="debilidad-stat-row" style="margin-bottom: 12px;">
-                <span class="debilidad-stat-label">Preguntas analizadas</span>
-                <span class="debilidad-stat-value">${d.totales} fallos</span>
-              </div>
-            </div>
-            <div class="debilidad-action-plan">
-              <div class="debilidad-action-title">Plan de Acción IA</div>
-              <div class="debilidad-action-buttons">
-                <button class="btn-debilidad-action primary btn-debilidad-filtrar" data-tema="${d.tema}" type="button">
-                  🔍 Filtrar
-                </button>
-                <button class="btn-debilidad-action btn-debilidad-flashcards" data-tema="${d.tema}" type="button">
-                  ⚡ Mazo
-                </button>
-                <button class="btn-debilidad-action btn-debilidad-quiz" data-tema="${d.tema}" type="button">
-                  📝 Quiz
-                </button>
+              <div class="review-q-text error-bank-q-text" style="font-size: 14.5px; font-weight: 700; color: var(--text); line-height: 1.5; margin-bottom: 12px;">${idx}. ${p.texto}</div>
+              <div class="review-options" style="display:flex; flex-direction:column; gap:8px;">${opcionesHtml}</div>
+              <div class="review-exp-container" style="margin-top: 14px;">${ui.formatearExplicacionClinica(p.explicacion, p.fuente, p.explicacion_correcta, p.explicacion_incorrecta)}</div>
+              <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top: 14px; border-top: 1px solid var(--border); padding-top: 12px;">
+                <button class="btn-ia btn-consultar-tutor" data-texto="${textoEscapado}" data-seleccion="${seleccionText}" type="button" style="font-size:11.5px; padding: 6px 12px; border-radius: 8px;">Consultar Tutor</button>
+                <button class="btn btn-primary btn-auto-flashcard" data-tema="${temaEscapado}" data-pregunta="${textoEscapado}" data-respuesta="${explicacionEscapada}" style="background: var(--warning); color:#000; font-size:11.5px; padding:6px 12px; border:none; border-radius: 8px;" type="button">Crear Flashcard</button>
+                <button class="btn btn-reportar-pregunta" data-id="${p.id}" type="button" style="font-size:11.5px; padding: 6px 12px; border-radius: 8px;">Reportar Error</button>
               </div>
             </div>
           `;
-          debilidadesListaEl.appendChild(card);
-        });
-
-        // Registrar listener de clicks en debilidades (una sola vez)
-        if (!debilidadesListaEl.dataset.listenerSet) {
-          debilidadesListaEl.dataset.listenerSet = "true";
-          debilidadesListaEl.addEventListener("click", async (e) => {
-            const btnFiltrar = e.target.closest(".btn-debilidad-filtrar");
-            const btnFlashcard = e.target.closest(".btn-debilidad-flashcards");
-            const btnQuiz = e.target.closest(".btn-debilidad-quiz");
-
-            if (btnFiltrar) {
-              const tema = btnFiltrar.getAttribute("data-tema");
-              if (selectEl) {
-                selectEl.value = tema;
-                selectEl.dispatchEvent(new Event("change"));
-                const errorListHeader = selectEl.closest(".panel");
-                if (errorListHeader) {
-                  errorListHeader.scrollIntoView({ behavior: "smooth" });
-                }
-              }
-            }
-
-            if (btnFlashcard) {
-              const tema = btnFlashcard.getAttribute("data-tema");
-              const selectorFlash = document.getElementById("flashcard-filtro-tema");
-              if (selectorFlash) {
-                let matchingOption = "";
-                Array.from(selectorFlash.options).forEach(opt => {
-                  if (opt.value.trim().toLowerCase() === tema.trim().toLowerCase()) {
-                    matchingOption = opt.value;
-                  }
-                });
-                if (matchingOption) {
-                  selectorFlash.value = matchingOption;
-                } else {
-                  const newOpt = new Option(tema, tema);
-                  selectorFlash.add(newOpt);
-                  selectorFlash.value = tema;
-                }
-                selectorFlash.dispatchEvent(new Event("change"));
-                if (window.flashcards && typeof window.flashcards.inicializarMazo === "function") {
-                  await window.flashcards.inicializarMazo();
-                }
-              }
-              ui.mostrarPantalla("flashcards");
-            }
-
-            if (btnQuiz) {
-              const tema = btnQuiz.getAttribute("data-tema");
-              const selectEspecialidad = document.getElementById("especialidad");
-              if (selectEspecialidad) {
-                const tabSimEsp = document.getElementById("tab-sim-especialidad");
-                if (tabSimEsp) {
-                  tabSimEsp.click();
-                }
-                let matchingOption = "";
-                Array.from(selectEspecialidad.options).forEach(opt => {
-                  if (opt.textContent.trim().toLowerCase().includes(tema.trim().toLowerCase()) || 
-                      opt.value.trim().toLowerCase().includes(tema.trim().toLowerCase())) {
-                    matchingOption = opt.value;
-                  }
-                });
-                if (matchingOption) {
-                  selectEspecialidad.value = matchingOption;
-                  selectEspecialidad.dispatchEvent(new Event("change"));
-                }
-              }
-              ui.mostrarPantalla("home");
-              setTimeout(() => {
-                const configPanel = document.getElementById("especialidad")?.closest(".panel");
-                if (configPanel) {
-                  configPanel.scrollIntoView({ behavior: "smooth" });
-                }
-              }, 300);
-            }
-          });
-        }
-      } else {
-        debilidadesCard.classList.add("hidden");
-      }
-    }
-
-    // 3. Poblar Filtro de Materias (Temas Específicos)
-    if (selectEl) {
-      const valorPrevio = selectEl.value;
-      const temasUnicos = [...new Set(preguntasFalladas.map(p => {
-        let sub = (p.subtema || "").trim();
-        if (!sub || sub.toLowerCase() === "varios" || sub.toLowerCase() === "general" || sub.toLowerCase() === "generalidades") {
-          return p.tema;
-        }
-        return sub;
-      }))].sort();
-
-      let optionsHtml = '<option value="">Todos los temas</option>';
-      temasUnicos.forEach(t => {
-        optionsHtml += `<option value="${t}">${t}</option>`;
-      });
-      selectEl.innerHTML = optionsHtml;
-
-      // Intentar restaurar valor seleccionado previo
-      if (temasUnicos.includes(valorPrevio)) {
-        selectEl.value = valorPrevio;
-      }
-
-      if (!selectEl.dataset.listenerSet) {
-        selectEl.dataset.listenerSet = "true";
-        selectEl.addEventListener("change", () => {
-          filtrarYMostrarPreguntas();
         });
       }
-    }
 
-    // 4. Helper para filtrar y renderizar preguntas
-    const filtrarYMostrarPreguntas = () => {
-      listaEl.innerHTML = "";
-      const filtroTema = selectEl ? selectEl.value : "";
-      
-      const preguntasFiltradas = filtroTema
-        ? preguntasFalladas.filter(p => {
-            let sub = (p.subtema || "").trim();
-            if (!sub || sub.toLowerCase() === "varios" || sub.toLowerCase() === "general" || sub.toLowerCase() === "generalidades") {
-              return p.tema === filtroTema;
-            }
-            return sub === filtroTema;
-          })
-        : preguntasFalladas;
+      // Crear tarjeta de especialidad unificada
+      const panel = document.createElement("div");
+      panel.className = "especialidad-panel";
+      panel.style.cssText = "border: 1px solid var(--border); border-radius: 20px; background: var(--panel-soft); padding: 24px; display: flex; flex-direction: column; gap: 16px; transition: all 0.3s ease; text-align: left;";
 
-      if (preguntasFiltradas.length === 0) {
-        if (vacioEl) vacioEl.classList.remove("hidden");
-        return;
-      }
-
-      if (vacioEl) vacioEl.classList.add("hidden");
-
-      let idx = 0;
-      preguntasFiltradas.forEach(p => {
-        idx++;
-        const opcionesArray = p.opciones;
-        const seleccion = p.seleccionada;
-
-        let opcionesHtml = "";
-        opcionesArray.forEach((o, oIdx) => {
-          let claseOpt = "";
-          if (oIdx === p.correcta) claseOpt = "correct";
-          if (oIdx === seleccion) claseOpt = "wrong";
-          opcionesHtml += `<div class="review-opt ${claseOpt}"><strong>${String.fromCharCode(65 + oIdx)}.</strong> ${o}</div>`;
-        });
-
-        const textoEscapado = p.texto.replace(/"/g, "&quot;");
-        const explicacionEscapada = (p.explicacion || "Sin desglose.").replace(/"/g, "&quot;");
-        const temaEscapado = (p.tema || "General").replace(/"/g, "&quot;");
-
-        const seleccionText = (seleccion !== null && opcionesArray[seleccion])
-          ? opcionesArray[seleccion].replace(/"/g, "&quot;")
-          : "Sin responder";
-
-        const div = document.createElement("div");
-        div.className = "review-item";
-        div.style.opacity = "0";
-        div.style.transform = "translateY(10px)";
-        div.style.transition = "opacity 0.25s ease, transform 0.25s ease";
-
-        div.innerHTML = `
-          <div class="error-bank-header">
-            <span class="chip chip-soft error-bank-chip">Materia: ${p.tema}</span>
-            <span class="chip chip-soft" style="font-size:11px;">Subtema: ${p.subtema}</span>
+      panel.innerHTML = `
+        <!-- Header de la especialidad -->
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+          <div>
+            <h4 style="margin: 0; font-size: 18px; color: var(--text); font-weight: 700; display:flex; align-items:center; gap:8px;">
+              ${esp.nombre}
+            </h4>
+            <p style="margin: 4px 0 0 0; font-size: 13px; color: var(--text-soft); font-weight:500;">${coberturaTexto}</p>
           </div>
-          <div class="review-q-text error-bank-q-text">${idx}. ${p.texto}</div>
-          <div class="review-options">${opcionesHtml}</div>
-          <div class="review-exp-container">${ui.formatearExplicacionClinica(p.explicacion, p.fuente, p.explicacion_correcta, p.explicacion_incorrecta)}</div>
-          <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top: 14px; border-top: 1px solid var(--border); padding-top: 12px;">
-            <button class="btn-ia btn-consultar-tutor" data-texto="${textoEscapado}" data-seleccion="${seleccionText}" type="button">Consultar Tutor IA</button>
-            <button class="btn btn-primary btn-auto-flashcard" data-tema="${temaEscapado}" data-pregunta="${textoEscapado}" data-respuesta="${explicacionEscapada}" style="background: var(--warning); color:#000; font-size:12px; padding:6px 12px; border:none;" type="button">Crear Flashcard</button>
-            <button class="btn btn-reportar-pregunta" data-id="${p.id}" type="button">Reportar Error</button>
+          <div style="text-align: right;">
+            <span style="font-size: 18px; font-weight: 800; color: ${colorNota};">${notaTexto}</span>
           </div>
-        `;
-        listaEl.appendChild(div);
+        </div>
 
-        setTimeout(() => {
-          div.style.opacity = "1";
-          div.style.transform = "translateY(0)";
-        }, idx * 25);
+        <!-- Barra de progreso de nota -->
+        <div style="background: rgba(255,255,255,0.05); height: 8px; border-radius: 4px; overflow: hidden; width: 100%;">
+          <div style="background: ${colorNota}; height: 100%; width: ${totalRespondidas > 0 ? nota : 0}%; transition: width 0.5s ease;"></div>
+        </div>
+
+        <!-- Diagnóstico Temático: Temas Consolidados vs Temas a Reforzar -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-top: 4px;">
+          <!-- Caja: Temas Dominados -->
+          <div style="background: rgba(34, 197, 94, 0.01); border: 1px solid rgba(34, 197, 94, 0.08); border-radius: 12px; padding: 14px 16px;">
+            <h5 style="margin: 0 0 8px 0; font-size: 12.5px; color: var(--success); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Temas Dominados</h5>
+            <ul style="margin: 0; padding-left: 18px; font-size: 12.5px; color: var(--text-soft); line-height: 1.6; display:flex; flex-direction:column; gap:4px; text-align: left;">
+              ${temasDominadosHtml}
+            </ul>
+          </div>
+
+          <!-- Caja: Temas a Reforzar -->
+          <div style="background: rgba(239, 68, 68, 0.01); border: 1px solid rgba(239, 68, 68, 0.08); border-radius: 12px; padding: 14px 16px;">
+            <h5 style="margin: 0 0 8px 0; font-size: 12.5px; color: var(--warning); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Temas a Reforzar</h5>
+            <ul style="margin: 0; padding-left: 18px; font-size: 12.5px; color: var(--text-soft); line-height: 1.6; display:flex; flex-direction:column; gap:4px; text-align: left;">
+              ${temasAReforzarHtml}
+            </ul>
+          </div>
+        </div>
+
+        <!-- Preguntas Falladas Colapsables -->
+        <div style="margin-top: 8px;">
+          <button class="btn-toggle-preguntas-falladas" type="button" style="width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 12px 18px; border-radius: 12px; background: rgba(255,255,255,0.02); font-weight: 700; border: 1px solid var(--border); font-size: 13px; color: var(--text); cursor: pointer; transition: background 0.2s ease;">
+            <span>Preguntas Falladas (${preguntasEsp.length})</span>
+            <span class="icono-toggle-preguntas" style="transition: transform 0.2s ease; font-size: 12px;">▼</span>
+          </button>
+          <div class="seccion-preguntas-falladas-desplegable" style="max-height: 0; overflow: hidden; opacity: 0; transition: max-height 0.3s ease-out, opacity 0.3s ease; margin-top: 0;">
+            <div style="padding-top: 14px; display: flex; flex-direction: column; gap: 14px;">
+              ${preguntasHtml}
+            </div>
+          </div>
+        </div>
+      `;
+
+      containerEl.appendChild(panel);
+
+      // Programar interactividad del colapsable de preguntas falladas
+      const btnToggle = panel.querySelector(".btn-toggle-preguntas-falladas");
+      const contentDiv = panel.querySelector(".seccion-preguntas-falladas-desplegable");
+      const iconoToggle = panel.querySelector(".icono-toggle-preguntas");
+
+      if (btnToggle && contentDiv) {
+        btnToggle.addEventListener("click", () => {
+          const isCollapsed = contentDiv.style.maxHeight === "0px" || !contentDiv.style.maxHeight || contentDiv.style.maxHeight === "0";
+          if (isCollapsed) {
+            contentDiv.style.maxHeight = `${contentDiv.scrollHeight + 100}px`;
+            contentDiv.style.opacity = "1";
+            if (iconoToggle) iconoToggle.style.transform = "rotate(180deg)";
+            btnToggle.style.background = "rgba(255,255,255,0.04)";
+          } else {
+            contentDiv.style.maxHeight = "0";
+            contentDiv.style.opacity = "0";
+            if (iconoToggle) iconoToggle.style.transform = "rotate(0deg)";
+            btnToggle.style.background = "rgba(255,255,255,0.02)";
+          }
+        });
+      }
+    });
+
+    // Delegar clicks dentro de las preguntas (Consultar tutor, Crear flashcard, Reportar)
+    if (!containerEl.dataset.listenerSet) {
+      containerEl.dataset.listenerSet = "true";
+      containerEl.addEventListener("click", async (e) => {
+        const btnTutor = e.target.closest(".btn-consultar-tutor");
+        const btnFlashcard = e.target.closest(".btn-auto-flashcard");
+        const btnReportar = e.target.closest(".btn-reportar-pregunta");
+
+        if (btnTutor) {
+          const texto = btnTutor.getAttribute("data-texto");
+          const seleccion = btnTutor.getAttribute("data-seleccion");
+          if (typeof window.consultarTutorIASobrePregunta === "function") {
+            window.consultarTutorIASobrePregunta(texto, seleccion);
+          } else {
+            alert("El servicio de consulta del tutor no está disponible en este momento.");
+          }
+        }
+
+        if (btnFlashcard) {
+          const tema = btnFlashcard.getAttribute("data-tema");
+          const pregunta = btnFlashcard.getAttribute("data-pregunta");
+          const respuesta = btnFlashcard.getAttribute("data-respuesta");
+          if (typeof window.crearFlashcardAutogenerada === "function") {
+            window.crearFlashcardAutogenerada(tema, pregunta, respuesta);
+          } else {
+            alert("No se pudo autogenerar la flashcard en esta pestaña.");
+          }
+        }
+
+        if (btnReportar) {
+          const preguntaId = btnReportar.getAttribute("data-id");
+          const motivo = prompt("Describa brevemente el error observado en la pregunta o desglose académico:");
+          if (motivo) {
+            try {
+              const res = await api.reportarPregunta(preguntaId, motivo);
+              alert(res.message || "Reporte registrado de manera exitosa. Revisaremos el caso médico a la brevedad.");
+            } catch (err) {
+              alert("Falla al enviar reporte de error.");
+            }
+          }
+        }
       });
-    };
-
-    // Ejecución inicial de renderizado de preguntas
-    filtrarYMostrarPreguntas();
+    }
   },
 
 
