@@ -1885,7 +1885,7 @@ const ui = {
           <div class="especialidad-header-clickable" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; cursor: pointer; padding: 14px 20px; user-select: none;">
             <div style="display: flex; align-items: center; gap: 12px;">
               <div style="text-align: left;">
-                <h4 style="margin: 0; font-size: 15px; color: var(--text); font-weight: 700;">${esp.nombre}</h4>
+                <h4 style="margin: 0; font-size: 15px; color: var(--text); font-weight: 700;">${esp.emoji} ${esp.nombre}</h4>
                 <p style="margin: 2px 0 0 0; font-size: 11.5px; color: var(--text-soft); font-weight: 500;">${coberturaTexto}</p>
               </div>
             </div>
