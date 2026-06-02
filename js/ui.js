@@ -1684,24 +1684,8 @@ const ui = {
               const materiaRaw = (p.tema || sesion.tema || "General").trim();
               
               // Buscar especialidad correspondiente
-              let espInfo = null;
-              state.LISTA_ESPECIALIDADES.forEach(esp => {
-                if (esp.nombre.toLowerCase() === materiaRaw.toLowerCase() || 
-                    esp.id.toLowerCase() === materiaRaw.toLowerCase()) {
-                  espInfo = conteoEspecialidades[esp.id];
-                }
-              });
-
-              if (!espInfo) {
-                // Matching aproximado
-                const espCoincidente = state.LISTA_ESPECIALIDADES.find(e => 
-                  e.nombre.toLowerCase().includes(materiaRaw.toLowerCase()) || 
-                  materiaRaw.toLowerCase().includes(e.nombre.toLowerCase())
-                );
-                if (espCoincidente) {
-                  espInfo = conteoEspecialidades[espCoincidente.id];
-                }
-              }
+              const espId = ui.normalizarTema(materiaRaw);
+              const espInfo = conteoEspecialidades[espId];
 
               if (espInfo) {
                 const esCorrecta = p.seleccionada === p.correcta;
@@ -1755,13 +1739,10 @@ const ui = {
       try {
         const info = conteoEspecialidades[esp.id] || { totales: 0, correctas: 0, subtemas: {} };
         
-        // Filtrar las preguntas falladas de esta especialidad
+        // Filtrar las preguntas falladas de esta especialidad de forma robusta y consistente
         const preguntasEsp = preguntasFalladas.filter(p => {
           if (!p || !p.tema) return false;
-          const pMateria = p.tema.trim().toLowerCase();
-          const espNombre = esp.nombre.trim().toLowerCase();
-          return pMateria === espNombre || pMateria === esp.id.toLowerCase() || 
-                 pMateria.includes(espNombre) || espNombre.includes(pMateria);
+          return ui.normalizarTema(p.tema) === esp.id;
         });
 
         const totalRespondidas = info.totales || 0;
@@ -1987,7 +1968,7 @@ const ui = {
       }
     });
 
-    if (!containerEl.dataset.listenerSet) {
+    if (containerEl.dataset && !containerEl.dataset.listenerSet) {
       containerEl.dataset.listenerSet = "true";
       containerEl.addEventListener("click", async (e) => {
         const btnTutor = e.target.closest(".btn-consultar-tutor");
