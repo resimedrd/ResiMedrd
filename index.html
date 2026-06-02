@@ -865,9 +865,10 @@
                   <span id="progreso-conceptos-debiles" style="font-size: 22px; font-weight: bold; color: #ef4444;">0</span>
                 </div>
               </div>
+            </div>
 
-              <!-- CAJÓN DESPLEGABLE DE GRÁFICOS ANALÍTICOS AVANZADOS -->
-              <div id="contenedor-graficos-acordeon" style="margin-top: 24px; border-top: 1px dashed var(--border-strong); padding-top: 20px; margin-bottom: 24px;">
+            <!-- CAJÓN DESPLEGABLE DE GRÁFICOS ANALÍTICOS AVANZADOS -->
+            <div id="contenedor-graficos-acordeon" style="margin-top: 24px; margin-bottom: 24px;">
                 <button id="btn-toggle-graficos" class="btn btn-ghost" type="button" style="width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 14px 20px; border-radius: 14px; background: rgba(255,255,255,0.02); font-weight: 700; border: 1px solid var(--border); font-size: 14px; color: var(--primary); transition: all 0.3s ease; cursor: pointer;">
                   <span style="display: flex; align-items: center; gap: 8px;">Ver Gráficos y Análisis Avanzado</span>
                   <span id="icono-toggle-graficos" style="transition: transform 0.3s ease; font-size: 14px;">▼</span>
@@ -925,9 +926,9 @@
                     </div>
                   </div>
 
-                  <div class="charts-dashboard-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; padding-top: 20px;">
+                  <div class="charts-dashboard-grid">
                     <!-- Gráfico 1: Curva de Aprendizaje -->
-                    <div class="chart-card-premium" style="background: rgba(255,255,255,0.01); border: 1px solid var(--border); border-radius: 16px; padding: 20px; min-height: 280px; display: flex; flex-direction: column;">
+                    <div class="chart-card-premium chart-card-fullwidth" style="background: rgba(255,255,255,0.01); border: 1px solid var(--border); border-radius: 16px; padding: 20px; min-height: 280px; display: flex; flex-direction: column;">
                       <h4 style="margin: 0 0 16px 0; font-size: 13.5px; color: var(--text); font-weight: 700; display: flex; align-items: center; gap: 6px;">Curva de Rendimiento Académico</h4>
                       <div style="position: relative; flex-grow: 1; height: 220px;">
                         <canvas id="chart-rendimiento-linea"></canvas>
@@ -1033,7 +1034,7 @@
 
 
               <!-- Rendimiento y Cobertura por Especialidad Colapsable -->
-              <div id="contenedor-especialidades-acordeon" style="margin-top: 24px; border-top: 1px dashed var(--border-strong); padding-top: 20px;">
+              <div id="contenedor-especialidades-acordeon" style="margin-top: 24px; margin-bottom: 24px;">
                 <button id="btn-toggle-especialidades" class="btn btn-ghost" type="button" style="width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 14px 20px; border-radius: 14px; background: rgba(255,255,255,0.02); font-weight: 700; border: 1px solid var(--border); font-size: 14px; color: var(--primary); transition: all 0.3s ease; cursor: pointer;">
                   <span style="display: flex; align-items: center; gap: 8px;">Ver Cobertura y Nota por Especialidad</span>
                   <span id="icono-toggle-especialidades" style="transition: transform 0.3s ease; font-size: 14px;">▼</span>
@@ -1146,7 +1147,6 @@
                 </article>
               </div>
             </div>
-          </div>
           </div>
 
             

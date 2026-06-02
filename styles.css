@@ -2626,9 +2626,19 @@ body.dark-mode::-webkit-scrollbar-thumb:hover {
 /* === FASE 3: GRID DE ANALÍTICAS AVANZADAS & TARJETAS PREMIUM === */
 .charts-dashboard-grid {
   display: grid !important;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)) !important;
-  gap: 20px !important;
+  grid-template-columns: repeat(2, 1fr) !important;
+  gap: 28px !important;
   padding-top: 20px !important;
+}
+
+.chart-card-fullwidth {
+  grid-column: 1 / -1 !important;
+}
+
+@media (max-width: 900px) {
+  .charts-dashboard-grid {
+    grid-template-columns: 1fr !important;
+  }
 }
 
 .chart-card-premium {
