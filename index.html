@@ -927,17 +927,20 @@
                   </div>
 
                   <div class="charts-dashboard-grid">
-                    <!-- Gráfico 1: Curva de Aprendizaje -->
-                    <div class="chart-card-premium chart-card-fullwidth" style="background: rgba(255,255,255,0.01); border: 1px solid var(--border); border-radius: 16px; padding: 20px; min-height: 280px; display: flex; flex-direction: column;">
-                      <h4 style="margin: 0 0 16px 0; font-size: 13.5px; color: var(--text); font-weight: 700; display: flex; align-items: center; gap: 6px;">Curva de Rendimiento Académico</h4>
+                    <!-- Gráfico 1: Curva de Aprendizaje (Fullwidth) -->
+                    <div class="chart-card-premium chart-card-fullwidth" style="background: rgba(255,255,255,0.01); border: 1px solid var(--border); border-radius: 16px; padding: 20px; min-height: 360px; display: flex; flex-direction: column;">
+                      <h4 style="margin: 0 0 16px 0; font-size: 13.5px; color: var(--text); font-weight: 700; display: flex; align-items: center; gap: 6px;">Evolución de tus Notas en Exámenes</h4>
                       <div style="position: relative; flex-grow: 1; height: 220px;">
                         <canvas id="chart-rendimiento-linea"></canvas>
+                      </div>
+                      <div style="margin-top: 14px; display: flex; flex-direction: column; gap: 6px; font-size: 11.5px; color: var(--text-soft); line-height: 1.4; border-top: 1px dashed var(--border); padding-top: 12px; text-align: left;">
+                        <span>Este gráfico muestra el progreso cronológico de tus calificaciones obtenidas en tus últimos 8 simulacros/exámenes. La línea principal refleja tu rendimiento en cada sesión, permitiéndote evaluar si tu nivel académico se está incrementando a lo largo del tiempo, con relación a la <strong>Meta de Adjudicación Competitiva (75%)</strong>.</span>
                       </div>
                     </div>
                     
                     <!-- Gráfico 2: Desglose por Especialidad -->
                     <div class="chart-card-premium" style="background: rgba(255,255,255,0.01); border: 1px solid var(--border); border-radius: 16px; padding: 20px; min-height: 340px; display: flex; flex-direction: column;">
-                      <h4 style="margin: 0 0 16px 0; font-size: 13.5px; color: var(--text); font-weight: 700; display: flex; align-items: center; gap: 6px;">Cobertura y Fuerza por Especialidad</h4>
+                      <h4 style="margin: 0 0 16px 0; font-size: 13.5px; color: var(--text); font-weight: 700; display: flex; align-items: center; gap: 6px;">Calificación Promedio por Especialidad</h4>
                       <div style="position: relative; height: 180px;">
                         <canvas id="chart-especialidad-barras"></canvas>
                       </div>

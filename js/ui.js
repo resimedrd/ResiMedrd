@@ -1579,7 +1579,7 @@ const ui = {
           labels: labelsBar,
           datasets: [
             {
-              label: 'Tu Rendimiento (%)',
+              label: 'Nota Promedio (%)',
               data: dataBar,
               backgroundColor: colorsBar,
               borderRadius: 6,
