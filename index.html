@@ -949,67 +949,55 @@
                         <canvas id="chart-repeticion-dona"></canvas>
                       </div>
                     </div>
-                  <!-- Módulo de Análisis Competitivo PrepMed (Fase 13) -->
-                  <div class="prepmed-comparison-panel" style="margin-top: 24px; background: linear-gradient(135deg, rgba(124, 58, 237, 0.05) 0%, rgba(79, 70, 229, 0.02) 100%); border: 1.5px solid rgba(124, 58, 237, 0.15); border-radius: 24px; padding: 24px; display: flex; flex-direction: column; gap: 16px;">
-                    <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px dashed rgba(124, 58, 237, 0.2); padding-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+                  <!-- Panel de Fortalezas Clínicas y Dominio de Materias (Fase 13 - Reemplazo Positivo) -->
+                  <div class="prepmed-comparison-panel" style="margin-top: 24px; background: linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, rgba(59, 130, 246, 0.02) 100%); border: 1.5px solid rgba(16, 185, 129, 0.15); border-radius: 24px; padding: 24px; display: flex; flex-direction: column; gap: 16px;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px dashed rgba(16, 185, 129, 0.2); padding-bottom: 12px; flex-wrap: wrap; gap: 8px;">
                       <h4 style="margin: 0; color: var(--text); font-size: 15px; font-weight: 800; display: flex; align-items: center; gap: 8px;">
-                        Análisis Clínico Competitivo vs PrepMed
+                        Diagnóstico de Fortalezas y Competencias
                       </h4>
-                      <span class="chip chip-soft" style="background: rgba(124, 58, 237, 0.1); color: #8b5cf6; border: 1px solid rgba(124, 58, 237, 0.2); font-size: 11px; font-weight: 700; border-radius: 8px; padding: 4px 10px;">Percentil Proyectado: <strong id="prepmed-percentile">--</strong></span>
+                      <span class="chip chip-soft" style="background: rgba(16, 185, 129, 0.1); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.2); font-size: 11px; font-weight: 700; border-radius: 8px; padding: 4px 10px;">Dominio Global: <strong id="prepmed-percentile">--%</strong></span>
                     </div>
 
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; align-items: center;">
-                      <!-- Gráfico comparativo de Barras -->
+                      <!-- Gráfico de Precisión en base a 100 -->
                       <div style="background: rgba(255, 255, 255, 0.01); border: 1px solid var(--border); border-radius: 16px; padding: 16px;">
-                        <span style="font-size: 11px; font-weight: 700; color: var(--text-soft); text-transform: uppercase; display: block; margin-bottom: 12px; letter-spacing: 0.5px;">Precisión Promedio Nacional</span>
+                        <span style="font-size: 11px; font-weight: 700; color: var(--text-soft); text-transform: uppercase; display: block; margin-bottom: 12px; letter-spacing: 0.5px;">Tu Porcentaje de Aciertos (Base 100)</span>
                         
                         <div style="display: flex; flex-direction: column; gap: 14px;">
-                          <!-- Tu Nota -->
+                          <!-- Precisión Global de Aciertos -->
                           <div>
                             <div style="display: flex; justify-content: space-between; font-size: 12.5px; margin-bottom: 4px; font-weight: 700;">
-                              <span style="color: var(--text);">ResiMed (Tu Perfil)</span>
-                              <span id="prepmed-user-pct" style="color: #7c3aed;">0%</span>
+                              <span style="color: var(--text);">Rendimiento General</span>
+                              <span id="prepmed-user-pct" style="color: var(--success);">0%</span>
                             </div>
-                            <div style="height: 8px; background: rgba(255,255,255,0.03); border-radius: 100px; overflow: hidden; border: 1px solid var(--border);">
-                              <div id="prepmed-user-bar" style="height: 100%; width: 0%; background: linear-gradient(90deg, #7c3aed, #4f46e5); border-radius: 100px; transition: width 1s cubic-bezier(0.16, 1, 0.3, 1);"></div>
-                            </div>
-                          </div>
-
-                          <!-- Nota PrepMed -->
-                          <div>
-                            <div style="display: flex; justify-content: space-between; font-size: 12.5px; margin-bottom: 4px; font-weight: 700;">
-                              <span style="color: var(--text-soft);">PrepMed (Media Nacional)</span>
-                              <span style="color: #6b7280;">68%</span>
-                            </div>
-                            <div style="height: 8px; background: rgba(255,255,255,0.03); border-radius: 100px; overflow: hidden; border: 1px solid var(--border);">
-                              <div style="height: 100%; width: 68%; background: #6b7280; border-radius: 100px;"></div>
+                            <div style="height: 12px; background: rgba(255,255,255,0.03); border-radius: 100px; overflow: hidden; border: 1px solid var(--border); padding: 1px;">
+                              <div id="prepmed-user-bar" style="height: 100%; width: 0%; background: linear-gradient(90deg, var(--success), #3b82f6); border-radius: 100px; transition: width 1s cubic-bezier(0.16, 1, 0.3, 1);"></div>
                             </div>
                           </div>
                         </div>
                       </div>
 
-                      <!-- Ventajas Competitivas -->
+                      <!-- Especialidad Estrella y Temas Más Fuertes -->
                       <div style="display: flex; flex-direction: column; gap: 12px;">
-                        <span style="font-size: 11px; font-weight: 700; color: var(--text-soft); text-transform: uppercase; display: block; margin-bottom: 2px; letter-spacing: 0.5px;">Ventaja Cognitiva ResiMed</span>
+                        <span style="font-size: 11px; font-weight: 700; color: var(--text-soft); text-transform: uppercase; display: block; margin-bottom: 2px; letter-spacing: 0.5px;">Áreas de Mayor Competencia</span>
                         
                         <div style="display: flex; align-items: flex-start; gap: 10px; font-size: 12px; line-height: 1.4;">
-                          <span style="font-size: 12px; background: rgba(34, 197, 94, 0.15); font-weight: 800; border-radius: 8px; color: var(--success); display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px;">AI</span>
+                          <span style="font-size: 11px; background: rgba(16, 185, 129, 0.15); font-weight: 800; border-radius: 8px; color: var(--success); display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px;">★</span>
                           <div>
-                            <strong style="color: var(--text);">Tutor IA Socrático:</strong>
-                            <span style="color: var(--text-soft); display: block; margin-top: 2px;">Explicaciones interactivas personalizadas en vez de respuestas estáticas PrepMed.</span>
+                            <strong style="color: var(--text);">Especialidad Estrella:</strong>
+                            <span id="modulo-fortalezas-estrella-text" style="color: var(--text-soft); display: block; margin-top: 2px;">Cargando tus datos académicos...</span>
                           </div>
                         </div>
 
                         <div style="display: flex; align-items: flex-start; gap: 10px; font-size: 12px; line-height: 1.4;">
-                          <span style="font-size: 11px; background: rgba(59, 130, 246, 0.15); font-weight: 800; border-radius: 8px; color: var(--primary); display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px;">SM2</span>
+                          <span style="font-size: 11px; background: rgba(59, 130, 246, 0.15); font-weight: 800; border-radius: 8px; color: var(--primary); display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px;">OK</span>
                           <div>
-                            <strong style="color: var(--text);">Repetición Espaciada SM-2:</strong>
-                            <span style="color: var(--text-soft); display: block; margin-top: 2px;">Retención de datos clínicos a largo plazo (+42% de eficiencia vs repaso tradicional).</span>
+                            <strong style="color: var(--text);">Estabilidad del Perfil:</strong>
+                            <span id="modulo-fortalezas-solido-text" style="color: var(--text-soft); display: block; margin-top: 2px;">Continúa practicando para expandir tus fortalezas.</span>
                           </div>
                         </div>
                       </div>
                     </div>
-                  </div>
                   </div>
                 </div>
               </div>

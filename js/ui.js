@@ -1237,28 +1237,14 @@ const ui = {
     const adviceEl = document.getElementById("metric-predict-advice");
     if (scoreEl) scoreEl.textContent = countValid > 0 ? `${predictionScore}%` : "--%";
 
-    // Actualizar Módulo Competitivo PrepMed (Fase 13)
+    // Actualizar Módulo de Dominio y Fortalezas Clínicas en base a 100 (Reemplazo Positivo)
     const pmUserPct = document.getElementById("prepmed-user-pct");
     const pmUserBar = document.getElementById("prepmed-user-bar");
     const pmPercentile = document.getElementById("prepmed-percentile");
     
     if (pmUserPct) pmUserPct.textContent = countValid > 0 ? `${predictionScore}%` : "--%";
     if (pmUserBar) pmUserBar.style.width = countValid > 0 ? `${predictionScore}%` : "0%";
-    
-    if (pmPercentile) {
-      if (countValid === 0) {
-        pmPercentile.textContent = "--";
-      } else {
-        // Cálculo de percentil proyectado frente a la media nacional
-        let percentile = 50;
-        if (predictionScore > 68) {
-          percentile = Math.round(50 + ((predictionScore - 68) / (100 - 68)) * 49);
-        } else if (predictionScore < 68) {
-          percentile = Math.round(10 + (predictionScore / 68) * 40);
-        }
-        pmPercentile.textContent = `${percentile}°`;
-      }
-    }
+    if (pmPercentile) pmPercentile.textContent = countValid > 0 ? `${predictionScore}%` : "--%";
     if (barEl) {
       barEl.style.width = countValid > 0 ? `${predictionScore}%` : "0%";
       if (predictionScore >= 75) {
@@ -1360,6 +1346,38 @@ const ui = {
     }
     if (criticalScoreEl) {
       criticalScoreEl.textContent = hasValidSpecData ? `${criticalScore}% de precisión` : "Sin datos";
+    }
+
+    // Actualizar Módulo de Fortalezas Clínicas en Detalle (Reemplazo Positivo)
+    const estrellaTextEl = document.getElementById("modulo-fortalezas-estrella-text");
+    const solidoTextEl = document.getElementById("modulo-fortalezas-solido-text");
+    
+    if (estrellaTextEl) {
+      estrellaTextEl.innerHTML = hasValidSpecData
+        ? `<strong style="color: var(--success);">${leaderName}</strong> con un destacado <strong>${leaderScore}%</strong> de precisión acumulada.`
+        : "Sin datos académicos acumulados aún.";
+    }
+    
+    if (solidoTextEl) {
+      if (hasValidSpecData) {
+        // Encontrar consistencia
+        let stdDevVal = 0;
+        if (historial && historial.length > 1) {
+          const scores = historial.filter(s => s.porcentaje !== undefined).map(s => s.porcentaje);
+          if (scores.length > 1) {
+            const sum = scores.reduce((a, b) => a + b, 0);
+            const mean = sum / scores.length;
+            const squareDiffs = scores.map(s => Math.pow(s - mean, 2));
+            const avgSquareDiff = squareDiffs.reduce((a, b) => a + b, 0) / squareDiffs.length;
+            stdDevVal = Math.round(Math.sqrt(avgSquareDiff));
+          }
+        }
+        solidoTextEl.innerHTML = stdDevVal > 0 
+          ? `Consistencia con desviación estable de <strong>±${stdDevVal}%</strong>. ¡Perfil consolidado!`
+          : "Tu desempeño inicial se mantiene estable y prometedor.";
+      } else {
+        solidoTextEl.textContent = "Continúa completando simulacros para perfilar la estabilidad de tu rendimiento.";
+      }
     }
 
     // C. Consistencia Académica (Desviación Estándar)
