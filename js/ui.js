@@ -1424,10 +1424,9 @@ const ui = {
 
     // Destruir instancias previas
     if (!window.resiMedCharts) {
-      window.resiMedCharts = { cobertura: null, bar: null, doughnut: null };
+      window.resiMedCharts = { cobertura: null, doughnut: null };
     }
     if (window.resiMedCharts.cobertura) window.resiMedCharts.cobertura.destroy();
-    if (window.resiMedCharts.bar) window.resiMedCharts.bar.destroy();
     if (window.resiMedCharts.doughnut) window.resiMedCharts.doughnut.destroy();
 
     const isDark = document.body.classList.contains("dark-mode");
@@ -1527,116 +1526,7 @@ const ui = {
       });
     }
 
-    // GRÁFICO 2: Rendimiento Actual vs. Meta de Especialidad (Grouped Bar Chart)
-    const labelsBar = [];
-    const dataBar = [];
-    const dataMeta = [];
-    const colorsBar = [];
 
-    const META_MINIMA = {
-      "pediatría": 70,
-      "ginecología": 65,
-      "ginecología y obstetricia": 65,
-      "cirugía": 75,
-      "cirugía general": 75,
-      "medicina interna": 68,
-      "psiquiatría": 60,
-      "cardiología": 72
-    };
-
-    state.LISTA_ESPECIALIDADES.forEach(esp => {
-      const key = esp.nombre.trim().toLowerCase();
-      const info = conteoEspecialidades[key];
-      if (info && info.totales > 0) {
-        labelsBar.push(info.nombre.split(" ")[0]);
-        const pct = Math.round((info.correctas / info.totales) * 100);
-        dataBar.push(pct);
-        
-        // Asignar meta específica o por defecto (68)
-        const metaVal = META_MINIMA[key] || 68;
-        dataMeta.push(metaVal);
-
-        // Color según rendimiento contra meta
-        if (pct >= metaVal) {
-          colorsBar.push('rgba(34, 197, 94, 0.85)'); // Supera la meta (Verde)
-        } else if (pct >= metaVal - 12) {
-          colorsBar.push('rgba(245, 158, 11, 0.85)'); // Cerca de la meta (Amber)
-        } else {
-          colorsBar.push('rgba(239, 68, 68, 0.85)'); // Crítico (Rojo)
-        }
-      }
-    });
-
-    // Placeholders si está vacío
-    if (labelsBar.length === 0) {
-      state.LISTA_ESPECIALIDADES.slice(0, 5).forEach(esp => {
-        labelsBar.push(esp.nombre.split(" ")[0]);
-        dataBar.push(0);
-        dataMeta.push(META_MINIMA[esp.nombre.trim().toLowerCase()] || 68);
-        colorsBar.push('rgba(148, 163, 184, 0.3)');
-      });
-    }
-
-    const ctxBarras = document.getElementById('chart-especialidad-barras');
-    if (ctxBarras) {
-      window.resiMedCharts.bar = new Chart(ctxBarras, {
-        type: 'bar',
-        data: {
-          labels: labelsBar,
-          datasets: [
-            {
-              label: 'Nota Promedio (%)',
-              data: dataBar,
-              backgroundColor: colorsBar,
-              borderRadius: 6,
-              barThickness: 14
-            }
-          ]
-        },
-        options: {
-          indexAxis: 'y',
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              display: false // Un solo dataset autoexplicado, omitimos leyenda redundante
-            },
-            tooltip: {
-              backgroundColor: isDark ? '#1e293b' : '#ffffff',
-              titleColor: isDark ? '#f8fafc' : '#0f172a',
-              bodyColor: isDark ? '#cbd5e1' : '#334155',
-              borderColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)',
-              borderWidth: 1,
-              callbacks: {
-                label: (context) => {
-                  const score = context.raw;
-                  const key = context.label.trim().toLowerCase();
-                  const metaVal = META_MINIMA[key] || 68;
-                  const delta = score - metaVal;
-                  const compStatus = delta >= 0 ? `¡Superada por +${delta}%!` : `Pendiente por ${Math.abs(delta)}%`;
-                  return [
-                    `Tu Rendimiento: ${score}%`,
-                    `Meta Mínima Competitiva: ${metaVal}% (${compStatus})`
-                  ];
-                }
-              }
-            }
-          },
-          scales: {
-            x: {
-              min: 0,
-              max: 100,
-              grid: { color: gridColor },
-              ticks: { color: textColor, font: { size: 10 } }
-            },
-            y: {
-              grid: { display: false },
-              ticks: { color: textColor, font: { size: 10, weight: '700' } }
-            }
-          }
-        }
-      });
-    }
 
     // GRÁFICO 3: Estado de Repetición Espaciada y Fuerza de Retención (Doughnut Chart con Plugin Central)
     const totalRepasos = srEstados.filter(e => e.flashcard_id);

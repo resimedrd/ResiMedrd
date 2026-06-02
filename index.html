@@ -927,40 +927,18 @@
                   </div>
 
                   <div class="charts-dashboard-grid">
-                    <!-- Gráfico 1: Cobertura por Especialidades (Fullwidth) -->
-                    <div class="chart-card-premium chart-card-fullwidth" style="background: rgba(255,255,255,0.01); border: 1px solid var(--border); border-radius: 16px; padding: 20px; min-height: 360px; display: flex; flex-direction: column;">
+                    <!-- Gráfico 1: Cobertura por Especialidades -->
+                    <div class="chart-card-premium" style="background: rgba(255,255,255,0.01); border: 1px solid var(--border); border-radius: 16px; padding: 20px; min-height: 340px; display: flex; flex-direction: column;">
                       <h4 style="margin: 0 0 16px 0; font-size: 13.5px; color: var(--text); font-weight: 700; display: flex; align-items: center; gap: 6px;">Cobertura de Preguntas por Especialidad</h4>
-                      <div style="position: relative; flex-grow: 1; height: 220px;">
+                      <div style="position: relative; height: 180px;">
                         <canvas id="chart-cobertura-barras"></canvas>
                       </div>
                       <div style="margin-top: 14px; display: flex; flex-direction: column; gap: 6px; font-size: 11.5px; color: var(--text-soft); line-height: 1.4; border-top: 1px dashed var(--border); padding-top: 12px; text-align: left;">
-                        <span>Este gráfico representa el porcentaje de cobertura de preguntas estudiadas (preguntas respondidas frente al total disponible en la base de datos de cada especialidad). Los colores indican tu nivel de cobertura: <strong>Verde (80% o más)</strong>, <strong>Ámbar (40% a 79%)</strong> y <strong>Rojo (menos del 40%)</strong>.</span>
-                      </div>
-                    </div>
-                    
-                    <!-- Gráfico 2: Desglose por Especialidad -->
-                    <div class="chart-card-premium" style="background: rgba(255,255,255,0.01); border: 1px solid var(--border); border-radius: 16px; padding: 20px; min-height: 340px; display: flex; flex-direction: column;">
-                      <h4 style="margin: 0 0 16px 0; font-size: 13.5px; color: var(--text); font-weight: 700; display: flex; align-items: center; gap: 6px;">Calificación Promedio por Especialidad</h4>
-                      <div style="position: relative; height: 180px;">
-                        <canvas id="chart-especialidad-barras"></canvas>
-                      </div>
-                      <div style="margin-top: 14px; display: flex; flex-direction: column; gap: 8px; font-size: 11px; color: var(--text-soft); line-height: 1.4; border-top: 1px solid var(--border); padding-top: 12px;">
-                        <div style="display: flex; align-items: center; gap: 6px;">
-                          <span style="width: 8px; height: 8px; background: rgba(34, 197, 94, 0.85); border-radius: 50%; flex-shrink: 0;"></span>
-                          <span><strong>Verde (Dominio):</strong> Superas la meta de rendimiento mínima recomendada para esta especialidad.</span>
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 6px;">
-                          <span style="width: 8px; height: 8px; background: rgba(245, 158, 11, 0.85); border-radius: 50%; flex-shrink: 0;"></span>
-                          <span><strong>Ámbar (Cercano):</strong> Te encuentras a menos de 12 puntos de alcanzar el puntaje competitivo objetivo.</span>
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 6px;">
-                          <span style="width: 8px; height: 8px; background: rgba(239, 68, 68, 0.85); border-radius: 50%; flex-shrink: 0;"></span>
-                          <span><strong>Rojo (Crítico):</strong> Rendimiento bajo en la materia; requiere repaso prioritario y resolver fallos.</span>
-                        </div>
+                        <span>Este gráfico representa el porcentaje de cobertura de preguntas estudiadas (preguntas respondidas frente al total disponible). Los colores indican la cobertura: <strong>Verde (>=80%)</strong>, <strong>Ámbar (40-79%)</strong> y <strong>Rojo (<40%)</strong>.</span>
                       </div>
                     </div>
 
-                    <!-- Gráfico 3: Estado de Repetición Espaciada -->
+                    <!-- Gráfico 2: Estado de Repetición Espaciada -->
                     <div class="chart-card-premium" style="background: rgba(255,255,255,0.01); border: 1px solid var(--border); border-radius: 16px; padding: 20px; min-height: 340px; display: flex; flex-direction: column;">
                       <h4 style="margin: 0 0 16px 0; font-size: 13.5px; color: var(--text); font-weight: 700; display: flex; align-items: center; gap: 6px;">Memorización y Repetición Espaciada</h4>
                       <div style="position: relative; height: 180px;">
