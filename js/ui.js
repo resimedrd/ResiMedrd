@@ -1189,10 +1189,20 @@ const ui = {
     });
   },
 
-  renderizarGraficosAvanzados(historial, srEstados = [], totalPersonalizadas = 0) {
+  async renderizarGraficosAvanzados(historial, srEstados = [], totalPersonalizadas = 0) {
     if (typeof Chart === "undefined") {
       console.warn("Chart.js aún no se ha cargado.");
       return;
+    }
+
+    // Obtener Coberturas reales del Banco de Preguntas para el gráfico
+    let datosCobertura = {};
+    if (state.usuarioConectado && state.usuarioConectado.id) {
+      try {
+        datosCobertura = await api.obtenerCobertura(state.usuarioConectado.id);
+      } catch (err) {
+        console.warn("No se pudo obtener coberturas de especialidades en gráficos:", err);
+      }
     }
 
     // ==========================================
@@ -1414,9 +1424,9 @@ const ui = {
 
     // Destruir instancias previas
     if (!window.resiMedCharts) {
-      window.resiMedCharts = { line: null, bar: null, doughnut: null };
+      window.resiMedCharts = { cobertura: null, bar: null, doughnut: null };
     }
-    if (window.resiMedCharts.line) window.resiMedCharts.line.destroy();
+    if (window.resiMedCharts.cobertura) window.resiMedCharts.cobertura.destroy();
     if (window.resiMedCharts.bar) window.resiMedCharts.bar.destroy();
     if (window.resiMedCharts.doughnut) window.resiMedCharts.doughnut.destroy();
 
@@ -1424,75 +1434,57 @@ const ui = {
     const textColor = isDark ? '#94a3b8' : '#475569';
     const gridColor = isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)';
 
-    // GRÁFICO 1: Curva de Aprendizaje y Meta Competitiva (Spline Line Chart)
-    const ultimasSesiones = [...historial]
-      .filter(s => s.porcentaje !== undefined && s.fecha)
-      .sort((a, b) => new Date(a.fecha) - new Date(b.fecha))
-      .slice(-8);
-
-    const labelsLinea = ultimasSesiones.map(s => {
-      try {
-        const d = new Date(s.fecha);
-        return d.toLocaleDateString("es-ES", { day: "2-digit", month: "2-digit" });
-      } catch (e) {
-        return "Ex.";
+    // GRÁFICOS DINÁMICOS PREMIUM
+    
+    // GRÁFICO 1: Cobertura de Preguntas por Especialidad (Horizontal Bar Chart)
+    const labelsCob = [];
+    const dataCob = [];
+    const colorsCob = [];
+    
+    state.LISTA_ESPECIALIDADES.forEach(esp => {
+      const key = esp.nombre.trim().toLowerCase();
+      let cobPorcentaje = 0;
+      
+      const claveReal = Object.keys(datosCobertura).find(k => k.trim().toLowerCase() === key);
+      if (claveReal) {
+        cobPorcentaje = datosCobertura[claveReal].porcentaje || 0;
+      }
+      
+      labelsCob.push(esp.nombre.split(" ")[0]);
+      dataCob.push(cobPorcentaje);
+      
+      if (cobPorcentaje >= 80) {
+        colorsCob.push('rgba(34, 197, 94, 0.85)');
+      } else if (cobPorcentaje >= 40) {
+        colorsCob.push('rgba(245, 158, 11, 0.85)');
+      } else {
+        colorsCob.push('rgba(239, 68, 68, 0.85)');
       }
     });
-    const dataLinea = ultimasSesiones.map(s => s.porcentaje);
 
-    const lineLabels = labelsLinea.length > 0 ? labelsLinea : ["Inicio"];
-    const lineData = dataLinea.length > 0 ? dataLinea : [0];
-
-    const ctxLinea = document.getElementById('chart-rendimiento-linea');
-    if (ctxLinea) {
-      const ctx = ctxLinea.getContext('2d');
-      const gradient = ctx.createLinearGradient(0, 0, 0, 200);
-      gradient.addColorStop(0, isDark ? 'rgba(59, 130, 246, 0.22)' : 'rgba(10, 102, 194, 0.22)');
-      gradient.addColorStop(1, 'rgba(59, 130, 246, 0.0)');
-
-      window.resiMedCharts.line = new Chart(ctx, {
-        type: 'line',
+    const ctxCob = document.getElementById('chart-cobertura-barras');
+    if (ctxCob) {
+      window.resiMedCharts.cobertura = new Chart(ctxCob, {
+        type: 'bar',
         data: {
-          labels: lineLabels,
+          labels: labelsCob,
           datasets: [
             {
-              label: 'Tu Rendimiento (%)',
-              data: lineData,
-              borderColor: isDark ? '#3b82f6' : '#0A66C2',
-              borderWidth: 3.5,
-              backgroundColor: gradient,
-              fill: true,
-              tension: 0.38,
-              pointBackgroundColor: isDark ? '#60a5fa' : '#0A66C2',
-              pointBorderColor: isDark ? '#0f172a' : '#ffffff',
-              pointBorderWidth: 2.5,
-              pointRadius: 5.5,
-              pointHoverRadius: 8
-            },
-            {
-              label: 'Meta Adjudicación (75%)',
-              data: Array(lineLabels.length).fill(75),
-              borderColor: isDark ? 'rgba(245, 158, 11, 0.65)' : 'rgba(217, 119, 6, 0.65)',
-              borderWidth: 2,
-              borderDash: [6, 4],
-              fill: false,
-              pointRadius: 0,
-              pointHoverRadius: 0
+              label: 'Preguntas Estudiadas (%)',
+              data: dataCob,
+              backgroundColor: colorsCob,
+              borderRadius: 6,
+              barThickness: 14
             }
           ]
         },
         options: {
+          indexAxis: 'y',
           responsive: true,
           maintainAspectRatio: false,
           plugins: {
             legend: {
-              display: true,
-              position: 'top',
-              labels: {
-                color: textColor,
-                boxWidth: 12,
-                font: { size: 10.5, family: 'Inter', weight: '600' }
-              }
+              display: false
             },
             tooltip: {
               backgroundColor: isDark ? '#1e293b' : '#ffffff',
@@ -1501,20 +1493,34 @@ const ui = {
               borderColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)',
               borderWidth: 1,
               callbacks: {
-                label: (context) => `${context.dataset.label}: ${context.raw}%`
+                label: (context) => {
+                  const score = context.raw;
+                  const key = context.label.trim().toLowerCase();
+                  let respondidas = 0;
+                  let totalBanco = 0;
+                  const claveReal = Object.keys(datosCobertura).find(k => k.trim().toLowerCase() === key);
+                  if (claveReal) {
+                    respondidas = datosCobertura[claveReal].respondidas || 0;
+                    totalBanco = datosCobertura[claveReal].totalBanco || 0;
+                  }
+                  return [
+                    `Tu Cobertura: ${score}%`,
+                    `Preguntas Respondidas: ${respondidas} de ${totalBanco}`
+                  ];
+                }
               }
             }
           },
           scales: {
             x: {
-              grid: { display: false },
-              ticks: { color: textColor, font: { size: 10.5 } }
-            },
-            y: {
               min: 0,
               max: 100,
               grid: { color: gridColor },
-              ticks: { color: textColor, font: { size: 10.5 }, stepSize: 20 }
+              ticks: { color: textColor, font: { size: 10 } }
+            },
+            y: {
+              grid: { display: false },
+              ticks: { color: textColor, font: { size: 10, weight: '700' } }
             }
           }
         }
