@@ -1317,11 +1317,11 @@ const ui = {
 
     let leaderName = "--";
     let leaderScore = 0;
-    let leaderEmoji = "🏆";
+    let leaderEmoji = "";
     
     let criticalName = "--";
     let criticalScore = 101;
-    let criticalEmoji = "🚨";
+    let criticalEmoji = "";
     
     let hasValidSpecData = false;
 
@@ -1348,14 +1348,14 @@ const ui = {
     // Actualizar Widgets Especialidades
     const leaderNameEl = document.getElementById("metric-leader-name");
     const leaderScoreEl = document.getElementById("metric-leader-score");
-    if (leaderNameEl) leaderNameEl.textContent = hasValidSpecData ? `${leaderEmoji} ${leaderName}` : "Ninguna aún";
+    if (leaderNameEl) leaderNameEl.textContent = hasValidSpecData ? `${leaderName}`.trim() : "Ninguna aún";
     if (leaderScoreEl) leaderScoreEl.textContent = hasValidSpecData ? `${leaderScore}% de precisión` : "Sin datos";
 
     const criticalNameEl = document.getElementById("metric-critical-name");
     const criticalScoreEl = document.getElementById("metric-critical-score");
     if (criticalNameEl) {
       criticalNameEl.textContent = hasValidSpecData 
-        ? `${criticalEmoji} ${criticalName}` 
+        ? `${criticalName}`.trim() 
         : "Ninguna aún";
     }
     if (criticalScoreEl) {
@@ -1524,7 +1524,7 @@ const ui = {
       const key = esp.nombre.trim().toLowerCase();
       const info = conteoEspecialidades[key];
       if (info && info.totales > 0) {
-        labelsBar.push(info.emoji + " " + info.nombre.split(" ")[0]);
+        labelsBar.push(info.nombre.split(" ")[0]);
         const pct = Math.round((info.correctas / info.totales) * 100);
         dataBar.push(pct);
         
@@ -1546,7 +1546,7 @@ const ui = {
     // Placeholders si está vacío
     if (labelsBar.length === 0) {
       state.LISTA_ESPECIALIDADES.slice(0, 5).forEach(esp => {
-        labelsBar.push((esp.emoji || "🔬") + " " + esp.nombre.split(" ")[0]);
+        labelsBar.push(esp.nombre.split(" ")[0]);
         dataBar.push(0);
         dataMeta.push(META_MINIMA[esp.nombre.trim().toLowerCase()] || 68);
         colorsBar.push('rgba(148, 163, 184, 0.3)');
@@ -1971,7 +1971,6 @@ const ui = {
         <!-- CABECERA PRINCIPAL DE LA ESPECIALIDAD (Fila Compacta Activa) -->
         <div class="especialidad-header-clickable" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; cursor: pointer; padding: 14px 20px; user-select: none;">
           <div style="display: flex; align-items: center; gap: 12px;">
-            <span style="font-size: 18px;">${esp.emoji}</span>
             <div style="text-align: left;">
               <h4 style="margin: 0; font-size: 15px; color: var(--text); font-weight: 700;">${esp.nombre}</h4>
               <p style="margin: 2px 0 0 0; font-size: 11.5px; color: var(--text-soft); font-weight: 500;">${coberturaTexto}</p>
