@@ -1734,226 +1734,247 @@ const ui = {
       }
     }
 
+    if (!datosCobertura) {
+      datosCobertura = {};
+    }
+
     // Limpiar contenedor de especialidades
     containerEl.innerHTML = "";
 
     // 3. Renderizar cada Especialidad con su desglose académico y banco de errores particular
     state.LISTA_ESPECIALIDADES.forEach(esp => {
-      const info = conteoEspecialidades[esp.id];
-      
-      // Filtrar las preguntas falladas de esta especialidad
-      const preguntasEsp = preguntasFalladas.filter(p => {
-        const pMateria = p.tema.trim().toLowerCase();
-        const espNombre = esp.nombre.trim().toLowerCase();
-        return pMateria === espNombre || pMateria === esp.id.toLowerCase() || 
-               pMateria.includes(espNombre) || espNombre.includes(pMateria);
-      });
-
-      const totalRespondidas = info.totales;
-      const totalCorrectas = info.correctas;
-      const nota = totalRespondidas > 0 ? Math.round((totalCorrectas / totalRespondidas) * 100) : 0;
-
-      // Obtener cobertura
-      const nombreBuscar = esp.nombre.trim().toLowerCase();
-      let dataCob = { totalBanco: 0, respondidas: 0, porcentaje: 0 };
-      const claveReal = Object.keys(datosCobertura).find(k => k.trim().toLowerCase() === nombreBuscar);
-      if (claveReal) {
-        dataCob = datosCobertura[claveReal];
-      }
-
-      // Colores de semáforo de nota
-      let colorNota = "var(--text-dim)";
-      let notaTexto = "Sin Datos";
-      if (totalRespondidas > 0) {
-        notaTexto = `${nota}%`;
-        if (nota >= 75) {
-          colorNota = "var(--success)";
-        } else if (nota >= 50) {
-          colorNota = "var(--warning)";
-        } else {
-          colorNota = "var(--danger)";
-        }
-      }
-
-      const coberturaTexto = `Estudiado: ${dataCob.respondidas} de ${dataCob.totalBanco} preguntas (${dataCob.porcentaje}%)`;
-
-      // Clasificar subtemas en Dominados vs A Reforzar (Obviando IA)
-      const temasDominados = [];
-      const temasAReforzar = [];
-
-      Object.keys(info.subtemas).forEach(subtemaName => {
-        const subData = info.subtemas[subtemaName];
-        const subTotales = subData.totales;
-        const subCorrectas = subData.correctas;
-        const subPorcentaje = subTotales > 0 ? Math.round((subCorrectas / subTotales) * 100) : 0;
-
-        // Motor Adaptativo de Auto-Superación
-        const historialRespuestas = subData.historialRespuestas || [];
-        const ultimas = historialRespuestas.slice(-5);
-        const correctasRecientes = ultimas.filter(r => r === true).length;
-        const totalesRecientes = ultimas.length;
-        const porcentajeReciente = totalesRecientes > 0 ? Math.round((correctasRecientes / totalesRecientes) * 100) : 0;
-
-        const superadoPorRacha = ultimas.length >= 3 && ultimas.slice(-3).every(r => r === true);
-        const superadoPorPrecision = totalesRecientes >= 3 && porcentajeReciente >= 75;
-
-        if (subPorcentaje >= 70 || superadoPorRacha || superadoPorPrecision) {
-          temasDominados.push({ nombre: subtemaName, porcentaje: subPorcentaje, totales: subTotales });
-        } else if (subCorrectas < subTotales) {
-          temasAReforzar.push({ nombre: subtemaName, porcentaje: subPorcentaje, totales: subTotales });
-        }
-      });
-
-      // Ordenar listados
-      temasDominados.sort((a, b) => b.porcentaje - a.porcentaje);
-      temasAReforzar.sort((a, b) => a.porcentaje - b.porcentaje);
-
-      // Generar HTML de subtemas
-      let temasDominadosHtml = '<li style="color: var(--text-dim); font-style: italic; list-style: none; margin-left: -18px;">Aún no posees temas consolidados.</li>';
-      if (temasDominados.length > 0) {
-        temasDominadosHtml = temasDominados.map(t => 
-          `<li><strong>${t.nombre}</strong> <span style="color: var(--success); font-weight:600; margin-left:6px;">(${t.porcentaje}% de aciertos)</span></li>`
-        ).join("");
-      }
-
-      let temasAReforzarHtml = '<li style="color: var(--text-dim); font-style: italic; list-style: none; margin-left: -18px;">¡Excelente! No tienes temas a reforzar en este momento.</li>';
-      if (temasAReforzar.length > 0) {
-        temasAReforzarHtml = temasAReforzar.map(t => 
-          `<li><strong>${t.nombre}</strong> <span style="color: var(--danger); font-weight:600; margin-left:6px;">(${t.porcentaje}% de precisión, ${t.totales} preguntas vistas)</span></li>`
-        ).join("");
-      }
-
-      // Generar HTML de preguntas falladas
-      let preguntasHtml = "";
-      if (preguntasEsp.length === 0) {
-        preguntasHtml = `<div style="text-align: center; color: var(--text-dim); font-size: 13px; font-style: italic; padding: 12px; background: rgba(255,255,255,0.01); border-radius: 8px;">No posees preguntas falladas en esta especialidad actualmente.</div>`;
-      } else {
-        let idx = 0;
-        preguntasEsp.forEach(p => {
-          idx++;
-          const opcionesArray = p.opciones;
-          const seleccion = p.seleccionada;
-
-          let opcionesHtml = "";
-          opcionesArray.forEach((o, oIdx) => {
-            let claseOpt = "";
-            if (oIdx === p.correcta) claseOpt = "correct";
-            if (oIdx === seleccion) claseOpt = "wrong";
-            opcionesHtml += `<div class="review-opt ${claseOpt}"><strong>${String.fromCharCode(65 + oIdx)}.</strong> ${o}</div>`;
-          });
-
-          const textoEscapado = p.texto.replace(/"/g, "&quot;");
-          const explicacionEscapada = (p.explicacion || "Sin desglose.").replace(/"/g, "&quot;");
-          const temaEscapado = (p.tema || "General").replace(/"/g, "&quot;");
-
-          const seleccionText = (seleccion !== null && opcionesArray[seleccion])
-            ? opcionesArray[seleccion].replace(/"/g, "&quot;")
-            : "Sin responder";
-
-          preguntasHtml += `
-            <div class="review-item" style="border: 1px solid var(--border); border-radius: 16px; padding: 18px; background: var(--panel); margin-bottom: 12px; text-align: left;">
-              <div class="error-bank-header" style="display:flex; justify-content:space-between; gap:10px; margin-bottom: 12px;">
-                <span class="chip chip-soft" style="font-size:11px; padding:4px 10px;">Tema: ${p.subtema}</span>
-              </div>
-              <div class="review-q-text error-bank-q-text" style="font-size: 14.5px; font-weight: 700; color: var(--text); line-height: 1.5; margin-bottom: 12px;">${idx}. ${p.texto}</div>
-              <div class="review-options" style="display:flex; flex-direction:column; gap:8px;">${opcionesHtml}</div>
-              <div class="review-exp-container" style="margin-top: 14px;">${ui.formatearExplicacionClinica(p.explicacion, p.fuente, p.explicacion_correcta, p.explicacion_incorrecta)}</div>
-              <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top: 14px; border-top: 1px solid var(--border); padding-top: 12px;">
-                <button class="btn-ia btn-consultar-tutor" data-texto="${textoEscapado}" data-seleccion="${seleccionText}" type="button" style="font-size:11.5px; padding: 6px 12px; border-radius: 8px;">Consultar Tutor</button>
-                <button class="btn btn-primary btn-auto-flashcard" data-tema="${temaEscapado}" data-pregunta="${textoEscapado}" data-respuesta="${explicacionEscapada}" style="background: var(--warning); color:#000; font-size:11.5px; padding:6px 12px; border:none; border-radius: 8px;" type="button">Crear Flashcard</button>
-                <button class="btn btn-reportar-pregunta" data-id="${p.id}" type="button" style="font-size:11.5px; padding: 6px 12px; border-radius: 8px;">Reportar Error</button>
-              </div>
-            </div>`;
+      try {
+        const info = conteoEspecialidades[esp.id] || { totales: 0, correctas: 0, subtemas: {} };
+        
+        // Filtrar las preguntas falladas de esta especialidad
+        const preguntasEsp = preguntasFalladas.filter(p => {
+          if (!p || !p.tema) return false;
+          const pMateria = p.tema.trim().toLowerCase();
+          const espNombre = esp.nombre.trim().toLowerCase();
+          return pMateria === espNombre || pMateria === esp.id.toLowerCase() || 
+                 pMateria.includes(espNombre) || espNombre.includes(pMateria);
         });
-      }
 
-      // Crear tarjeta de especialidad unificada (Fila Altamente Compacta)
-      const panel = document.createElement("div");
-      panel.className = "especialidad-panel";
-      panel.style.cssText = "border: 1px solid var(--border); border-radius: 14px; background: var(--panel-soft); overflow: hidden; display: flex; flex-direction: column; transition: all 0.3s ease; margin-bottom: 8px;";
+        const totalRespondidas = info.totales || 0;
+        const totalCorrectas = info.correctas || 0;
+        const nota = totalRespondidas > 0 ? Math.round((totalCorrectas / totalRespondidas) * 100) : 0;
 
-      panel.innerHTML = `
-        <!-- CABECERA PRINCIPAL DE LA ESPECIALIDAD (Fila Compacta Activa) -->
-        <div class="especialidad-header-clickable" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; cursor: pointer; padding: 14px 20px; user-select: none;">
-          <div style="display: flex; align-items: center; gap: 12px;">
-            <div style="text-align: left;">
-              <h4 style="margin: 0; font-size: 15px; color: var(--text); font-weight: 700;">${esp.nombre}</h4>
-              <p style="margin: 2px 0 0 0; font-size: 11.5px; color: var(--text-soft); font-weight: 500;">${coberturaTexto}</p>
-            </div>
-          </div>
-          <div style="display: flex; align-items: center; gap: 12px;">
-            <span class="chip" style="background: ${totalRespondidas > 0 ? colorNota : 'rgba(255,255,255,0.02)'}; border-color: ${colorNota}; color: ${totalRespondidas > 0 ? '#fff' : 'var(--text-dim)'}; font-size: 11.5px; font-weight: 700; padding: 3px 10px; margin: 0; border-radius: 12px; display: inline-block;">
-              ${notaTexto}
-            </span>
-            <span class="chip chip-soft" style="font-size: 11px; padding: 2px 8px; margin: 0; border-color: var(--border); display: inline-block;">
-              Fallos: ${preguntasEsp.length}
-            </span>
-            <span class="icono-toggle-especialidad" style="transition: transform 0.25s ease; font-size: 11px; color: var(--text-soft);">▼</span>
-          </div>
-        </div>
+        // Obtener cobertura
+        const nombreBuscar = esp.nombre.trim().toLowerCase();
+        let dataCob = { totalBanco: 0, respondidas: 0, porcentaje: 0 };
+        const keysCobertura = datosCobertura ? Object.keys(datosCobertura) : [];
+        const claveReal = keysCobertura.find(k => k && k.trim().toLowerCase() === nombreBuscar);
+        if (claveReal && datosCobertura[claveReal]) {
+          dataCob = {
+            totalBanco: datosCobertura[claveReal].totalBanco || 0,
+            respondidas: datosCobertura[claveReal].respondidas || 0,
+            porcentaje: datosCobertura[claveReal].porcentaje || 0
+          };
+        }
 
-        <!-- BARRA DE PROGRESO DE LA ESPECIALIDAD DE 3PX (COMPACTA) -->
-        <div style="background: rgba(255,255,255,0.03); height: 3px; width: 100%; overflow: hidden; position: relative;">
-          <div style="background: ${colorNota}; height: 100%; width: ${totalRespondidas > 0 ? nota : 0}%; transition: width 0.4s ease;"></div>
-        </div>
-
-        <!-- CONTENIDO DESPLEGABLE DE LA ESPECIALIDAD -->
-        <div class="especialidad-contenido-desplegable" style="max-height: 0; overflow: hidden; opacity: 0; transition: max-height 0.35s ease-out, opacity 0.25s ease; border-top: 1px solid transparent; background: rgba(255,255,255,0.005); text-align: left;">
-          <div style="padding: 20px; display: flex; flex-direction: column; gap: 16px;">
-            <!-- Temas Consolidados vs Temas a Reforzar -->
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px;">
-              <!-- Caja: Temas Dominados -->
-              <div style="background: rgba(34, 197, 94, 0.005); border: 1px solid rgba(34, 197, 94, 0.05); border-radius: 10px; padding: 12px 14px;">
-                <h5 style="margin: 0 0 6px 0; font-size: 11.5px; color: var(--success); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Temas Dominados</h5>
-                <ul style="margin: 0; padding-left: 16px; font-size: 12px; color: var(--text-soft); line-height: 1.5; display:flex; flex-direction:column; gap:3px; text-align: left;">
-                  ${temasDominadosHtml}
-                </ul>
-              </div>
-
-              <!-- Caja: Temas a Reforzar -->
-              <div style="background: rgba(239, 68, 68, 0.005); border: 1px solid rgba(239, 68, 68, 0.05); border-radius: 10px; padding: 12px 14px;">
-                <h5 style="margin: 0 0 6px 0; font-size: 11.5px; color: var(--warning); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Temas a Reforzar</h5>
-                <ul style="margin: 0; padding-left: 16px; font-size: 12px; color: var(--text-soft); line-height: 1.5; display:flex; flex-direction:column; gap:3px; text-align: left;">
-                  ${temasAReforzarHtml}
-                </ul>
-              </div>
-            </div>
-
-            <!-- Listado de Preguntas Falladas -->
-            <div style="margin-top: 4px;">
-              <h5 style="margin: 0 0 10px 0; font-size: 12px; color: var(--text-dim); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; text-align: left;">Preguntas Falladas Registradas:</h5>
-              <div style="display: flex; flex-direction: column; gap: 12px;">
-                ${preguntasHtml}
-              </div>
-            </div>
-          </div>
-        </div>
-      `;
-
-      containerEl.appendChild(panel);
-
-      // Programar interactividad de la cabecera colapsable de especialidad
-      const headerClickable = panel.querySelector(".especialidad-header-clickable");
-      const contentDiv = panel.querySelector(".especialidad-contenido-desplegable");
-      const iconoToggle = panel.querySelector(".icono-toggle-especialidad");
-
-      if (headerClickable && contentDiv) {
-        headerClickable.addEventListener("click", () => {
-          const isCollapsed = contentDiv.style.maxHeight === "0px" || !contentDiv.style.maxHeight || contentDiv.style.maxHeight === "0";
-          if (isCollapsed) {
-            contentDiv.style.maxHeight = `${contentDiv.scrollHeight + 5000}px`;
-            contentDiv.style.opacity = "1";
-            contentDiv.style.borderTop = "1px solid var(--border)";
-            if (iconoToggle) iconoToggle.style.transform = "rotate(180deg)";
-            panel.style.background = "var(--panel)";
+        // Colores de semáforo de nota
+        let colorNota = "var(--text-dim)";
+        let notaTexto = "Sin Datos";
+        if (totalRespondidas > 0) {
+          notaTexto = `${nota}%`;
+          if (nota >= 75) {
+            colorNota = "var(--success)";
+          } else if (nota >= 50) {
+            colorNota = "var(--warning)";
           } else {
-            contentDiv.style.maxHeight = "0";
-            contentDiv.style.opacity = "0";
-            contentDiv.style.borderTop = "1px solid transparent";
-            if (iconoToggle) iconoToggle.style.transform = "rotate(0deg)";
-            panel.style.background = "var(--panel-soft)";
+            colorNota = "var(--danger)";
+          }
+        }
+
+        const coberturaTexto = `Estudiado: ${dataCob.respondidas} de ${dataCob.totalBanco} preguntas (${dataCob.porcentaje}%)`;
+
+        // Clasificar subtemas en Dominados vs A Reforzar (Obviando IA)
+        const temasDominados = [];
+        const temasAReforzar = [];
+
+        const subtemasObj = info.subtemas || {};
+        Object.keys(subtemasObj).forEach(subtemaName => {
+          try {
+            const subData = subtemasObj[subtemaName];
+            if (!subData) return;
+            const subTotales = subData.totales || 0;
+            const subCorrectas = subData.correctas || 0;
+            const subPorcentaje = subTotales > 0 ? Math.round((subCorrectas / subTotales) * 100) : 0;
+
+            // Motor Adaptativo de Auto-Superación
+            const historialRespuestas = subData.historialRespuestas || [];
+            const ultimas = historialRespuestas.slice(-5);
+            const correctasRecientes = ultimas.filter(r => r === true).length;
+            const totalesRecientes = ultimas.length;
+            const porcentajeReciente = totalesRecientes > 0 ? Math.round((correctasRecientes / totalesRecientes) * 100) : 0;
+
+            const superadoPorRacha = ultimas.length >= 3 && ultimas.slice(-3).every(r => r === true);
+            const superadoPorPrecision = totalesRecientes >= 3 && porcentajeReciente >= 75;
+
+            if (subPorcentaje >= 70 || superadoPorRacha || superadoPorPrecision) {
+              temasDominados.push({ nombre: subtemaName, porcentaje: subPorcentaje, totales: subTotales });
+            } else if (subCorrectas < subTotales) {
+              temasAReforzar.push({ nombre: subtemaName, porcentaje: subPorcentaje, totales: subTotales });
+            }
+          } catch (eSub) {
+            console.warn("Falla al clasificar subtema:", subtemaName, eSub);
           }
         });
+
+        // Ordenar listados
+        temasDominados.sort((a, b) => b.porcentaje - a.porcentaje);
+        temasAReforzar.sort((a, b) => a.porcentaje - b.porcentaje);
+
+        // Generar HTML de subtemas
+        let temasDominadosHtml = '<li style="color: var(--text-dim); font-style: italic; list-style: none; margin-left: -18px;">Aún no posees temas consolidados.</li>';
+        if (temasDominados.length > 0) {
+          temasDominadosHtml = temasDominados.map(t => 
+            `<li><strong>${t.nombre}</strong> <span style="color: var(--success); font-weight:600; margin-left:6px;">(${t.porcentaje}% de aciertos)</span></li>`
+          ).join("");
+        }
+
+        let temasAReforzarHtml = '<li style="color: var(--text-dim); font-style: italic; list-style: none; margin-left: -18px;">¡Excelente! No tienes temas a reforzar en este momento.</li>';
+        if (temasAReforzar.length > 0) {
+          temasAReforzarHtml = temasAReforzar.map(t => 
+            `<li><strong>${t.nombre}</strong> <span style="color: var(--danger); font-weight:600; margin-left:6px;">(${t.porcentaje}% de precisión, ${t.totales} preguntas vistas)</span></li>`
+          ).join("");
+        }
+
+        // Generar HTML de preguntas falladas
+        let preguntasHtml = "";
+        if (preguntasEsp.length === 0) {
+          preguntasHtml = `<div style="text-align: center; color: var(--text-dim); font-size: 13px; font-style: italic; padding: 12px; background: rgba(255,255,255,0.01); border-radius: 8px;">No posees preguntas falladas en esta especialidad actualmente.</div>`;
+        } else {
+          let idx = 0;
+          preguntasEsp.forEach(p => {
+            if (!p) return;
+            idx++;
+            const opcionesArray = p.opciones || [];
+            const seleccion = p.seleccionada;
+
+            let opcionesHtml = "";
+            opcionesArray.forEach((o, oIdx) => {
+              let claseOpt = "";
+              if (oIdx === p.correcta) claseOpt = "correct";
+              if (oIdx === seleccion) claseOpt = "wrong";
+              opcionesHtml += `<div class="review-opt ${claseOpt}"><strong>${String.fromCharCode(65 + oIdx)}.</strong> ${o}</div>`;
+            });
+
+            const textoEscapado = (p.texto || "").replace(/"/g, "&quot;");
+            const explicacionEscapada = (p.explicacion || "Sin desglose.").replace(/"/g, "&quot;");
+            const temaEscapado = (p.tema || "General").replace(/"/g, "&quot;");
+
+            const seleccionText = (seleccion !== null && seleccion !== undefined && opcionesArray[seleccion])
+              ? opcionesArray[seleccion].replace(/"/g, "&quot;")
+              : "Sin responder";
+
+            preguntasHtml += `
+              <div class="review-item" style="border: 1px solid var(--border); border-radius: 16px; padding: 18px; background: var(--panel); margin-bottom: 12px; text-align: left;">
+                <div class="error-bank-header" style="display:flex; justify-content:space-between; gap:10px; margin-bottom: 12px;">
+                  <span class="chip chip-soft" style="font-size:11px; padding:4px 10px;">Tema: ${p.subtema || 'Varios'}</span>
+                </div>
+                <div class="review-q-text error-bank-q-text" style="font-size: 14.5px; font-weight: 700; color: var(--text); line-height: 1.5; margin-bottom: 12px;">${idx}. ${p.texto || ''}</div>
+                <div class="review-options" style="display:flex; flex-direction:column; gap:8px;">${opcionesHtml}</div>
+                <div class="review-exp-container" style="margin-top: 14px;">${ui.formatearExplicacionClinica(p.explicacion, p.fuente, p.explicacion_correcta, p.explicacion_incorrecta)}</div>
+                <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top: 14px; border-top: 1px solid var(--border); padding-top: 12px;">
+                  <button class="btn-ia btn-consultar-tutor" data-texto="${textoEscapado}" data-seleccion="${seleccionText}" type="button" style="font-size:11.5px; padding: 6px 12px; border-radius: 8px;">Consultar Tutor</button>
+                  <button class="btn btn-primary btn-auto-flashcard" data-tema="${temaEscapado}" data-pregunta="${textoEscapado}" data-respuesta="${explicacionEscapada}" style="background: var(--warning); color:#000; font-size:11.5px; padding:6px 12px; border:none; border-radius: 8px;" type="button">Crear Flashcard</button>
+                  <button class="btn btn-reportar-pregunta" data-id="${p.id}" type="button" style="font-size:11.5px; padding: 6px 12px; border-radius: 8px;">Reportar Error</button>
+                </div>
+              </div>`;
+          });
+        }
+
+        // Crear tarjeta de especialidad unificada (Fila Altamente Compacta)
+        const panel = document.createElement("div");
+        panel.className = "especialidad-panel";
+        panel.style.cssText = "border: 1px solid var(--border); border-radius: 14px; background: var(--panel-soft); overflow: hidden; display: flex; flex-direction: column; transition: all 0.3s ease; margin-bottom: 8px;";
+
+        panel.innerHTML = `
+          <!-- CABECERA PRINCIPAL DE LA ESPECIALIDAD (Fila Compacta Activa) -->
+          <div class="especialidad-header-clickable" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; cursor: pointer; padding: 14px 20px; user-select: none;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <div style="text-align: left;">
+                <h4 style="margin: 0; font-size: 15px; color: var(--text); font-weight: 700;">${esp.nombre}</h4>
+                <p style="margin: 2px 0 0 0; font-size: 11.5px; color: var(--text-soft); font-weight: 500;">${coberturaTexto}</p>
+              </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <span class="chip" style="background: ${totalRespondidas > 0 ? colorNota : 'rgba(255,255,255,0.02)'}; border-color: ${colorNota}; color: ${totalRespondidas > 0 ? '#fff' : 'var(--text-dim)'}; font-size: 11.5px; font-weight: 700; padding: 3px 10px; margin: 0; border-radius: 12px; display: inline-block;">
+                ${notaTexto}
+              </span>
+              <span class="chip chip-soft" style="font-size: 11px; padding: 2px 8px; margin: 0; border-color: var(--border); display: inline-block;">
+                Fallos: ${preguntasEsp.length}
+              </span>
+              <span class="icono-toggle-especialidad" style="transition: transform 0.25s ease; font-size: 11px; color: var(--text-soft);">▼</span>
+            </div>
+          </div>
+
+          <!-- BARRA DE PROGRESO DE LA ESPECIALIDAD DE 3PX (COMPACTA) -->
+          <div style="background: rgba(255,255,255,0.03); height: 3px; width: 100%; overflow: hidden; position: relative;">
+            <div style="background: ${colorNota}; height: 100%; width: ${totalRespondidas > 0 ? nota : 0}%; transition: width 0.4s ease;"></div>
+          </div>
+
+          <!-- CONTENIDO DESPLEGABLE DE LA ESPECIALIDAD -->
+          <div class="especialidad-contenido-desplegable" style="max-height: 0; overflow: hidden; opacity: 0; transition: max-height 0.35s ease-out, opacity 0.25s ease; border-top: 1px solid transparent; background: rgba(255,255,255,0.005); text-align: left;">
+            <div style="padding: 20px; display: flex; flex-direction: column; gap: 16px;">
+              <!-- Temas Consolidados vs Temas a Reforzar -->
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px;">
+                <!-- Caja: Temas Dominados -->
+                <div style="background: rgba(34, 197, 94, 0.005); border: 1px solid rgba(34, 197, 94, 0.05); border-radius: 10px; padding: 12px 14px;">
+                  <h5 style="margin: 0 0 6px 0; font-size: 11.5px; color: var(--success); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Temas Dominados</h5>
+                  <ul style="margin: 0; padding-left: 16px; font-size: 12px; color: var(--text-soft); line-height: 1.5; display:flex; flex-direction:column; gap:3px; text-align: left;">
+                    ${temasDominadosHtml}
+                  </ul>
+                </div>
+
+                <!-- Caja: Temas a Reforzar -->
+                <div style="background: rgba(239, 68, 68, 0.005); border: 1px solid rgba(239, 68, 68, 0.05); border-radius: 10px; padding: 12px 14px;">
+                  <h5 style="margin: 0 0 6px 0; font-size: 11.5px; color: var(--warning); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Temas a Reforzar</h5>
+                  <ul style="margin: 0; padding-left: 16px; font-size: 12px; color: var(--text-soft); line-height: 1.5; display:flex; flex-direction:column; gap:3px; text-align: left;">
+                    ${temasAReforzarHtml}
+                  </ul>
+                </div>
+              </div>
+
+              <!-- Listado de Preguntas Falladas -->
+              <div style="margin-top: 4px;">
+                <h5 style="margin: 0 0 10px 0; font-size: 12px; color: var(--text-dim); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; text-align: left;">Preguntas Falladas Registradas:</h5>
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                  ${preguntasHtml}
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+
+        containerEl.appendChild(panel);
+
+        // Programar interactividad de la cabecera colapsable de especialidad
+        const headerClickable = panel.querySelector(".especialidad-header-clickable");
+        const contentDiv = panel.querySelector(".especialidad-contenido-desplegable");
+        const iconoToggle = panel.querySelector(".icono-toggle-especialidad");
+
+        if (headerClickable && contentDiv) {
+          headerClickable.addEventListener("click", () => {
+            const isCollapsed = contentDiv.style.maxHeight === "0px" || !contentDiv.style.maxHeight || contentDiv.style.maxHeight === "0";
+            if (isCollapsed) {
+              contentDiv.style.maxHeight = `${contentDiv.scrollHeight + 5000}px`;
+              contentDiv.style.opacity = "1";
+              contentDiv.style.borderTop = "1px solid var(--border)";
+              if (iconoToggle) iconoToggle.style.transform = "rotate(180deg)";
+              panel.style.background = "var(--panel)";
+            } else {
+              contentDiv.style.maxHeight = "0";
+              contentDiv.style.opacity = "0";
+              contentDiv.style.borderTop = "1px solid transparent";
+              if (iconoToggle) iconoToggle.style.transform = "rotate(0deg)";
+              panel.style.background = "var(--panel-soft)";
+            }
+          });
+        }
+      } catch (errEsp) {
+        console.error("Falla al renderizar especialidad:", esp.nombre, errEsp);
       }
     });
 
