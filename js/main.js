@@ -812,4 +812,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // 9. Intentar restaurar sesión guardada (Carga del ciclo de vida inicial)
   await auth.restaurarSesion();
+
+  // Validar si la sesión expiró previamente
+  if (sessionStorage.getItem("resiMed_session_expired") === "true") {
+    sessionStorage.removeItem("resiMed_session_expired");
+    alert("🔒 Tu sesión de estudio ha finalizado por seguridad. Por favor, accede de nuevo a tu panel médico.");
+  }
 });

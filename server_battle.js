@@ -491,18 +491,28 @@ function iniciarMatchmakingLoop(db) {
       iniciarBatallaAleatoria(db, matchmakingQueue.splice(0, 5));
     } else if (queueTimeLeft <= 0) {
       // El temporizador de 30 segundos terminó
-      if (matchmakingQueue.length >= 2) {
-        // Iniciar con los jugadores reales que tengamos
-        iniciarBatallaAleatoria(db, matchmakingQueue.splice(0, matchmakingQueue.length));
-      } else if (matchmakingQueue.length === 1) {
-        // Cancelar búsqueda si no hay contrincantes y notificar al jugador
-        const unicoJugadorReal = matchmakingQueue.shift();
-        if (unicoJugadorReal && unicoJugadorReal.ws && unicoJugadorReal.ws.readyState === ws.OPEN) {
-          unicoJugadorReal.ws.send(JSON.stringify({
-            type: "matchmaking_failed",
-            message: "No se encontraron contrincantes disponibles en este momento. Por favor, intenta de nuevo o crea una sala privada con amigos."
-          }));
+      if (matchmakingQueue.length >= 1) {
+        const jugadoresReales = matchmakingQueue.splice(0, matchmakingQueue.length);
+        const botsParaInyectar = [];
+        const cantidadBots = 5 - jugadoresReales.length;
+        const nombresDisponibles = [...BOT_NAMES];
+        
+        for (let i = 0; i < cantidadBots; i++) {
+          const indiceAleatorio = Math.floor(Math.random() * nombresDisponibles.length);
+          const nombreBot = nombresDisponibles.splice(indiceAleatorio, 1)[0] || `Médico ${i + 1}`;
+          
+          botsParaInyectar.push({
+            id: `bot_${Date.now()}_${i}`,
+            nombre: `${nombreBot} (Virtual)`,
+            ws: null,
+            score: 0,
+            answers: [],
+            isBot: true
+          });
         }
+        
+        console.log(`🤖 Matchmaking finalizado: Emparejando ${jugadoresReales.length} jugador(es) real(es) con ${cantidadBots} bots.`);
+        iniciarBatallaAleatoria(db, jugadoresReales, botsParaInyectar);
       }
 
       // Detener bucle

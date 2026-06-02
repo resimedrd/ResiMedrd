@@ -142,13 +142,9 @@ h1, h2, h3, h4, h5, h6, .brand-mark, .flashcard-q, .mode-title, .quiz-timer, .re
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: linear-gradient(135deg, hsl(210, 40%, 98%) 0%, hsl(210, 30%, 94%) 100%) !important;
+  background: linear-gradient(135deg, var(--bg) 0%, var(--bg-2) 100%) !important;
   z-index: -1;
   transition: background 0.3s ease;
-}
-
-body.dark-mode .app-bg {
-  background: hsl(222, 47%, 6%) !important;
 }
 
 .layout {
@@ -4030,6 +4026,57 @@ body.dark-mode .premium-metrics-panel {
   background: rgba(239, 68, 68, 0.1);
   border-color: rgba(239, 68, 68, 0.3);
   color: var(--danger);
+}
+
+/* ==========================================================================
+   PARCHES DE ESTILOS RESPONSIVOS Y LAYOUTS FLUIDOS EN MÓVIL
+   ========================================================================== */
+
+@media (max-width: 850px) {
+  /* Apilar Dashboard y Sidebar Estadístico en vertical */
+  .home-grid {
+    grid-template-columns: 1fr !important;
+    gap: 20px !important;
+  }
+
+  /* Modificar el banner de bienvenida principal */
+  .hero-card {
+    grid-template-columns: 1fr !important;
+    padding: 24px !important;
+    gap: 20px !important;
+  }
+  
+  .hero-stats {
+    flex-direction: row !important;
+    gap: 12px;
+  }
+  
+  .stat-card {
+    flex: 1;
+    text-align: center;
+    flex-direction: column;
+    gap: 6px;
+  }
+}
+
+@media (max-width: 600px) {
+  /* Distribuir las tarjetas de estadísticas finales del examen en rejilla 2x2 en vez de 4x1 en móvil */
+  .results-stats {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+  }
+
+  /* Ajustar cuadrícula de modos de estudio */
+  .mode-grid {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+
+  /* Ajustar la visualización del percentil vs PrepMed */
+  .prepmed-comparison-panel {
+    padding: 16px !important;
+    border-radius: 16px !important;
+  }
 }
 
 

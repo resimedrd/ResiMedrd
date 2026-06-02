@@ -22,6 +22,7 @@ async function request(url, options = {}) {
     // Si la sesión expiró o no está autorizado, forzar logout
     localStorage.removeItem("resiMed_session");
     localStorage.removeItem("resiMed_jwt_token");
+    sessionStorage.setItem("resiMed_session_expired", "true");
     window.location.reload();
     throw new Error("Sesión expirada. Inicie sesión nuevamente.");
   }
