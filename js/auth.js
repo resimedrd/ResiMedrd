@@ -226,6 +226,12 @@ const auth = {
 
     const btnToggleSidebar = document.getElementById("btn-toggle-sidebar");
     const appSidebar = document.getElementById("app-sidebar");
+    const btnIrInicio = document.getElementById("btn-ir-inicio");
+    const btnIrBatalla = document.getElementById("btn-ir-batalla");
+    const btnVerPerfil = document.getElementById("btn-ver-perfil");
+    const btnCerrarSesion = document.getElementById("btn-cerrar-sesion");
+    const saludoUsuario = document.getElementById("saludo-usuario");
+
     if (btnToggleSidebar) btnToggleSidebar.classList.add("hidden");
     if (appSidebar) {
       appSidebar.classList.add("hidden");
