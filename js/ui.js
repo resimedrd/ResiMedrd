@@ -1582,21 +1582,8 @@ const ui = {
               label: 'Tu Rendimiento (%)',
               data: dataBar,
               backgroundColor: colorsBar,
-              borderRadius: 5,
-              barThickness: 9,
-              categoryPercentage: 0.8,
-              barPercentage: 0.9
-            },
-            {
-              label: 'Meta Mínima Competitiva',
-              data: dataMeta,
-              backgroundColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)',
-              borderColor: isDark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.15)',
-              borderWidth: 1,
-              borderRadius: 5,
-              barThickness: 9,
-              categoryPercentage: 0.8,
-              barPercentage: 0.9
+              borderRadius: 6,
+              barThickness: 14
             }
           ]
         },
@@ -1606,13 +1593,7 @@ const ui = {
           maintainAspectRatio: false,
           plugins: {
             legend: {
-              display: true,
-              position: 'top',
-              labels: {
-                color: textColor,
-                boxWidth: 12,
-                font: { size: 10, family: 'Inter', weight: '600' }
-              }
+              display: false // Un solo dataset autoexplicado, omitimos leyenda redundante
             },
             tooltip: {
               backgroundColor: isDark ? '#1e293b' : '#ffffff',
@@ -1621,7 +1602,17 @@ const ui = {
               borderColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)',
               borderWidth: 1,
               callbacks: {
-                label: (context) => `${context.dataset.label}: ${context.raw}%`
+                label: (context) => {
+                  const score = context.raw;
+                  const key = context.label.trim().toLowerCase();
+                  const metaVal = META_MINIMA[key] || 68;
+                  const delta = score - metaVal;
+                  const compStatus = delta >= 0 ? `¡Superada por +${delta}%!` : `Pendiente por ${Math.abs(delta)}%`;
+                  return [
+                    `Tu Rendimiento: ${score}%`,
+                    `Meta Mínima Competitiva: ${metaVal}% (${compStatus})`
+                  ];
+                }
               }
             }
           },
@@ -1634,7 +1625,7 @@ const ui = {
             },
             y: {
               grid: { display: false },
-              ticks: { color: textColor, font: { size: 10 } }
+              ticks: { color: textColor, font: { size: 10, weight: '700' } }
             }
           }
         }
