@@ -1449,7 +1449,7 @@ const ui = {
         cobPorcentaje = datosCobertura[claveReal].porcentaje || 0;
       }
       
-      labelsCob.push(esp.nombre.split(" ")[0]);
+      labelsCob.push(esp.nombre);
       dataCob.push(cobPorcentaje);
       
       if (cobPorcentaje >= 80) {
