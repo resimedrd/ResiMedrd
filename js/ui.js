@@ -773,7 +773,7 @@ const ui = {
       }
 
       const [datosResumen, personalizadas, srEstados, diarioFlashcards] = await Promise.all([
-        api.obtenerResumenDashboard(user.id),
+        api.obtenerResumenDashboard(user.id).catch(() => ({})),
         api.obtenerFlashcardsPersonalizadas(user.id).catch(() => []),
         api.obtenerRepeticionEspaciada(user.id).catch(() => []),
         api.obtenerHistorialDiarioFlashcards(user.id).catch(() => [])
@@ -785,15 +785,16 @@ const ui = {
       const pFlashcardsActivas = document.getElementById("progreso-flashcards-activas");
       const pConceptosDebiles = document.getElementById("progreso-conceptos-debiles");
 
-      if (pExamenes) pExamenes.textContent = datosResumen.totalSesiones || 0;
-      if (pPreguntas) pPreguntas.textContent = datosResumen.totalPreguntasRespondidas || 0;
+      if (pExamenes) pExamenes.textContent = (datosResumen && datosResumen.totalSesiones) || 0;
+      if (pPreguntas) pPreguntas.textContent = (datosResumen && datosResumen.totalPreguntasRespondidas) || 0;
       
       if (pPromedio) {
-        pPromedio.textContent = `${datosResumen.promedioGeneral || 0}%`;
+        const prom = (datosResumen && datosResumen.promedioGeneral) || 0;
+        pPromedio.textContent = `${prom}%`;
         let colorPromedio = "var(--danger)";
-        if (datosResumen.promedioGeneral >= 75) {
+        if (prom >= 75) {
           colorPromedio = "var(--success)";
-        } else if (datosResumen.promedioGeneral >= 50) {
+        } else if (prom >= 50) {
           colorPromedio = "var(--warning)";
         }
         pPromedio.style.color = colorPromedio;
@@ -826,7 +827,7 @@ const ui = {
       if (dEficiencia) dEficiencia.textContent = `${pctEficiencia}%`;
       if (dRepasar) dRepasar.textContent = `${pctRepasar}%`;
 
-      const historial = await api.obtenerHistorialCompleto(user.id);
+      const historial = await api.obtenerHistorialCompleto(user.id).catch(() => []) || [];
 
       // Renderizar tabla de evaluaciones
       ui.renderizarTablaHistorial(historial);
@@ -1032,13 +1033,21 @@ const ui = {
       });
 
       // Actualizar coberturas
-      const datosCobertura = await api.obtenerCobertura(user.id);
+      let datosCobertura = {};
+      try {
+        datosCobertura = await api.obtenerCobertura(user.id);
+      } catch (errCob) {
+        console.warn("Falla al recuperar coberturas en progreso:", errCob);
+      }
+      if (!datosCobertura) datosCobertura = {};
+
       state.LISTA_ESPECIALIDADES.forEach(esp => {
         const nombreBuscar = esp.nombre.trim().toLowerCase();
         let data = { totalBanco: 0, respondidas: 0, porcentaje: 0 };
         
-        const claveReal = Object.keys(datosCobertura).find(k => k.trim().toLowerCase() === nombreBuscar);
-        if (claveReal) {
+        const keysCob = Object.keys(datosCobertura);
+        const claveReal = keysCob.find(k => k && k.trim().toLowerCase() === nombreBuscar);
+        if (claveReal && datosCobertura[claveReal]) {
           data = datosCobertura[claveReal];
         }
         
