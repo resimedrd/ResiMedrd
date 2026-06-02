@@ -1958,63 +1958,69 @@ const ui = {
                 <button class="btn btn-primary btn-auto-flashcard" data-tema="${temaEscapado}" data-pregunta="${textoEscapado}" data-respuesta="${explicacionEscapada}" style="background: var(--warning); color:#000; font-size:11.5px; padding:6px 12px; border:none; border-radius: 8px;" type="button">Crear Flashcard</button>
                 <button class="btn btn-reportar-pregunta" data-id="${p.id}" type="button" style="font-size:11.5px; padding: 6px 12px; border-radius: 8px;">Reportar Error</button>
               </div>
-            </div>
-          `;
+            </div>`;
         });
       }
 
-      // Crear tarjeta de especialidad unificada
+      // Crear tarjeta de especialidad unificada (Fila Altamente Compacta)
       const panel = document.createElement("div");
       panel.className = "especialidad-panel";
-      panel.style.cssText = "border: 1px solid var(--border); border-radius: 20px; background: var(--panel-soft); padding: 24px; display: flex; flex-direction: column; gap: 16px; transition: all 0.3s ease; text-align: left;";
+      panel.style.cssText = "border: 1px solid var(--border); border-radius: 14px; background: var(--panel-soft); overflow: hidden; display: flex; flex-direction: column; transition: all 0.3s ease; margin-bottom: 8px;";
 
       panel.innerHTML = `
-        <!-- Header de la especialidad -->
-        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
-          <div>
-            <h4 style="margin: 0; font-size: 18px; color: var(--text); font-weight: 700; display:flex; align-items:center; gap:8px;">
-              ${esp.nombre}
-            </h4>
-            <p style="margin: 4px 0 0 0; font-size: 13px; color: var(--text-soft); font-weight:500;">${coberturaTexto}</p>
+        <!-- CABECERA PRINCIPAL DE LA ESPECIALIDAD (Fila Compacta Activa) -->
+        <div class="especialidad-header-clickable" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; cursor: pointer; padding: 14px 20px; user-select: none;">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="font-size: 18px;">${esp.emoji}</span>
+            <div style="text-align: left;">
+              <h4 style="margin: 0; font-size: 15px; color: var(--text); font-weight: 700;">${esp.nombre}</h4>
+              <p style="margin: 2px 0 0 0; font-size: 11.5px; color: var(--text-soft); font-weight: 500;">${coberturaTexto}</p>
+            </div>
           </div>
-          <div style="text-align: right;">
-            <span style="font-size: 18px; font-weight: 800; color: ${colorNota};">${notaTexto}</span>
-          </div>
-        </div>
-
-        <!-- Barra de progreso de nota -->
-        <div style="background: rgba(255,255,255,0.05); height: 8px; border-radius: 4px; overflow: hidden; width: 100%;">
-          <div style="background: ${colorNota}; height: 100%; width: ${totalRespondidas > 0 ? nota : 0}%; transition: width 0.5s ease;"></div>
-        </div>
-
-        <!-- Diagnóstico Temático: Temas Consolidados vs Temas a Reforzar -->
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-top: 4px;">
-          <!-- Caja: Temas Dominados -->
-          <div style="background: rgba(34, 197, 94, 0.01); border: 1px solid rgba(34, 197, 94, 0.08); border-radius: 12px; padding: 14px 16px;">
-            <h5 style="margin: 0 0 8px 0; font-size: 12.5px; color: var(--success); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Temas Dominados</h5>
-            <ul style="margin: 0; padding-left: 18px; font-size: 12.5px; color: var(--text-soft); line-height: 1.6; display:flex; flex-direction:column; gap:4px; text-align: left;">
-              ${temasDominadosHtml}
-            </ul>
-          </div>
-
-          <!-- Caja: Temas a Reforzar -->
-          <div style="background: rgba(239, 68, 68, 0.01); border: 1px solid rgba(239, 68, 68, 0.08); border-radius: 12px; padding: 14px 16px;">
-            <h5 style="margin: 0 0 8px 0; font-size: 12.5px; color: var(--warning); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Temas a Reforzar</h5>
-            <ul style="margin: 0; padding-left: 18px; font-size: 12.5px; color: var(--text-soft); line-height: 1.6; display:flex; flex-direction:column; gap:4px; text-align: left;">
-              ${temasAReforzarHtml}
-            </ul>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span class="chip" style="background: ${totalRespondidas > 0 ? colorNota : 'rgba(255,255,255,0.02)'}; border-color: ${colorNota}; color: ${totalRespondidas > 0 ? '#fff' : 'var(--text-dim)'}; font-size: 11.5px; font-weight: 700; padding: 3px 10px; margin: 0; border-radius: 12px; display: inline-block;">
+              ${notaTexto}
+            </span>
+            <span class="chip chip-soft" style="font-size: 11px; padding: 2px 8px; margin: 0; border-color: var(--border); display: inline-block;">
+              Fallos: ${preguntasEsp.length}
+            </span>
+            <span class="icono-toggle-especialidad" style="transition: transform 0.25s ease; font-size: 11px; color: var(--text-soft);">▼</span>
           </div>
         </div>
 
-        <!-- Preguntas Falladas Colapsables -->
-        <div style="margin-top: 8px;">
-          <button class="btn-toggle-preguntas-falladas" type="button" style="width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 12px 18px; border-radius: 12px; background: rgba(255,255,255,0.02); font-weight: 700; border: 1px solid var(--border); font-size: 13px; color: var(--text); cursor: pointer; transition: background 0.2s ease;">
-            <span>Preguntas Falladas (${preguntasEsp.length})</span>
-            <span class="icono-toggle-preguntas" style="transition: transform 0.2s ease; font-size: 12px;">▼</span>
-          </button>
-          <div class="seccion-preguntas-falladas-desplegable" style="max-height: 0; overflow: hidden; opacity: 0; transition: max-height 0.3s ease-out, opacity 0.3s ease; margin-top: 0;">
-            <div style="padding-top: 14px; display: flex; flex-direction: column; gap: 14px;">
-              ${preguntasHtml}
+        <!-- BARRA DE PROGRESO DE LA ESPECIALIDAD DE 3PX (COMPACTA) -->
+        <div style="background: rgba(255,255,255,0.03); height: 3px; width: 100%; overflow: hidden; position: relative;">
+          <div style="background: ${colorNota}; height: 100%; width: ${totalRespondidas > 0 ? nota : 0}%; transition: width 0.4s ease;"></div>
+        </div>
+
+        <!-- CONTENIDO DESPLEGABLE DE LA ESPECIALIDAD -->
+        <div class="especialidad-contenido-desplegable" style="max-height: 0; overflow: hidden; opacity: 0; transition: max-height 0.35s ease-out, opacity 0.25s ease; border-top: 1px solid transparent; background: rgba(255,255,255,0.005); text-align: left;">
+          <div style="padding: 20px; display: flex; flex-direction: column; gap: 16px;">
+            <!-- Temas Consolidados vs Temas a Reforzar -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px;">
+              <!-- Caja: Temas Dominados -->
+              <div style="background: rgba(34, 197, 94, 0.005); border: 1px solid rgba(34, 197, 94, 0.05); border-radius: 10px; padding: 12px 14px;">
+                <h5 style="margin: 0 0 6px 0; font-size: 11.5px; color: var(--success); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Temas Dominados</h5>
+                <ul style="margin: 0; padding-left: 16px; font-size: 12px; color: var(--text-soft); line-height: 1.5; display:flex; flex-direction:column; gap:3px; text-align: left;">
+                  ${temasDominadosHtml}
+                </ul>
+              </div>
+
+              <!-- Caja: Temas a Reforzar -->
+              <div style="background: rgba(239, 68, 68, 0.005); border: 1px solid rgba(239, 68, 68, 0.05); border-radius: 10px; padding: 12px 14px;">
+                <h5 style="margin: 0 0 6px 0; font-size: 11.5px; color: var(--warning); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Temas a Reforzar</h5>
+                <ul style="margin: 0; padding-left: 16px; font-size: 12px; color: var(--text-soft); line-height: 1.5; display:flex; flex-direction:column; gap:3px; text-align: left;">
+                  ${temasAReforzarHtml}
+                </ul>
+              </div>
+            </div>
+
+            <!-- Listado de Preguntas Falladas -->
+            <div style="margin-top: 4px;">
+              <h5 style="margin: 0 0 10px 0; font-size: 12px; color: var(--text-dim); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; text-align: left;">Preguntas Falladas Registradas:</h5>
+              <div style="display: flex; flex-direction: column; gap: 12px;">
+                ${preguntasHtml}
+              </div>
             </div>
           </div>
         </div>
@@ -2022,30 +2028,31 @@ const ui = {
 
       containerEl.appendChild(panel);
 
-      // Programar interactividad del colapsable de preguntas falladas
-      const btnToggle = panel.querySelector(".btn-toggle-preguntas-falladas");
-      const contentDiv = panel.querySelector(".seccion-preguntas-falladas-desplegable");
-      const iconoToggle = panel.querySelector(".icono-toggle-preguntas");
+      // Programar interactividad de la cabecera colapsable de especialidad
+      const headerClickable = panel.querySelector(".especialidad-header-clickable");
+      const contentDiv = panel.querySelector(".especialidad-contenido-desplegable");
+      const iconoToggle = panel.querySelector(".icono-toggle-especialidad");
 
-      if (btnToggle && contentDiv) {
-        btnToggle.addEventListener("click", () => {
+      if (headerClickable && contentDiv) {
+        headerClickable.addEventListener("click", () => {
           const isCollapsed = contentDiv.style.maxHeight === "0px" || !contentDiv.style.maxHeight || contentDiv.style.maxHeight === "0";
           if (isCollapsed) {
-            contentDiv.style.maxHeight = `${contentDiv.scrollHeight + 100}px`;
+            contentDiv.style.maxHeight = `${contentDiv.scrollHeight + 5000}px`;
             contentDiv.style.opacity = "1";
+            contentDiv.style.borderTop = "1px solid var(--border)";
             if (iconoToggle) iconoToggle.style.transform = "rotate(180deg)";
-            btnToggle.style.background = "rgba(255,255,255,0.04)";
+            panel.style.background = "var(--panel)";
           } else {
             contentDiv.style.maxHeight = "0";
             contentDiv.style.opacity = "0";
+            contentDiv.style.borderTop = "1px solid transparent";
             if (iconoToggle) iconoToggle.style.transform = "rotate(0deg)";
-            btnToggle.style.background = "rgba(255,255,255,0.02)";
+            panel.style.background = "var(--panel-soft)";
           }
         });
       }
     });
 
-    // Delegar clicks dentro de las preguntas (Consultar tutor, Crear flashcard, Reportar)
     if (!containerEl.dataset.listenerSet) {
       containerEl.dataset.listenerSet = "true";
       containerEl.addEventListener("click", async (e) => {
