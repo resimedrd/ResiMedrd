@@ -828,6 +828,7 @@ const ui = {
       if (dRepasar) dRepasar.textContent = `${pctRepasar}%`;
 
       const historial = await api.obtenerHistorialCompleto(user.id).catch(() => []) || [];
+      console.log("DEBUG: actualizarProgresoEstudiante for user", user.id, "historial loaded with", historial.length, "items.");
 
       // Renderizar tabla de evaluaciones
       ui.renderizarTablaHistorial(historial);
@@ -1651,6 +1652,7 @@ const ui = {
     });
 
     const preguntasFalladas = Array.from(preguntasFalladasMap.values());
+    console.log("DEBUG: renderizarBancoDeErrores called with", historial.length, "sessions. Found", preguntasFalladas.length, "failed questions.");
 
     if (preguntasFalladas.length === 0) {
       containerEl.innerHTML = "";
