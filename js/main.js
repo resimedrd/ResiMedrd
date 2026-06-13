@@ -677,6 +677,125 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
+  // === 8b. REPORTES DE ERROR Y CORRECCIÓN DE PREGUNTAS (FASE 6) ===
+  const formReportarError = document.getElementById("form-reportar-error");
+  const modalReportarError = document.getElementById("modal-reportar-error");
+  const btnModalReporteCerrar = document.getElementById("btn-modal-reporte-cerrar");
+
+  if (modalReportarError && btnModalReporteCerrar) {
+    btnModalReporteCerrar.addEventListener("click", () => {
+      modalReportarError.classList.remove("active");
+    });
+    modalReportarError.addEventListener("click", (e) => {
+      if (e.target === modalReportarError) {
+        modalReportarError.classList.remove("active");
+      }
+    });
+  }
+
+  if (formReportarError) {
+    formReportarError.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const preguntaId = document.getElementById("modal-reporte-pregunta-id").value;
+      const motivo = document.getElementById("modal-reporte-motivo").value;
+      const comentario = document.getElementById("modal-reporte-comentario").value.trim();
+
+      try {
+        await api.guardarReporteError(preguntaId, motivo, comentario);
+        alert("✓ Reporte registrado de manera exitosa. Revisaremos el caso médico a la brevedad.");
+        modalReportarError.classList.remove("active");
+        formReportarError.reset();
+      } catch (err) {
+        alert("✗ Falla al enviar reporte de error: " + err.message);
+      }
+    });
+  }
+
+  const formCorregirPregunta = document.getElementById("form-corregir-pregunta");
+  const modalCorregirPregunta = document.getElementById("modal-corregir-pregunta");
+  const btnModalCorregirCerrar = document.getElementById("btn-modal-corregir-cerrar");
+
+  if (modalCorregirPregunta && btnModalCorregirCerrar) {
+    btnModalCorregirCerrar.addEventListener("click", () => {
+      modalCorregirPregunta.classList.remove("active");
+    });
+    modalCorregirPregunta.addEventListener("click", (e) => {
+      if (e.target === modalCorregirPregunta) {
+        modalCorregirPregunta.classList.remove("active");
+      }
+    });
+  }
+
+  if (formCorregirPregunta) {
+    formCorregirPregunta.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const preguntaId = document.getElementById("modal-corregir-pregunta-id").value;
+      const reporteId = document.getElementById("modal-corregir-reporte-id").value;
+
+      const texto = document.getElementById("modal-corregir-texto").value.trim();
+      const opciones = [
+        document.getElementById("modal-corregir-opc0").value.trim(),
+        document.getElementById("modal-corregir-opc1").value.trim(),
+        document.getElementById("modal-corregir-opc2").value.trim(),
+        document.getElementById("modal-corregir-opc3").value.trim()
+      ];
+      const correcta = parseInt(document.getElementById("modal-corregir-correcta").value);
+      const tema = document.getElementById("modal-corregir-tema").value.trim();
+      const subtema = document.getElementById("modal-corregir-subtema").value.trim();
+      const fuente = document.getElementById("modal-corregir-fuente").value.trim();
+      const examen_id = document.getElementById("modal-corregir-examen-id").value;
+      const difficulty = document.getElementById("modal-corregir-dificultad").value;
+      const explicacion = document.getElementById("modal-corregir-explicacion").value.trim();
+
+      const data = {
+        texto,
+        opciones,
+        correcta,
+        tema,
+        subtema,
+        fuente,
+        examen_id: examen_id ? parseInt(examen_id) : null,
+        difficulty: difficulty !== "" ? parseFloat(difficulty) : 0.5,
+        explicacion,
+        activo: 1
+      };
+
+      try {
+        await api.editarPregunta(preguntaId, data);
+        await api.resolverReporteError(reporteId);
+        
+        alert("✓ Pregunta corregida y reporte resuelto con éxito.");
+        modalCorregirPregunta.classList.remove("active");
+        formCorregirPregunta.reset();
+        
+        await ui.cargarReportesAdministrador();
+      } catch (err) {
+        alert("✗ Falla al guardar la corrección: " + err.message);
+      }
+    });
+  }
+
+  const btnRefrescarReportes = document.getElementById("btn-admin-refrescar-reportes");
+  if (btnRefrescarReportes) {
+    btnRefrescarReportes.addEventListener("click", async () => {
+      await ui.cargarReportesAdministrador();
+    });
+  }
+
+  // Escuchar clicks globales para abrir el modal de reportar error en preguntas
+  document.addEventListener("click", (e) => {
+    const btnReportar = e.target.closest(".btn-reportar-pregunta");
+    if (btnReportar) {
+      const preguntaId = btnReportar.getAttribute("data-id");
+      const modal = document.getElementById("modal-reportar-error");
+      if (modal) {
+        const inputId = document.getElementById("modal-reporte-pregunta-id");
+        if (inputId) inputId.value = preguntaId;
+        modal.classList.add("active");
+      }
+    }
+  });
+
   // 9. Intentar restaurar sesión guardada (Carga del ciclo de vida inicial)
   await auth.restaurarSesion();
 

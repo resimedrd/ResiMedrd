@@ -132,6 +132,20 @@ async function iniciarBaseDeDatos(db) {
     )
   `);
 
+  // 6. Tabla de reportes_error (SaaS Feedback Loop)
+  await db.exec(`
+    CREATE TABLE IF NOT EXISTS reportes_error (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      usuario_id INTEGER NOT NULL,
+      pregunta_id INTEGER NOT NULL,
+      motivo TEXT NOT NULL,
+      comentario TEXT,
+      leido INTEGER DEFAULT 0,
+      fecha TEXT DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (usuario_id) REFERENCES usuarios(id),
+      FOREIGN KEY (pregunta_id) REFERENCES preguntas(id)
+    )
+  `);
 
   // 7. Tabla de batalla_historial (Modo Batalla)
   await db.exec(`

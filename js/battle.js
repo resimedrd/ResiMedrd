@@ -869,6 +869,10 @@ const battle = {
             `;
           }
           
+          botonesAccionHtml += `
+            <button class="btn btn-secondary btn-reportar-pregunta" data-id="${q.id}" style="border-color: var(--danger); color: var(--danger); font-size:12px; padding:6px 12px; min-width: auto; background: transparent; cursor: pointer; border-radius: 8px; font-weight: 600;" type="button">⚠️ Reportar Error</button>
+          `;
+          
           botonesAccionHtml += `</div>`;
 
           let statusChipHtml = "";

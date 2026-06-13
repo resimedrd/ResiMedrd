@@ -651,6 +651,25 @@
             </div>
           </div>
 
+          <!-- FASE 6: BANCO DE REPORTES DE ERROR DE LA COMUNIDAD -->
+          <div class="admin-box" style="margin-top: 24px; padding: 20px; border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 12px; background: rgba(239, 68, 68, 0.02);">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 8px;">
+              <h3 style="color: var(--danger); margin: 0; display: flex; align-items: center; gap: 8px; font-size: 15px;">
+                Reportes de Error de la Comunidad
+                <span id="admin-reportes-badge" class="admin-badge-count hidden">0</span>
+              </h3>
+              <button id="btn-admin-refrescar-reportes" class="btn btn-ghost" style="padding: 4px 8px; font-size: 11px; border-color: rgba(239,68,68,0.2); color: var(--danger); min-width: auto;" type="button">Refrescar</button>
+            </div>
+            <p style="font-size: 12.5px; color: var(--text-soft); margin-bottom: 16px;">Revisa y resuelve las fallas en preguntas reportadas por los estudiantes en tiempo real.</p>
+            
+            <div id="admin-reportes-lista" style="display: flex; flex-direction: column; gap: 12px; max-height: 400px; overflow-y: auto; padding-right: 4px;">
+              <!-- Inyectado dinámicamente -->
+            </div>
+            <div id="admin-reportes-vacio" class="history-empty" style="padding: 20px; border-color: rgba(255,255,255,0.05); font-size: 12.5px; color: var(--text-dim);">
+              ✓ No hay reportes de error pendientes en la plataforma.
+            </div>
+          </div>
+
             </article>
 
             <!-- CARD DE EVOLUCIÓN CLÍNICA PREMIUM Y GAMIFICADA -->
@@ -1718,7 +1737,37 @@
     </div>
   </div>
 
-
+  <!-- MODAL REPORTAR ERROR EN PREGUNTA (FASE 6) -->
+  <div id="modal-reportar-error" class="modal-ia-overlay">
+    <div class="modal-ia-container" style="max-width: 480px;">
+      <div class="modal-ia-header">
+        <div class="modal-ia-title">
+          <span style="font-size: 24px;">⚠️</span>
+          <h3>Reportar Error en Pregunta</h3>
+        </div>
+        <button id="btn-modal-reporte-cerrar" class="modal-ia-close" type="button">&times;</button>
+      </div>
+      <form id="form-reportar-error" style="padding: 20px; display: flex; flex-direction: column; gap: 16px;">
+        <input type="hidden" id="modal-reporte-pregunta-id" />
+        <div class="form-block" style="margin: 0;">
+          <label style="margin-bottom: 6px; font-weight: 500; font-size: 13px;">Motivo del Reporte</label>
+          <select id="modal-reporte-motivo" class="input" style="width: 100%;" required>
+            <option value="" disabled selected>Selecciona un motivo...</option>
+            <option value="Error en la clave / respuesta correcta">Error en la clave / respuesta correcta</option>
+            <option value="Caso clínico confuso o con errores">Caso clínico confuso o con errores</option>
+            <option value="Explicación académica incompleta o errónea">Explicación académica incompleta o errónea</option>
+            <option value="Error en la fuente bibliográfica">Error en la fuente bibliográfica</option>
+            <option value="Otro motivo">Otro motivo</option>
+          </select>
+        </div>
+        <div class="form-block" style="margin: 0;">
+          <label style="margin-bottom: 6px; font-weight: 500; font-size: 13px;">Comentarios / Detalles Adicionales</label>
+          <textarea id="modal-reporte-comentario" class="input" style="min-height: 100px; width: 100%; font-family: inherit;" placeholder="Describe detalladamente cuál es la inconsistencia detectada..." required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary" style="background: var(--danger); color: #fff; width: 100%; margin-top: 10px; border: none; box-shadow: 0 4px 14px rgba(239, 68, 68, 0.25);">Enviar Reporte Académico</button>
+      </form>
+    </div>
+  </div>
 
   <!-- MODAL DEBILIDADES POR ESPECIALIDAD & RECOMENDACIÓN ENURM (FASE 1) -->
   <div id="modal-debilidades-especialidad" class="modal-ia-overlay">
@@ -1779,7 +1828,84 @@
     </div>
   </div>
 
-
+  <!-- MODAL EDITAR / CORREGIR PREGUNTA (FASE 2 - ADMIN) -->
+  <div id="modal-corregir-pregunta" class="modal-ia-overlay">
+    <div class="modal-ia-container" style="max-width: 500px;">
+      <div class="modal-ia-header">
+        <div class="modal-ia-title">
+          <span style="font-size: 24px;">✏️</span>
+          <h3>Corregir Pregunta Académica</h3>
+        </div>
+        <button id="btn-modal-corregir-cerrar" class="modal-ia-close" type="button">&times;</button>
+      </div>
+      <form id="form-corregir-pregunta" style="padding: 20px; display: flex; flex-direction: column; gap: 12px;">
+        <input type="hidden" id="modal-corregir-pregunta-id" />
+        <input type="hidden" id="modal-corregir-reporte-id" />
+        
+        <div>
+          <label style="font-size: 12px; font-weight: 600; color: var(--text-soft); text-transform: uppercase; display:block; margin-bottom:4px;">Enunciado o Caso Clínico</label>
+          <textarea id="modal-corregir-texto" class="input" style="min-height: 70px; font-family: inherit;" required></textarea>
+        </div>
+        
+        <div>
+          <label style="font-size: 12px; font-weight: 600; color: var(--text-soft); text-transform: uppercase; display:block; margin-bottom:4px;">Opciones de Respuesta</label>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+            <input type="text" id="modal-corregir-opc0" class="input" placeholder="Opción A" required />
+            <input type="text" id="modal-corregir-opc1" class="input" placeholder="Opción B" required />
+            <input type="text" id="modal-corregir-opc2" class="input" placeholder="Opción C" required />
+            <input type="text" id="modal-corregir-opc3" class="input" placeholder="Opción D" required />
+          </div>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+          <div>
+            <label style="font-size: 12px; font-weight: 600; color: var(--text-soft); text-transform: uppercase; display:block; margin-bottom:4px;">Respuesta Correcta</label>
+            <select id="modal-corregir-correcta" class="input">
+              <option value="0">Opción A</option>
+              <option value="1">Opción B</option>
+              <option value="2">Opción C</option>
+              <option value="3">Opción D</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size: 12px; font-weight: 600; color: var(--text-soft); text-transform: uppercase; display:block; margin-bottom:4px;">Especialidad / Tema</label>
+            <input type="text" id="modal-corregir-tema" class="input" required />
+          </div>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+          <div>
+            <label style="font-size: 12px; font-weight: 600; color: var(--text-soft); text-transform: uppercase; display:block; margin-bottom:4px;">Subtema específico</label>
+            <input type="text" id="modal-corregir-subtema" class="input" placeholder="Ej: Fisiología Renal" />
+          </div>
+          <div>
+            <label style="font-size: 12px; font-weight: 600; color: var(--text-soft); text-transform: uppercase; display:block; margin-bottom:4px;">Fuente Oficial</label>
+            <input type="text" id="modal-corregir-fuente" class="input" required />
+          </div>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+          <div>
+            <label style="font-size: 12px; font-weight: 600; color: var(--text-soft); text-transform: uppercase; display:block; margin-bottom:4px;">Asociar a Examen Oficial</label>
+            <select id="modal-corregir-examen-id" class="input">
+              <option value="">-- Banco General (Sin Examen) --</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size: 12px; font-weight: 600; color: var(--text-soft); text-transform: uppercase; display:block; margin-bottom:4px;">Dificultad (0.0 - 1.0)</label>
+            <input type="number" id="modal-corregir-dificultad" class="input" step="0.1" min="0" max="1" placeholder="Ej: 0.5" />
+          </div>
+        </div>
+        
+        <div>
+          <label style="font-size: 12px; font-weight: 600; color: var(--text-soft); text-transform: uppercase; display:block; margin-bottom:4px;">Explicación Clínica / Desglose Docente</label>
+          <textarea id="modal-corregir-explicacion" class="input" style="min-height: 50px; font-family: inherit;" placeholder="Usa 🔬 JUSTIFICACIÓN (Por qué SÍ): y 🚫 DESCARTE (Por qué NO): para visual premium" required></textarea>
+        </div>
+        
+        <button type="submit" class="btn btn-primary" style="background: var(--warning); color: #000; font-weight: bold; width: 100%; margin-top: 4px;">💾 Guardar Cambios y Resolver Reporte</button>
+      </form>
+    </div>
+  </div>
 
   <!-- MODAL DE CONFIRMACIÓN DE INICIO DE EXAMEN (Fase 1) -->
   <div id="modal-confirmar-inicio" class="modal-ia-overlay">

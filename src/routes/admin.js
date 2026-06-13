@@ -173,7 +173,83 @@ router.post("/api/admin/cargar-masivo", autenticarToken, exigirAdmin, async (req
 });
 
 
-// Reportes de error eliminados
+router.post("/api/reportes-error", autenticarToken, async (req, res) => {
+  const db = getDB();
+  try {
+    const { preguntaId, motivo, comentario } = req.body;
+    const usuarioId = req.usuario.id;
+
+    if (!preguntaId || !motivo) {
+      return res.status(400).json({ error: "Faltan campos requeridos." });
+    }
+
+    await db.run(
+      `INSERT INTO reportes_error (usuario_id, pregunta_id, motivo, comentario) VALUES (?, ?, ?, ?)`,
+      [usuarioId, preguntaId, motivo, comentario || ""]
+    );
+
+    res.status(201).json({ mensaje: "Reporte de error enviado con éxito." });
+  } catch (error) {
+    console.error("Error al crear reporte de error:", error);
+    res.status(500).json({ error: "Error al guardar el reporte en la base de datos." });
+  }
+});
+
+// 2. Obtener todos los reportes de error (Solo para Administrador)
+
+router.get("/api/admin/reportes-error", autenticarToken, exigirAdmin, async (req, res) => {
+  const db = getDB();
+  try {
+    const usuarioId = req.usuario.id;
+    const usuarioReal = await db.get(`SELECT rol FROM usuarios WHERE id = ?`, [usuarioId]);
+
+    if (!usuarioReal || usuarioReal.rol !== "admin") {
+      return res.status(403).json({ error: "Acceso denegado. No eres administrador." });
+    }
+
+    const reportes = await db.all(`
+      SELECT 
+        r.id, r.pregunta_id, r.motivo, r.comentario, r.leido, r.fecha,
+        p.texto AS pregunta_texto, p.tema AS pregunta_tema,
+        p.opciones AS pregunta_opciones, p.correcta AS pregunta_correcta,
+        p.subtema AS pregunta_subtema, p.explicacion AS pregunta_explicacion,
+        p.fuente AS pregunta_fuente,
+        p.examen_id AS pregunta_examen_id, p.difficulty AS pregunta_difficulty,
+        u.nombre AS usuario_nombre, u.email AS usuario_email
+      FROM reportes_error r
+      JOIN preguntas p ON r.pregunta_id = p.id
+      JOIN usuarios u ON r.usuario_id = u.id
+      ORDER BY r.leido ASC, r.fecha DESC
+    `);
+
+    res.json(reportes);
+  } catch (error) {
+    console.error("Error al obtener reportes de error:", error);
+    res.status(500).json({ error: "Error interno del servidor al consultar los reportes." });
+  }
+});
+
+// 3. Marcar reporte de error como leído/resuelto (Solo para Administrador)
+
+router.put("/api/admin/reportes-error/:id/marcar-leido", autenticarToken, exigirAdmin, async (req, res) => {
+  const db = getDB();
+  try {
+    const reporteId = req.params.id;
+    const usuarioId = req.usuario.id;
+    const usuarioReal = await db.get(`SELECT rol FROM usuarios WHERE id = ?`, [usuarioId]);
+
+    if (!usuarioReal || usuarioReal.rol !== "admin") {
+      return res.status(403).json({ error: "Acceso denegado. No eres administrador." });
+    }
+
+    await db.run(`UPDATE reportes_error SET leido = 1 WHERE id = ?`, [reporteId]);
+
+    res.json({ mensaje: "Reporte marcado como resuelto con éxito." });
+  } catch (error) {
+    console.error("Error al marcar reporte como resuelto:", error);
+    res.status(500).json({ error: "Error interno del servidor al actualizar el estado." });
+  }
+});
 
 // 4. Modificar una pregunta (Solo para Administrador - Soporte FASE 3)
 

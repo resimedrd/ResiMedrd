@@ -1050,7 +1050,6 @@ const quiz = {
           opcionesHtml += `<div class="review-opt ${claseOpt}"><strong>${String.fromCharCode(65 + oIdx)}.</strong> ${oLimpia}</div>`;
         });
 
-        // Habilitar botón para Tutor IA, Inyección de Flashcards Automáticas y Reporte de Error
         let botonesAccionHtml = `<div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px;">`;
         const textoEscapado = p.texto.replace(/"/g, "&quot;");
         const explicacionEscapada = (p.explicacion || "Sin desglose.").replace(/"/g, "&quot;");
@@ -1065,6 +1064,10 @@ const quiz = {
             <button class="btn btn-primary btn-auto-flashcard" data-tema="${temaEscapado}" data-pregunta="${textoEscapado}" data-respuesta="${explicacionEscapada}" style="background: var(--warning); color:#000; font-size:12px; padding:6px 12px; border:none;" type="button">Crear Flashcard</button>
           `;
         }
+        
+        botonesAccionHtml += `
+          <button class="btn btn-secondary btn-reportar-pregunta" data-id="${p.id}" style="border-color: var(--danger); color: var(--danger); font-size:12px; padding:6px 12px; min-width: auto; background: transparent; cursor: pointer; border-radius: 8px; font-weight: 600;" type="button">⚠️ Reportar Error</button>
+        `;
         
         botonesAccionHtml += `</div>`;
 
@@ -1187,6 +1190,10 @@ const quiz = {
               <button class="btn btn-primary btn-auto-flashcard" data-tema="${temaEscapado}" data-pregunta="${textoEscapado}" data-respuesta="${explicacionEscapada}" style="background: var(--warning); color:#000; font-size:12px; padding:6px 12px; border:none;" type="button">Crear Flashcard</button>
             `;
           }
+          
+          botonesAccionHtml += `
+            <button class="btn btn-secondary btn-reportar-pregunta" data-id="${p.id}" style="border-color: var(--danger); color: var(--danger); font-size:12px; padding:6px 12px; min-width: auto; background: transparent; cursor: pointer; border-radius: 8px; font-weight: 600;" type="button">⚠️ Reportar Error</button>
+          `;
           
           botonesAccionHtml += `</div>`;
 
