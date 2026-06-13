@@ -450,69 +450,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
-  // === 6.1. MODAL INTERACTIVO DE REPORTAR ERROR EN PREGUNTA (FASE 6) ===
-  const modalReportarError = document.getElementById("modal-reportar-error");
-  const btnModalReporteCerrar = document.getElementById("btn-modal-reporte-cerrar");
-  const formReportarError = document.getElementById("form-reportar-error");
-
-  if (modalReportarError && btnModalReporteCerrar) {
-    btnModalReporteCerrar.addEventListener("click", () => {
-      modalReportarError.classList.remove("active");
-    });
-
-    modalReportarError.addEventListener("click", (e) => {
-      if (e.target === modalReportarError) {
-        modalReportarError.classList.remove("active");
-      }
-    });
-  }
-
-  // Escuchar el evento delegado de presionar "⚠️ Reportar Error" en cualquier pantalla
-  document.addEventListener("click", (e) => {
-    const btn = e.target.closest(".btn-reportar-pregunta");
-    if (!btn) return;
-
-    const preguntaId = btn.getAttribute("data-id");
-    const inputPreguntaId = document.getElementById("modal-reporte-pregunta-id");
-
-    if (inputPreguntaId && modalReportarError) {
-      inputPreguntaId.value = preguntaId;
-      
-      // Limpiar campos del modal
-      const selectMotivo = document.getElementById("modal-reporte-motivo");
-      const txtComentario = document.getElementById("modal-reporte-comentario");
-      if (selectMotivo) selectMotivo.selectedIndex = 0;
-      if (txtComentario) txtComentario.value = "";
-
-      modalReportarError.classList.add("active");
-    }
-  });
-
-  if (formReportarError) {
-    formReportarError.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      if (!state.usuarioConectado) return;
-
-      const preguntaId = document.getElementById("modal-reporte-pregunta-id").value;
-      const motivo = document.getElementById("modal-reporte-motivo").value;
-      const comentario = document.getElementById("modal-reporte-comentario").value.trim();
-
-      try {
-        await api.guardarReporteError(preguntaId, motivo, comentario);
-        formReportarError.reset();
-        modalReportarError.classList.remove("active");
-        alert("✓ ¡Reporte de error enviado con éxito! Los docentes revisarán esta pregunta.");
-        
-        // Si el usuario reportante también es administrador, recargar en caliente
-        if (state.usuarioConectado.rol === "admin") {
-          await ui.cargarReportesAdministrador();
-          await ui.cargarExamenesAdministrador();
-        }
-      } catch (err) {
-        alert("✗ Falla al enviar el reporte: " + err.message);
-      }
-    });
-  }
 
   // === MODAL INTERACTIVO DE DEBILIDADES POR ESPECIALIDAD (FASE 1) ===
   const modalDebilidades = document.getElementById("modal-debilidades-especialidad");
@@ -529,63 +466,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
-  // === MODAL INTERACTIVO DE EDICIÓN DE PREGUNTAS (FASE 2 - ADMIN) ===
-  const modalCorregirPregunta = document.getElementById("modal-corregir-pregunta");
-  const btnModalCorregirCerrar = document.getElementById("btn-modal-corregir-cerrar");
-  const formCorregirPregunta = document.getElementById("form-corregir-pregunta");
 
-  if (modalCorregirPregunta && btnModalCorregirCerrar) {
-    btnModalCorregirCerrar.addEventListener("click", () => {
-      modalCorregirPregunta.classList.remove("active");
-    });
-    modalCorregirPregunta.addEventListener("click", (e) => {
-      if (e.target === modalCorregirPregunta) {
-        modalCorregirPregunta.classList.remove("active");
-      }
-    });
-  }
-
-  if (formCorregirPregunta) {
-    formCorregirPregunta.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      if (!state.usuarioConectado || state.usuarioConectado.rol !== "admin") return;
-
-      const preguntaId = document.getElementById("modal-corregir-pregunta-id").value;
-      const reporteId = document.getElementById("modal-corregir-reporte-id").value;
-
-      const texto = document.getElementById("modal-corregir-texto").value.trim();
-      const opciones = [
-        document.getElementById("modal-corregir-opc0").value.trim(),
-        document.getElementById("modal-corregir-opc1").value.trim(),
-        document.getElementById("modal-corregir-opc2").value.trim(),
-        document.getElementById("modal-corregir-opc3").value.trim()
-      ];
-      const correcta = parseInt(document.getElementById("modal-corregir-correcta").value);
-      const tema = document.getElementById("modal-corregir-tema").value.trim();
-      const subtema = document.getElementById("modal-corregir-subtema").value.trim();
-      const explicacion = document.getElementById("modal-corregir-explicacion").value.trim();
-      const fuente = document.getElementById("modal-corregir-fuente").value.trim();
-      const examen_id = document.getElementById("modal-corregir-examen-id").value;
-      const difficulty = document.getElementById("modal-corregir-dificultad").value;
-
-      try {
-        await api.editarPregunta(preguntaId, {
-          texto, opciones, correcta, tema, subtema, explicacion, fuente, examen_id, difficulty
-        });
-
-        await api.resolverReporteError(reporteId);
-
-        formCorregirPregunta.reset();
-        modalCorregirPregunta.classList.remove("active");
-        alert("✓ Pregunta académica corregida con éxito en el banco. El reporte ha sido resuelto automáticamente.");
-
-        await ui.cargarReportesAdministrador();
-        await ui.cargarExamenesAdministrador();
-      } catch (err) {
-        alert("✗ Falla al guardar la corrección de la pregunta: " + err.message);
-      }
-    });
-  }
 
   // === FILTROS EN REVISIÓN DE RESULTADOS (FASE 4) ===
   const btnFiltroTodas = document.getElementById("btn-filtro-revision-todas");
@@ -602,16 +483,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     btnFiltroErradas.addEventListener("click", () => ui.filtrarRevision("erradas"));
   }
 
-  // Listener para el botón de refrescar reportes en el panel administrador
-  const btnAdminRefrescarReportes = document.getElementById("btn-admin-refrescar-reportes");
-  if (btnAdminRefrescarReportes) {
-    btnAdminRefrescarReportes.addEventListener("click", async () => {
-      if (state.usuarioConectado && state.usuarioConectado.rol === "admin") {
-        await ui.cargarReportesAdministrador();
-        await ui.cargarExamenesAdministrador();
-      }
-    });
-  }
+
 
   // === FORMULARIO NUEVO EXAMEN (FASE 3) ===
   const formNuevoExamen = document.getElementById("form-nuevo-examen");

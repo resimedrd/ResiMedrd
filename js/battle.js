@@ -869,9 +869,7 @@ const battle = {
             `;
           }
           
-          botonesAccionHtml += `
-            <button class="btn btn-reportar-pregunta" data-id="${q.id}" type="button">Reportar Error</button>
-          </div>`;
+          botonesAccionHtml += `</div>`;
 
           let statusChipHtml = "";
           if (seleccion === null || seleccion === undefined) {

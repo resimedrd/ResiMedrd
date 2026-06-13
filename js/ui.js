@@ -2015,7 +2015,6 @@ const ui = {
       containerEl.addEventListener("click", async (e) => {
         const btnTutor = e.target.closest(".btn-consultar-tutor");
         const btnFlashcard = e.target.closest(".btn-auto-flashcard");
-        const btnReportar = e.target.closest(".btn-reportar-pregunta");
 
         if (btnTutor) {
           const texto = btnTutor.getAttribute("data-texto");
@@ -2038,137 +2037,12 @@ const ui = {
           }
         }
 
-        if (btnReportar) {
-          const preguntaId = btnReportar.getAttribute("data-id");
-          const motivo = prompt("Describa brevemente el error observado en la pregunta o desglose académico:");
-          if (motivo) {
-            try {
-              const res = await api.reportarPregunta(preguntaId, motivo);
-              alert(res.message || "Reporte registrado de manera exitosa. Revisaremos el caso médico a la brevedad.");
-            } catch (err) {
-              alert("Falla al enviar reporte de error.");
-            }
-          }
-        }
       });
     }
   },
 
 
 
-  async cargarReportesAdministrador() {
-    const badgeEl = document.getElementById("admin-reportes-badge");
-    const listaEl = document.getElementById("admin-reportes-lista");
-    const vacioEl = document.getElementById("admin-reportes-vacio");
-
-    if (!listaEl) return;
-
-    try {
-      const reportes = await api.obtenerReportesError();
-      const reportesNoLeidos = reportes.filter(r => r.leido === 0);
-
-      if (badgeEl) {
-        badgeEl.textContent = reportesNoLeidos.length;
-        if (reportesNoLeidos.length > 0) {
-          badgeEl.classList.remove("hidden");
-        } else {
-          badgeEl.classList.add("hidden");
-        }
-      }
-
-      listaEl.innerHTML = "";
-
-      if (reportes.length === 0) {
-        if (vacioEl) vacioEl.classList.remove("hidden");
-        return;
-      }
-
-      if (vacioEl) vacioEl.classList.add("hidden");
-
-      reportes.forEach(r => {
-        const d = new Date(r.fecha);
-        const fechaTxt = d.toLocaleString("es-ES", {
-          day: "2-digit",
-          month: "2-digit",
-          year: "numeric",
-          hour: "2-digit",
-          minute: "2-digit"
-        });
-
-        const card = document.createElement("div");
-        card.className = `report-card ${r.leido === 0 ? "unread" : "resolved"}`;
-        card.id = `reporte-card-${r.id}`;
-
-        let botonResolucionHtml = "";
-        if (r.leido === 0) {
-          botonResolucionHtml = `
-            <div class="report-card-actions" style="display: flex; gap: 8px; justify-content: flex-end;">
-              <button class="btn-corregir-pregunta-admin" type="button" style="background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.2); color: var(--warning); font-size: 11.5px; font-weight: 600; padding: 5px 10px; border-radius: 8px; cursor: pointer; transition: all 0.2s ease;">Corregir Pregunta</button>
-              <button class="btn-resolver-reporte" data-id="${r.id}" type="button">✓ Marcar como Resuelto</button>
-            </div>
-          `;
-        } else {
-          botonResolucionHtml = `
-            <div class="report-card-actions" style="font-size: 11px; color: var(--success); font-weight: bold;">
-              ✓ Resuelto y Verificado
-            </div>
-          `;
-        }
-
-        card.innerHTML = `
-          <div class="report-card-header">
-            <div>
-              Reportante: <span class="report-card-reporter">${r.usuario_nombre}</span> (${r.usuario_email})
-            </div>
-            <span class="report-card-date">${fechaTxt}</span>
-          </div>
-          <div style="font-size: 11.5px; color: var(--text-dim); margin-top: 4px;">
-            Materia: <strong>${r.pregunta_tema}</strong>
-          </div>
-          <div class="report-card-qtext" style="margin-top: 6px;">
-            <strong>Pregunta:</strong> ${r.pregunta_texto}
-          </div>
-          <div style="margin-top: 6px;">
-            <span class="report-card-category">${r.motivo}</span>
-          </div>
-          <div class="report-card-comment" style="margin-top: 6px;">
-            <strong>Comentario del médico:</strong> ${r.comentario || "Sin comentarios adicionales."}
-          </div>
-          ${botonResolucionHtml}
-        `;
-
-        listaEl.appendChild(card);
-
-        // Vincular listener en caliente para corregir pregunta (Fase 2)
-        if (r.leido === 0) {
-          const btnCorregir = card.querySelector(".btn-corregir-pregunta-admin");
-          if (btnCorregir) {
-            btnCorregir.addEventListener("click", () => {
-              ui.abrirModalCorreccionPregunta(r);
-            });
-          }
-        }
-      });
-
-      const botonesResolver = listaEl.querySelectorAll(".btn-resolver-reporte");
-      botonesResolver.forEach(btn => {
-        btn.addEventListener("click", async (e) => {
-          e.stopPropagation();
-          const rId = btn.getAttribute("data-id");
-          try {
-            await api.resolverReporteError(rId);
-            alert("✓ Reporte marcado como resuelto. ¡Excelente gestión!");
-            await ui.cargarReportesAdministrador();
-          } catch (err) {
-            alert("✗ Error al resolver el reporte: " + err.message);
-          }
-        });
-      });
-
-    } catch (error) {
-      console.error("Error al cargar reportes para el admin:", error);
-    }
-  },
 
   async cargarExamenesAdministrador() {
     const listaEl = document.getElementById("admin-examenes-lista");
@@ -2271,60 +2145,6 @@ const ui = {
     }
   },
 
-  abrirModalCorreccionPregunta(r) {
-    const modal = document.getElementById("modal-corregir-pregunta");
-    if (!modal) return;
-
-    // Poblar IDs
-    document.getElementById("modal-corregir-pregunta-id").value = r.pregunta_id;
-    document.getElementById("modal-corregir-reporte-id").value = r.id;
-
-    // Poblar Enunciado
-    document.getElementById("modal-corregir-texto").value = r.pregunta_texto;
-
-    // Parsear Opciones
-    let opcionesArray = state.safeParseOpciones(r.pregunta_opciones);
-
-    // Poblar Opciones en los inputs correspondientes
-    for (let i = 0; i < 4; i++) {
-      const opcInput = document.getElementById(`modal-corregir-opc${i}`);
-      if (opcInput) {
-        opcInput.value = opcionesArray[i] || "";
-      }
-    }
-
-    // Poblar el resto de campos
-    document.getElementById("modal-corregir-correcta").value = r.pregunta_correcta;
-    document.getElementById("modal-corregir-tema").value = r.pregunta_tema;
-    document.getElementById("modal-corregir-subtema").value = r.pregunta_subtema || "";
-    document.getElementById("modal-corregir-explicacion").value = r.pregunta_explicacion || "";
-    document.getElementById("modal-corregir-fuente").value = r.pregunta_fuente || "";
-
-    // Poblar nuevos campos FASE 3 (Examen y Dificultad)
-    const selectExamen = document.getElementById("modal-corregir-examen-id");
-    if (selectExamen) {
-      if (r.pregunta_examen_id) {
-        let existeOpcion = false;
-        for (let idxOpt = 0; idxOpt < selectExamen.options.length; idxOpt++) {
-          if (parseInt(selectExamen.options[idxOpt].value) === parseInt(r.pregunta_examen_id)) {
-            existeOpcion = true;
-            break;
-          }
-        }
-        if (!existeOpcion) {
-          selectExamen.innerHTML += `<option value="${r.pregunta_examen_id}">${r.pregunta_fuente || 'Examen asociado'}</option>`;
-        }
-      }
-      selectExamen.value = r.pregunta_examen_id || "";
-    }
-    const inputDificultad = document.getElementById("modal-corregir-dificultad");
-    if (inputDificultad) {
-      inputDificultad.value = r.pregunta_difficulty !== undefined ? r.pregunta_difficulty : 0.5;
-    }
-
-    // Abrir Modal
-    modal.classList.add("active");
-  },
 
   filtrarRevision(tipo) {
     const revisionContainer = document.getElementById("revision-container");

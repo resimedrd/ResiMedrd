@@ -911,12 +911,7 @@ const quiz = {
       const fuente = preguntaActual ? preguntaActual.fuente : null;
       const expCorrecta = preguntaActual ? preguntaActual.explicacion_correcta : null;
       const expIncorrecta = preguntaActual ? preguntaActual.explicacion_incorrecta : null;
-      feedbackExplicacion.innerHTML = `
-        ${ui.formatearExplicacionClinica(explicacion, fuente, expCorrecta, expIncorrecta)}
-        <div style="display: flex; justify-content: flex-end; margin-top: 8px;">
-          <button class="btn btn-reportar-pregunta" data-id="${preguntaActual ? preguntaActual.id : ''}" style="margin: 0;" type="button">Reportar Error en Pregunta</button>
-        </div>
-      `;
+      feedbackExplicacion.innerHTML = ui.formatearExplicacionClinica(explicacion, fuente, expCorrecta, expIncorrecta);
     }
   },
 
@@ -1071,9 +1066,7 @@ const quiz = {
           `;
         }
         
-        botonesAccionHtml += `
-          <button class="btn btn-reportar-pregunta" data-id="${p.id}" type="button">Reportar Error</button>
-        </div>`;
+        botonesAccionHtml += `</div>`;
 
         const div = document.createElement("div");
         div.className = "review-item";
@@ -1195,9 +1188,7 @@ const quiz = {
             `;
           }
           
-          botonesAccionHtml += `
-            <button class="btn btn-reportar-pregunta" data-id="${p.id}" type="button">Reportar Error</button>
-          </div>`;
+          botonesAccionHtml += `</div>`;
 
           const div = document.createElement("div");
           div.className = "review-item";

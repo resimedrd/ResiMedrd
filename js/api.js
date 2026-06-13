@@ -135,19 +135,6 @@ const api = {
       body: JSON.stringify({ preguntas, usuarioId, examen_id })
     }),
 
-  guardarReporteError: (preguntaId, motivo, comentario) =>
-    request("/api/reportes-error", {
-      method: "POST",
-      body: JSON.stringify({ preguntaId, motivo, comentario })
-    }),
-
-  obtenerReportesError: () =>
-    request("/api/admin/reportes-error"),
-
-  resolverReporteError: (id) =>
-    request(`/api/admin/reportes-error/${id}/marcar-leido`, {
-      method: "PUT"
-    }),
 
   editarPregunta: (id, data) =>
     request(`/api/admin/preguntas/${id}`, {
