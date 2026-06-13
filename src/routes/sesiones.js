@@ -98,6 +98,44 @@ router.get("/api/historial", autenticarToken, async (req, res) => {
       }
       filas = await db.all(`SELECT * FROM sesiones WHERE usuario_id = ? ORDER BY fecha DESC`, [usuarioId]);
     }
+
+    // Cargar mapa de temas de preguntas para rellenar de forma retrocompatible sesiones viejas
+    const preguntasRows = await db.all(`SELECT id, tema, subtema FROM preguntas`);
+    const temaMap = {};
+    const subtemaMap = {};
+    preguntasRows.forEach(row => {
+      temaMap[row.id] = row.tema;
+      subtemaMap[row.id] = row.subtema;
+    });
+
+    filas.forEach(sesion => {
+      if (sesion.detalle) {
+        try {
+          const preguntas = JSON.parse(sesion.detalle);
+          if (Array.isArray(preguntas)) {
+            let modificado = false;
+            preguntas.forEach(p => {
+              if (p && p.id) {
+                if (!p.tema && temaMap[p.id]) {
+                  p.tema = temaMap[p.id];
+                  modificado = true;
+                }
+                if (!p.subtema && subtemaMap[p.id]) {
+                  p.subtema = subtemaMap[p.id];
+                  modificado = true;
+                }
+              }
+            });
+            if (modificado) {
+              sesion.detalle = JSON.stringify(preguntas);
+            }
+          }
+        } catch (e) {
+          console.error("Error al procesar detalle retrocompatible en sesiones:", e);
+        }
+      }
+    });
+
     res.json(filas);
   } catch (error) {
     res.status(500).json({ error: "Error al obtener historial completo." });
