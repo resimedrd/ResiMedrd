@@ -2536,10 +2536,20 @@ body.dark-mode::-webkit-scrollbar-thumb:hover {
    📈 ESTILOS DE GRÁFICOS Y MÉTRICAS AVANZADAS
    ========================================================================== */
 
-#seccion-graficos-desplegable.activo {
-  max-height: 2000px !important;
-  opacity: 1 !important;
-  margin-top: 10px !important;
+/* Cajones Desplegables de Perfil con Altura Dinámica */
+.cajon-desplegable {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  margin-top: 0;
+  transition: max-height 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease, margin-top 0.3s ease;
+}
+
+.panel-acordeon {
+  border-radius: 28px !important;
+  padding: 32px !important;
+  background: var(--panel) !important;
+  border: 1px solid var(--border) !important;
 }
 
 #btn-toggle-graficos:hover {
@@ -2572,11 +2582,7 @@ body.dark-mode::-webkit-scrollbar-thumb:hover {
   }
 }
 
-#seccion-evaluaciones-desplegable.activo {
-  max-height: 2000px !important;
-  opacity: 1 !important;
-  margin-top: 10px !important;
-}
+
 
 #btn-toggle-evaluaciones:hover {
   background: rgba(255, 255, 255, 0.05) !important;
@@ -2589,11 +2595,7 @@ body.dark-mode::-webkit-scrollbar-thumb:hover {
   color: var(--primary);
 }
 
-#seccion-especialidades-desplegable.activo {
-  max-height: 2000px !important;
-  opacity: 1 !important;
-  margin-top: 10px !important;
-}
+
 
 #btn-toggle-especialidades:hover {
   background: rgba(255, 255, 255, 0.05) !important;
@@ -2606,11 +2608,7 @@ body.dark-mode::-webkit-scrollbar-thumb:hover {
   color: var(--primary);
 }
 
-#seccion-diario-desplegable.activo {
-  max-height: 2000px !important;
-  opacity: 1 !important;
-  margin-top: 10px !important;
-}
+
 
 #btn-toggle-diario:hover {
   background: rgba(255, 255, 255, 0.05) !important;

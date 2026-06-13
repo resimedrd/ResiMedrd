@@ -874,7 +874,7 @@
                   <span id="icono-toggle-graficos" style="transition: transform 0.3s ease; font-size: 14px;">▼</span>
                 </button>
 
-                <div id="seccion-graficos-desplegable" style="max-height: 0; overflow: hidden; opacity: 0; transition: max-height 0.4s ease-out, opacity 0.3s ease; margin-top: 0;">
+                <div id="seccion-graficos-desplegable" class="cajon-desplegable">
                   
                   <!-- Tarjetas Analíticas Superiores de Pronóstico ENURM -->
                   <div id="seccion-graficos-metricas-header" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-top: 20px;">
@@ -1021,7 +1021,7 @@
                   <span id="icono-toggle-especialidades" style="transition: transform 0.3s ease; font-size: 14px;">▼</span>
                 </button>
 
-                <div id="seccion-especialidades-desplegable" style="max-height: 0; overflow: hidden; opacity: 0; transition: max-height 0.4s ease-out, opacity 0.3s ease; margin-top: 0;">
+                <div id="seccion-especialidades-desplegable" class="cajon-desplegable">
                   <div style="padding-top: 20px;">
                     <h4 style="margin: 0 0 16px 0; font-size: 13px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px;">Rendimiento y Cobertura por Especialidad:</h4>
                     <div id="perfil-especialidades-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px;">
@@ -1039,8 +1039,8 @@
                 <span id="icono-toggle-evaluaciones" style="transition: transform 0.3s ease; font-size: 14px;">▼</span>
               </button>
 
-              <div id="seccion-evaluaciones-desplegable" style="max-height: 0; overflow: hidden; opacity: 0; transition: max-height 0.4s ease-out, opacity 0.3s ease; margin-top: 0;">
-                <article class="panel" style="border-radius: 28px; padding: 32px; background: var(--panel); border: 1px solid var(--border); margin-top: 20px;">
+              <div id="seccion-evaluaciones-desplegable" class="cajon-desplegable">
+                <article class="panel panel-acordeon" style="margin-top: 20px;">
                   <div class="panel-head" style="margin-bottom: 20px;">
                     <h3 style="color: var(--text); font-size: 20px; font-weight: 700;">Historial de Evaluaciones</h3>
                     <p style="font-size: 14px; color: var(--text-dim); margin-top: 4px;">Registro completo y cronológico de todas tus sesiones de estudio y simulacros.</p>
@@ -1078,7 +1078,7 @@
                 <span id="icono-toggle-diario" style="transition: transform 0.3s ease; font-size: 14px;">▼</span>
               </button>
 
-              <div id="seccion-diario-desplegable" style="max-height: 0; overflow: hidden; opacity: 0; transition: max-height 0.4s ease-out, opacity 0.3s ease; margin-top: 0;">
+              <div id="seccion-diario-desplegable" class="cajon-desplegable">
                 <!-- FASE 2: Evaluación Diaria de Flashcards -->
                 <div id="widget-evaluacion-diaria" style="background: rgba(255, 255, 255, 0.01); border: 1px solid var(--border); border-radius: 20px; padding: 24px; margin-top: 20px; margin-bottom: 24px;">
                   <h4 style="margin: 0 0 16px 0; font-size: 13px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 8px;">
@@ -1100,7 +1100,7 @@
                   </div>
                 </div>
 
-                <article class="panel" style="border-radius: 28px; padding: 32px; background: var(--panel); border: 1px solid var(--border); margin-top: 20px;">
+                <article class="panel panel-acordeon" style="margin-top: 20px;">
                   <div class="panel-head" style="margin-bottom: 20px;">
                     <h3 style="color: var(--text); font-size: 20px; font-weight: 700;">Historial de Estudio Diario (Flashcards)</h3>
                     <p style="font-size: 14px; color: var(--text-dim); margin-top: 4px;">Seguimiento diario de tu rendimiento, volumen de estudio y nivel de retención de datos puros.</p>
@@ -1137,7 +1137,7 @@
             <div class="banco-errores-grid" style="display: flex; flex-direction: column; gap: 24px;">
               
               <!-- COBERTURA, RENDIMIENTO Y BANCO DE ERRORES POR ESPECIALIDAD -->
-              <article class="panel" style="border-radius: 28px; padding: 32px; background: var(--panel); border: 1px solid var(--border);">
+              <article class="panel panel-acordeon">
                 <div class="panel-head" style="margin-bottom: 24px;">
                   <h3 style="color: var(--text); font-size: 20px; font-weight: 700; display: flex; align-items: center; gap: 8px;">
                     Rendimiento y Banco de Errores por Especialidad

@@ -836,6 +836,20 @@ const ui = {
       // Renderizar tabla de historial diario de flashcards
       ui.renderizarTablaDiarioFlashcards(diarioFlashcards);
 
+      const toggleCajon = (seccion, estaActivo) => {
+        if (!seccion) return;
+        seccion.classList.toggle("activo", estaActivo);
+        if (estaActivo) {
+          seccion.style.maxHeight = seccion.scrollHeight + "px";
+          seccion.style.opacity = "1";
+          seccion.style.marginTop = "10px";
+        } else {
+          seccion.style.maxHeight = "0px";
+          seccion.style.opacity = "0";
+          seccion.style.marginTop = "0px";
+        }
+      };
+
       // Vincular toggle del Cajón Desplegable de Gráficos Analíticos
       const btnToggle = document.getElementById("btn-toggle-graficos");
       if (btnToggle && !btnToggle.dataset.hasListener) {
@@ -843,7 +857,8 @@ const ui = {
         btnToggle.addEventListener("click", () => {
           const seccion = document.getElementById("seccion-graficos-desplegable");
           if (seccion) {
-            const estaActivo = seccion.classList.toggle("activo");
+            const estaActivo = !seccion.classList.contains("activo");
+            toggleCajon(seccion, estaActivo);
             btnToggle.classList.toggle("activo", estaActivo);
             const icono = document.getElementById("icono-toggle-graficos");
             if (icono) {
@@ -852,15 +867,22 @@ const ui = {
             if (estaActivo) {
               // Dibujar los gráficos dinámicos con Chart.js
               ui.renderizarGraficosAvanzados(historial, srEstados, personalizadas.length);
+              // Forzar ajuste de altura después de dibujar los gráficos
+              setTimeout(() => {
+                seccion.style.maxHeight = seccion.scrollHeight + "px";
+              }, 50);
             }
           }
         });
       }
       
-      // Si la sección de gráficos ya está activa al recargar el perfil, refrescarlos en caliente
+      // Si la sección de gráficos ya está activa al recargar el perfil, refrescarlos en caliente y ajustar altura
       const seccionGraficos = document.getElementById("seccion-graficos-desplegable");
       if (seccionGraficos && seccionGraficos.classList.contains("activo")) {
         ui.renderizarGraficosAvanzados(historial, srEstados, personalizadas.length);
+        seccionGraficos.style.maxHeight = seccionGraficos.scrollHeight + "px";
+        seccionGraficos.style.opacity = "1";
+        seccionGraficos.style.marginTop = "10px";
       }
 
       // Vincular toggle del Cajón Desplegable del Historial de Evaluaciones
@@ -870,7 +892,8 @@ const ui = {
         btnToggleEval.addEventListener("click", () => {
           const seccionEval = document.getElementById("seccion-evaluaciones-desplegable");
           if (seccionEval) {
-            const estaActivoEval = seccionEval.classList.toggle("activo");
+            const estaActivoEval = !seccionEval.classList.contains("activo");
+            toggleCajon(seccionEval, estaActivoEval);
             btnToggleEval.classList.toggle("activo", estaActivoEval);
             const iconoEval = document.getElementById("icono-toggle-evaluaciones");
             if (iconoEval) {
@@ -887,7 +910,8 @@ const ui = {
         btnToggleEsp.addEventListener("click", () => {
           const seccionEsp = document.getElementById("seccion-especialidades-desplegable");
           if (seccionEsp) {
-            const estaActivoEsp = seccionEsp.classList.toggle("activo");
+            const estaActivoEsp = !seccionEsp.classList.contains("activo");
+            toggleCajon(seccionEsp, estaActivoEsp);
             btnToggleEsp.classList.toggle("activo", estaActivoEsp);
             const iconoEsp = document.getElementById("icono-toggle-especialidades");
             if (iconoEsp) {
@@ -904,13 +928,24 @@ const ui = {
         btnToggleDiario.addEventListener("click", () => {
           const seccionDiario = document.getElementById("seccion-diario-desplegable");
           if (seccionDiario) {
-            const estaActivoDiario = seccionDiario.classList.toggle("activo");
+            const estaActivoDiario = !seccionDiario.classList.contains("activo");
+            toggleCajon(seccionDiario, estaActivoDiario);
             btnToggleDiario.classList.toggle("activo", estaActivoDiario);
             const iconoDiario = document.getElementById("icono-toggle-diario");
             if (iconoDiario) {
               iconoDiario.textContent = estaActivoDiario ? "▲" : "▼";
             }
           }
+        });
+      }
+
+      // Añadir escuchador de resize único global para ajustar las alturas en caliente
+      if (!window.hasAccordionResizeListener) {
+        window.hasAccordionResizeListener = true;
+        window.addEventListener("resize", () => {
+          document.querySelectorAll(".cajon-desplegable.activo").forEach(seccion => {
+            seccion.style.maxHeight = seccion.scrollHeight + "px";
+          });
         });
       }
       
@@ -1061,6 +1096,11 @@ const ui = {
         if (barraEl) {
           barraEl.style.width = `${data.porcentaje}%`;
         }
+      });
+
+      // Recalcular alturas de cajones desplegables que ya estén activos tras inyectar todo el progreso
+      document.querySelectorAll(".cajon-desplegable.activo").forEach(seccion => {
+        seccion.style.maxHeight = seccion.scrollHeight + "px";
       });
 
     } catch (error) {
