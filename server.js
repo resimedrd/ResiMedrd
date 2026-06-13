@@ -1102,12 +1102,35 @@ app.get("/api/preguntas/mapeo-temas", autenticarToken, async (req, res) => {
 
 app.get("/api/temas", async (req, res) => {
   try {
-    const preguntas = await db.all(`SELECT tema FROM preguntas WHERE (activo = 1 OR activo IS NULL)`);
+    const sql = `
+      SELECT 
+        CASE 
+          WHEN LOWER(tema) LIKE '%pediatria%' OR LOWER(tema) LIKE '%pediatría%' OR LOWER(tema) LIKE '%pediatra%' OR LOWER(tema) LIKE '%pediat%' THEN 'pediatria'
+          WHEN LOWER(tema) LIKE '%ginecologia%' OR LOWER(tema) LIKE '%ginecología%' OR LOWER(tema) LIKE '%obstetricia%' OR LOWER(tema) LIKE '%gineco%' OR LOWER(tema) LIKE '%obstet%' OR LOWER(tema) LIKE '%ginec%' THEN 'ginecologia'
+          WHEN LOWER(tema) LIKE '%cirugia%' OR LOWER(tema) LIKE '%cirugía%' OR LOWER(tema) LIKE '%quirur%' OR LOWER(tema) LIKE '%quirúr%' OR LOWER(tema) LIKE '%cirug%' THEN 'cirugia'
+          WHEN LOWER(tema) LIKE '%interna%' THEN 'interna'
+          WHEN LOWER(tema) LIKE '%basica%' OR LOWER(tema) LIKE '%básica%' OR LOWER(tema) LIKE '%básico%' OR LOWER(tema) LIKE '%basico%' OR LOWER(tema) LIKE '%fisiologia%' OR LOWER(tema) LIKE '%fisiología%' OR LOWER(tema) LIKE '%anatomia%' OR LOWER(tema) LIKE '%anatomía%' OR LOWER(tema) LIKE '%farmacologia%' OR LOWER(tema) LIKE '%farmacología%' OR LOWER(tema) LIKE '%embriologia%' OR LOWER(tema) LIKE '%embriología%' OR LOWER(tema) LIKE '%histologia%' OR LOWER(tema) LIKE '%histología%' OR LOWER(tema) LIKE '%microbiologia%' OR LOWER(tema) LIKE '%microbiología%' OR LOWER(tema) LIKE '%parasitologia%' OR LOWER(tema) LIKE '%parasitología%' OR LOWER(tema) LIKE '%bioquimica%' OR LOWER(tema) LIKE '%bioquímica%' OR LOWER(tema) LIKE '%genetica%' OR LOWER(tema) LIKE '%genética%' THEN 'basicas'
+          WHEN LOWER(tema) LIKE '%cardio%' THEN 'cardiologia'
+          WHEN LOWER(tema) LIKE '%neumo%' OR LOWER(tema) LIKE '%respirato%' OR LOWER(tema) LIKE '%pulmonar%' THEN 'neumologia'
+          WHEN LOWER(tema) LIKE '%gastro%' OR LOWER(tema) LIKE '%digestiv%' THEN 'gastro'
+          WHEN LOWER(tema) LIKE '%neuro%' THEN 'neurologia'
+          WHEN LOWER(tema) LIKE '%nefro%' OR LOWER(tema) LIKE '%urolo%' OR LOWER(tema) LIKE '%urólo%' THEN 'nefro'
+          WHEN LOWER(tema) LIKE '%infecto%' OR LOWER(tema) LIKE '%virologia%' OR LOWER(tema) LIKE '%virología%' OR LOWER(tema) LIKE '%bacteriologia%' OR LOWER(tema) LIKE '%bacteriología%' THEN 'infectologia'
+          WHEN LOWER(tema) LIKE '%trauma%' OR LOWER(tema) LIKE '%orto%' THEN 'trauma'
+          WHEN LOWER(tema) LIKE '%psiquia%' OR LOWER(tema) LIKE '%salud mental%' OR LOWER(tema) LIKE '%psiquic%' THEN 'psiquiatria'
+          WHEN LOWER(tema) LIKE '%salud publica%' OR LOWER(tema) LIKE '%salud pública%' OR LOWER(tema) LIKE '%epidemio%' OR LOWER(tema) LIKE '%preventiva%' OR LOWER(tema) LIKE '%bioestadistica%' OR LOWER(tema) LIKE '%bioestadística%' OR LOWER(tema) = 'salud' THEN 'salud'
+          ELSE LOWER(TRIM(tema))
+        END as esp_id,
+        COUNT(*) as total
+      FROM preguntas 
+      WHERE (activo = 1 OR activo IS NULL)
+      GROUP BY esp_id
+    `;
+    const filas = await db.all(sql);
     
     const conteo = {};
-    preguntas.forEach(p => {
-      const espId = normalizarTema(p.tema);
-      conteo[espId] = (conteo[espId] || 0) + 1;
+    filas.forEach(f => {
+      conteo[f.esp_id] = f.total;
     });
 
     const ESPECIALIDADES_OFICIALES = [
@@ -1337,78 +1360,114 @@ app.get("/api/dashboard/cobertura", autenticarToken, async (req, res) => {
       { id: "salud", nombre: "Salud Pública y Epidemiología" }
     ];
 
-    // 1. Obtener todas las preguntas activas para calcular el total absoluto por especialidad normalizada
-    const preguntasBanco = await db.all(
-      `SELECT id, tema, texto FROM preguntas WHERE activo = 1`
-    );
+    const sql = `
+      WITH total_banco AS (
+        SELECT 
+          CASE 
+            WHEN LOWER(tema) LIKE '%pediatria%' OR LOWER(tema) LIKE '%pediatría%' OR LOWER(tema) LIKE '%pediatra%' OR LOWER(tema) LIKE '%pediat%' THEN 'pediatria'
+            WHEN LOWER(tema) LIKE '%ginecologia%' OR LOWER(tema) LIKE '%ginecología%' OR LOWER(tema) LIKE '%obstetricia%' OR LOWER(tema) LIKE '%gineco%' OR LOWER(tema) LIKE '%obstet%' OR LOWER(tema) LIKE '%ginec%' THEN 'ginecologia'
+            WHEN LOWER(tema) LIKE '%cirugia%' OR LOWER(tema) LIKE '%cirugía%' OR LOWER(tema) LIKE '%quirur%' OR LOWER(tema) LIKE '%quirúr%' OR LOWER(tema) LIKE '%cirug%' THEN 'cirugia'
+            WHEN LOWER(tema) LIKE '%interna%' THEN 'interna'
+            WHEN LOWER(tema) LIKE '%basica%' OR LOWER(tema) LIKE '%básica%' OR LOWER(tema) LIKE '%básico%' OR LOWER(tema) LIKE '%basico%' OR LOWER(tema) LIKE '%fisiologia%' OR LOWER(tema) LIKE '%fisiología%' OR LOWER(tema) LIKE '%anatomia%' OR LOWER(tema) LIKE '%anatomía%' OR LOWER(tema) LIKE '%farmacologia%' OR LOWER(tema) LIKE '%farmacología%' OR LOWER(tema) LIKE '%embriologia%' OR LOWER(tema) LIKE '%embriología%' OR LOWER(tema) LIKE '%histologia%' OR LOWER(tema) LIKE '%histología%' OR LOWER(tema) LIKE '%microbiologia%' OR LOWER(tema) LIKE '%microbiología%' OR LOWER(tema) LIKE '%parasitologia%' OR LOWER(tema) LIKE '%parasitología%' OR LOWER(tema) LIKE '%bioquimica%' OR LOWER(tema) LIKE '%bioquímica%' OR LOWER(tema) LIKE '%genetica%' OR LOWER(tema) LIKE '%genética%' THEN 'basicas'
+            WHEN LOWER(tema) LIKE '%cardio%' THEN 'cardiologia'
+            WHEN LOWER(tema) LIKE '%neumo%' OR LOWER(tema) LIKE '%respirato%' OR LOWER(tema) LIKE '%pulmonar%' THEN 'neumologia'
+            WHEN LOWER(tema) LIKE '%gastro%' OR LOWER(tema) LIKE '%digestiv%' THEN 'gastro'
+            WHEN LOWER(tema) LIKE '%neuro%' THEN 'neurologia'
+            WHEN LOWER(tema) LIKE '%nefro%' OR LOWER(tema) LIKE '%urolo%' OR LOWER(tema) LIKE '%urólo%' THEN 'nefro'
+            WHEN LOWER(tema) LIKE '%infecto%' OR LOWER(tema) LIKE '%virologia%' OR LOWER(tema) LIKE '%virología%' OR LOWER(tema) LIKE '%bacteriologia%' OR LOWER(tema) LIKE '%bacteriología%' THEN 'infectologia'
+            WHEN LOWER(tema) LIKE '%trauma%' OR LOWER(tema) LIKE '%orto%' THEN 'trauma'
+            WHEN LOWER(tema) LIKE '%psiquia%' OR LOWER(tema) LIKE '%salud mental%' OR LOWER(tema) LIKE '%psiquic%' THEN 'psiquiatria'
+            WHEN LOWER(tema) LIKE '%salud publica%' OR LOWER(tema) LIKE '%salud pública%' OR LOWER(tema) LIKE '%epidemio%' OR LOWER(tema) LIKE '%preventiva%' OR LOWER(tema) LIKE '%bioestadistica%' OR LOWER(tema) LIKE '%bioestadística%' OR LOWER(tema) = 'salud' THEN 'salud'
+            ELSE LOWER(TRIM(tema))
+          END as esp_id,
+          COUNT(*) as total
+        FROM preguntas
+        WHERE activo = 1
+        GROUP BY esp_id
+      ),
+      unicas_vistas AS (
+        SELECT 
+          CASE 
+            WHEN LOWER(p.tema) LIKE '%pediatria%' OR LOWER(p.tema) LIKE '%pediatría%' OR LOWER(p.tema) LIKE '%pediatra%' OR LOWER(p.tema) LIKE '%pediat%' THEN 'pediatria'
+            WHEN LOWER(p.tema) LIKE '%ginecologia%' OR LOWER(p.tema) LIKE '%ginecología%' OR LOWER(p.tema) LIKE '%obstetricia%' OR LOWER(p.tema) LIKE '%gineco%' OR LOWER(p.tema) LIKE '%obstet%' OR LOWER(p.tema) LIKE '%ginec%' THEN 'ginecologia'
+            WHEN LOWER(p.tema) LIKE '%cirugia%' OR LOWER(p.tema) LIKE '%cirugía%' OR LOWER(p.tema) LIKE '%quirur%' OR LOWER(p.tema) LIKE '%quirúr%' OR LOWER(p.tema) LIKE '%cirug%' THEN 'cirugia'
+            WHEN LOWER(p.tema) LIKE '%interna%' THEN 'interna'
+            WHEN LOWER(p.tema) LIKE '%basica%' OR LOWER(p.tema) LIKE '%básica%' OR LOWER(p.tema) LIKE '%básico%' OR LOWER(p.tema) LIKE '%basico%' OR LOWER(p.tema) LIKE '%fisiologia%' OR LOWER(p.tema) LIKE '%fisiología%' OR LOWER(p.tema) LIKE '%anatomia%' OR LOWER(p.tema) LIKE '%anatomía%' OR LOWER(p.tema) LIKE '%farmacologia%' OR LOWER(p.tema) LIKE '%farmacología%' OR LOWER(p.tema) LIKE '%embriologia%' OR LOWER(p.tema) LIKE '%embriología%' OR LOWER(p.tema) LIKE '%histologia%' OR LOWER(p.tema) LIKE '%histología%' OR LOWER(p.tema) LIKE '%microbiologia%' OR LOWER(p.tema) LIKE '%microbiología%' OR LOWER(p.tema) LIKE '%parasitologia%' OR LOWER(p.tema) LIKE '%parasitología%' OR LOWER(p.tema) LIKE '%bioquimica%' OR LOWER(p.tema) LIKE '%bioquímica%' OR LOWER(p.tema) LIKE '%genetica%' OR LOWER(p.tema) LIKE '%genética%' THEN 'basicas'
+            WHEN LOWER(p.tema) LIKE '%cardio%' THEN 'cardiologia'
+            WHEN LOWER(p.tema) LIKE '%neumo%' OR LOWER(p.tema) LIKE '%respirato%' OR LOWER(p.tema) LIKE '%pulmonar%' THEN 'neumologia'
+            WHEN LOWER(p.tema) LIKE '%gastro%' OR LOWER(p.tema) LIKE '%digestiv%' THEN 'gastro'
+            WHEN LOWER(p.tema) LIKE '%neuro%' THEN 'neurologia'
+            WHEN LOWER(p.tema) LIKE '%nefro%' OR LOWER(p.tema) LIKE '%urolo%' OR LOWER(p.tema) LIKE '%urólo%' THEN 'nefro'
+            WHEN LOWER(p.tema) LIKE '%infecto%' OR LOWER(p.tema) LIKE '%virologia%' OR LOWER(p.tema) LIKE '%virología%' OR LOWER(p.tema) LIKE '%bacteriologia%' OR LOWER(p.tema) LIKE '%bacteriología%' THEN 'infectologia'
+            WHEN LOWER(p.tema) LIKE '%trauma%' OR LOWER(p.tema) LIKE '%orto%' THEN 'trauma'
+            WHEN LOWER(p.tema) LIKE '%psiquia%' OR LOWER(p.tema) LIKE '%salud mental%' OR LOWER(p.tema) LIKE '%psiquic%' THEN 'psiquiatria'
+            WHEN LOWER(p.tema) LIKE '%salud publica%' OR LOWER(p.tema) LIKE '%salud pública%' OR LOWER(p.tema) LIKE '%epidemio%' OR LOWER(p.tema) LIKE '%preventiva%' OR LOWER(p.tema) LIKE '%bioestadistica%' OR LOWER(p.tema) LIKE '%bioestadística%' OR LOWER(p.tema) = 'salud' THEN 'salud'
+            ELSE LOWER(TRIM(p.tema))
+          END as esp_id,
+          COUNT(DISTINCT q.texto) as total_vistas
+        FROM preguntas p
+        JOIN (
+          SELECT distinct json_extract(value, '$.texto') as texto
+          FROM sesiones, json_each(sesiones.detalle)
+          WHERE sesiones.usuario_id = ? AND sesiones.detalle IS NOT NULL
+        ) q ON p.texto = q.texto
+        WHERE p.activo = 1
+        GROUP BY esp_id
+      ),
+      antiguas_vistas AS (
+        SELECT 
+          CASE 
+            WHEN LOWER(tema) LIKE '%pediatria%' OR LOWER(tema) LIKE '%pediatría%' OR LOWER(tema) LIKE '%pediatra%' OR LOWER(tema) LIKE '%pediat%' THEN 'pediatria'
+            WHEN LOWER(tema) LIKE '%ginecologia%' OR LOWER(tema) LIKE '%ginecología%' OR LOWER(tema) LIKE '%obstetricia%' OR LOWER(tema) LIKE '%gineco%' OR LOWER(tema) LIKE '%obstet%' OR LOWER(tema) LIKE '%ginec%' THEN 'ginecologia'
+            WHEN LOWER(tema) LIKE '%cirugia%' OR LOWER(tema) LIKE '%cirugía%' OR LOWER(tema) LIKE '%quirur%' OR LOWER(tema) LIKE '%quirúr%' OR LOWER(tema) LIKE '%cirug%' THEN 'cirugia'
+            WHEN LOWER(tema) LIKE '%interna%' THEN 'interna'
+            WHEN LOWER(tema) LIKE '%basica%' OR LOWER(tema) LIKE '%básica%' OR LOWER(tema) LIKE '%básico%' OR LOWER(tema) LIKE '%basico%' OR LOWER(tema) LIKE '%fisiologia%' OR LOWER(tema) LIKE '%fisiología%' OR LOWER(tema) LIKE '%anatomia%' OR LOWER(tema) LIKE '%anatomía%' OR LOWER(tema) LIKE '%farmacologia%' OR LOWER(tema) LIKE '%farmacología%' OR LOWER(tema) LIKE '%embriologia%' OR LOWER(tema) LIKE '%embriología%' OR LOWER(tema) LIKE '%histologia%' OR LOWER(tema) LIKE '%histología%' OR LOWER(tema) LIKE '%microbiologia%' OR LOWER(tema) LIKE '%microbiología%' OR LOWER(tema) LIKE '%parasitologia%' OR LOWER(tema) LIKE '%parasitología%' OR LOWER(tema) LIKE '%bioquimica%' OR LOWER(tema) LIKE '%bioquímica%' OR LOWER(tema) LIKE '%genetica%' OR LOWER(tema) LIKE '%genética%' THEN 'basicas'
+            WHEN LOWER(tema) LIKE '%cardio%' THEN 'cardiologia'
+            WHEN LOWER(tema) LIKE '%neumo%' OR LOWER(tema) LIKE '%respirato%' OR LOWER(tema) LIKE '%pulmonar%' THEN 'neumologia'
+            WHEN LOWER(tema) LIKE '%gastro%' OR LOWER(tema) LIKE '%digestiv%' THEN 'gastro'
+            WHEN LOWER(tema) LIKE '%neuro%' THEN 'neurologia'
+            WHEN LOWER(tema) LIKE '%nefro%' OR LOWER(tema) LIKE '%urolo%' OR LOWER(tema) LIKE '%urólo%' THEN 'nefro'
+            WHEN LOWER(tema) LIKE '%infecto%' OR LOWER(tema) LIKE '%virologia%' OR LOWER(tema) LIKE '%virología%' OR LOWER(tema) LIKE '%bacteriologia%' OR LOWER(tema) LIKE '%bacteriología%' THEN 'infectologia'
+            WHEN LOWER(tema) LIKE '%trauma%' OR LOWER(tema) LIKE '%orto%' THEN 'trauma'
+            WHEN LOWER(tema) LIKE '%psiquia%' OR LOWER(tema) LIKE '%salud mental%' OR LOWER(tema) LIKE '%psiquic%' THEN 'psiquiatria'
+            WHEN LOWER(tema) LIKE '%salud publica%' OR LOWER(tema) LIKE '%salud pública%' OR LOWER(tema) LIKE '%epidemio%' OR LOWER(tema) LIKE '%preventiva%' OR LOWER(tema) LIKE '%bioestadistica%' OR LOWER(tema) LIKE '%bioestadística%' OR LOWER(tema) = 'salud' THEN 'salud'
+            ELSE LOWER(TRIM(tema))
+          END as esp_id,
+          SUM(cantidad_preguntas) as total_antiguas
+        FROM sesiones
+        WHERE usuario_id = ? AND detalle IS NULL
+        GROUP BY esp_id
+      )
+      SELECT 
+        tb.esp_id,
+        tb.total as total_banco,
+        COALESCE(uv.total_vistas, 0) as total_vistas,
+        COALESCE(av.total_antiguas, 0) as total_antiguas
+      FROM total_banco tb
+      LEFT JOIN unicas_vistas uv ON tb.esp_id = uv.esp_id
+      LEFT JOIN antiguas_vistas av ON tb.esp_id = av.esp_id
+    `;
 
-    const totalPorEspecialidad = {};
-    ESPECIALIDADES_OFICIALES.forEach(esp => {
-      totalPorEspecialidad[esp.id] = 0;
+    const filas = await db.all(sql, [usuarioId, usuarioId]);
+
+    const conteo = {};
+    filas.forEach(f => {
+      conteo[f.esp_id] = {
+        totalBanco: f.total_banco,
+        respondidas: Math.min(f.total_vistas + f.total_antiguas, f.total_banco)
+      };
     });
 
-    preguntasBanco.forEach(p => {
-      const espId = normalizarTema(p.tema);
-      if (totalPorEspecialidad[espId] !== undefined) {
-        totalPorEspecialidad[espId] += 1;
-      }
-    });
-
-    // 2. Obtener todas las sesiones de este usuario para calcular preguntas respondidas
-    const sesiones = await db.all(
-      `SELECT tema, cantidad_preguntas, detalle FROM sesiones WHERE usuario_id = ?`,
-      [usuarioId]
-    );
-
-    const preguntasVistasPorEspecialidad = {};
-    const cantAntiguasPorEspecialidad = {};
-
-    ESPECIALIDADES_OFICIALES.forEach(esp => {
-      preguntasVistasPorEspecialidad[esp.id] = new Set();
-      cantAntiguasPorEspecialidad[esp.id] = 0;
-    });
-
-    sesiones.forEach(s => {
-      const temaSesion = s.tema;
-      if (s.detalle) {
-        try {
-          const preguntas = JSON.parse(s.detalle);
-          if (Array.isArray(preguntas)) {
-            preguntas.forEach(p => {
-              const temaPregunta = p.tema || temaSesion;
-              const espId = normalizarTema(temaPregunta);
-              if (preguntasVistasPorEspecialidad[espId]) {
-                preguntasVistasPorEspecialidad[espId].add(p.texto);
-              }
-            });
-          }
-        } catch (e) {
-          const espId = normalizarTema(temaSesion);
-          if (cantAntiguasPorEspecialidad[espId] !== undefined) {
-            cantAntiguasPorEspecialidad[espId] += s.cantidad_preguntas;
-          }
-        }
-      } else {
-        const espId = normalizarTema(temaSesion);
-        if (cantAntiguasPorEspecialidad[espId] !== undefined) {
-          cantAntiguasPorEspecialidad[espId] += s.cantidad_preguntas;
-        }
-      }
-    });
-
-    // 3. Compilar el resultado de cobertura
     const cobertura = {};
     ESPECIALIDADES_OFICIALES.forEach(esp => {
-      const totalBanco = totalPorEspecialidad[esp.id] || 0;
-      const unicasNuevas = preguntasVistasPorEspecialidad[esp.id] ? preguntasVistasPorEspecialidad[esp.id].size : 0;
-      const cantidadAntiguas = cantAntiguasPorEspecialidad[esp.id] || 0;
-      
-      const respondidasEstimado = Math.min(unicasNuevas + cantidadAntiguas, totalBanco);
-      const porcentaje = totalBanco > 0 ? Math.round((respondidasEstimado / totalBanco) * 100) : 0;
+      const data = conteo[esp.id] || { totalBanco: 0, respondidas: 0 };
+      const totalBanco = data.totalBanco;
+      const respondidas = data.respondidas;
+      const porcentaje = totalBanco > 0 ? Math.round((respondidas / totalBanco) * 100) : 0;
 
       cobertura[esp.nombre] = {
         totalBanco,
-        respondidas: respondidasEstimado,
+        respondidas,
         porcentaje
       };
     });
