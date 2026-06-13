@@ -173,7 +173,7 @@ router.post("/api/admin/cargar-masivo", autenticarToken, exigirAdmin, async (req
 });
 
 
-router.post("/api/reportes-error", autenticarToken, exigirAdmin, async (req, res) => {
+router.post("/api/reportes-error", autenticarToken, async (req, res) => {
   const db = getDB();
   try {
     const { preguntaId, motivo, comentario } = req.body;
