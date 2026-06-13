@@ -88,10 +88,16 @@ router.get("/api/historial", autenticarToken, async (req, res) => {
     if (!usuarioId) {
       return res.status(400).json({ error: "Falta el ID de usuario." });
     }
-    if (parseInt(usuarioId) !== req.usuario.id) {
-      return res.status(403).json({ error: "Acceso no autorizado." });
+
+    let filas;
+    if (req.usuario.rol === "admin") {
+      filas = await db.all(`SELECT * FROM sesiones ORDER BY fecha DESC`);
+    } else {
+      if (parseInt(usuarioId) !== req.usuario.id) {
+        return res.status(403).json({ error: "Acceso no autorizado." });
+      }
+      filas = await db.all(`SELECT * FROM sesiones WHERE usuario_id = ? ORDER BY fecha DESC`, [usuarioId]);
     }
-    const filas = await db.all(`SELECT * FROM sesiones WHERE usuario_id = ? ORDER BY fecha DESC`, [usuarioId]);
     res.json(filas);
   } catch (error) {
     res.status(500).json({ error: "Error al obtener historial completo." });

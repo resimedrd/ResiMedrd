@@ -1787,6 +1787,8 @@ const ui = {
           return ui.normalizarTema(p.tema) === esp.id;
         });
 
+        if (preguntasEsp.length === 0) return;
+
         const totalRespondidas = info.totales || 0;
         const totalCorrectas = info.correctas || 0;
         const nota = totalRespondidas > 0 ? Math.round((totalCorrectas / totalRespondidas) * 100) : 0;
@@ -1920,7 +1922,7 @@ const ui = {
         // Crear tarjeta de especialidad unificada (Fila Altamente Compacta)
         const panel = document.createElement("div");
         panel.className = "especialidad-panel";
-        panel.style.cssText = "border: 1px solid var(--border); border-radius: 14px; background: var(--panel-soft); overflow: hidden; display: flex; flex-direction: column; transition: all 0.3s ease; margin-bottom: 8px;";
+        panel.style.cssText = "border: 1px solid var(--border); border-radius: 14px; background: var(--panel); overflow: hidden; display: flex; flex-direction: column; transition: all 0.3s ease; margin-bottom: 8px;";
 
         panel.innerHTML = `
           <!-- CABECERA PRINCIPAL DE LA ESPECIALIDAD (Fila Compacta Activa) -->
@@ -1938,7 +1940,7 @@ const ui = {
               <span class="chip chip-soft" style="font-size: 11px; padding: 2px 8px; margin: 0; border-color: var(--border); display: inline-block;">
                 Fallos: ${preguntasEsp.length}
               </span>
-              <span class="icono-toggle-especialidad" style="transition: transform 0.25s ease; font-size: 11px; color: var(--text-soft);">▼</span>
+              <span class="icono-toggle-especialidad" style="transition: transform 0.25s ease; font-size: 11px; color: var(--text-soft); transform: rotate(180deg);">▼</span>
             </div>
           </div>
 
@@ -1948,7 +1950,7 @@ const ui = {
           </div>
 
           <!-- CONTENIDO DESPLEGABLE DE LA ESPECIALIDAD -->
-          <div class="especialidad-contenido-desplegable" style="max-height: 0; overflow: hidden; opacity: 0; transition: max-height 0.35s ease-out, opacity 0.25s ease; border-top: 1px solid transparent; background: rgba(255,255,255,0.005); text-align: left;">
+          <div class="especialidad-contenido-desplegable" style="max-height: none; overflow: hidden; opacity: 1; transition: max-height 0.35s ease-out, opacity 0.25s ease; border-top: 1px solid var(--border); background: rgba(255,255,255,0.005); text-align: left;">
             <div style="padding: 20px; display: flex; flex-direction: column; gap: 16px;">
               <!-- Temas Consolidados vs Temas a Reforzar -->
               <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px;">
