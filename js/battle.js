@@ -605,26 +605,25 @@ const battle = {
   },
 
   marcarJugadorRespondioLive(playerId) {
-    // Encontrar al oponente correspondiente
-    const indicators = document.querySelectorAll(".opponent-responded-indicator");
-    for (const ind of indicators) {
-      const statusText = ind.querySelector(".opponent-status-text");
-      if (statusText && statusText.textContent === "Pensando") {
-        statusText.textContent = "Listo";
-        statusText.style.color = "var(--success)";
-        
-        const pulseDot = ind.querySelector(".opponent-pulse-dot");
-        if (pulseDot) {
-          pulseDot.classList.add("ready");
-        }
-        
-        // Simular que su barra de progreso avanza un poco
-        const barId = ind.id.replace("track-check-", "track-fill-");
-        const fill = document.getElementById(barId);
-        if (fill) {
-          fill.style.width = `${((battle.preguntaActualIndex + 1) / 15) * 100}%`;
-        }
-        break;
+    const jugador = battle.jugadoresDeLaBatalla.find(p => p.id === playerId);
+    if (!jugador) return;
+    
+    const nameKey = jugador.nombre.replace(/\s+/g, '');
+    const statusText = document.getElementById(`track-text-${nameKey}`);
+    const pulseDot = document.getElementById(`track-dot-${nameKey}`);
+    const fill = document.getElementById(`track-fill-${nameKey}`);
+
+    if (statusText && statusText.textContent === "Pensando") {
+      statusText.textContent = "Listo";
+      statusText.style.color = "var(--success)";
+      
+      if (pulseDot) {
+        pulseDot.classList.add("ready");
+      }
+      
+      if (fill) {
+        const totalQ = battle.repasoBatallaPreguntas.length || 15;
+        fill.style.width = `${((battle.preguntaActualIndex + 1) / totalQ) * 100}%`;
       }
     }
   },

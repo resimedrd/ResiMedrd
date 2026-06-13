@@ -476,10 +476,21 @@ const flashcards = {
   },
 
   compararRespuestas(correcta, escrita) {
-    if (!escrita || escrita.trim() === "") {
+    const sanitizarString = (str) => {
+      if (!str) return "";
+      return str
+        .replace(/\r?\n|\r|\t/g, " ") // normalizar saltos de línea y tabulaciones a espacios
+        .trim()
+        .replace(/\s+/g, " "); // colapsar espacios múltiples en un único espacio
+    };
+
+    const correctaSanitizada = sanitizarString(correcta);
+    const escritaSanitizada = sanitizarString(escrita);
+
+    if (!escritaSanitizada || escritaSanitizada === "") {
       return {
         score: 0,
-        correctaHtml: correcta,
+        correctaHtml: correctaSanitizada || "(Vacío)",
         escritaHtml: "(No ingresaste respuesta)",
         veredicto: "No se ingresó ninguna respuesta escrita.",
         colorClass: "danger"
@@ -497,11 +508,11 @@ const flashcards = {
         .filter(w => w.trim().length > 2); // palabras con más de 2 letras
     };
 
-    const palabrasCorrectas = limpiar(correcta);
-    const palabrasEscritas = limpiar(escrita);
+    const palabrasCorrectas = limpiar(correctaSanitizada);
+    const palabrasEscritas = limpiar(escritaSanitizada);
 
     if (palabrasCorrectas.length === 0) {
-      return { score: 100, correctaHtml: correcta, escritaHtml: escrita, veredicto: "✓ Coincidencia completa.", colorClass: "success" };
+      return { score: 100, correctaHtml: correctaSanitizada, escritaHtml: escritaSanitizada, veredicto: "✓ Coincidencia completa.", colorClass: "success" };
     }
 
     // Filtro de stop words comunes en español
@@ -543,8 +554,8 @@ const flashcards = {
     };
 
     const matchesSet = new Set(palabrasClaveCorrectas.filter(w => setEscritas.has(w)));
-    const correctaHtml = resaltarMatch(correcta, matchesSet);
-    const escritaHtml = resaltarMatch(escrita, matchesSet);
+    const correctaHtml = resaltarMatch(correctaSanitizada, matchesSet);
+    const escritaHtml = resaltarMatch(escritaSanitizada, matchesSet);
 
     let veredicto = "";
     let colorClass = "";

@@ -724,8 +724,56 @@ function procesarAvancePregunta(room) {
   if (room.timerInterval) {
     clearInterval(room.timerInterval);
   }
-  avanzarSiguientePregunta(room);
+  iniciarFeedbackPregunta(room);
 }
+
+function iniciarFeedbackPregunta(room) {
+  const qIndex = room.currentQuestionIndex;
+  const question = room.questions[qIndex];
+
+  // 1. Recopilar resultados de aciertos de esta pregunta para cada jugador en la sala
+  const results = room.players.map(p => {
+    const ans = p.answers.find(a => a.questionIndex === qIndex);
+    return {
+      nombre: p.nombre,
+      correct: ans ? ans.correct : false
+    };
+  });
+
+  // 2. Broadcast de feedback inmediato
+  broadcastToRoom(room, {
+    type: "question_feedback",
+    questionIndex: qIndex,
+    correcta: question.correcta,
+    explicacion: question.explicacion || "Sin desglose.",
+    fuente: question.fuente || "ENURM Oficial",
+    results: results
+  });
+
+  // 3. Iniciar cuenta regresiva de feedback
+  let feedbackTimeLeft = 10; // 10 segundos de visualización de explicación
+
+  // Broadcast del tick inicial de feedback
+  broadcastToRoom(room, {
+    type: "feedback_tick",
+    timeLeft: feedbackTimeLeft
+  });
+
+  room.timerInterval = setInterval(() => {
+    feedbackTimeLeft -= 1;
+
+    broadcastToRoom(room, {
+      type: "feedback_tick",
+      timeLeft: feedbackTimeLeft
+    });
+
+    if (feedbackTimeLeft <= 0) {
+      clearInterval(room.timerInterval);
+      avanzarSiguientePregunta(room);
+    }
+  }, 1000);
+}
+
 
 function avanzarSiguientePregunta(room) {
   room.currentQuestionIndex += 1;
