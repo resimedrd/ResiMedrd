@@ -4124,9 +4124,41 @@ body.dark-mode .premium-metrics-panel {
 /* --- AJUSTES PARA EXÁMENES Y CONTENEDORES (≤ 768px) --- */
 @media (max-width: 768px) {
   .quiz-layout {
-    grid-template-columns: 1fr !important;
+    display: flex !important;
+    flex-direction: column !important;
     gap: 12px !important;
     padding: 8px !important;
+  }
+
+  .quiz-side-column {
+    order: -1 !important; /* Mueve el temporizador y el contador arriba de la pregunta */
+    position: sticky !important;
+    top: 70px !important;
+    z-index: 100 !important;
+    width: 100% !important;
+  }
+
+  .sidebar-unified-card-v2 {
+    background: var(--panel-strong) !important;
+    border: 1px solid var(--border-strong) !important;
+    border-radius: 16px !important;
+    padding: 12px 18px !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15) !important;
+  }
+
+  .sidebar-counter-row {
+    display: flex !important;
+    flex-direction: row-reverse !important;
+    align-items: center !important;
+    gap: 10px !important;
+    border-bottom: none !important;
+    padding-bottom: 0 !important;
+    width: auto !important;
+    margin: 0 !important;
   }
 
   .quiz-container {
@@ -4306,6 +4338,94 @@ body.dark-mode .premium-metrics-panel {
   .chart-card-premium canvas {
     max-height: 190px !important;
     width: 100% !important;
+  }
+
+  /* Transición de tablas a tarjetas para pantallas táctiles */
+  .table-container {
+    border: none !important;
+  }
+
+  table#tabla-progreso-historial,
+  table#tabla-progreso-diario-flashcards {
+    display: block !important;
+  }
+
+  table#tabla-progreso-historial thead,
+  table#tabla-progreso-diario-flashcards thead {
+    display: none !important; /* Esconde la cabecera original en móvil */
+  }
+
+  table#tabla-progreso-historial tbody,
+  table#tabla-progreso-diario-flashcards tbody {
+    display: block !important;
+    width: 100% !important;
+  }
+
+  table#tabla-progreso-historial tbody tr,
+  table#tabla-progreso-diario-flashcards tbody tr {
+    display: block !important;
+    background: var(--panel-strong) !important;
+    border: 1px solid var(--border-strong) !important;
+    border-radius: 16px !important;
+    padding: 14px !important;
+    margin-bottom: 12px !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1) !important;
+  }
+
+  table#tabla-progreso-historial tbody td,
+  table#tabla-progreso-diario-flashcards tbody td {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 8px 0 !important;
+    border: none !important;
+    text-align: right !important;
+    font-size: 13px !important;
+    border-bottom: 1px dashed rgba(255, 255, 255, 0.05) !important;
+  }
+
+  table#tabla-progreso-historial tbody td:last-child,
+  table#tabla-progreso-diario-flashcards tbody td:last-child {
+    border-bottom: none !important;
+  }
+
+  /* Inyección de etiquetas de datos para simulacros */
+  table#tabla-progreso-historial tbody td::before {
+    content: "Dato:";
+    font-weight: 700 !important;
+    color: var(--text-dim) !important;
+    float: left;
+    text-transform: uppercase;
+    font-size: 10px;
+  }
+
+  table#tabla-progreso-historial tbody td:nth-child(1)::before { content: "Fecha"; }
+  table#tabla-progreso-historial tbody td:nth-child(2)::before { content: "Especialidad"; }
+  table#tabla-progreso-historial tbody td:nth-child(3)::before { content: "Modalidad"; }
+  table#tabla-progreso-historial tbody td:nth-child(4)::before { content: "Preguntas"; }
+  table#tabla-progreso-historial tbody td:nth-child(5)::before { content: "Aciertos"; }
+  table#tabla-progreso-historial tbody td:nth-child(6)::before { content: "Nota Final"; }
+  table#tabla-progreso-historial tbody td:nth-child(7)::before { content: "Acción"; }
+
+  /* Inyección de etiquetas de datos para flashcards */
+  table#tabla-progreso-diario-flashcards tbody td::before {
+    content: "Dato:";
+    font-weight: 700 !important;
+    color: var(--text-dim) !important;
+    float: left;
+    text-transform: uppercase;
+    font-size: 10px;
+  }
+
+  table#tabla-progreso-diario-flashcards tbody td:nth-child(1)::before { content: "Fecha"; }
+  table#tabla-progreso-diario-flashcards tbody td:nth-child(2)::before { content: "Repasadas"; }
+  table#tabla-progreso-diario-flashcards tbody td:nth-child(3)::before { content: "Lo Sabía"; }
+  table#tabla-progreso-diario-flashcards tbody td:nth-child(4)::before { content: "No Lo Sabía"; }
+  table#tabla-progreso-diario-flashcards tbody td:nth-child(5)::before { content: "Retención"; }
+
+  /* Evitar zoom automático desagradable en inputs para iOS Safari */
+  input, select, textarea {
+    font-size: 16px !important;
   }
 }
 
