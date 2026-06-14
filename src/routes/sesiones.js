@@ -81,6 +81,31 @@ router.get("/api/sesiones", autenticarToken, async (req, res) => {
   }
 });
 
+let cacheTemaMap = null;
+let cacheSubtemaMap = null;
+let cacheTime = 0;
+
+async function obtenerMapaPreguntas(db) {
+  const ahora = Date.now();
+  if (cacheTemaMap && cacheSubtemaMap && (ahora - cacheTime < 300000)) {
+    return { temaMap: cacheTemaMap, subtemaMap: cacheSubtemaMap };
+  }
+
+  const preguntasRows = await db.all(`SELECT id, tema, subtema FROM preguntas`);
+  const temaMap = {};
+  const subtemaMap = {};
+  preguntasRows.forEach(row => {
+    temaMap[row.id] = row.tema;
+    subtemaMap[row.id] = row.subtema;
+  });
+
+  cacheTemaMap = temaMap;
+  cacheSubtemaMap = subtemaMap;
+  cacheTime = ahora;
+
+  return { temaMap, subtemaMap };
+}
+
 router.get("/api/historial", autenticarToken, async (req, res) => {
   const db = getDB();
   try {
@@ -100,13 +125,7 @@ router.get("/api/historial", autenticarToken, async (req, res) => {
     }
 
     // Cargar mapa de temas de preguntas para rellenar de forma retrocompatible sesiones viejas
-    const preguntasRows = await db.all(`SELECT id, tema, subtema FROM preguntas`);
-    const temaMap = {};
-    const subtemaMap = {};
-    preguntasRows.forEach(row => {
-      temaMap[row.id] = row.tema;
-      subtemaMap[row.id] = row.subtema;
-    });
+    const { temaMap, subtemaMap } = await obtenerMapaPreguntas(db);
 
     filas.forEach(sesion => {
       if (sesion.detalle) {
@@ -246,13 +265,13 @@ router.get("/api/dashboard/cobertura", autenticarToken, async (req, res) => {
             WHEN LOWER(p.tema) LIKE '%salud publica%' OR LOWER(p.tema) LIKE '%salud pública%' OR LOWER(p.tema) LIKE '%epidemio%' OR LOWER(p.tema) LIKE '%preventiva%' OR LOWER(p.tema) LIKE '%bioestadistica%' OR LOWER(p.tema) LIKE '%bioestadística%' OR LOWER(p.tema) = 'salud' THEN 'salud'
             ELSE LOWER(TRIM(p.tema))
           END as esp_id,
-          COUNT(DISTINCT q.texto) as total_vistas
+          COUNT(DISTINCT q.pregunta_id) as total_vistas
         FROM preguntas p
         JOIN (
-          SELECT distinct json_extract(value, '$.texto') as texto
+          SELECT distinct CAST(json_extract(value, '$.id') AS INTEGER) as pregunta_id
           FROM sesiones, json_each(sesiones.detalle)
           WHERE sesiones.usuario_id = ? AND sesiones.detalle IS NOT NULL
-        ) q ON p.texto = q.texto
+        ) q ON p.id = q.pregunta_id
         WHERE p.activo = 1
         GROUP BY esp_id
       ),

@@ -4429,19 +4429,23 @@ body.dark-mode .premium-metrics-panel {
   }
 }
 
-/* Layout del Header de Gráficas/Métricas (2x2) */
+/* Layout del Header de Gráficas/Métricas (1x4) */
 #seccion-graficos-metricas-header {
   display: grid;
-  grid-template-columns: repeat(2, minmax(200px, 270px));
+  grid-template-columns: repeat(4, 1fr);
   gap: 16px;
   margin-top: 20px;
-  justify-content: center;
+}
+
+@media (max-width: 900px) {
+  #seccion-graficos-metricas-header {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (max-width: 520px) {
   #seccion-graficos-metricas-header {
     grid-template-columns: 1fr;
-    justify-content: stretch;
   }
 }
 
@@ -4530,6 +4534,426 @@ body.dark-mode .premium-metrics-panel {
   color: var(--warning);
   text-transform: uppercase;
   letter-spacing: 0.5px;
+}
+
+/* Tarjetas de Estadísticas Principales */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+@media (max-width: 800px) {
+  .stats-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 520px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.stat-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 12px;
+  transition: all 0.25s ease;
+  min-width: 0;
+}
+
+.stat-card:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: var(--border-strong);
+  transform: translateY(-1px);
+}
+
+.stat-icon-container {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.stat-details {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.stat-label {
+  font-size: 8.5px;
+  font-weight: 700;
+  color: var(--text-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.stat-value {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1.2;
+}
+
+/* Tarjetas Analíticas (1x4 Grid) */
+.analytic-widget-card {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.015) 0%, rgba(255, 255, 255, 0.002) 100%);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 20px 22px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 140px;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.analytic-widget-card:hover {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.005) 100%);
+  border-color: rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.5);
+}
+
+.analytic-widget-card .card-content-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center; /* Alinea íconos al centro vertical para equilibrio visual */
+  height: 100%;
+  width: 100%;
+  gap: 12px;
+}
+
+.analytic-widget-card .card-left {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex-grow: 1;
+  min-width: 0; /* TRUCO CLAVE: evita que el texto largo empuje al ícono hacia afuera */
+}
+
+.analytic-widget-card .card-right-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1.5px solid var(--border);
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.analytic-widget-card .card-right-icon.text-success {
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.08);
+  border-color: rgba(16, 185, 129, 0.25);
+}
+
+.analytic-widget-card .card-right-icon.text-danger {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.08);
+  border-color: rgba(239, 68, 68, 0.25);
+}
+
+.analytic-widget-card .card-right-icon.text-warning {
+  color: #f59e0b;
+  background: rgba(245, 158, 11, 0.08);
+  border-color: rgba(245, 158, 11, 0.25);
+}
+
+.analytic-widget-card .card-tag {
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin-bottom: 2px;
+}
+
+/* Colores específicos de tags */
+.predict-card .card-tag { color: #3b82f6; }
+.strong-card .card-tag { color: #10b981; }
+.critical-card .card-tag { color: #ef4444; }
+.consistency-card .card-tag { color: #f59e0b; }
+
+.analytic-widget-card .card-main-val {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--text);
+  font-family: 'Outfit', sans-serif;
+}
+
+.analytic-widget-card .card-sub-val {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-soft);
+}
+
+.analytic-widget-card .card-trend-up {
+  font-size: 12px;
+  font-weight: 600;
+  color: #10b981;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 2px;
+}
+
+.analytic-widget-card .card-specialty-name {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+  max-width: 100%; /* Adapta al 100% de la columna izquierda autolimitada */
+}
+
+.analytic-widget-card .card-performance-label {
+  font-size: 11.5px;
+  font-weight: 600;
+}
+
+.strong-card .card-performance-label { color: #10b981; }
+.critical-card .card-performance-label { color: #ef4444; }
+.consistency-card .card-performance-label { color: #f59e0b; }
+
+.analytic-widget-card .card-desc {
+  font-size: 11px;
+  color: var(--text-soft);
+  margin-top: 6px;
+  line-height: 1.35;
+}
+
+.predict-card .card-footer-desc {
+  margin-top: 10px;
+  border-top: 1px dashed var(--border);
+  padding-top: 8px;
+  font-size: 11px;
+  color: var(--text-soft);
+  line-height: 1.3;
+}
+
+/* Lista de Especialidades */
+.specialty-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+}
+
+.specialty-row:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: var(--border-strong);
+  transform: translateY(-1px);
+}
+
+.specialty-info {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 220px;
+  flex-shrink: 0;
+}
+
+.specialty-icon-container {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.specialty-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.specialty-bars-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex-grow: 1;
+  margin: 0 24px;
+}
+
+.specialty-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.specialty-bar-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-soft);
+  width: 85px;
+  flex-shrink: 0;
+}
+
+.specialty-bar-bg {
+  height: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 100px;
+  flex-grow: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+.specialty-bar-fill {
+  height: 100%;
+  border-radius: 100px;
+  transition: width 0.6s ease;
+}
+
+.specialty-bar-fill.blue {
+  background: #3b82f6;
+}
+
+.specialty-bar-fill.green {
+  background: #10b981;
+}
+
+.specialty-pct {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text);
+  width: 36px;
+  text-align: right;
+}
+
+.specialty-status-wrapper {
+  width: 210px;
+  display: flex;
+  justify-content: flex-end;
+  flex-shrink: 0;
+}
+
+.specialty-diagnostic-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  min-width: 190px;
+  width: 190px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.01);
+  text-align: left;
+}
+
+.diagnostic-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.diagnostic-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.diagnostic-title {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.diagnostic-desc {
+  font-size: 10px;
+  color: var(--text-soft);
+  line-height: 1.3;
+}
+
+/* Modificadores de prioridad para la tarjeta */
+.specialty-diagnostic-card.badge-fortaleza {
+  background: rgba(16, 185, 129, 0.04);
+  border-color: rgba(16, 185, 129, 0.18);
+  color: #10b981;
+}
+.specialty-diagnostic-card.badge-fortaleza .diagnostic-desc {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.specialty-diagnostic-card.badge-inprogress {
+  background: rgba(59, 130, 246, 0.04);
+  border-color: rgba(59, 130, 246, 0.18);
+  color: #3b82f6;
+}
+.specialty-diagnostic-card.badge-inprogress .diagnostic-desc {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.specialty-diagnostic-card.badge-reforzar {
+  background: rgba(245, 158, 11, 0.04);
+  border-color: rgba(245, 158, 11, 0.18);
+  color: #f59e0b;
+}
+.specialty-diagnostic-card.badge-reforzar .diagnostic-desc {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.specialty-diagnostic-card.badge-priority {
+  background: rgba(239, 68, 68, 0.04);
+  border-color: rgba(239, 68, 68, 0.18);
+  color: #ef4444;
+}
+.specialty-diagnostic-card.badge-priority .diagnostic-desc {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+@media (max-width: 850px) {
+  .specialty-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+  .specialty-info {
+    width: 100%;
+  }
+  .specialty-bars-container {
+    margin: 0;
+  }
+  .specialty-status-wrapper {
+    width: 100%;
+    justify-content: flex-start;
+  }
+  .specialty-diagnostic-card {
+    width: 100%;
+    min-width: 100%;
+  }
 }
 
 

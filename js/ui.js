@@ -73,6 +73,8 @@ const ui = {
         targetSelector = '.sidebar-item[data-target="preguntas"]';
       } else if (nombrePantalla === "perfil") {
         targetSelector = '.sidebar-item[data-target="estadisticas"]';
+      } else if (nombrePantalla === "historial") {
+        targetSelector = '.sidebar-item[data-target="historial"]';
       } else if (nombrePantalla === "errores") {
         targetSelector = '.sidebar-item[data-target="errores"]';
       } else if (nombrePantalla.startsWith("battle")) {
@@ -87,7 +89,7 @@ const ui = {
     if (nombrePantalla === "home") {
       ui.cargarDashboardHome();
       ui.cargarHistorialReciente();
-    } else if (nombrePantalla === "perfil") {
+    } else if (nombrePantalla === "perfil" || nombrePantalla === "historial") {
       ui.actualizarProgresoEstudiante();
     } else if (nombrePantalla === "errores") {
       ui.actualizarProgresoEstudiante();
@@ -107,42 +109,135 @@ const ui = {
     }
   },
 
-  // RENDERIZAR GRID DE ESPECIALIDADES EN MI PERFIL
+  // RENDERIZAR LISTA DE ESPECIALIDADES EN MI PERFIL
   async inicializarGridEspecialidades() {
-    const grid = document.getElementById("perfil-especialidades-grid");
-    if (!grid) return;
+    const list = document.getElementById("perfil-especialidades-lista");
+    if (!list) return;
     
-    grid.innerHTML = "";
+    list.innerHTML = "";
+    
+    // Mapa de especialidades a íconos SVG personalizados y colores de fondo circulares
+    const iconsMap = {
+      pediatria: {
+        bg: "rgba(59, 130, 246, 0.12)",
+        color: "#3b82f6",
+        svg: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20z"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>`
+      },
+      ginecologia: {
+        bg: "rgba(236, 72, 153, 0.12)",
+        color: "#ec4899",
+        svg: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="6"/><line x1="12" y1="15" x2="12" y2="22"/><line x1="9" y1="18" x2="15" y2="18"/></svg>`
+      },
+      cirugia: {
+        bg: "rgba(20, 184, 166, 0.12)",
+        color: "#20b8a6",
+        svg: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l4-4a1 1 0 0 0 0-1.4l-1.6-1.6a1 1 0 0 0-1.4 0l-4 4z"/><path d="M14.7 7.7L2 20.4a2 2 0 0 0 0 2.8 2 2 0 0 0 2.8 0L17.5 10.5"/></svg>`
+      },
+      interna: {
+        bg: "rgba(239, 68, 68, 0.12)",
+        color: "#ef4444",
+        svg: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>`
+      },
+      basicas: {
+        bg: "rgba(100, 116, 139, 0.12)",
+        color: "#64748b",
+        svg: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 10.5C5 7.5 7.5 5 10.5 4.5"/><path d="M13.5 19.5c3-.5 5.5-3 6-6"/><path d="M19.5 4.5C19 7.5 16.5 10 13.5 10.5"/><path d="M10.5 13.5c-3 .5-5.5 3-6 6"/><circle cx="18" cy="6" r="2"/><circle cx="6" cy="18" r="2"/><circle cx="12" cy="12" r="1"/></svg>`
+      },
+      cardiologia: {
+        bg: "rgba(244, 63, 94, 0.12)",
+        color: "#f43f5e",
+        svg: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>`
+      },
+      neumologia: {
+        bg: "rgba(56, 189, 248, 0.12)",
+        color: "#38bdf8",
+        svg: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"/><path d="M12 12v10"/><path d="M9 18h6"/></svg>`
+      },
+      gastro: {
+        bg: "rgba(245, 158, 11, 0.12)",
+        color: "#f59e0b",
+        svg: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21a9 9 0 0 0 9-9 9 9 0 0 0-9-9 9 9 0 0 0-9 9 9 9 0 0 0 9 9Z"/><path d="M12 7v10"/><path d="M8 12h8"/></svg>`
+      },
+      nefro: {
+        bg: "rgba(99, 102, 241, 0.12)",
+        color: "#6366f1",
+        svg: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22a7 7 0 0 0 7-7c0-4.3-7-11-7-11S5 10.7 5 15a7 7 0 0 0 7 7z"/></svg>`
+      },
+      neurologia: {
+        bg: "rgba(139, 92, 246, 0.12)",
+        color: "#8b5cf6",
+        svg: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1 0-3.88 2.5 2.5 0 0 1 0-3.88 2.5 2.5 0 0 1 0-3.88A2.5 2.5 0 0 1 9.5 2Z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 0-3.88 2.5 2.5 0 0 0 0-3.88 2.5 2.5 0 0 0 0-3.88A2.5 2.5 0 0 0 14.5 2Z"/></svg>`
+      },
+      infectologia: {
+        bg: "rgba(132, 204, 22, 0.12)",
+        color: "#84cc16",
+        svg: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m4.9 4.9 1.4 1.4"/><path d="m17.7 17.7 1.4 1.4"/><path d="m4.9 19.1 1.4-1.4"/><path d="m17.7 6.3 1.4-1.4"/></svg>`
+      },
+      trauma: {
+        bg: "rgba(217, 119, 6, 0.12)",
+        color: "#d97706",
+        svg: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2 2 0 1 1 2 2L5 19a2 2 0 1 1-2-2L17 3z"/></svg>`
+      },
+      psiquiatria: {
+        bg: "rgba(244, 114, 182, 0.12)",
+        color: "#f472b6",
+        svg: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>`
+      },
+      salud: {
+        bg: "rgba(20, 184, 166, 0.12)",
+        color: "#20b8a6",
+        svg: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>`
+      }
+    };
+
     state.LISTA_ESPECIALIDADES.forEach(esp => {
-      const card = document.createElement("div");
-      card.className = "specialty-analytics-card interactive";
-      card.setAttribute("data-id", esp.id);
+      const row = document.createElement("div");
+      row.className = "specialty-row interactive";
+      row.setAttribute("data-id", esp.id);
       
-      card.innerHTML = `
-        <div class="specialty-analytics-header">
-          <span class="specialty-analytics-title">${esp.nombre}</span>
-          <div class="specialty-analytics-score-label">Nota: <span id="porcentaje-${esp.id}" class="specialty-analytics-score-val">0%</span></div>
+      const config = iconsMap[esp.id] || { bg: "rgba(255,255,255,0.05)", color: "#ffffff", svg: "🔬" };
+      
+      row.innerHTML = `
+        <div class="specialty-info">
+          <div class="specialty-icon-container" style="background: ${config.bg}; color: ${config.color};">
+            ${config.svg}
+          </div>
+          <span class="specialty-name">${esp.nombre}</span>
         </div>
-        <!-- Barra de Nota -->
-        <div class="specialty-analytics-bar-bg">
-          <div id="barra-${esp.id}" class="specialty-analytics-bar-fill"></div>
+        <div class="specialty-bars-container">
+          <div class="specialty-bar-row">
+            <span class="specialty-bar-label">Cobertura</span>
+            <div class="specialty-bar-bg">
+              <div id="cobertura-barra-${esp.id}" class="specialty-bar-fill blue" style="width: 0%;"></div>
+            </div>
+            <span id="cobertura-texto-${esp.id}" class="specialty-pct">0%</span>
+          </div>
+          <div class="specialty-bar-row">
+            <span class="specialty-bar-label">Rendimiento</span>
+            <div class="specialty-bar-bg">
+              <div id="barra-${esp.id}" class="specialty-bar-fill green" style="width: 0%;"></div>
+            </div>
+            <span id="porcentaje-${esp.id}" class="specialty-pct">0%</span>
+          </div>
         </div>
-        <!-- Cobertura -->
-        <div class="specialty-analytics-coverage-header">
-          <span>Cobertura del Banco:</span>
-          <span id="cobertura-texto-${esp.id}" class="specialty-analytics-coverage-val">0 / 0 (0%)</span>
+        <div class="specialty-status-wrapper">
+          <div id="badge-container-${esp.id}" class="specialty-diagnostic-card badge-inprogress">
+            <div class="diagnostic-header">
+              <span id="badge-icon-${esp.id}" class="diagnostic-icon">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+              </span>
+              <span id="badge-title-${esp.id}" class="diagnostic-title">En progreso</span>
+            </div>
+            <span id="badge-desc-${esp.id}" class="diagnostic-desc">Rendimiento promedio, sigue practicando</span>
+          </div>
         </div>
-        <div class="specialty-analytics-coverage-bar-bg">
-          <div id="cobertura-barra-${esp.id}" class="specialty-analytics-coverage-bar-fill"></div>
-        </div>
-        <div style="font-size: 11px; text-align: center; color: var(--primary); margin-top: 4px; font-weight: 600;">Ver análisis de temas y bibliografía</div>
       `;
       
-      card.addEventListener("click", () => {
+      row.addEventListener("click", () => {
         ui.abrirAnalisisEspecialidad(esp);
       });
       
-      grid.appendChild(card);
+      list.appendChild(row);
     });
   },
 
@@ -173,8 +268,14 @@ const ui = {
     if (retroEl) {
       const scoreText = (notaEl ? notaEl.textContent : "0%").replace("%", "");
       const score = parseInt(scoreText) || 0;
-      const vistasText = (coberturaEl ? coberturaEl.textContent : "0 / 0").split(" ")[0];
-      const vistas = parseInt(vistasText) || 0;
+      let vistas = 0;
+      if (coberturaEl) {
+        if (coberturaEl.hasAttribute("data-vistas")) {
+          vistas = parseInt(coberturaEl.getAttribute("data-vistas")) || 0;
+        } else {
+          vistas = parseInt(coberturaEl.textContent.split(" ")[0]) || 0;
+        }
+      }
 
       let feedbackBadge = "";
       let feedbackText = "";
@@ -919,23 +1020,7 @@ const ui = {
         });
       }
 
-      // Vincular toggle del Cajón Desplegable de Cobertura por Especialidad
-      const btnToggleEsp = document.getElementById("btn-toggle-especialidades");
-      if (btnToggleEsp && !btnToggleEsp.dataset.hasListener) {
-        btnToggleEsp.dataset.hasListener = "true";
-        btnToggleEsp.addEventListener("click", () => {
-          const seccionEsp = document.getElementById("seccion-especialidades-desplegable");
-          if (seccionEsp) {
-            const estaActivoEsp = !seccionEsp.classList.contains("activo");
-            toggleCajon(seccionEsp, estaActivoEsp);
-            btnToggleEsp.classList.toggle("activo", estaActivoEsp);
-            const iconoEsp = document.getElementById("icono-toggle-especialidades");
-            if (iconoEsp) {
-              iconoEsp.textContent = estaActivoEsp ? "▲" : "▼";
-            }
-          }
-        });
-      }
+
 
       // Vincular toggle del Cajón Desplegable de Historial Diario de Flashcards
       const btnToggleDiario = document.getElementById("btn-toggle-diario");
@@ -1056,35 +1141,7 @@ const ui = {
         }
       });
 
-      // Actualizar barras de rendimiento por especialidad
-      state.LISTA_ESPECIALIDADES.forEach(esp => {
-        const info = conteoEspecialidades[esp.id];
-        let porcentajeFinal = 0;
-        if (info && info.totales > 0) {
-          porcentajeFinal = Math.round((info.correctas / info.totales) * 100);
-        }
-
-        let colorSemaforo = "var(--danger)";
-        if (porcentajeFinal >= 75) {
-          colorSemaforo = "var(--success)";
-        } else if (porcentajeFinal >= 50) {
-          colorSemaforo = "var(--warning)";
-        }
-
-        const textoEl = document.getElementById(`porcentaje-${esp.id}`);
-        const barraEl = document.getElementById(`barra-${esp.id}`);
-        
-        if (textoEl) {
-          textoEl.textContent = `${porcentajeFinal}%`;
-          textoEl.style.color = colorSemaforo;
-        }
-        if (barraEl) {
-          barraEl.style.width = `${porcentajeFinal}%`;
-          barraEl.style.backgroundColor = colorSemaforo;
-        }
-      });
-
-      // Actualizar coberturas
+      // Recuperar coberturas en progreso desde la API
       let datosCobertura = {};
       try {
         datosCobertura = await api.obtenerCobertura(user.id);
@@ -1093,24 +1150,102 @@ const ui = {
       }
       if (!datosCobertura) datosCobertura = {};
 
+      // Actualizar rendimiento, cobertura y badges por especialidad de manera unificada
       state.LISTA_ESPECIALIDADES.forEach(esp => {
+        // 1. Rendimiento (Correctas / Totales)
+        const info = conteoEspecialidades[esp.id];
+        let porcentajeRendimiento = 0;
+        if (info && info.totales > 0) {
+          porcentajeRendimiento = Math.round((info.correctas / info.totales) * 100);
+        }
+
+        // 2. Cobertura (Respondidas / TotalBanco)
         const nombreBuscar = esp.nombre.trim().toLowerCase();
-        let data = { totalBanco: 0, respondidas: 0, porcentaje: 0 };
+        let dataCob = { totalBanco: 0, respondidas: 0, porcentaje: 0 };
         
         const keysCob = Object.keys(datosCobertura);
         const claveReal = keysCob.find(k => k && k.trim().toLowerCase() === nombreBuscar);
         if (claveReal && datosCobertura[claveReal]) {
-          data = datosCobertura[claveReal];
+          dataCob = datosCobertura[claveReal];
         }
+
+        // 3. Actualizar elementos DOM de la fila
+        const barraRendimiento = document.getElementById(`barra-${esp.id}`);
+        const textoRendimiento = document.getElementById(`porcentaje-${esp.id}`);
+        const barraCobertura = document.getElementById(`cobertura-barra-${esp.id}`);
+        const textoCobertura = document.getElementById(`cobertura-texto-${esp.id}`);
         
-        const textoEl = document.getElementById(`cobertura-texto-${esp.id}`);
-        const barraEl = document.getElementById(`cobertura-barra-${esp.id}`);
-        
-        if (textoEl) {
-          textoEl.textContent = `${data.respondidas} / ${data.totalBanco} (${data.porcentaje}%)`;
+        const badgeContainer = document.getElementById(`badge-container-${esp.id}`);
+        const badgeIcon = document.getElementById(`badge-icon-${esp.id}`);
+        const badgeTitle = document.getElementById(`badge-title-${esp.id}`);
+        const badgeDesc = document.getElementById(`badge-desc-${esp.id}`);
+
+        if (barraRendimiento) {
+          barraRendimiento.style.width = `${porcentajeRendimiento}%`;
         }
-        if (barraEl) {
-          barraEl.style.width = `${data.porcentaje}%`;
+        if (textoRendimiento) {
+          textoRendimiento.textContent = `${porcentajeRendimiento}%`;
+        }
+        if (barraCobertura) {
+          barraCobertura.style.width = `${dataCob.porcentaje}%`;
+        }
+        if (textoCobertura) {
+          textoCobertura.textContent = `${dataCob.porcentaje}%`;
+          textoCobertura.setAttribute("data-vistas", dataCob.respondidas);
+        }
+
+        // 4. Lógica dinámica de badges de prioridad y textos detallados
+        let badgeText = "En progreso";
+        let badgeClass = "badge-inprogress";
+        let badgeSubtext = "Rendimiento promedio, sigue practicando";
+        let iconSvg = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>`;
+
+        const haIniciado = (info && info.totales > 0) || dataCob.respondidas > 0;
+        
+        if (!haIniciado) {
+          badgeText = "En progreso";
+          badgeClass = "badge-inprogress";
+          badgeSubtext = "Aún sin datos, inicia un entrenamiento";
+        } else if (dataCob.porcentaje < 10 && porcentajeRendimiento < 40) {
+          badgeText = "Prioridad";
+          badgeClass = "badge-priority";
+          badgeSubtext = "Baja cobertura y bajo rendimiento";
+          iconSvg = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>`;
+        } else if (porcentajeRendimiento >= 70) {
+          if (dataCob.porcentaje >= 20) {
+            badgeText = "Fortaleza";
+            badgeClass = "badge-fortaleza";
+            badgeSubtext = "Buen rendimiento y buena cobertura";
+            iconSvg = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
+          } else {
+            badgeText = "En progreso";
+            badgeClass = "badge-inprogress";
+            badgeSubtext = "Buen rendimiento, falta más cobertura";
+            iconSvg = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>`;
+          }
+        } else if (porcentajeRendimiento < 50) {
+          badgeText = "Reforzar";
+          badgeClass = "badge-reforzar";
+          badgeSubtext = "Rendimiento bajo, necesita más práctica";
+          iconSvg = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m18.7 8-5.1 5.2-2.8-2.7L7 14.3"/></svg>`;
+        } else {
+          badgeText = "En progreso";
+          badgeClass = "badge-inprogress";
+          badgeSubtext = "Rendimiento promedio, sigue practicando";
+          iconSvg = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>`;
+        }
+
+        if (badgeContainer) {
+          badgeContainer.className = `specialty-diagnostic-card ${badgeClass}`;
+        }
+        if (badgeIcon) {
+          badgeIcon.innerHTML = iconSvg;
+        }
+        if (badgeTitle) {
+          badgeTitle.textContent = badgeText;
+        }
+        if (badgeDesc) {
+          badgeDesc.textContent = badgeSubtext;
         }
       });
 
@@ -1124,22 +1259,29 @@ const ui = {
     }
   },
 
-  renderizarTablaHistorial(historial) {
+  renderizarTablaHistorial(historial, mostrarTodos = false) {
     const tablaCuerpo = document.getElementById("tabla-progreso-cuerpo");
     const tablaVacio = document.getElementById("tabla-historial-vacio");
+    const verMasBtnContainer = document.getElementById("btn-historial-ver-mas-container");
+    const verMasBtn = document.getElementById("btn-historial-ver-mas");
     
     if (!tablaCuerpo) return;
 
     if (!historial || historial.length === 0) {
       tablaCuerpo.innerHTML = "";
       if (tablaVacio) tablaVacio.classList.remove("hidden");
+      if (verMasBtnContainer) verMasBtnContainer.classList.add("hidden");
       return;
     }
 
     if (tablaVacio) tablaVacio.classList.add("hidden");
     tablaCuerpo.innerHTML = "";
 
-    historial.forEach(sesion => {
+    // Limitar a 5 elementos por defecto para optimizar el espacio
+    const limite = mostrarTodos ? historial.length : Math.min(5, historial.length);
+    const subconjunto = historial.slice(0, limite);
+
+    subconjunto.forEach(sesion => {
       let fechaTxt = "Fecha desconocida";
       if (sesion.fecha) {
         try {
@@ -1196,24 +1338,46 @@ const ui = {
 
       tablaCuerpo.appendChild(fila);
     });
+
+    // Controlar visibilidad y acción del botón Ver más
+    if (verMasBtnContainer && verMasBtn) {
+      if (historial.length > 5 && !mostrarTodos) {
+        verMasBtnContainer.classList.remove("hidden");
+        // Reemplazar botón por clon para limpiar listeners viejos
+        const nuevoBtn = verMasBtn.cloneNode(true);
+        verMasBtn.parentNode.replaceChild(nuevoBtn, verMasBtn);
+        nuevoBtn.addEventListener("click", () => {
+          ui.renderizarTablaHistorial(historial, true);
+        });
+      } else {
+        verMasBtnContainer.classList.add("hidden");
+      }
+    }
   },
 
-  renderizarTablaDiarioFlashcards(historial) {
+  renderizarTablaDiarioFlashcards(historial, mostrarTodos = false) {
     const tablaCuerpo = document.getElementById("tabla-diario-flashcards-cuerpo");
     const tablaVacio = document.getElementById("tabla-diario-flashcards-vacio");
+    const verMasBtnContainer = document.getElementById("btn-diario-ver-mas-container");
+    const verMasBtn = document.getElementById("btn-diario-ver-mas");
     
     if (!tablaCuerpo) return;
 
     if (!historial || historial.length === 0) {
       tablaCuerpo.innerHTML = "";
       if (tablaVacio) tablaVacio.classList.remove("hidden");
+      if (verMasBtnContainer) verMasBtnContainer.classList.add("hidden");
       return;
     }
 
     if (tablaVacio) tablaVacio.classList.add("hidden");
     tablaCuerpo.innerHTML = "";
 
-    historial.forEach(registro => {
+    // Limitar a 5 días de estudio por defecto para conservar espacio
+    const limite = mostrarTodos ? historial.length : Math.min(5, historial.length);
+    const subconjunto = historial.slice(0, limite);
+
+    subconjunto.forEach(registro => {
       let fechaTxt = "Fecha desconocida";
       if (registro.dia) {
         try {
@@ -1253,6 +1417,21 @@ const ui = {
       
       tablaCuerpo.appendChild(fila);
     });
+
+    // Controlar visibilidad y acción del botón Ver más (Flashcards)
+    if (verMasBtnContainer && verMasBtn) {
+      if (historial.length > 5 && !mostrarTodos) {
+        verMasBtnContainer.classList.remove("hidden");
+        // Reemplazar botón por clon para limpiar listeners viejos
+        const nuevoBtn = verMasBtn.cloneNode(true);
+        verMasBtn.parentNode.replaceChild(nuevoBtn, verMasBtn);
+        nuevoBtn.addEventListener("click", () => {
+          ui.renderizarTablaDiarioFlashcards(historial, true);
+        });
+      } else {
+        verMasBtnContainer.classList.add("hidden");
+      }
+    }
   },
 
   async renderizarGraficosAvanzados(historial, srEstados = [], totalPersonalizadas = 0) {
@@ -1456,28 +1635,10 @@ const ui = {
       }
     }
 
-    // C. Consistencia Académica (Desviación Estándar)
-    let consistencyLabel = "Estableciendo...";
-    let consistencyDetail = "0% Desviación";
-    if (historial && historial.length > 1) {
-      const scores = historial.filter(s => s.porcentaje !== undefined).map(s => s.porcentaje);
-      if (scores.length > 1) {
-        const sum = scores.reduce((a, b) => a + b, 0);
-        const mean = sum / scores.length;
-        const squareDiffs = scores.map(s => Math.pow(s - mean, 2));
-        const avgSquareDiff = squareDiffs.reduce((a, b) => a + b, 0) / squareDiffs.length;
-        const stdDev = Math.round(Math.sqrt(avgSquareDiff));
-        
-        consistencyDetail = `Desviación de ±${stdDev}%`;
-        if (stdDev <= 6) {
-          consistencyLabel = "Excelente (Estable)";
-        } else if (stdDev <= 14) {
-          consistencyLabel = "Consistente";
-        } else {
-          consistencyLabel = "Inconstante / Variable";
-        }
-      }
-    }
+    // C. Consistencia Académica (Racha de días de estudio)
+    const streakVal = (state.usuarioConectado && state.usuarioConectado.streak) || 0;
+    const consistencyLabel = `${streakVal} ${streakVal === 1 ? "día" : "días"}`;
+    const consistencyDetail = "Racha actual";
 
     const consistencyLabelEl = document.getElementById("metric-consistency-label");
     const consistencyDetailEl = document.getElementById("metric-consistency-detail");
@@ -1501,99 +1662,7 @@ const ui = {
 
     // GRÁFICOS DINÁMICOS PREMIUM
     
-    // GRÁFICO 1: Cobertura de Preguntas por Especialidad (Horizontal Bar Chart)
-    const labelsCob = [];
-    const dataCob = [];
-    const colorsCob = [];
-    
-    state.LISTA_ESPECIALIDADES.forEach(esp => {
-      const key = esp.nombre.trim().toLowerCase();
-      let cobPorcentaje = 0;
-      
-      const claveReal = Object.keys(datosCobertura).find(k => k.trim().toLowerCase() === key);
-      if (claveReal) {
-        cobPorcentaje = datosCobertura[claveReal].porcentaje || 0;
-      }
-      
-      labelsCob.push(esp.nombre);
-      dataCob.push(cobPorcentaje);
-      
-      if (cobPorcentaje >= 80) {
-        colorsCob.push('rgba(34, 197, 94, 0.85)');
-      } else if (cobPorcentaje >= 40) {
-        colorsCob.push('rgba(245, 158, 11, 0.85)');
-      } else {
-        colorsCob.push('rgba(239, 68, 68, 0.85)');
-      }
-    });
-
-    const ctxCob = document.getElementById('chart-cobertura-barras');
-    if (ctxCob) {
-      window.resiMedCharts.cobertura = new Chart(ctxCob, {
-        type: 'bar',
-        data: {
-          labels: labelsCob,
-          datasets: [
-            {
-              label: 'Preguntas Estudiadas (%)',
-              data: dataCob,
-              backgroundColor: colorsCob,
-              borderRadius: 6,
-              barThickness: 14
-            }
-          ]
-        },
-        options: {
-          indexAxis: 'y',
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              display: false
-            },
-            tooltip: {
-              backgroundColor: isDark ? '#1e293b' : '#ffffff',
-              titleColor: isDark ? '#f8fafc' : '#0f172a',
-              bodyColor: isDark ? '#cbd5e1' : '#334155',
-              borderColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)',
-              borderWidth: 1,
-              callbacks: {
-                label: (context) => {
-                  const score = context.raw;
-                  const key = context.label.trim().toLowerCase();
-                  let respondidas = 0;
-                  let totalBanco = 0;
-                  const claveReal = Object.keys(datosCobertura).find(k => k.trim().toLowerCase() === key);
-                  if (claveReal) {
-                    respondidas = datosCobertura[claveReal].respondidas || 0;
-                    totalBanco = datosCobertura[claveReal].totalBanco || 0;
-                  }
-                  return [
-                    `Tu Cobertura: ${score}%`,
-                    `Preguntas Respondidas: ${respondidas} de ${totalBanco}`
-                  ];
-                }
-              }
-            }
-          },
-          scales: {
-            x: {
-              min: 0,
-              max: 100,
-              grid: { color: gridColor },
-              ticks: { color: textColor, font: { size: 10 } }
-            },
-            y: {
-              grid: { display: false },
-              ticks: { color: textColor, font: { size: 10, weight: '700' } }
-            }
-          }
-        }
-      });
-    }
-
-
-
+    // (Gráfico 1 de Cobertura removido porque ahora se usa una tabla dinámica premium integrada)
     // GRÁFICO 3: Estado de Repetición Espaciada y Fuerza de Retención (Doughnut Chart con Plugin Central)
     const totalRepasos = srEstados.filter(e => e.flashcard_id);
     const dominadas = totalRepasos.filter(e => e.interval > 0).length;
@@ -1676,6 +1745,7 @@ const ui = {
     if (!containerEl) return;
 
     // 1. Extraer preguntas falladas únicas agrupadas por especialidad
+    ui.bancoErroresPreguntas = {};
     const preguntasFalladasMap = new Map();
     historial.forEach(sesion => {
       if (sesion.detalle) {
@@ -1796,7 +1866,7 @@ const ui = {
     state.LISTA_ESPECIALIDADES.forEach(esp => {
       try {
         const info = conteoEspecialidades[esp.id] || { totales: 0, correctas: 0, subtemas: {} };
-        
+
         // Filtrar las preguntas falladas de esta especialidad de forma robusta y consistente
         const preguntasEsp = preguntasFalladas.filter(p => {
           if (!p || !p.tema) return false;
@@ -1804,6 +1874,9 @@ const ui = {
         });
 
         if (preguntasEsp.length === 0) return;
+
+        // Guardar preguntas en memoria para lazy rendering
+        ui.bancoErroresPreguntas[esp.id] = preguntasEsp;
 
         const totalRespondidas = info.totales || 0;
         const totalCorrectas = info.correctas || 0;
@@ -1890,55 +1963,10 @@ const ui = {
           ).join("");
         }
 
-        // Generar HTML de preguntas falladas
-        let preguntasHtml = "";
-        if (preguntasEsp.length === 0) {
-          preguntasHtml = `<div style="text-align: center; color: var(--text-dim); font-size: 13px; font-style: italic; padding: 12px; background: rgba(255,255,255,0.01); border-radius: 8px;">No posees preguntas falladas en esta especialidad actualmente.</div>`;
-        } else {
-          let idx = 0;
-          preguntasEsp.forEach(p => {
-            if (!p) return;
-            idx++;
-            const opcionesArray = p.opciones || [];
-            const seleccion = p.seleccionada;
-
-            let opcionesHtml = "";
-            opcionesArray.forEach((o, oIdx) => {
-              let claseOpt = "";
-              if (oIdx === p.correcta) claseOpt = "correct";
-              if (oIdx === seleccion) claseOpt = "wrong";
-              opcionesHtml += `<div class="review-opt ${claseOpt}"><strong>${String.fromCharCode(65 + oIdx)}.</strong> ${o}</div>`;
-            });
-
-            const textoEscapado = (p.texto || "").replace(/"/g, "&quot;");
-            const explicacionEscapada = (p.explicacion || "Sin desglose.").replace(/"/g, "&quot;");
-            const temaEscapado = (p.tema || "General").replace(/"/g, "&quot;");
-
-            const seleccionText = (seleccion !== null && seleccion !== undefined && opcionesArray[seleccion])
-              ? opcionesArray[seleccion].replace(/"/g, "&quot;")
-              : "Sin responder";
-
-            preguntasHtml += `
-              <div class="review-item" style="border: 1px solid var(--border); border-radius: 16px; padding: 18px; background: var(--panel); margin-bottom: 12px; text-align: left;">
-                <div class="error-bank-header" style="display:flex; justify-content:space-between; gap:10px; margin-bottom: 12px;">
-                  <span class="chip chip-soft" style="font-size:11px; padding:4px 10px;">Tema: ${p.subtema || 'Varios'}</span>
-                </div>
-                <div class="review-q-text error-bank-q-text" style="font-size: 14.5px; font-weight: 700; color: var(--text); line-height: 1.5; margin-bottom: 12px;">${idx}. ${p.texto || ''}</div>
-                <div class="review-options" style="display:flex; flex-direction:column; gap:8px;">${opcionesHtml}</div>
-                <div class="review-exp-container" style="margin-top: 14px;">${ui.formatearExplicacionClinica(p.explicacion, p.fuente, p.explicacion_correcta, p.explicacion_incorrecta)}</div>
-                <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top: 14px; border-top: 1px solid var(--border); padding-top: 12px;">
-                  <button class="btn-ia btn-consultar-tutor" data-texto="${textoEscapado}" data-seleccion="${seleccionText}" type="button" style="font-size:11.5px; padding: 6px 12px; border-radius: 8px;">Consultar Tutor</button>
-                  <button class="btn btn-primary btn-auto-flashcard" data-tema="${temaEscapado}" data-pregunta="${textoEscapado}" data-respuesta="${explicacionEscapada}" style="background: var(--warning); color:#000; font-size:11.5px; padding:6px 12px; border:none; border-radius: 8px;" type="button">Crear Flashcard</button>
-                  <button class="btn btn-reportar-pregunta" data-id="${p.id}" type="button" style="font-size:11.5px; padding: 6px 12px; border-radius: 8px;">Reportar Error</button>
-                </div>
-              </div>`;
-          });
-        }
-
         // Crear tarjeta de especialidad unificada (Fila Altamente Compacta)
         const panel = document.createElement("div");
         panel.className = "especialidad-panel";
-        panel.style.cssText = "border: 1px solid var(--border); border-radius: 14px; background: var(--panel); overflow: hidden; display: flex; flex-direction: column; transition: all 0.3s ease; margin-bottom: 8px;";
+        panel.style.cssText = "border: 1px solid var(--border); border-radius: 14px; background: var(--panel-soft); overflow: hidden; display: flex; flex-direction: column; transition: all 0.3s ease; margin-bottom: 8px;";
 
         panel.innerHTML = `
           <!-- CABECERA PRINCIPAL DE LA ESPECIALIDAD (Fila Compacta Activa) -->
@@ -1956,7 +1984,7 @@ const ui = {
               <span class="chip chip-soft" style="font-size: 11px; padding: 2px 8px; margin: 0; border-color: var(--border); display: inline-block;">
                 Fallos: ${preguntasEsp.length}
               </span>
-              <span class="icono-toggle-especialidad" style="transition: transform 0.25s ease; font-size: 11px; color: var(--text-soft); transform: rotate(180deg);">▼</span>
+              <span class="icono-toggle-especialidad" style="transition: transform 0.25s ease; font-size: 11px; color: var(--text-soft); transform: rotate(0deg);">▼</span>
             </div>
           </div>
 
@@ -1966,7 +1994,7 @@ const ui = {
           </div>
 
           <!-- CONTENIDO DESPLEGABLE DE LA ESPECIALIDAD -->
-          <div class="especialidad-contenido-desplegable" style="max-height: none; overflow: hidden; opacity: 1; transition: max-height 0.35s ease-out, opacity 0.25s ease; border-top: 1px solid var(--border); background: rgba(255,255,255,0.005); text-align: left;">
+          <div class="especialidad-contenido-desplegable" style="max-height: 0px; overflow: hidden; opacity: 0; transition: max-height 0.35s ease-out, opacity 0.25s ease; border-top: 1px solid transparent; background: rgba(255,255,255,0.005); text-align: left;">
             <div style="padding: 20px; display: flex; flex-direction: column; gap: 16px;">
               <!-- Temas Consolidados vs Temas a Reforzar -->
               <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px;">
@@ -1990,8 +2018,8 @@ const ui = {
               <!-- Listado de Preguntas Falladas -->
               <div style="margin-top: 4px;">
                 <h5 style="margin: 0 0 10px 0; font-size: 12px; color: var(--text-dim); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; text-align: left;">Preguntas Falladas Registradas:</h5>
-                <div style="display: flex; flex-direction: column; gap: 12px;">
-                  ${preguntasHtml}
+                <div class="preguntas-falladas-list-container" data-esp-id="${esp.id}" style="display: flex; flex-direction: column; gap: 12px;">
+                  <div style="text-align: center; padding: 12px; color: var(--text-soft); font-size: 13px;">Cargando preguntas de la especialidad...</div>
                 </div>
               </div>
             </div>
@@ -2009,6 +2037,7 @@ const ui = {
           headerClickable.addEventListener("click", () => {
             const isCollapsed = contentDiv.style.maxHeight === "0px" || !contentDiv.style.maxHeight || contentDiv.style.maxHeight === "0";
             if (isCollapsed) {
+              ui.cargarPreguntasFalladasEnDesplegable(esp.id, contentDiv);
               contentDiv.style.maxHeight = `${contentDiv.scrollHeight + 5000}px`;
               contentDiv.style.opacity = "1";
               contentDiv.style.borderTop = "1px solid var(--border)";
@@ -2057,6 +2086,61 @@ const ui = {
 
       });
     }
+  },
+
+  cargarPreguntasFalladasEnDesplegable(espId, contentDiv) {
+    const listContainer = contentDiv.querySelector(`.preguntas-falladas-list-container[data-esp-id="${espId}"]`);
+    if (!listContainer || listContainer.dataset.cargado === "true") return;
+
+    const preguntasEsp = (ui.bancoErroresPreguntas && ui.bancoErroresPreguntas[espId]) || [];
+    let preguntasHtml = "";
+
+    if (preguntasEsp.length === 0) {
+      preguntasHtml = `<div style="text-align: center; color: var(--text-dim); font-size: 13px; font-style: italic; padding: 12px; background: rgba(255,255,255,0.01); border-radius: 8px;">No posees preguntas falladas en esta especialidad actualmente.</div>`;
+    } else {
+      let idx = 0;
+      preguntasEsp.forEach(p => {
+        if (!p) return;
+        idx++;
+        const opcionesArray = p.opciones || [];
+        const seleccion = p.seleccionada;
+
+        let opcionesHtml = "";
+        opcionesArray.forEach((o, oIdx) => {
+          let claseOpt = "";
+          if (oIdx === p.correcta) claseOpt = "correct";
+          if (oIdx === seleccion) claseOpt = "wrong";
+          opcionesHtml += `<div class="review-opt ${claseOpt}"><strong>${String.fromCharCode(65 + oIdx)}.</strong> ${o}</div>`;
+        });
+
+        const textoEscapado = (p.texto || "").replace(/"/g, "&quot;");
+        const explicacionEscapada = (p.explicacion || "Sin desglose.").replace(/"/g, "&quot;");
+        const temaEscapado = (p.tema || "General").replace(/"/g, "&quot;");
+
+        const seleccionText = (seleccion !== null && seleccion !== undefined && opcionesArray[seleccion])
+          ? opcionesArray[seleccion].replace(/"/g, "&quot;")
+          : "Sin responder";
+
+        preguntasHtml += `
+          <div class="review-item" style="border: 1px solid var(--border); border-radius: 16px; padding: 18px; background: var(--panel); margin-bottom: 12px; text-align: left;">
+            <div class="error-bank-header" style="display:flex; justify-content:space-between; gap:10px; margin-bottom: 12px;">
+              <span class="chip chip-soft" style="font-size:11px; padding:4px 10px;">Tema: ${p.subtema || 'Varios'}</span>
+            </div>
+            <div class="review-q-text error-bank-q-text" style="font-size: 14.5px; font-weight: 700; color: var(--text); line-height: 1.5; margin-bottom: 12px;">${idx}. ${p.texto || ''}</div>
+            <div class="review-options" style="display:flex; flex-direction:column; gap:8px;">${opcionesHtml}</div>
+            <div class="review-exp-container" style="margin-top: 14px;">${ui.formatearExplicacionClinica(p.explicacion, p.fuente, p.explicacion_correcta, p.explicacion_incorrecta)}</div>
+            <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top: 14px; border-top: 1px solid var(--border); padding-top: 12px;">
+              <button class="btn-ia btn-consultar-tutor" data-texto="${textoEscapado}" data-seleccion="${seleccionText}" type="button" style="font-size:11.5px; padding: 6px 12px; border-radius: 8px;">Consultar Tutor</button>
+              <button class="btn btn-primary btn-auto-flashcard" data-tema="${temaEscapado}" data-pregunta="${textoEscapado}" data-respuesta="${explicacionEscapada}" style="background: var(--warning); color:#000; font-size:11.5px; padding:6px 12px; border:none; border-radius: 8px;" type="button">Crear Flashcard</button>
+              <button class="btn btn-reportar-pregunta" data-id="${p.id}" type="button" style="font-size:11.5px; padding: 6px 12px; border-radius: 8px;">Reportar Error</button>
+            </div>
+          </div>`;
+      });
+    }
+
+    listContainer.innerHTML = preguntasHtml;
+    listContainer.dataset.cargado = "true";
+    contentDiv.style.maxHeight = `${contentDiv.scrollHeight + 500}px`;
   },
 
   async cargarReportesAdministrador() {

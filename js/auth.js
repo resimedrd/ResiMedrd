@@ -167,7 +167,7 @@ const auth = {
 
     if (!enrutadoExamen) {
       const hash = window.location.hash.replace("#", "");
-      const pantallasValidas = ["home", "perfil", "flashcards", "quiz", "resultados"];
+      const pantallasValidas = ["home", "perfil", "flashcards", "resultados", "historial", "errores"];
       
       if (hash === "resultados") {
         const restaurado = quiz.restaurarUltimoResultado();
@@ -176,6 +176,9 @@ const auth = {
         } else {
           ui.mostrarPantalla("home", false);
         }
+      } else if (hash.startsWith("battle")) {
+        battle.mostrarPantallaBattle("battle");
+        battle.conectarWebSocket();
       } else if (pantallasValidas.includes(hash)) {
         ui.mostrarPantalla(hash, false);
       } else {

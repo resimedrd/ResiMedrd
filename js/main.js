@@ -250,25 +250,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       } else if (target === "estadisticas") {
         ui.mostrarPantalla("perfil");
       } else if (target === "historial") {
-        ui.mostrarPantalla("perfil");
-        
-        // Auto expandir historial
-        const seccionEval = document.getElementById("seccion-evaluaciones-desplegable");
-        if (seccionEval && !seccionEval.classList.contains("activo")) {
-          const btnToggleEval = document.getElementById("btn-toggle-evaluaciones");
-          if (btnToggleEval) btnToggleEval.click();
-        }
-        // Auto expandir diario
-        const seccionDiario = document.getElementById("seccion-diario-desplegable");
-        if (seccionDiario && !seccionDiario.classList.contains("activo")) {
-          const btnToggleDiario = document.getElementById("btn-toggle-diario");
-          if (btnToggleDiario) btnToggleDiario.click();
-        }
-        
-        setTimeout(() => {
-          const scrollTarget = document.getElementById("contenedor-evaluaciones-acordeon");
-          if (scrollTarget) scrollTarget.scrollIntoView({ behavior: "smooth", block: "start" });
-        }, 300);
+        ui.mostrarPantalla("historial");
       } else if (target === "errores") {
         ui.mostrarPantalla("errores");
       } else if (target === "ranking") {

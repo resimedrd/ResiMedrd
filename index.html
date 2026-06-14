@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=1.5.2" />
+  <link rel="stylesheet" href="styles.css?v=1.7.6" />
   <style>
     /* Evitar parpadeo de pantallas no deseadas antes de cargar el CSS/JS (FOUC) */
     .screen {
@@ -811,26 +811,56 @@
                 </div>
               </div>
 
-              <div style="display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap;">
-                <div style="flex: 1; min-width: 130px; background: var(--panel-soft); padding: 12px; border-radius: 8px; border-left: 4px solid var(--primary); text-align: center;">
-                  <span style="font-size: 11px; color: var(--text-soft); display: block; text-transform: uppercase;">Simulacros</span>
-                  <span id="progreso-total-examenes" style="font-size: 22px; font-weight: bold; color: var(--text);">0</span>
+              <div class="stats-grid">
+                <!-- Card 1: Simulacros -->
+                <div class="stat-card">
+                  <div class="stat-icon-container" style="background: rgba(59, 130, 246, 0.12); color: #3b82f6;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>
+                  </div>
+                  <div class="stat-details">
+                    <span class="stat-label">Simulacros</span>
+                    <span id="progreso-total-examenes" class="stat-value">0</span>
+                  </div>
                 </div>
-                <div style="flex: 1; min-width: 130px; background: var(--panel-soft); padding: 12px; border-radius: 8px; border-left: 4px solid var(--success); text-align: center;">
-                  <span style="font-size: 11px; color: var(--text-soft); display: block; text-transform: uppercase;">Contestadas</span>
-                  <span id="progreso-total-preguntas" style="font-size: 22px; font-weight: bold; color: var(--text);">0</span>
+                <!-- Card 2: Contestadas -->
+                <div class="stat-card">
+                  <div class="stat-icon-container" style="background: rgba(16, 185, 129, 0.12); color: #10b981;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" fill="rgba(16, 185, 129, 0.15)"/><polyline points="9 11 12 14 17 9"/></svg>
+                  </div>
+                  <div class="stat-details">
+                    <span class="stat-label">Contestadas</span>
+                    <span id="progreso-total-preguntas" class="stat-value">0</span>
+                  </div>
                 </div>
-                <div style="flex: 1; min-width: 130px; background: var(--panel-soft); padding: 12px; border-radius: 8px; border-left: 4px solid var(--warning); text-align: center;">
-                  <span style="font-size: 11px; color: var(--text-soft); display: block; text-transform: uppercase;">Promedio</span>
-                  <span id="progreso-promedio-global" style="font-size: 22px; font-weight: bold; color: var(--warning);">0%</span>
+                <!-- Card 3: Promedio -->
+                <div class="stat-card">
+                  <div class="stat-icon-container" style="background: rgba(245, 158, 11, 0.12); color: #f59e0b;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+                  </div>
+                  <div class="stat-details">
+                    <span class="stat-label">Promedio</span>
+                    <span id="progreso-promedio-global" class="stat-value" style="color: #f87171;">0%</span>
+                  </div>
                 </div>
-                <div style="flex: 1; min-width: 130px; background: var(--panel-soft); padding: 12px; border-radius: 8px; border-left: 4px solid #8b5cf6; text-align: center;">
-                  <span style="font-size: 11px; color: var(--text-soft); display: block; text-transform: uppercase;">Flashcards Activas</span>
-                  <span id="progreso-flashcards-activas" style="font-size: 22px; font-weight: bold; color: #8b5cf6;">0</span>
+                <!-- Card 4: Flashcards Activas -->
+                <div class="stat-card">
+                  <div class="stat-icon-container" style="background: rgba(139, 92, 246, 0.12); color: #8b5cf6;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                  </div>
+                  <div class="stat-details">
+                    <span class="stat-label">Flashcards</span>
+                    <span id="progreso-flashcards-activas" class="stat-value" style="color: #a78bfa;">0</span>
+                  </div>
                 </div>
-                <div style="flex: 1; min-width: 130px; background: var(--panel-soft); padding: 12px; border-radius: 8px; border-left: 4px solid #ef4444; text-align: center;">
-                  <span style="font-size: 11px; color: var(--text-soft); display: block; text-transform: uppercase;">Conceptos Débiles</span>
-                  <span id="progreso-conceptos-debiles" style="font-size: 22px; font-weight: bold; color: #ef4444;">0</span>
+                <!-- Card 5: Conceptos Débiles -->
+                <div class="stat-card">
+                  <div class="stat-icon-container" style="background: rgba(239, 68, 68, 0.12); color: #ef4444;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                  </div>
+                  <div class="stat-details">
+                    <span class="stat-label">Conceptos Débiles</span>
+                    <span id="progreso-conceptos-debiles" class="stat-value" style="color: #f87171;">0</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -848,50 +878,66 @@
                   <div style="position: relative; margin-top: 20px;">
                     <div id="seccion-graficos-metricas-header">
                       <!-- Pronóstico ENURM -->
-                      <div class="analytic-widget-card" style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.08) 0%, rgba(29, 78, 216, 0.02) 100%); border: 1px solid var(--border); border-radius: 16px; padding: 18px; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between;">
-                        <div>
-                          <span style="font-size: 11px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">Pronóstico ENURM</span>
-                          <div style="display: flex; align-items: baseline; gap: 6px;">
-                            <span id="metric-predict-score" style="font-size: 28px; font-weight: 800; font-family: 'Outfit', sans-serif; color: var(--text);">--%</span>
-                            <span id="metric-predict-label" style="font-size: 12px; font-weight: 600; color: var(--text-dim);">Est.</span>
+                      <div class="analytic-widget-card predict-card">
+                        <div class="card-left">
+                          <span class="card-tag">Pronóstico ENURM</span>
+                          <div class="card-main-val">
+                            <span id="metric-predict-score">--%</span>
+                            <span class="card-sub-val">Est.</span>
+                          </div>
+                          <div class="card-trend-up">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+                            <span>8% vs semana pasada</span>
                           </div>
                         </div>
-                        <div style="margin-top: 10px;">
-                          <div style="height: 6px; background: var(--panel-soft); border: 1px solid var(--border); border-radius: 100px; overflow: hidden; margin-bottom: 6px;">
-                            <div id="metric-predict-bar" style="height: 100%; width: 0%; background: var(--primary); border-radius: 100px; transition: width 0.8s ease;"></div>
-                          </div>
-                          <span id="metric-predict-advice" style="font-size: 11px; color: var(--text-dim); display: block; line-height: 1.3;">Basado en historial ponderado.</span>
+                        <div class="card-footer-desc">
+                          <span id="metric-predict-advice">Realiza 2 simulacros más para mejorar tu estimación.</span>
                         </div>
                       </div>
 
-                      <!-- Especialidad Líder -->
-                      <div class="analytic-widget-card" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(4, 120, 87, 0.02) 100%); border: 1px solid var(--border); border-radius: 16px; padding: 18px; display: flex; flex-direction: column; justify-content: space-between;">
-                        <div>
-                          <span style="font-size: 11px; font-weight: 700; color: var(--success); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">Especialidad Fuerte</span>
-                          <span id="metric-leader-name" style="font-size: 15px; font-weight: 700; color: var(--text); display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 4px;">--</span>
-                          <span id="metric-leader-score" style="font-size: 13px; font-weight: 600; color: var(--success); display: block; margin-top: 2px;">--% de precisión</span>
+                      <!-- Especialidad Fuerte -->
+                      <div class="analytic-widget-card strong-card">
+                        <div class="card-content-wrapper">
+                          <div class="card-left">
+                            <span class="card-tag">Especialidad Fuerte</span>
+                            <span id="metric-leader-name" class="card-specialty-name">--</span>
+                            <span id="metric-leader-score" class="card-performance-label">--% de rendimiento</span>
+                            <span class="card-desc">Tu mejor desempeño hasta ahora.</span>
+                          </div>
+                          <div class="card-right-icon text-success">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
+                          </div>
                         </div>
-                        <span style="font-size: 11px; color: var(--text-dim); display: block; margin-top: 10px; border-top: 1px dashed var(--border); padding-top: 6px;">Tu área de mayor solidez.</span>
                       </div>
 
                       <!-- Especialidad Crítica -->
-                      <div class="analytic-widget-card" style="background: linear-gradient(135deg, rgba(239, 68, 68, 0.08) 0%, rgba(185, 28, 28, 0.02) 100%); border: 1px solid var(--border); border-radius: 16px; padding: 18px; display: flex; flex-direction: column; justify-content: space-between;">
-                        <div>
-                          <span style="font-size: 11px; font-weight: 700; color: var(--danger); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">Especialidad Crítica</span>
-                          <span id="metric-critical-name" style="font-size: 15px; font-weight: 700; color: var(--text); display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 4px;">--</span>
-                          <span id="metric-critical-score" style="font-size: 13px; font-weight: 600; color: var(--danger); display: block; margin-top: 2px;">--% de precisión</span>
+                      <div class="analytic-widget-card critical-card">
+                        <div class="card-content-wrapper">
+                          <div class="card-left">
+                            <span class="card-tag">Especialidad Crítica</span>
+                            <span id="metric-critical-name" class="card-specialty-name">--</span>
+                            <span id="metric-critical-score" class="card-performance-label">--% de rendimiento</span>
+                            <span class="card-desc">Priorizar en tus próximos estudios.</span>
+                          </div>
+                          <div class="card-right-icon text-danger">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+                          </div>
                         </div>
-                        <span style="font-size: 11px; color: var(--text-dim); display: block; margin-top: 10px; border-top: 1px dashed var(--border); padding-top: 6px;">Priorizar en tus repasos.</span>
                       </div>
 
-                      <!-- Consistencia -->
-                      <div class="analytic-widget-card" style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.08) 0%, rgba(180, 83, 9, 0.02) 100%); border: 1px solid var(--border); border-radius: 16px; padding: 18px; display: flex; flex-direction: column; justify-content: space-between;">
-                        <div>
-                          <span style="font-size: 11px; font-weight: 700; color: var(--warning); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">Consistencia Académica</span>
-                          <span id="metric-consistency-label" style="font-size: 18px; font-weight: 800; font-family: 'Outfit', sans-serif; color: var(--text); display: block; margin-top: 4px;">--</span>
-                          <span id="metric-consistency-detail" style="font-size: 12px; color: var(--text-dim); display: block; margin-top: 2px;">--% Desviación</span>
+                      <!-- Consistencia Académica -->
+                      <div class="analytic-widget-card consistency-card">
+                        <div class="card-content-wrapper">
+                          <div class="card-left">
+                            <span class="card-tag">Consistencia Académica</span>
+                            <span id="metric-consistency-label" class="card-specialty-name">--</span>
+                            <span id="metric-consistency-detail" class="card-performance-label">Racha actual</span>
+                            <span class="card-desc">¡Sigue así! Estás creando un buen hábito.</span>
+                          </div>
+                          <div class="card-right-icon text-warning">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
+                          </div>
                         </div>
-                        <span style="font-size: 11px; color: var(--text-dim); display: block; margin-top: 10px; border-top: 1px dashed var(--border); padding-top: 6px;">Variación de tus notas.</span>
                       </div>
                     </div>
 
@@ -910,14 +956,56 @@
                   </div>
 
                   <div class="charts-dashboard-grid">
-                    <!-- Gráfico 1: Cobertura por Especialidades (Horizontal Fullwidth) -->
-                    <div class="chart-card-premium chart-card-fullwidth" style="background: rgba(255,255,255,0.01); border: 1px solid var(--border); border-radius: 16px; padding: 20px; min-height: 520px; display: flex; flex-direction: column;">
-                      <h4 style="margin: 0 0 16px 0; font-size: 13.5px; color: var(--text); font-weight: 700; display: flex; align-items: center; gap: 6px;">Cobertura de Preguntas por Especialidad</h4>
-                      <div style="position: relative; height: 360px;">
-                        <canvas id="chart-cobertura-barras"></canvas>
+                    <!-- Especialidades: Cobertura y Rendimiento por Especialidad (Fullwidth) -->
+                    <div class="specialties-list-container chart-card-fullwidth" style="background: rgba(255, 255, 255, 0.01); border: 1px solid var(--border); border-radius: 16px; padding: 24px; display: flex; flex-direction: column;">
+                      <!-- Cabecera de la tabla -->
+                      <div class="specialties-list-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 16px; flex-wrap: wrap; gap: 8px;">
+                        <div style="display: flex; flex-direction: column; gap: 4px;">
+                          <h3 style="margin: 0; font-size: 15px; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 6px;">
+                            Cobertura y Rendimiento por Especialidad
+                            <span class="info-icon" title="Información sobre cobertura y rendimiento" style="cursor: pointer; color: var(--text-soft); font-size: 14px;">ⓘ</span>
+                          </h3>
+                          <div style="display: flex; align-items: center; gap: 16px; font-size: 11px; color: var(--text-soft); margin-top: 4px; flex-wrap: wrap; row-gap: 4px;">
+                            <span style="display: flex; align-items: center; gap: 6px;">
+                              <span style="width: 8px; height: 8px; background-color: #3b82f6; border-radius: 50%;"></span>
+                              Cobertura (preguntas respondidas)
+                            </span>
+                            <span style="display: flex; align-items: center; gap: 6px;">
+                              <span style="width: 8px; height: 8px; background-color: #10b981; border-radius: 50%;"></span>
+                              Rendimiento (aciertos)
+                            </span>
+                          </div>
+                        </div>
+                        <div style="font-size: 11px; font-weight: 700; color: var(--text-soft); padding-right: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Prioridad</div>
                       </div>
-                      <div style="margin-top: 14px; display: flex; flex-direction: column; gap: 6px; font-size: 11.5px; color: var(--text-soft); line-height: 1.4; border-top: 1px dashed var(--border); padding-top: 12px; text-align: left;">
-                        <span>Este gráfico representa el porcentaje de cobertura de preguntas estudiadas (preguntas respondidas frente al total disponible). Los colores indican la cobertura: <strong>Verde (>=80%)</strong>, <strong>Ámbar (40-79%)</strong> y <strong>Rojo (<40%)</strong>.</span>
+
+                      <!-- Filas de especialidades -->
+                      <div id="perfil-especialidades-lista" style="display: flex; flex-direction: column; gap: 12px;">
+                        <!-- Cargado dinámicamente desde JS -->
+                      </div>
+
+                      <!-- Leyenda Footer -->
+                      <div class="specialties-list-footer" style="display: flex; flex-wrap: wrap; gap: 16px; border-top: 1px solid var(--border); padding-top: 16px; margin-top: 16px; font-size: 11px; color: var(--text-soft); row-gap: 8px;">
+                        <span style="display: flex; align-items: center; gap: 6px;">
+                          <span style="width: 8px; height: 8px; background-color: #10b981; border-radius: 50%;"></span>
+                          Fortaleza: Buen rendimiento y buena cobertura
+                        </span>
+                        <span style="display: flex; align-items: center; gap: 6px;">
+                          <span style="width: 8px; height: 8px; background-color: #3b82f6; border-radius: 50%;"></span>
+                          En progreso: Rendimiento promedio, sigue practicando
+                        </span>
+                        <span style="display: flex; align-items: center; gap: 6px;">
+                          <span style="width: 8px; height: 8px; background-color: #f59e0b; border-radius: 50%;"></span>
+                          Reforzar: Rendimiento bajo, necesita más práctica
+                        </span>
+                        <span style="display: flex; align-items: center; gap: 6px;">
+                          <span style="width: 8px; height: 8px; background-color: #3b82f6; border-radius: 50%;"></span>
+                          En progreso: Buen rendimiento, falta más cobertura
+                        </span>
+                        <span style="display: flex; align-items: center; gap: 6px;">
+                          <span style="width: 8px; height: 8px; background-color: #ef4444; border-radius: 50%;"></span>
+                          Prioridad: Baja cobertura y bajo rendimiento
+                        </span>
                       </div>
                     </div>
 
@@ -997,132 +1085,113 @@
 
 
 
-              <!-- Rendimiento y Cobertura por Especialidad Colapsable -->
-              <div id="contenedor-especialidades-acordeon" style="margin-top: 24px; margin-bottom: 24px;">
-                <button id="btn-toggle-especialidades" class="btn btn-ghost" type="button" style="width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 14px 20px; border-radius: 14px; background: rgba(255,255,255,0.02); font-weight: 700; border: 1px solid var(--border); font-size: 14px; color: var(--primary); transition: all 0.3s ease; cursor: pointer;">
-                  <span style="display: flex; align-items: center; gap: 8px;">Ver Cobertura y Nota por Especialidad</span>
-                  <span id="icono-toggle-especialidades" style="transition: transform 0.3s ease; font-size: 14px;">▼</span>
-                </button>
 
-                <div id="seccion-especialidades-desplegable" class="cajon-desplegable">
-                  <div style="padding-top: 20px;">
-                    <h4 style="margin: 0 0 16px 0; font-size: 13px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px;">Rendimiento y Cobertura por Especialidad:</h4>
-                    <div id="perfil-especialidades-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px;">
-                      <!-- Cargado dinámicamente desde JS -->
-                    </div>
-                  </div>
-                </div>
-              </div>
             
 
-            <!-- Historial de Evaluaciones Colapsable -->
-            <div id="contenedor-evaluaciones-acordeon" style="margin-top: 24px;">
-              <button id="btn-toggle-evaluaciones" class="btn btn-ghost" type="button" style="width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 14px 20px; border-radius: 14px; background: rgba(255,255,255,0.02); font-weight: 700; border: 1px solid var(--border); font-size: 14px; color: var(--primary); transition: all 0.3s ease; cursor: pointer;">
-                <span style="display: flex; align-items: center; gap: 8px;">Ver Historial de Evaluaciones (Simulacros)</span>
-                <span id="icono-toggle-evaluaciones" style="transition: transform 0.3s ease; font-size: 14px;">▼</span>
-              </button>
+          </div>
+      </section>
 
-              <div id="seccion-evaluaciones-desplegable" class="cajon-desplegable">
-                <article class="panel panel-acordeon" style="margin-top: 20px;">
-                  <div class="panel-head" style="margin-bottom: 20px;">
-                    <h3 style="color: var(--text); font-size: 20px; font-weight: 700;">Historial de Evaluaciones</h3>
-                    <p style="font-size: 14px; color: var(--text-dim); margin-top: 4px;">Registro completo y cronológico de todas tus sesiones de estudio y simulacros.</p>
-                  </div>
-                  
-                  <div class="table-container" style="overflow-x: auto; margin-top: 16px;">
-                    <table id="tabla-progreso-historial" style="width: 100%; border-collapse: collapse; text-align: left; font-size: 14px;">
-                      <thead>
-                        <tr style="border-bottom: 2px solid var(--border-strong); color: var(--text-soft); font-weight: 600; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px;">
-                          <th style="padding: 12px 16px;">Fecha</th>
-                          <th style="padding: 12px 16px;">Especialidad / Tema</th>
-                          <th style="padding: 12px 16px;">Modalidad</th>
-                          <th style="padding: 12px 16px; text-align: center;">Preguntas</th>
-                          <th style="padding: 12px 16px; text-align: center;">Aciertos</th>
-                          <th style="padding: 12px 16px; text-align: right;">Nota</th>
-                          <th style="padding: 12px 16px; text-align: center;">Acción</th>
-                        </tr>
-                      </thead>
-                      <tbody id="tabla-progreso-cuerpo" style="color: var(--text-soft);">
-                        <!-- Cargado dinámicamente -->
-                      </tbody>
-                    </table>
-                    <div id="tabla-historial-vacio" class="history-empty hidden" style="margin-top: 16px; text-align: center; padding: 24px; color: var(--text-dim);">
-                      Aún no registras exámenes en tu cuenta.
-                    </div>
-                  </div>
-                </article>
+      <!-- SECCIÓN INDEPENDIENTE: HISTORIAL ACADÉMICO Y ESTUDIO -->
+      <section id="pantalla-historial" class="screen">
+        <div class="profile-container" style="max-width: 1000px; margin: 0 auto; padding: 24px; display: flex; flex-direction: column; gap: 28px;">
+          
+          <!-- Historial de Evaluaciones -->
+          <article class="panel panel-premium" style="background: rgba(255, 255, 255, 0.015); border: 1px solid var(--border); border-radius: 20px; padding: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.15);">
+            <div class="panel-head" style="margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 14px;">
+              <h3 style="color: var(--text); font-size: 20px; font-weight: 700; margin: 0; display: flex; align-items: center; gap: 8px;">
+                📋 Historial de Evaluaciones
+              </h3>
+              <p style="font-size: 13.5px; color: var(--text-dim); margin-top: 4px; margin-bottom: 0;">Registro completo y cronológico de todas tus sesiones de estudio y simulacros.</p>
+            </div>
+            
+            <div class="table-container" style="overflow-x: auto; margin-top: 16px;">
+              <table id="tabla-progreso-historial" style="width: 100%; border-collapse: collapse; text-align: left; font-size: 14px;">
+                <thead>
+                  <tr style="border-bottom: 2px solid var(--border-strong); color: var(--text-soft); font-weight: 600; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px;">
+                    <th style="padding: 12px 16px;">Fecha</th>
+                    <th style="padding: 12px 16px;">Especialidad / Tema</th>
+                    <th style="padding: 12px 16px;">Modalidad</th>
+                    <th style="padding: 12px 16px; text-align: center;">Preguntas</th>
+                    <th style="padding: 12px 16px; text-align: center;">Aciertos</th>
+                    <th style="padding: 12px 16px; text-align: right;">Nota</th>
+                    <th style="padding: 12px 16px; text-align: center;">Acción</th>
+                  </tr>
+                </thead>
+                <tbody id="tabla-progreso-cuerpo" style="color: var(--text-soft);">
+                  <!-- Cargado dinámicamente -->
+                </tbody>
+              </table>
+              <div id="tabla-historial-vacio" class="history-empty hidden" style="margin-top: 16px; text-align: center; padding: 24px; color: var(--text-dim);">
+                Aún no registras exámenes en tu cuenta.
               </div>
             </div>
 
-            <!-- Historial Diario de Flashcards Colapsable -->
-            <div id="contenedor-diario-acordeon" style="margin-top: 24px;">
-              <button id="btn-toggle-diario" class="btn btn-ghost" type="button" style="width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 14px 20px; border-radius: 14px; background: rgba(255,255,255,0.02); font-weight: 700; border: 1px solid var(--border); font-size: 14px; color: var(--primary); transition: all 0.3s ease; cursor: pointer;">
-                <span style="display: flex; align-items: center; gap: 8px;">Ver Historial de Estudio Diario (Flashcards)</span>
-                <span id="icono-toggle-diario" style="transition: transform 0.3s ease; font-size: 14px;">▼</span>
+            <!-- Botón Ver más -->
+            <div id="btn-historial-ver-mas-container" class="hidden" style="text-align: center; margin-top: 16px; border-top: 1px dashed var(--border); padding-top: 14px;">
+              <button id="btn-historial-ver-mas" class="btn btn-ghost" type="button" style="padding: 10px 24px; border-radius: 12px; font-weight: 700; font-size: 13px; cursor: pointer; color: var(--primary); border: 1px dashed var(--primary); background: rgba(59, 130, 246, 0.02); transition: all 0.2s ease;">
+                🔍 Ver más evaluaciones
               </button>
+            </div>
+          </article>
 
-              <div id="seccion-diario-desplegable" class="cajon-desplegable">
-                <!-- FASE 2: Evaluación Diaria de Flashcards -->
-                <div id="widget-evaluacion-diaria" style="background: rgba(255, 255, 255, 0.01); border: 1px solid var(--border); border-radius: 20px; padding: 24px; margin-top: 20px; margin-bottom: 24px;">
-                  <h4 style="margin: 0 0 16px 0; font-size: 13px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 8px;">
-                    Evaluación Diaria de Flashcards (Hoy)
-                  </h4>
-                  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; text-align: center;">
-                    <div style="background: var(--panel-soft); padding: 16px; border-radius: 12px; border: 1px solid var(--border); border-left: 4px solid var(--text-dim);">
-                      <span style="font-size: 11px; color: var(--text-soft); display: block; text-transform: uppercase; margin-bottom: 4px;">Tarjetas Evaluadas</span>
-                      <span id="diario-tarjetas-evaluadas" style="font-size: 24px; font-weight: 800; color: var(--text);">0</span>
-                    </div>
-                    <div style="background: var(--panel-soft); padding: 16px; border-radius: 12px; border: 1px solid var(--border); border-left: 4px solid var(--success);">
-                      <span style="font-size: 11px; color: var(--text-soft); display: block; text-transform: uppercase; margin-bottom: 4px;">Eficiencia / Dominadas</span>
-                      <span id="diario-porcentaje-eficiencia" style="font-size: 24px; font-weight: 800; color: var(--success);">0%</span>
-                    </div>
-                    <div style="background: var(--panel-soft); padding: 16px; border-radius: 12px; border: 1px solid var(--border); border-left: 4px solid var(--danger);">
-                      <span style="font-size: 11px; color: var(--text-soft); display: block; text-transform: uppercase; margin-bottom: 4px;">Por Repasar / Falladas</span>
-                      <span id="diario-porcentaje-repasar" style="font-size: 24px; font-weight: 800; color: var(--danger);">0%</span>
-                    </div>
-                  </div>
+          <!-- Historial Diario de Flashcards -->
+          <article class="panel panel-premium" style="background: rgba(255, 255, 255, 0.015); border: 1px solid var(--border); border-radius: 20px; padding: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.15);">
+            <!-- FASE 2: Evaluación Diaria de Flashcards -->
+            <div id="widget-evaluacion-diaria" style="background: rgba(255, 255, 255, 0.01); border: 1px solid var(--border); border-radius: 20px; padding: 24px; margin-bottom: 24px;">
+              <h4 style="margin: 0 0 16px 0; font-size: 13px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 8px;">
+                ⚡ Evaluación Diaria de Flashcards (Hoy)
+              </h4>
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; text-align: center;">
+                <div style="background: var(--panel-soft); padding: 16px; border-radius: 12px; border: 1px solid var(--border); border-left: 4px solid var(--text-dim);">
+                  <span style="font-size: 11px; color: var(--text-soft); display: block; text-transform: uppercase; margin-bottom: 4px;">Tarjetas Evaluadas</span>
+                  <span id="diario-tarjetas-evaluadas" style="font-size: 24px; font-weight: 800; color: var(--text);">0</span>
                 </div>
-
-                <article class="panel panel-acordeon" style="margin-top: 20px;">
-                  <div class="panel-head" style="margin-bottom: 20px;">
-                    <h3 style="color: var(--text); font-size: 20px; font-weight: 700;">Historial de Estudio Diario (Flashcards)</h3>
-                    <p style="font-size: 14px; color: var(--text-dim); margin-top: 4px;">Seguimiento diario de tu rendimiento, volumen de estudio y nivel de retención de datos puros.</p>
-                  </div>
-                  
-                  <div class="table-container" style="overflow-x: auto; margin-top: 16px;">
-                    <table id="tabla-progreso-diario-flashcards" style="width: 100%; border-collapse: collapse; text-align: left; font-size: 14px;">
-                      <thead>
-                        <tr style="border-bottom: 2px solid var(--border-strong); color: var(--text-soft); font-weight: 600; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px;">
-                          <th style="padding: 12px 16px;">Fecha</th>
-                          <th style="padding: 12px 16px; text-align: center;">Tarjetas Repasadas</th>
-                          <th style="padding: 12px 16px; text-align: center;">Lo Sabía (Aciertos)</th>
-                          <th style="padding: 12px 16px; text-align: center;">No Lo Sabía (Fallos)</th>
-                          <th style="padding: 12px 16px; text-align: right;">Eficiencia / Retención</th>
-                        </tr>
-                      </thead>
-                      <tbody id="tabla-diario-flashcards-cuerpo" style="color: var(--text-soft);">
-                        <!-- Cargado dinámicamente -->
-                      </tbody>
-                    </table>
-                    <div id="tabla-diario-flashcards-vacio" class="history-empty hidden" style="margin-top: 16px; text-align: center; padding: 24px; color: var(--text-dim);">
-                      Aún no registras repasos de flashcards en tu cuenta.
-                    </div>
-                  </div>
-                </article>
+                <div style="background: var(--panel-soft); padding: 16px; border-radius: 12px; border: 1px solid var(--border); border-left: 4px solid var(--success);">
+                  <span style="font-size: 11px; color: var(--text-soft); display: block; text-transform: uppercase; margin-bottom: 4px;">Eficiencia / Dominadas</span>
+                  <span id="diario-porcentaje-eficiencia" style="font-size: 24px; font-weight: 800; color: var(--success);">0%</span>
+                </div>
+                <div style="background: var(--panel-soft); padding: 16px; border-radius: 12px; border: 1px solid var(--border); border-left: 4px solid var(--danger);">
+                  <span style="font-size: 11px; color: var(--text-soft); display: block; text-transform: uppercase; margin-bottom: 4px;">Por Repasar / Falladas</span>
+                  <span id="diario-porcentaje-repasar" style="font-size: 24px; font-weight: 800; color: var(--danger);">0%</span>
+                </div>
               </div>
             </div>
-          </div>
 
+            <div class="panel-head" style="margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 14px;">
+              <h3 style="color: var(--text); font-size: 20px; font-weight: 700; margin: 0; display: flex; align-items: center; gap: 8px;">
+                🧠 Historial de Estudio Diario (Flashcards)
+              </h3>
+              <p style="font-size: 13.5px; color: var(--text-dim); margin-top: 4px; margin-bottom: 0;">Seguimiento diario de tu rendimiento, volumen de estudio y nivel de retención de datos puros.</p>
+            </div>
             
+            <div class="table-container" style="overflow-x: auto; margin-top: 16px;">
+              <table id="tabla-progreso-diario-flashcards" style="width: 100%; border-collapse: collapse; text-align: left; font-size: 14px;">
+                <thead>
+                  <tr style="border-bottom: 2px solid var(--border-strong); color: var(--text-soft); font-weight: 600; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px;">
+                    <th style="padding: 12px 16px;">Fecha</th>
+                    <th style="padding: 12px 16px; text-align: center;">Tarjetas Repasadas</th>
+                    <th style="padding: 12px 16px; text-align: center;">Lo Sabía (Aciertos)</th>
+                    <th style="padding: 12px 16px; text-align: center;">No Lo Sabía (Fallos)</th>
+                    <th style="padding: 12px 16px; text-align: right;">Eficiencia / Retención</th>
+                  </tr>
+                </thead>
+                <tbody id="tabla-diario-flashcards-cuerpo" style="color: var(--text-soft);">
+                  <!-- Cargado dinámicamente -->
+                </tbody>
+              </table>
+              <div id="tabla-diario-flashcards-vacio" class="history-empty hidden" style="margin-top: 16px; text-align: center; padding: 24px; color: var(--text-dim);">
+                Aún no registras repasos de flashcards en tu cuenta.
+              </div>
+            </div>
 
-          </div>
-
-
-
-        
-
-            
-          </div>
+            <!-- Botón Ver más (Flashcards) -->
+            <div id="btn-diario-ver-mas-container" class="hidden" style="text-align: center; margin-top: 16px; border-top: 1px dashed var(--border); padding-top: 14px;">
+              <button id="btn-diario-ver-mas" class="btn btn-ghost" type="button" style="padding: 10px 24px; border-radius: 12px; font-weight: 700; font-size: 13px; cursor: pointer; color: var(--primary); border: 1px dashed var(--primary); background: rgba(59, 130, 246, 0.02); transition: all 0.2s ease;">
+                🔍 Ver más repasos
+              </button>
+            </div>
+          </article>
+        </div>
       </section>
 
       <!-- SECCIÓN INDEPENDIENTE: BANCO DE ERRORES -->
@@ -1924,15 +1993,15 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="js/state.js?v=1.5.2"></script>
-  <script src="js/api.js?v=1.5.2"></script>
-  <script src="js/spaced_repetition.js?v=1.5.2"></script>
-  <script src="js/analytics.js?v=1.5.2"></script>
-  <script src="js/ui.js?v=1.5.2"></script>
-  <script src="js/auth.js?v=1.5.2"></script>
-  <script src="js/quiz.js?v=1.5.2"></script>
-  <script src="js/flashcards.js?v=1.5.2"></script>
-  <script src="js/battle.js?v=1.5.2"></script>
-  <script src="js/main.js?v=1.5.2"></script>
+  <script src="js/state.js?v=1.7.6"></script>
+  <script src="js/api.js?v=1.7.6"></script>
+  <script src="js/spaced_repetition.js?v=1.7.6"></script>
+  <script src="js/analytics.js?v=1.7.6"></script>
+  <script src="js/ui.js?v=1.7.6"></script>
+  <script src="js/auth.js?v=1.7.6"></script>
+  <script src="js/quiz.js?v=1.7.6"></script>
+  <script src="js/flashcards.js?v=1.7.6"></script>
+  <script src="js/battle.js?v=1.7.6"></script>
+  <script src="js/main.js?v=1.7.6"></script>
 </body>
 </html>
