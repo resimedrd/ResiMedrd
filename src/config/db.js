@@ -7,8 +7,10 @@ const ADMIN_EMAIL = "frank@resimed.com";
 
 async function conectarBaseDeDatos() {
   if (dbInstance) return dbInstance;
+  const dbPath = process.env.DATABASE_PATH || path.join(__dirname, "../../resimed.db");
+  console.log("Conectando a base de datos en:", dbPath);
   dbInstance = await open({
-    filename: path.join(__dirname, "../../resimed.db"),
+    filename: dbPath,
     driver: sqlite3.Database
   });
   await iniciarBaseDeDatos(dbInstance);
