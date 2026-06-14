@@ -249,31 +249,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         ui.mostrarPantalla("flashcards");
       } else if (target === "estadisticas") {
         ui.mostrarPantalla("perfil");
-        // Hacer clic en pestaña de progreso
-        const tabProgreso = document.getElementById("tab-perfil-progreso");
-        if (tabProgreso) tabProgreso.click();
-        
-        // Auto expandir gráficos si está colapsado
-        const seccionGraficos = document.getElementById("seccion-graficos-desplegable");
-        if (seccionGraficos && !seccionGraficos.classList.contains("activo")) {
-          const btnToggle = document.getElementById("btn-toggle-graficos");
-          if (btnToggle) btnToggle.click();
-        }
-        // Auto expandir cobertura
-        const seccionEsp = document.getElementById("seccion-especialidades-desplegable");
-        if (seccionEsp && !seccionEsp.classList.contains("activo")) {
-          const btnToggleEsp = document.getElementById("btn-toggle-especialidades");
-          if (btnToggleEsp) btnToggleEsp.click();
-        }
-        
-        setTimeout(() => {
-          const scrollTarget = document.getElementById("contenedor-graficos-acordeon");
-          if (scrollTarget) scrollTarget.scrollIntoView({ behavior: "smooth", block: "start" });
-        }, 300);
       } else if (target === "historial") {
         ui.mostrarPantalla("perfil");
-        const tabProgreso = document.getElementById("tab-perfil-progreso");
-        if (tabProgreso) tabProgreso.click();
         
         // Auto expandir historial
         const seccionEval = document.getElementById("seccion-evaluaciones-desplegable");
