@@ -785,6 +785,25 @@ const ui = {
       if (pExamenes) pExamenes.textContent = (datosResumen && datosResumen.totalSesiones) || 0;
       if (pPreguntas) pPreguntas.textContent = (datosResumen && datosResumen.totalPreguntasRespondidas) || 0;
       
+      const totalContestadas = (datosResumen && datosResumen.totalPreguntasRespondidas) || 0;
+      const overlayBloqueo = document.getElementById("seccion-graficos-metricas-bloqueo");
+      if (overlayBloqueo) {
+        if (totalContestadas < 50) {
+          overlayBloqueo.classList.remove("hidden");
+          const progressText = document.getElementById("locked-progress-text");
+          const progressBarFill = document.getElementById("locked-progress-bar-fill");
+          if (progressText) {
+            progressText.textContent = `${totalContestadas} / 50 preguntas contestadas`;
+          }
+          if (progressBarFill) {
+            const pct = Math.min(100, Math.round((totalContestadas / 50) * 100));
+            progressBarFill.style.width = `${pct}%`;
+          }
+        } else {
+          overlayBloqueo.classList.add("hidden");
+        }
+      }
+      
       if (pPromedio) {
         const prom = (datosResumen && datosResumen.promedioGeneral) || 0;
         pPromedio.textContent = `${prom}%`;
