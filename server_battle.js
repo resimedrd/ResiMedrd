@@ -91,7 +91,6 @@ function inicializarBatallas(server, db, JWT_SECRET) {
                     // Si la batalla está activa, enviarle la pregunta actual de inmediato
                     if (r.state === "playing" && r.currentQuestionIndex >= 0) {
                       const question = r.questions[r.currentQuestionIndex];
-                      const isFeedbackPhase = r.phase === "feedback";
                       wsConn.send(JSON.stringify({
                         type: "new_question",
                         questionIndex: r.currentQuestionIndex,
@@ -99,26 +98,8 @@ function inicializarBatallas(server, db, JWT_SECRET) {
                         texto: question.texto,
                         opciones: question.opciones,
                         tema: question.tema,
-                        timeLeft: isFeedbackPhase ? 0 : ((r.questionTimeLeft !== undefined) ? r.questionTimeLeft : r.settings.timePerQuestion)
+                        timeLeft: (r.questionTimeLeft !== undefined) ? r.questionTimeLeft : r.settings.timePerQuestion
                       }));
-
-                      if (isFeedbackPhase) {
-                        const results = r.players.map(p => {
-                          const ans = p.answers.find(a => a.questionIndex === r.currentQuestionIndex);
-                          return {
-                            nombre: p.nombre,
-                            correct: ans ? ans.correct : false
-                          };
-                        });
-                        wsConn.send(JSON.stringify({
-                          type: "question_feedback",
-                          questionIndex: r.currentQuestionIndex,
-                          correcta: question.correcta,
-                          explicacion: question.explicacion || "Sin desglose.",
-                          fuente: question.fuente || "ENURM Oficial",
-                          results: results
-                        }));
-                      }
                     } else if (r.state === "results" && r.podio) {
                       wsConn.send(JSON.stringify({
                         type: "battle_finished",
@@ -684,7 +665,6 @@ async function iniciarBatallaAleatoria(db, jugadoresReales, bots = []) {
 }
 
 function enviarPreguntaSincronizada(room) {
-  room.phase = "question";
   if (room.timerInterval) {
     clearInterval(room.timerInterval);
   }
@@ -785,11 +765,10 @@ function procesarAvancePregunta(room) {
   if (room.timerInterval) {
     clearInterval(room.timerInterval);
   }
-  iniciarFeedbackPregunta(room);
+  avanzarSiguientePregunta(room);
 }
 
 function iniciarFeedbackPregunta(room) {
-  room.phase = "feedback";
   const qIndex = room.currentQuestionIndex;
   const question = room.questions[qIndex];
 
