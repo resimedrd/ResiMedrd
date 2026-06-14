@@ -1091,6 +1091,137 @@
           </div>
       </section>
 
+      <!-- PANTALLA DE AJUSTES Y CONFIGURACIÓN -->
+      <section id="pantalla-ajustes" class="screen">
+        <div class="profile-shell" style="max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px;">
+          <!-- Encabezado de Ajustes -->
+          <article class="panel" style="border-radius: 20px; padding: 24px; background: var(--hero-bg); border: 1px solid var(--border);">
+            <div style="display: flex; align-items: center; gap: 16px;">
+              <div style="width: 44px; height: 44px; background: rgba(59, 130, 246, 0.1); color: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 20px;">
+                ⚙️
+              </div>
+              <div>
+                <h2 style="margin: 0; color: var(--text); font-size: 16px; font-weight: 800; letter-spacing: -0.3px;">Ajustes de Cuenta</h2>
+                <p style="margin: 2px 0 0 0; font-size: 12.5px; color: var(--text-soft);">Administra tus datos personales y la seguridad de tu cuenta.</p>
+              </div>
+            </div>
+          </article>
+
+          <!-- Menú de Pestañas (Tabs) -->
+          <div style="display: flex; gap: 12px; border-bottom: 1px solid var(--border); padding-bottom: 12px;">
+            <button id="btn-tab-ajustes-perfil" class="btn btn-ghost active" type="button" style="min-width: auto; padding: 8px 16px; font-size: 13px; font-weight: 600; border-radius: 10px;">
+              👤 Mi Perfil
+            </button>
+            <button id="btn-tab-ajustes-seguridad" class="btn btn-ghost" type="button" style="min-width: auto; padding: 8px 16px; font-size: 13px; font-weight: 600; border-radius: 10px;">
+              🔒 Seguridad
+            </button>
+          </div>
+
+          <!-- Pestaña 1: Perfil (Editable) -->
+          <div id="ajustes-seccion-perfil" class="ajustes-tab-content">
+            <article class="panel" style="border-radius: 20px; padding: 24px; background: var(--bg-card); border: 1px solid var(--border);">
+              <form id="form-ajustes-perfil" style="display: flex; flex-direction: column; gap: 20px;">
+                
+                <!-- Nombre y Email -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                  <div class="form-block" style="margin: 0;">
+                    <label style="margin-bottom: 6px; font-weight: 600; font-size: 13px; color: var(--text-soft);">Nombre Completo</label>
+                    <input type="text" id="ajustes-perfil-nombre" class="input" required style="width: 100%;" />
+                  </div>
+                  <div class="form-block" style="margin: 0;">
+                    <label style="margin-bottom: 6px; font-weight: 600; font-size: 13px; color: var(--text-soft);">Correo Electrónico (Solo Lectura)</label>
+                    <input type="email" id="ajustes-perfil-email" class="input" disabled style="width: 100%; opacity: 0.6; cursor: not-allowed;" />
+                  </div>
+                </div>
+
+                <!-- Fecha de Nacimiento y Especialidad -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                  <div class="form-block" style="margin: 0;">
+                    <label style="margin-bottom: 6px; font-weight: 600; font-size: 13px; color: var(--text-soft);">Fecha de Nacimiento (Opcional)</label>
+                    <input type="date" id="ajustes-perfil-nacimiento" class="input" style="width: 100%;" />
+                  </div>
+                  <div class="form-block" style="margin: 0;">
+                    <label style="margin-bottom: 6px; font-weight: 600; font-size: 13px; color: var(--text-soft);">Especialidad a la que aspiras</label>
+                    <select id="ajustes-perfil-aspiracion" class="input" style="width: 100%;">
+                      <!-- Inyectado dinámicamente -->
+                    </select>
+                  </div>
+                </div>
+
+                <!-- Meta Semanal y Fecha de Registro -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                  <div class="form-block" style="margin: 0;">
+                    <label style="margin-bottom: 6px; font-weight: 600; font-size: 13px; color: var(--text-soft);">Meta de Preguntas Semanal</label>
+                    <select id="ajustes-perfil-meta" class="input" style="width: 100%;">
+                      <option value="10">10 Preguntas</option>
+                      <option value="20">20 Preguntas</option>
+                      <option value="50">50 Preguntas (Recomendado)</option>
+                      <option value="100">100 Preguntas (Intenso)</option>
+                      <option value="150">150 Preguntas (AMBOSS Elite)</option>
+                      <option value="200">200 Preguntas (PrepMed Leyenda)</option>
+                    </select>
+                  </div>
+                  <div class="form-block" style="margin: 0;">
+                    <label style="margin-bottom: 6px; font-weight: 600; font-size: 13px; color: var(--text-soft);">Fecha de Registro</label>
+                    <input type="text" id="ajustes-perfil-registro" class="input" disabled style="width: 100%; opacity: 0.6; cursor: not-allowed;" />
+                  </div>
+                </div>
+
+                <!-- Biografía -->
+                <div class="form-block" style="margin: 0;">
+                  <label style="margin-bottom: 6px; font-weight: 600; font-size: 13px; color: var(--text-soft);">Biografía Médica / Académica</label>
+                  <textarea id="ajustes-perfil-biografia" class="input" style="min-height: 100px; width: 100%; font-family: inherit; resize: vertical;" placeholder="Ej. Médico interno egresado de la UASD, aspirando a Residencia de Cirugía General..."></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="align-self: flex-start; min-width: 160px; font-size: 13px; font-weight: bold; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%) !important; border: none;">
+                  💾 Guardar Cambios
+                </button>
+              </form>
+            </article>
+          </div>
+
+          <!-- Pestaña 2: Seguridad y Cambio de Contraseña -->
+          <div id="ajustes-seccion-seguridad" class="ajustes-tab-content hidden">
+            <article class="panel" style="border-radius: 20px; padding: 24px; background: var(--bg-card); border: 1px solid var(--border); display: flex; flex-direction: column; gap: 24px;">
+              <!-- Tarjeta Informativa de Seguridad -->
+              <div style="background: rgba(22, 163, 74, 0.05); border: 1px solid rgba(22, 163, 74, 0.2); border-radius: 12px; padding: 16px; display: flex; gap: 12px; align-items: flex-start;">
+                <span style="font-size: 18px;">🛡️</span>
+                <div style="font-size: 13px; line-height: 1.5; color: var(--text-soft);">
+                  <strong style="color: var(--success); display: block; margin-bottom: 4px;">Seguridad de Datos ResiMed</strong>
+                  Tus datos de acceso están encriptados mediante el algoritmo industrial <strong>bcrypt</strong> y las peticiones están blindadas con tokens <strong>JWT</strong> de un solo uso. Te sugerimos cambiar tu contraseña de forma periódica y no compartir tus credenciales.
+                </div>
+              </div>
+
+              <!-- Formulario de Cambio de Contraseña -->
+              <form id="form-ajustes-password" style="display: flex; flex-direction: column; gap: 20px;">
+                <h4 style="margin: 0; color: var(--text); font-size: 14px; font-weight: 700; border-bottom: 1px solid var(--border); padding-bottom: 8px;">Cambiar Contraseña</h4>
+
+                <div class="form-block" style="margin: 0;">
+                  <label style="margin-bottom: 6px; font-weight: 600; font-size: 13px; color: var(--text-soft);">Contraseña Actual</label>
+                  <input type="password" id="ajustes-password-actual" class="input" required style="width: 100%;" placeholder="Ingresa tu contraseña actual" />
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                  <div class="form-block" style="margin: 0;">
+                    <label style="margin-bottom: 6px; font-weight: 600; font-size: 13px; color: var(--text-soft);">Nueva Contraseña</label>
+                    <input type="password" id="ajustes-password-nueva" class="input" required style="width: 100%;" placeholder="Mínimo 6 caracteres" minlength="6" />
+                  </div>
+                  <div class="form-block" style="margin: 0;">
+                    <label style="margin-bottom: 6px; font-weight: 600; font-size: 13px; color: var(--text-soft);">Confirmar Nueva Contraseña</label>
+                    <input type="password" id="ajustes-password-confirmar" class="input" required style="width: 100%;" placeholder="Repite la nueva contraseña" minlength="6" />
+                  </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="align-self: flex-start; min-width: 180px; font-size: 13px; font-weight: bold; background: linear-gradient(135deg, var(--danger) 0%, #dc2626 100%) !important; border: none; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.25);">
+                  🔑 Actualizar Contraseña
+                </button>
+              </form>
+            </article>
+          </div>
+
+        </div>
+      </section>
+
       <!-- SECCIÓN INDEPENDIENTE: HISTORIAL ACADÉMICO Y ESTUDIO -->
       <section id="pantalla-historial" class="screen">
         <div class="profile-container" style="max-width: 1000px; margin: 0 auto; padding: 24px; display: flex; flex-direction: column; gap: 28px;">

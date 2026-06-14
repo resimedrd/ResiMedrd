@@ -257,9 +257,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         battle.mostrarPantallaBattle("battle");
         battle.conectarWebSocket();
       } else if (target === "ajustes") {
-        ui.mostrarPantalla("perfil");
-        const btnPerfilEditar = document.getElementById("btn-perfil-editar");
-        if (btnPerfilEditar) btnPerfilEditar.click();
+        ui.mostrarPantalla("ajustes");
       }
     });
   });
@@ -508,6 +506,78 @@ document.addEventListener("DOMContentLoaded", async () => {
         await ui.actualizarProgresoEstudiante();
       } catch (err) {
         alert("✗ Falla al actualizar perfil: " + err.message);
+      }
+    });
+  }
+
+  // === 7.2. PANTALLA INDEPENDIENTE DE AJUSTES Y CONFIGURACIÓN ===
+  const btnTabPerfil = document.getElementById("btn-tab-ajustes-perfil");
+  const btnTabSeguridad = document.getElementById("btn-tab-ajustes-seguridad");
+  const seccionPerfil = document.getElementById("ajustes-seccion-perfil");
+  const seccionSeguridad = document.getElementById("ajustes-seccion-seguridad");
+
+  if (btnTabPerfil && btnTabSeguridad && seccionPerfil && seccionSeguridad) {
+    btnTabPerfil.addEventListener("click", () => {
+      btnTabPerfil.classList.add("active");
+      btnTabSeguridad.classList.remove("active");
+      seccionPerfil.classList.remove("hidden");
+      seccionSeguridad.classList.add("hidden");
+    });
+
+    btnTabSeguridad.addEventListener("click", () => {
+      btnTabSeguridad.classList.add("active");
+      btnTabPerfil.classList.remove("active");
+      seccionSeguridad.classList.remove("hidden");
+      seccionPerfil.classList.add("hidden");
+    });
+  }
+
+  const formAjustesPerfil = document.getElementById("form-ajustes-perfil");
+  if (formAjustesPerfil) {
+    formAjustesPerfil.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!state.usuarioConectado) return;
+
+      const nombre = document.getElementById("ajustes-perfil-nombre").value.trim();
+      const especialidadAspirada = document.getElementById("ajustes-perfil-aspiracion").value;
+      const metaSemanal = parseInt(document.getElementById("ajustes-perfil-meta").value) || 50;
+      const fechaNacimiento = document.getElementById("ajustes-perfil-nacimiento").value;
+      const biografia = document.getElementById("ajustes-perfil-biografia").value.trim();
+
+      try {
+        const data = await api.actualizarPerfil(nombre, especialidadAspirada, metaSemanal, fechaNacimiento, biografia);
+        
+        state.usuarioConectado = data.usuario;
+        localStorage.setItem("resiMed_session", JSON.stringify(data.usuario));
+
+        alert("✓ ¡Ajustes de perfil actualizados con éxito!");
+        await ui.actualizarProgresoEstudiante();
+      } catch (err) {
+        alert("✗ Falla al actualizar perfil: " + err.message);
+      }
+    });
+  }
+
+  const formAjustesPassword = document.getElementById("form-ajustes-password");
+  if (formAjustesPassword) {
+    formAjustesPassword.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      
+      const passwordActual = document.getElementById("ajustes-password-actual").value;
+      const passwordNueva = document.getElementById("ajustes-password-nueva").value;
+      const passwordConfirmar = document.getElementById("ajustes-password-confirmar").value;
+
+      if (passwordNueva !== passwordConfirmar) {
+        alert("✗ Las contraseñas nuevas no coinciden.");
+        return;
+      }
+
+      try {
+        const data = await api.cambiarPassword(passwordActual, passwordNueva);
+        alert("✓ " + data.mensaje);
+        formAjustesPassword.reset();
+      } catch (err) {
+        alert("✗ Error: " + err.message);
       }
     });
   }

@@ -52,7 +52,10 @@ async function iniciarBaseDeDatos(db) {
       nombre TEXT NOT NULL,
       email TEXT UNIQUE NOT NULL,
       password TEXT NOT NULL,
-      rol TEXT DEFAULT 'usuario'
+      rol TEXT DEFAULT 'usuario',
+      fecha_nacimiento TEXT,
+      biografia TEXT,
+      fecha_registro TEXT DEFAULT CURRENT_TIMESTAMP
     )
   `);
 
@@ -176,7 +179,10 @@ async function iniciarBaseDeDatos(db) {
     { nombre: "battle_ganadas", definicion: "INTEGER DEFAULT 0" },
     { nombre: "battle_perdidas", definicion: "INTEGER DEFAULT 0" },
     { nombre: "battle_racha_actual", definicion: "INTEGER DEFAULT 0" },
-    { nombre: "battle_racha_mejor", definicion: "INTEGER DEFAULT 0" }
+    { nombre: "battle_racha_mejor", definicion: "INTEGER DEFAULT 0" },
+    { nombre: "fecha_nacimiento", definicion: "TEXT" },
+    { nombre: "biografia", definicion: "TEXT" },
+    { nombre: "fecha_registro", definicion: "TEXT DEFAULT CURRENT_TIMESTAMP" }
   ];
 
   for (const col of columnasUsuarios) {

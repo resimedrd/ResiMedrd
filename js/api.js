@@ -120,10 +120,16 @@ const api = {
   obtenerResumenStatsFlashcards: (usuarioId) =>
     request(`/api/flashcards/resumen-stats?usuarioId=${usuarioId}`),
 
-  actualizarPerfil: (nombre, especialidadAspirada, metaSemanal) => 
+  actualizarPerfil: (nombre, especialidadAspirada, metaSemanal, fechaNacimiento, biografia) => 
     request("/api/usuario/actualizar", {
       method: "PUT",
-      body: JSON.stringify({ nombre, especialidadAspirada, metaSemanal })
+      body: JSON.stringify({ nombre, especialidadAspirada, metaSemanal, fechaNacimiento, biografia })
+    }),
+
+  cambiarPassword: (passwordActual, passwordNueva) => 
+    request("/api/usuario/cambiar-password", {
+      method: "PUT",
+      body: JSON.stringify({ passwordActual, passwordNueva })
     }),
 
   guardarPregunta: (texto, opciones, correcta, tema, explicacion, fuente, usuarioId, examen_id, difficulty) => 
