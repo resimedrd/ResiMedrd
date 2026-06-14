@@ -647,6 +647,16 @@ const quiz = {
   renderizarPreguntaActual() {
     quiz.ocultarFeedback();
 
+    // Garantizar que la tarjeta de herramientas de estudio solo se muestre en modo estudio
+    const cardEstudio = document.getElementById("study-tools-card");
+    if (cardEstudio) {
+      if (state.modoActual === "estudio") {
+        cardEstudio.classList.remove("hidden");
+      } else {
+        cardEstudio.classList.add("hidden");
+      }
+    }
+
     // Resetear las herramientas de estudio AMBOSS
     quiz.keyInfoActivo = false;
     const btnKeyInfo = document.getElementById("btn-key-info");
