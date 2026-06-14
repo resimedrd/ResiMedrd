@@ -787,17 +787,33 @@ const battle = {
       feedbackBox.scrollIntoView({ behavior: "smooth", block: "nearest" });
 
       // Si estamos en modo manual de amigos, ocultar Corregir y mostrar Siguiente Pregunta
-      const btnCorregir = document.getElementById("btn-battle-corregir");
-      const btnSiguiente = document.getElementById("btn-battle-siguiente");
+      const manualControls = document.getElementById("battle-manual-controls");
       const setFastMode = document.getElementById("battle-settings-fastmode");
       const isManualMode = battle.modalidadActual === "amigos" && setFastMode && setFastMode.value === "normal";
 
+      const timerRow = document.getElementById("battle-feedback-timer-row");
+      const manualRow = document.getElementById("battle-feedback-manual-row");
+      const sourceManual = document.getElementById("battle-feedback-fuente-manual");
+
       if (isManualMode) {
-        if (btnCorregir) btnCorregir.classList.add("hidden");
+        if (manualControls) manualControls.classList.add("hidden"); // Esconder el botón Corregir
+        if (timerRow) timerRow.classList.add("hidden");
+        if (manualRow) manualRow.classList.remove("hidden");
+        if (sourceManual) sourceManual.textContent = payload.fuente;
+        
+        const btnSiguiente = document.getElementById("btn-battle-siguiente");
         if (btnSiguiente) {
-          btnSiguiente.classList.remove("hidden");
           btnSiguiente.disabled = false;
+          // Actualizar el total con el número de jugadores activos
+          const totalPlayers = (battle.jugadoresDeLaBatalla && battle.jugadoresDeLaBatalla.length) || 2;
+          const countSpan = document.getElementById("battle-siguiente-count");
+          const totalSpan = document.getElementById("battle-siguiente-total");
+          if (countSpan) countSpan.textContent = "0";
+          if (totalSpan) totalSpan.textContent = totalPlayers;
         }
+      } else {
+        if (timerRow) timerRow.classList.remove("hidden");
+        if (manualRow) manualRow.classList.add("hidden");
       }
     }
   },

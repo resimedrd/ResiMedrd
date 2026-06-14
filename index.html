@@ -1623,12 +1623,9 @@
             </div>
 
             <!-- Contenedor de Botones de Control de Flujo (Solo para salas de amigos en modo manual) -->
-            <div id="battle-manual-controls" class="hidden" style="display: flex; gap: 12px; margin-top: 20px; margin-bottom: 20px;">
+            <div id="battle-manual-controls" class="hidden" style="margin-top: 20px; margin-bottom: 20px;">
               <button id="btn-battle-corregir" class="btn btn-primary" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%) !important;" type="button">
                 🎯 Solicitar Corregir (<span id="battle-corregir-count">0</span>/<span id="battle-corregir-total">0</span>)
-              </button>
-              <button id="btn-battle-siguiente" class="btn btn-primary hidden" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; background: linear-gradient(135deg, var(--success) 0%, #16a34a 100%) !important;" type="button">
-                ➡️ Solicitar Siguiente Pregunta (<span id="battle-siguiente-count">0</span>/<span id="battle-siguiente-total">0</span>)
               </button>
             </div>
 
@@ -1637,10 +1634,21 @@
               <div id="battle-feedback-estado" class="feedback-estado"></div>
               <p id="battle-feedback-explicacion" class="feedback-explicacion"></p>
               
-              <!-- Reloj de cuenta regresiva para avanzar -->
-              <div style="margin-top: 16px; border-top: 1px dashed var(--border); padding-top: 12px; font-size: 13px; color: var(--text-dim); display: flex; justify-content: space-between; align-items: center;">
+              <!-- Reloj de cuenta regresiva para avanzar (Modo rápido / automático) -->
+              <div id="battle-feedback-timer-row" style="margin-top: 16px; border-top: 1px dashed var(--border); padding-top: 12px; font-size: 13px; color: var(--text-dim); display: flex; justify-content: space-between; align-items: center;">
                 <span>Siguiente pregunta en: <strong id="battle-feedback-timer">10</strong>s</span>
                 <span id="battle-feedback-fuente" style="font-style: italic;">Nelson, 21 ed</span>
+              </div>
+
+              <!-- Control Siguiente Pregunta por Consenso (Modo manual) -->
+              <div id="battle-feedback-manual-row" class="hidden" style="margin-top: 16px; border-top: 1px dashed var(--border); padding-top: 12px; display: flex; flex-direction: column; gap: 8px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: var(--text-dim); margin-bottom: 4px;">
+                  <span>Consenso requerido para continuar</span>
+                  <span id="battle-feedback-fuente-manual" style="font-style: italic;">Nelson, 21 ed</span>
+                </div>
+                <button id="btn-battle-siguiente" class="btn btn-primary" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; background: linear-gradient(135deg, var(--success) 0%, #16a34a 100%) !important;" type="button">
+                  ➡️ Solicitar Siguiente Pregunta (<span id="battle-siguiente-count">0</span>/<span id="battle-siguiente-total">0</span>)
+                </button>
               </div>
             </div>
           </article>
