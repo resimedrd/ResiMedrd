@@ -4956,7 +4956,9 @@ body.dark-mode .premium-metrics-panel {
   }
 }
 
-
-
-
-
+/* ==========================================================================
+   UTILITY OVERRIDES (Ensures .hidden always takes precedence over class rules)
+   ========================================================================== */
+.hidden {
+  display: none !important;
+}
