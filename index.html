@@ -451,7 +451,7 @@
       </section>
 
       <section id="pantalla-home" class="screen">
-        <section class="hero-card">
+        <section class="hero-card" style="grid-template-columns: 1fr;">
           <div class="hero-copy">
             <span class="eyebrow">Preparación ENURM Profesional</span>
             <h2>Entrena con el rigor del examen real.</h2>
@@ -464,16 +464,6 @@
               <button id="btn-ir-flashcards" class="btn btn-primary" style="background: linear-gradient(135deg, var(--warning) 0%, #d97706 100%); color: #000; font-weight: bold; border: none; box-shadow: 0 4px 14px rgba(245, 158, 11, 0.35); gap: 8px;" type="button">
                 Estudiar Flashcards ENURM
               </button>
-            </div>
-          </div>
-          <div class="hero-stats">
-            <div class="stat-card">
-              <span class="stat-label">Simulacros hechos</span>
-              <span id="resumen-total-sesiones" class="stat-value">0</span>
-            </div>
-            <div class="stat-card">
-              <span class="stat-label">Puntaje Promedio</span>
-              <span id="resumen-promedio-general" class="stat-value">0%</span>
             </div>
           </div>
         </section>
@@ -679,6 +669,14 @@
                 <p>Tus datos históricos individuales en esta PC.</p>
               </div>
               <div class="dashboard-grid" style="margin-bottom: 20px;">
+                <div class="dashboard-metric">
+                  <span class="dashboard-label">Simulacros hechos</span>
+                  <span id="resumen-total-sesiones" class="dashboard-value">0</span>
+                </div>
+                <div class="dashboard-metric">
+                  <span class="dashboard-label">Puntaje Promedio</span>
+                  <span id="resumen-promedio-general" class="dashboard-value">0%</span>
+                </div>
                 <div class="dashboard-metric">
                   <span class="dashboard-label">Record Personal</span>
                   <span id="dashboard-mejor-porcentaje" class="dashboard-value">0%</span>
