@@ -9,6 +9,7 @@ const battle = {
   preguntasBatalla: [],
   preguntaActualIndex: 0,
   timePerQuestion: 60,
+  fastMode: "normal", // "normal" o "rapido"
   repasoBatallaPreguntas: [], // Almacén para revisión pospartida
   respuestasUsuarioBatalla: [], // Respuestas del usuario para reporte pospartida
   jugadoresDeLaBatalla: [], // Jugadores activos en la partida actual
@@ -276,6 +277,9 @@ const battle = {
         battle.modalidadActual = payload.settings ? (payload.settings.timePerQuestion === 30 ? "aleatoria" : "amigos") : "amigos";
         battle.estadoActual = payload.state;
         battle.jugadoresDeLaBatalla = payload.players || [];
+        if (payload.settings && payload.settings.fastMode) {
+          battle.fastMode = payload.settings.fastMode;
+        }
         if (payload.state === "playing") {
           battle.mostrarPantallaBattle("battle-quiz");
         } else if (payload.state === "results") {
@@ -543,6 +547,7 @@ const battle = {
   renderizarPreguntaArena(payload) {
     battle.preguntaActualIndex = payload.questionIndex;
     battle.timePerQuestion = payload.timeLeft;
+    battle.fastMode = payload.fastMode || "normal";
 
     // Inicializar respuesta del usuario para esta pregunta en null
     if (battle.respuestasUsuarioBatalla[payload.questionIndex] === undefined) {
@@ -789,7 +794,7 @@ const battle = {
       // Si estamos en modo manual de amigos, ocultar Corregir y mostrar Siguiente Pregunta
       const manualControls = document.getElementById("battle-manual-controls");
       const setFastMode = document.getElementById("battle-settings-fastmode");
-      const isManualMode = battle.modalidadActual === "amigos" && setFastMode && setFastMode.value === "normal";
+      const isManualMode = battle.modalidadActual === "amigos" && (battle.fastMode === "normal" || (setFastMode && setFastMode.value === "normal"));
 
       const timerRow = document.getElementById("battle-feedback-timer-row");
       const manualRow = document.getElementById("battle-feedback-manual-row");

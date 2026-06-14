@@ -816,7 +816,12 @@ function procesarAvancePregunta(room) {
   if (room.timerInterval) {
     clearInterval(room.timerInterval);
   }
-  avanzarSiguientePregunta(room);
+  const isFastMode = room.modalidad === "aleatoria" || (room.settings && room.settings.fastMode === "rapido");
+  if (isFastMode) {
+    avanzarSiguientePregunta(room);
+  } else {
+    iniciarFeedbackPregunta(room);
+  }
 }
 
 function iniciarFeedbackPregunta(room) {
