@@ -332,7 +332,9 @@ const battle = {
 
       case "room_updated":
         battle.modalidadActual = "amigos";
-        if (battle.estadoActual === "lobby") {
+        battle.salaCodigo = payload.code;
+        if (battle.estadoActual !== "playing" && battle.estadoActual !== "results") {
+          battle.estadoActual = "lobby";
           battle.actualizarLobby(payload);
         } else {
           battle.actualizarJugadoresLobby(payload.players);
