@@ -793,8 +793,13 @@ const battle = {
 
       // Si estamos en modo manual de amigos, ocultar Corregir y mostrar Siguiente Pregunta
       const manualControls = document.getElementById("battle-manual-controls");
-      const setFastMode = document.getElementById("battle-settings-fastmode");
-      const isManualMode = battle.modalidadActual === "amigos" && (battle.fastMode === "normal" || (setFastMode && setFastMode.value === "normal"));
+      const isManualMode = battle.modalidadActual === "amigos" && battle.fastMode !== "rapido";
+
+      console.log("DEBUG: Feedback manual check", {
+        modalidadActual: battle.modalidadActual,
+        fastMode: battle.fastMode,
+        isManualMode: isManualMode
+      });
 
       const timerRow = document.getElementById("battle-feedback-timer-row");
       const manualRow = document.getElementById("battle-feedback-manual-row");
@@ -808,6 +813,7 @@ const battle = {
         
         const btnSiguiente = document.getElementById("btn-battle-siguiente");
         if (btnSiguiente) {
+          btnSiguiente.classList.remove("hidden");
           btnSiguiente.disabled = false;
           // Actualizar el total con el número de jugadores activos
           const totalPlayers = (battle.jugadoresDeLaBatalla && battle.jugadoresDeLaBatalla.length) || 2;
