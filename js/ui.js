@@ -38,6 +38,12 @@ const ui = {
 
     const nombrePantalla = idReal.replace("pantalla-", "");
 
+    // Protección para evitar entrar a la pantalla de evaluación (quiz) sin un examen activo
+    if (nombrePantalla === "quiz" && !localStorage.getItem("resiMed_examen_activo")) {
+      ui.mostrarPantalla("home", false);
+      return;
+    }
+
     if (pushState) {
       window.history.pushState({ pantalla: nombrePantalla }, "", "#" + nombrePantalla);
     }

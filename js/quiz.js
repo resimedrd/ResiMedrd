@@ -509,7 +509,7 @@ const quiz = {
         }
       }
 
-      ui.mostrarPantalla("quiz");
+      ui.mostrarPantalla("quiz", false);
 
       // 3. Configuración de Tiempos
       if (modo === "guardia") {
