@@ -142,10 +142,11 @@ function inicializarBatallas(server, db, JWT_SECRET) {
             const roomCode = generarCodigoSala();
             const totalQ = message.settings ? (parseInt(message.settings.totalQuestions) || 15) : 15;
             const timeP = message.settings ? (parseInt(message.settings.timePerQuestion) || 60) : 60;
+            const fastM = message.settings ? (message.settings.fastMode || "normal") : "normal";
             const room = {
               code: roomCode,
               modalidad: "amigos",
-              settings: { totalQuestions: totalQ, timePerQuestion: timeP },
+              settings: { totalQuestions: totalQ, timePerQuestion: timeP, fastMode: fastM },
               hostId: userId,
               players: [{ id: userId, nombre: userNombre, ws: wsConn, score: 0, answers: [], isConnected: true }],
               questions: [],
@@ -216,6 +217,7 @@ function inicializarBatallas(server, db, JWT_SECRET) {
 
             room.settings.totalQuestions = parseInt(message.settings.totalQuestions) || 15;
             room.settings.timePerQuestion = parseInt(message.settings.timePerQuestion) || 60;
+            room.settings.fastMode = message.settings.fastMode || "normal";
 
             broadcastToRoom(room, {
               type: "room_updated",
@@ -348,6 +350,50 @@ function inicializarBatallas(server, db, JWT_SECRET) {
                   });
                 }
               }
+            }
+            break;
+          }
+
+          case "request_correction": {
+            const code = salaActualCodigo;
+            const room = activeRooms.get(code);
+            if (!room || room.state !== "playing" || room.phase !== "question") return;
+
+            room.correctionsRequested.add(userId);
+
+            const totalActivePlayers = room.players.filter(p => p.isConnected).length;
+            const votesCount = room.correctionsRequested.size;
+
+            broadcastToRoom(room, {
+              type: "correction_vote_updated",
+              count: votesCount,
+              total: totalActivePlayers
+            });
+
+            if (votesCount >= totalActivePlayers) {
+              procesarAvancePregunta(room);
+            }
+            break;
+          }
+
+          case "request_next_question": {
+            const code = salaActualCodigo;
+            const room = activeRooms.get(code);
+            if (!room || room.state !== "playing" || room.phase !== "feedback") return;
+
+            room.nextQuestionsRequested.add(userId);
+
+            const totalActivePlayers = room.players.filter(p => p.isConnected).length;
+            const votesCount = room.nextQuestionsRequested.size;
+
+            broadcastToRoom(room, {
+              type: "next_question_vote_updated",
+              count: votesCount,
+              total: totalActivePlayers
+            });
+
+            if (votesCount >= totalActivePlayers) {
+              avanzarSiguientePregunta(room);
             }
             break;
           }
@@ -665,6 +711,10 @@ async function iniciarBatallaAleatoria(db, jugadoresReales, bots = []) {
 }
 
 function enviarPreguntaSincronizada(room) {
+  room.phase = "question";
+  room.correctionsRequested = new Set();
+  room.nextQuestionsRequested = new Set();
+
   if (room.timerInterval) {
     clearInterval(room.timerInterval);
   }
@@ -680,7 +730,8 @@ function enviarPreguntaSincronizada(room) {
     texto: question.texto,
     opciones: question.opciones,
     tema: question.tema,
-    timeLeft: room.settings.timePerQuestion
+    timeLeft: room.settings.timePerQuestion,
+    fastMode: room.settings.fastMode || "normal"
   };
 
   broadcastToRoom(room, questionPayload);
@@ -769,6 +820,7 @@ function procesarAvancePregunta(room) {
 }
 
 function iniciarFeedbackPregunta(room) {
+  room.phase = "feedback";
   const qIndex = room.currentQuestionIndex;
   const question = room.questions[qIndex];
 
@@ -791,28 +843,38 @@ function iniciarFeedbackPregunta(room) {
     results: results
   });
 
-  // 3. Iniciar cuenta regresiva de feedback
-  let feedbackTimeLeft = 10; // 10 segundos de visualización de explicación
+  const isFastMode = room.modalidad === "aleatoria" || (room.settings && room.settings.fastMode === "rapido");
 
-  // Broadcast del tick inicial de feedback
-  broadcastToRoom(room, {
-    type: "feedback_tick",
-    timeLeft: feedbackTimeLeft
-  });
+  if (isFastMode) {
+    // 3. Iniciar cuenta regresiva de feedback automática de 10s
+    let feedbackTimeLeft = 10;
 
-  room.timerInterval = setInterval(() => {
-    feedbackTimeLeft -= 1;
-
+    // Broadcast del tick inicial de feedback
     broadcastToRoom(room, {
       type: "feedback_tick",
       timeLeft: feedbackTimeLeft
     });
 
-    if (feedbackTimeLeft <= 0) {
-      clearInterval(room.timerInterval);
-      avanzarSiguientePregunta(room);
-    }
-  }, 1000);
+    room.timerInterval = setInterval(() => {
+      feedbackTimeLeft -= 1;
+
+      broadcastToRoom(room, {
+        type: "feedback_tick",
+        timeLeft: feedbackTimeLeft
+      });
+
+      if (feedbackTimeLeft <= 0) {
+        clearInterval(room.timerInterval);
+        avanzarSiguientePregunta(room);
+      }
+    }, 1000);
+  } else {
+    // Modo Manual: No hay temporizador regresivo automático de avance
+    broadcastToRoom(room, {
+      type: "feedback_tick",
+      timeLeft: -1
+    });
+  }
 }
 
 

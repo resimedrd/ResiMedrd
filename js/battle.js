@@ -161,6 +161,7 @@ const battle = {
     // 5. Vincular Configuración en Caliente (Solo Host)
     const setQuestions = document.getElementById("battle-settings-questions");
     const setTime = document.getElementById("battle-settings-time");
+    const setFastMode = document.getElementById("battle-settings-fastmode");
 
     const enviarConfiguracion = () => {
       if (battle.isHost && battle.socket && battle.socket.readyState === WebSocket.OPEN) {
@@ -168,7 +169,8 @@ const battle = {
           type: "configure_room",
           settings: {
             totalQuestions: setQuestions.value,
-            timePerQuestion: setTime.value
+            timePerQuestion: setTime.value,
+            fastMode: setFastMode ? setFastMode.value : "normal"
           }
         }));
       }
@@ -176,6 +178,7 @@ const battle = {
 
     if (setQuestions) setQuestions.addEventListener("change", enviarConfiguracion);
     if (setTime) setTime.addEventListener("change", enviarConfiguracion);
+    if (setFastMode) setFastMode.addEventListener("change", enviarConfiguracion);
 
     // 6. Botón de Abandono Rápido en la Arena de Batalla (Finalizar Batalla en caliente)
     const btnBattleQuit = document.getElementById("btn-battle-quit");
@@ -187,6 +190,28 @@ const battle = {
           }
           battle.mostrarPantallaBattle("battle");
           battle.estadoActual = "idle";
+        }
+      });
+    }
+
+    // 7. Botones de Control de Consenso Manual (Batalla con amigos modo normal)
+    const btnCorregir = document.getElementById("btn-battle-corregir");
+    const btnSiguiente = document.getElementById("btn-battle-siguiente");
+
+    if (btnCorregir) {
+      btnCorregir.addEventListener("click", () => {
+        if (battle.socket && battle.socket.readyState === WebSocket.OPEN) {
+          battle.socket.send(JSON.stringify({ type: "request_correction" }));
+          btnCorregir.disabled = true; // Deshabilitar temporalmente tras votar
+        }
+      });
+    }
+
+    if (btnSiguiente) {
+      btnSiguiente.addEventListener("click", () => {
+        if (battle.socket && battle.socket.readyState === WebSocket.OPEN) {
+          battle.socket.send(JSON.stringify({ type: "request_next_question" }));
+          btnSiguiente.disabled = true; // Deshabilitar temporalmente tras votar
         }
       });
     }
@@ -338,6 +363,22 @@ const battle = {
         battle.marcarJugadorRespondioLive(payload.playerId);
         break;
 
+      case "correction_vote_updated": {
+        const countSpan = document.getElementById("battle-corregir-count");
+        const totalSpan = document.getElementById("battle-corregir-total");
+        if (countSpan) countSpan.textContent = payload.count;
+        if (totalSpan) totalSpan.textContent = payload.total;
+        break;
+      }
+
+      case "next_question_vote_updated": {
+        const countSpan = document.getElementById("battle-siguiente-count");
+        const totalSpan = document.getElementById("battle-siguiente-total");
+        if (countSpan) countSpan.textContent = payload.count;
+        if (totalSpan) totalSpan.textContent = payload.total;
+        break;
+      }
+
       case "question_feedback":
         battle.mostrarFeedbackInmediato(payload);
         break;
@@ -425,6 +466,11 @@ const battle = {
     if (setTime) {
       setTime.disabled = !battle.isHost;
       setTime.value = payload.settings.timePerQuestion;
+    }
+    const setFastMode = document.getElementById("battle-settings-fastmode");
+    if (setFastMode && payload.settings && payload.settings.fastMode) {
+      setFastMode.disabled = !battle.isHost;
+      setFastMode.value = payload.settings.fastMode;
     }
 
     if (btnStart) btnStart.style.display = battle.isHost ? "block" : "none";
@@ -567,6 +613,34 @@ const battle = {
 
     // Inicializar visualización del Temporizador
     battle.actualizarTemporizadorArena(payload.timeLeft);
+
+    // Configurar controles de consenso manual si aplica
+    const totalPlayers = (battle.jugadoresDeLaBatalla && battle.jugadoresDeLaBatalla.length) || 2;
+    const manualControls = document.getElementById("battle-manual-controls");
+    const btnCorregir = document.getElementById("btn-battle-corregir");
+    const btnSiguiente = document.getElementById("btn-battle-siguiente");
+
+    if (battle.modalidadActual === "amigos" && payload.fastMode === "normal") {
+      if (manualControls) manualControls.classList.remove("hidden");
+      if (btnCorregir) {
+        btnCorregir.classList.remove("hidden");
+        btnCorregir.disabled = false;
+        const countSpan = document.getElementById("battle-corregir-count");
+        const totalSpan = document.getElementById("battle-corregir-total");
+        if (countSpan) countSpan.textContent = "0";
+        if (totalSpan) totalSpan.textContent = totalPlayers;
+      }
+      if (btnSiguiente) {
+        btnSiguiente.classList.add("hidden");
+        btnSiguiente.disabled = false;
+        const countSpan = document.getElementById("battle-siguiente-count");
+        const totalSpan = document.getElementById("battle-siguiente-total");
+        if (countSpan) countSpan.textContent = "0";
+        if (totalSpan) totalSpan.textContent = totalPlayers;
+      }
+    } else {
+      if (manualControls) manualControls.classList.add("hidden");
+    }
   },
 
   actualizarTemporizadorArena(timeLeft) {
@@ -709,6 +783,20 @@ const battle = {
       
       feedbackBox.classList.remove("hidden");
       feedbackBox.scrollIntoView({ behavior: "smooth", block: "nearest" });
+
+      // Si estamos en modo manual de amigos, ocultar Corregir y mostrar Siguiente Pregunta
+      const btnCorregir = document.getElementById("btn-battle-corregir");
+      const btnSiguiente = document.getElementById("btn-battle-siguiente");
+      const setFastMode = document.getElementById("battle-settings-fastmode");
+      const isManualMode = battle.modalidadActual === "amigos" && setFastMode && setFastMode.value === "normal";
+
+      if (isManualMode) {
+        if (btnCorregir) btnCorregir.classList.add("hidden");
+        if (btnSiguiente) {
+          btnSiguiente.classList.remove("hidden");
+          btnSiguiente.disabled = false;
+        }
+      }
     }
   },
 

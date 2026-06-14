@@ -1571,6 +1571,15 @@
                   <option value="150">150 Segundos (2.5 Minutos)</option>
                 </select>
               </div>
+
+              <!-- Selector de Modo de Combate -->
+              <div class="form-block">
+                <label for="battle-settings-fastmode">Modo de Combate</label>
+                <select id="battle-settings-fastmode" class="input">
+                  <option value="normal" selected>Normal (Manual: Corregir / Siguiente)</option>
+                  <option value="rapido">Rápido (Automático como Aleatorio)</option>
+                </select>
+              </div>
             </div>
 
             <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 32px;">
@@ -1611,6 +1620,16 @@
             <div class="question-card">
               <h3 id="battle-pregunta-texto" class="question-text">Cargando caso clínico multijugador...</h3>
               <div id="battle-opciones-container" class="options-grid"></div>
+            </div>
+
+            <!-- Contenedor de Botones de Control de Flujo (Solo para salas de amigos en modo manual) -->
+            <div id="battle-manual-controls" class="hidden" style="display: flex; gap: 12px; margin-top: 20px; margin-bottom: 20px;">
+              <button id="btn-battle-corregir" class="btn btn-primary" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%) !important;" type="button">
+                🎯 Solicitar Corregir (<span id="battle-corregir-count">0</span>/<span id="battle-corregir-total">0</span>)
+              </button>
+              <button id="btn-battle-siguiente" class="btn btn-primary hidden" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; background: linear-gradient(135deg, var(--success) 0%, #16a34a 100%) !important;" type="button">
+                ➡️ Solicitar Siguiente Pregunta (<span id="battle-siguiente-count">0</span>/<span id="battle-siguiente-total">0</span>)
+              </button>
             </div>
 
             <!-- Caja de Feedback Inmediato (Amigos únicamente) -->
