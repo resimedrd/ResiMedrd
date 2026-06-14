@@ -5,6 +5,7 @@ const battle = {
   salaCodigo: null,
   isHost: false,
   modalidadActual: null, // "amigos" o "aleatoria"
+  estadoActual: "idle", // "idle", "queue", "lobby", "playing", "results"
   preguntasBatalla: [],
   preguntaActualIndex: 0,
   timePerQuestion: 60,
@@ -38,10 +39,11 @@ const battle = {
 
     if (btnResultsReturn) {
       btnResultsReturn.addEventListener("click", () => {
-        battle.mostrarPantallaBattle("battle");
         if (battle.socket && battle.socket.readyState === WebSocket.OPEN) {
-          battle.socket.send(JSON.stringify({ type: "leave_queue" })); // Asegurar limpieza
+          battle.socket.send(JSON.stringify({ type: "leave_room" }));
         }
+        battle.mostrarPantallaBattle("battle");
+        battle.estadoActual = "idle";
       });
     }
 
@@ -90,9 +92,11 @@ const battle = {
 
     if (btnBattleLobbyLeave) {
       btnBattleLobbyLeave.addEventListener("click", () => {
+        if (battle.socket && battle.socket.readyState === WebSocket.OPEN) {
+          battle.socket.send(JSON.stringify({ type: "leave_room" }));
+        }
         battle.mostrarPantallaBattle("battle");
-        // Forzar reconexión para limpiar estado de sala
-        battle.conectarWebSocket();
+        battle.estadoActual = "idle";
       });
     }
 
@@ -118,6 +122,13 @@ const battle = {
             type: "enter_queue",
             settings: { totalQuestions: totalQ, timePerQuestion: 30 } // Forzado a 30 segundos
           }));
+          // Scroll automático suave hacia el HUD de búsqueda
+          setTimeout(() => {
+            const hud = document.getElementById("battle-queue-hud");
+            if (hud) {
+              hud.scrollIntoView({ behavior: "smooth", block: "center" });
+            }
+          }, 80);
         } else {
           alert("Conexión perdida. Intentando reconectar...");
           battle.conectarWebSocket();
@@ -171,11 +182,11 @@ const battle = {
     if (btnBattleQuit) {
       btnBattleQuit.addEventListener("click", () => {
         if (confirm("¿Confirmas que deseas abandonar y finalizar esta batalla? Tu progreso actual en esta partida no se guardará.")) {
-          if (battle.socket) {
-            battle.socket.close();
+          if (battle.socket && battle.socket.readyState === WebSocket.OPEN) {
+            battle.socket.send(JSON.stringify({ type: "leave_room" }));
           }
           battle.mostrarPantallaBattle("battle");
-          battle.conectarWebSocket(); // Reconectar de inmediato para estar listo para la siguiente batalla
+          battle.estadoActual = "idle";
         }
       });
     }
@@ -235,6 +246,20 @@ const battle = {
         alert("⚠️ Error en Batalla: " + payload.message);
         break;
 
+      case "reconnected":
+        battle.salaCodigo = payload.code;
+        battle.modalidadActual = payload.settings ? (payload.settings.timePerQuestion === 30 ? "aleatoria" : "amigos") : "amigos";
+        battle.estadoActual = payload.state;
+        battle.jugadoresDeLaBatalla = payload.players || [];
+        if (payload.state === "playing") {
+          battle.mostrarPantallaBattle("battle-quiz");
+        } else if (payload.state === "results") {
+          battle.mostrarPantallaBattle("battle-results");
+        } else {
+          battle.mostrarPantallaBattle("battle-lobby");
+        }
+        break;
+
       // --- MÓDULO 1: ESTADÍSTICAS Y PANEL GENERAL ---
       case "battle_stats":
         battle.actualizarPerfilBattleUI(payload.stats, payload.historial);
@@ -244,18 +269,21 @@ const battle = {
       case "queue_entered": {
         const hud = document.getElementById("battle-queue-hud");
         if (hud) hud.classList.remove("hidden");
+        battle.estadoActual = "queue";
         break;
       }
 
       case "queue_left": {
         const hud = document.getElementById("battle-queue-hud");
         if (hud) hud.classList.add("hidden");
+        battle.estadoActual = "idle";
         break;
       }
 
       case "matchmaking_failed": {
         const hud = document.getElementById("battle-queue-hud");
         if (hud) hud.classList.add("hidden");
+        battle.estadoActual = "idle";
         alert(payload.message || "No se encontraron contrincantes disponibles. Por favor, intenta de nuevo.");
         break;
       }
@@ -273,12 +301,17 @@ const battle = {
         battle.salaCodigo = payload.code;
         battle.isHost = true;
         battle.modalidadActual = "amigos";
+        battle.estadoActual = "lobby";
         battle.abrirLobby(payload);
         break;
 
       case "room_updated":
         battle.modalidadActual = "amigos";
-        battle.actualizarLobby(payload);
+        if (battle.estadoActual === "lobby") {
+          battle.actualizarLobby(payload);
+        } else {
+          battle.actualizarJugadoresLobby(payload.players);
+        }
         break;
 
       // --- MÓDULO 4: ARENA DE JUEGO MULTIJUGADOR ---
@@ -286,6 +319,7 @@ const battle = {
         battle.modalidadActual = payload.modalidad;
         battle.jugadoresDeLaBatalla = payload.players || [];
         battle.respuestasUsuarioBatalla = []; // Resetear respuestas
+        battle.estadoActual = "playing";
         battle.mostrarPantallaBattle("battle-quiz");
         // Ocultar HUD de cola de matchmaking
         const hud = document.getElementById("battle-queue-hud");
@@ -314,6 +348,7 @@ const battle = {
         break;
 
       case "battle_finished":
+        battle.estadoActual = "results";
         battle.finalizarArena(payload);
         break;
 
@@ -504,9 +539,9 @@ const battle = {
         `;
 
         btn.addEventListener("click", () => {
-          // Deshabilitar todas tras hacer click para evitar doble submit
+          // Remover clase selected de todas las opciones en esta pregunta
           document.querySelectorAll("#battle-opciones-container .option-btn").forEach(b => {
-            b.disabled = true;
+            b.classList.remove("selected");
           });
           btn.classList.add("selected");
 
@@ -529,6 +564,9 @@ const battle = {
 
     // Inicializar visualización de Contrincantes
     battle.actualizarLiveTrackOponentes(payload.players || []);
+
+    // Inicializar visualización del Temporizador
+    battle.actualizarTemporizadorArena(payload.timeLeft);
   },
 
   actualizarTemporizadorArena(timeLeft) {

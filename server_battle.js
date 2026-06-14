@@ -84,7 +84,8 @@ function inicializarBatallas(server, db, JWT_SECRET) {
                       settings: r.settings,
                       currentQuestionIndex: r.currentQuestionIndex,
                       totalQuestions: r.questions.length,
-                      timePerQuestion: r.settings.timePerQuestion
+                      timePerQuestion: r.settings.timePerQuestion,
+                      players: r.players.map(p => ({ id: p.id, nombre: p.nombre }))
                     }));
                     
                     // Si la batalla está activa, enviarle la pregunta actual de inmediato
@@ -97,7 +98,13 @@ function inicializarBatallas(server, db, JWT_SECRET) {
                         texto: question.texto,
                         opciones: question.opciones,
                         tema: question.tema,
-                        timeLeft: r.settings.timePerQuestion
+                        timeLeft: (r.questionTimeLeft !== undefined) ? r.questionTimeLeft : r.settings.timePerQuestion
+                      }));
+                    } else if (r.state === "results" && r.podio) {
+                      wsConn.send(JSON.stringify({
+                        type: "battle_finished",
+                        podio: r.podio,
+                        questions: r.questions
                       }));
                     }
                     
@@ -304,6 +311,47 @@ function inicializarBatallas(server, db, JWT_SECRET) {
             break;
           }
 
+          case "leave_room": {
+            if (salaActualCodigo) {
+              const room = activeRooms.get(salaActualCodigo);
+              if (room) {
+                // Remover al jugador inmediatamente de la sala en memoria
+                room.players = room.players.filter(p => p.id !== userId);
+                salaActualCodigo = null;
+
+                // Si la sala se queda vacía de jugadores reales, purgarla
+                const tieneReales = room.players.some(p => !p.isBot);
+                if (!tieneReales) {
+                  if (room.timerInterval) {
+                    clearInterval(room.timerInterval);
+                  }
+                  activeRooms.delete(room.code);
+                  console.log(`🧹 Sala ${room.code} purgada inmediatamente al salir el último jugador real.`);
+                } else {
+                  // Reasignar host si el host era el que salía
+                  if (room.modalidad === "amigos" && room.hostId === userId) {
+                    const nuevoHost = room.players.find(p => !p.isBot);
+                    if (nuevoHost) {
+                      room.hostId = nuevoHost.id;
+                    }
+                  }
+                  broadcastToRoom(room, {
+                    type: "room_updated",
+                    code: room.code,
+                    settings: room.settings,
+                    players: room.players.map(p => ({
+                      id: p.id,
+                      nombre: p.nombre,
+                      isHost: p.id === room.hostId,
+                      isConnected: p.isConnected !== false
+                    }))
+                  });
+                }
+              }
+            }
+            break;
+          }
+
           // --- CONTROL GENERAL DE PARTIDA ---
           case "submit_answer": {
             const code = salaActualCodigo;
@@ -320,35 +368,34 @@ function inicializarBatallas(server, db, JWT_SECRET) {
 
             const player = room.players.find(p => p.id === userId);
             if (player) {
-              // Evitar doble respuesta
-              if (player.answers.some(ans => ans.questionIndex === qIndex)) {
-                return;
-              }
-
+              let existingAns = player.answers.find(ans => ans.questionIndex === qIndex);
               const correct = room.questions[qIndex].correcta === message.answerIndex;
-              if (correct) {
-                player.score += 1;
-              }
 
-              player.answers.push({
-                questionIndex: qIndex,
-                answerIndex: message.answerIndex,
-                correct: correct
-              });
+              if (existingAns) {
+                // Si cambia la respuesta, ajustar puntuación acumulativa de forma diferencial
+                if (existingAns.correct && !correct) {
+                  player.score = Math.max(0, player.score - 1);
+                } else if (!existingAns.correct && correct) {
+                  player.score += 1;
+                }
+                existingAns.answerIndex = message.answerIndex;
+                existingAns.correct = correct;
+              } else {
+                if (correct) {
+                  player.score += 1;
+                }
+                player.answers.push({
+                  questionIndex: qIndex,
+                  answerIndex: message.answerIndex,
+                  correct: correct
+                });
+              }
 
               // Informar que el jugador respondió
               broadcastToRoom(room, {
                 type: "player_responded",
                 playerId: userId
               });
-
-              // Evaluar si todos los jugadores reales conectados han respondido
-              const reales = room.players.filter(p => !p.isBot && p.isConnected !== false);
-              const todosRespondieron = reales.every(p => p.answers.some(ans => ans.questionIndex === qIndex));
-
-              if (todosRespondieron) {
-                procesarAvancePregunta(room);
-              }
             }
             break;
           }
@@ -640,12 +687,14 @@ function enviarPreguntaSincronizada(room) {
 
   // Iniciar temporizador regresivo del lado del servidor
   let timeLeft = room.settings.timePerQuestion;
+  room.questionTimeLeft = timeLeft;
   
   // Programar a los bots si es modalidad continua o inmediata
   simularRespuestasDeBots(room, qIndex);
 
   room.timerInterval = setInterval(() => {
     timeLeft -= 1;
+    room.questionTimeLeft = timeLeft;
     
     // Broadcast de tick del temporizador
     broadcastToRoom(room, {
@@ -707,14 +756,6 @@ function simularRespuestasDeBots(room, qIndex) {
             playerId: bot.id
           });
         }
-
-        // Evaluar si todos respondieron tras el click del bot
-        const reales = room.players.filter(p => !p.isBot && p.isConnected !== false);
-        const todosRespondieron = reales.every(p => p.answers.some(ans => ans.questionIndex === qIndex));
-
-        if (todosRespondieron) {
-          procesarAvancePregunta(room);
-        }
       }
     }, delay);
   }
@@ -724,7 +765,7 @@ function procesarAvancePregunta(room) {
   if (room.timerInterval) {
     clearInterval(room.timerInterval);
   }
-  iniciarFeedbackPregunta(room);
+  avanzarSiguientePregunta(room);
 }
 
 function iniciarFeedbackPregunta(room) {
@@ -813,6 +854,7 @@ async function finalizarBatalla(room) {
   }
 
   // Notificar resultados definitivos
+  room.podio = podio;
   broadcastToRoom(room, {
     type: "battle_finished",
     podio: podio,
