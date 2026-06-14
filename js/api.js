@@ -117,6 +117,9 @@ const api = {
   obtenerHistorialDiarioFlashcards: (usuarioId) =>
     request(`/api/flashcards/historial-diario?usuarioId=${usuarioId}`),
 
+  obtenerResumenStatsFlashcards: (usuarioId) =>
+    request(`/api/flashcards/resumen-stats?usuarioId=${usuarioId}`),
+
   actualizarPerfil: (nombre, especialidadAspirada, metaSemanal) => 
     request("/api/usuario/actualizar", {
       method: "PUT",

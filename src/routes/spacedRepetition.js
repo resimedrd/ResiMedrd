@@ -160,6 +160,59 @@ router.get("/api/flashcards/historial-diario", autenticarToken, async (req, res)
   }
 });
 
+router.get("/api/flashcards/resumen-stats", autenticarToken, async (req, res) => {
+  const db = getDB();
+  try {
+    const { usuarioId } = req.query;
+    if (parseInt(usuarioId) !== req.usuario.id) {
+      return res.status(403).json({ error: "Acceso no autorizado." });
+    }
+
+    // 1. Obtener estados de repetición de flashcards
+    const srFilas = await db.all(
+      `SELECT repetitions, interval, next_review FROM spaced_repetition WHERE usuario_id = ? AND flashcard_id IS NOT NULL`,
+      [usuarioId]
+    );
+
+    // 2. Obtener aciertos/fallos históricos de flashcards
+    const historial = await db.get(
+      `SELECT COUNT(*) AS total, SUM(CASE WHEN se_la_sabia = 1 THEN 1 ELSE 0 END) AS aciertos FROM historial_flashcards WHERE usuario_id = ?`,
+      [usuarioId]
+    );
+
+    let dominadas = 0;
+    let porRepasar = 0;
+    const ahora = new Date();
+
+    srFilas.forEach(f => {
+      // Dominada si tiene 3 o más repeticiones exitosas o intervalo de repaso de 7 o más días
+      if (f.repetitions >= 3 || f.interval >= 7) {
+        dominadas++;
+      }
+      // Por repasar si toca hoy o si su intervalo es 0 (fallada y pendiente)
+      const fechaRevision = f.next_review ? new Date(f.next_review) : ahora;
+      if (fechaRevision <= ahora || f.interval === 0) {
+        porRepasar++;
+      }
+    });
+
+    const totalReviews = historial ? (historial.total || 0) : 0;
+    const totalAciertos = historial ? (historial.aciertos || 0) : 0;
+    const retencion = totalReviews > 0 ? Math.round((totalAciertos / totalReviews) * 100) : 0;
+
+    res.json({
+      dominadas,
+      porRepasar,
+      retencion,
+      totalReviews,
+      totalAciertos
+    });
+  } catch (error) {
+    console.error("Error al obtener estadísticas de flashcards:", error);
+    res.status(500).json({ error: "Error al obtener estadísticas de flashcards." });
+  }
+});
+
 /* ==========================================================================
    🚨 APIS DE REPORTES DE ERROR EN PREGUNTAS (FASE 6)
    ========================================================================== */

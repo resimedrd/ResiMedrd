@@ -129,6 +129,8 @@ baseDatosFlashcardsEstaticas[23] = {
 const flashcards = {
   inicializar() {
     state.modoFlashcard = "classic"; // "classic" or "active"
+    state.globalFlashcardsStats = null;
+    state.flashcardStates = {};
 
     const btnIrFlashcards = document.getElementById("btn-ir-flashcards");
     const btnFlashcardsRegresar = document.getElementById("btn-flashcards-regresar");
@@ -381,6 +383,8 @@ const flashcards = {
         srEstados.forEach(e => {
           if (e.flashcard_id) estados[e.flashcard_id] = e;
         });
+        state.flashcardStates = estados;
+        await flashcards.cargarEstadisticasGlobales();
       }
 
       // Segmentar en dos bloques en caliente: prioritario (interval === 0) y enfriamiento (interval > 0)
@@ -579,13 +583,76 @@ const flashcards = {
     };
   },
 
+  // CARGAR ESTADISTICAS HISTORICAS GLOBALES DESDE EL SERVIDOR
+  async cargarEstadisticasGlobales() {
+    if (!state.usuarioConectado) return;
+    try {
+      const stats = await api.obtenerResumenStatsFlashcards(state.usuarioConectado.id);
+      state.globalFlashcardsStats = stats;
+      flashcards.actualizarContadores();
+    } catch (e) {
+      console.error("Error al cargar estadísticas globales de flashcards:", e);
+    }
+  },
+
   // AVANZAR TARJETA CON MOTOR DE SPACED REPETITION (SM-2 / FSRS) PERSISTENTE
   async avanzar(seLaSabia) {
     const card = state.mazoActualFlashcards[state.indiceActualFlashcard];
+    if (!card) return;
     
     // Sincronizar FSRS/SM-2 persistente en el servidor
     // SeLaSabia: true -> Bien (2), false -> Fallado (0)
-    await spacedRepetition.sincronizarEstado(null, card.pregunta, seLaSabia, seLaSabia ? 2 : 0);
+    const nuevoEstado = await spacedRepetition.sincronizarEstado(null, card.pregunta, seLaSabia, seLaSabia ? 2 : 0);
+
+    // Obtener estado anterior
+    if (!state.flashcardStates) {
+      state.flashcardStates = {};
+    }
+    const oldEstado = state.flashcardStates[card.pregunta];
+
+    const ahora = new Date();
+
+    // Determinar si era dominada antes
+    const eraDominada = oldEstado && (oldEstado.repetitions >= 3 || oldEstado.interval >= 7);
+    // Determinar si es dominada ahora
+    const esDominadaAhora = nuevoEstado && (nuevoEstado.repetitions >= 3 || nuevoEstado.interval >= 7);
+
+    // Determinar si era pendiente antes
+    const eraPendiente = !oldEstado || !oldEstado.next_review || new Date(oldEstado.next_review) <= ahora || oldEstado.interval === 0;
+    // Determinar si es pendiente ahora
+    const esPendienteAhora = nuevoEstado && (new Date(nuevoEstado.nextReview) <= ahora || nuevoEstado.interval === 0);
+
+    // Actualizar estadísticas globales en memoria de forma reactiva
+    if (state.globalFlashcardsStats) {
+      if (esDominadaAhora && !eraDominada) {
+        state.globalFlashcardsStats.dominadas++;
+      } else if (!esDominadaAhora && eraDominada) {
+        state.globalFlashcardsStats.dominadas = Math.max(0, state.globalFlashcardsStats.dominadas - 1);
+      }
+
+      if (eraPendiente && !esPendienteAhora) {
+        state.globalFlashcardsStats.porRepasar = Math.max(0, state.globalFlashcardsStats.porRepasar - 1);
+      } else if (!eraPendiente && esPendienteAhora) {
+        state.globalFlashcardsStats.porRepasar++;
+      }
+
+      state.globalFlashcardsStats.totalReviews++;
+      if (seLaSabia) {
+        state.globalFlashcardsStats.totalAciertos++;
+      }
+      state.globalFlashcardsStats.retencion = state.globalFlashcardsStats.totalReviews > 0
+        ? Math.round((state.globalFlashcardsStats.totalAciertos / state.globalFlashcardsStats.totalReviews) * 100)
+        : 0;
+    }
+
+    // Actualizar estado guardado en memoria para revisiones subsecuentes
+    if (nuevoEstado) {
+      state.flashcardStates[card.pregunta] = {
+        repetitions: nuevoEstado.repetitions,
+        interval: nuevoEstado.interval,
+        next_review: nuevoEstado.nextReview
+      };
+    }
 
     if (seLaSabia) {
       state.dominadasFlashcards++;
@@ -635,17 +702,24 @@ const flashcards = {
     const repEl = document.getElementById("flashcard-stat-repaso");
     const retEl = document.getElementById("flashcard-stat-retencion");
 
-    if (domEl) domEl.textContent = state.dominadasFlashcards;
-    if (repEl) repEl.textContent = state.repasoFlashcards;
-
-    const totalRespondidas = state.dominadasFlashcards + state.repasoFlashcards;
-    const porcentaje = totalRespondidas > 0 ? Math.round((state.dominadasFlashcards / totalRespondidas) * 100) : 0;
+    const dominadas = state.globalFlashcardsStats ? state.globalFlashcardsStats.dominadas : state.dominadasFlashcards;
+    const porRepasar = state.globalFlashcardsStats ? state.globalFlashcardsStats.porRepasar : state.repasoFlashcards;
     
+    let retencion = 0;
+    if (state.globalFlashcardsStats) {
+      retencion = state.globalFlashcardsStats.retencion;
+    } else {
+      const totalRespondidas = state.dominadasFlashcards + state.repasoFlashcards;
+      retencion = totalRespondidas > 0 ? Math.round((state.dominadasFlashcards / totalRespondidas) * 100) : 0;
+    }
+
+    if (domEl) domEl.textContent = dominadas;
+    if (repEl) repEl.textContent = porRepasar;
     if (retEl) {
-      retEl.textContent = `${porcentaje}%`;
-      if (porcentaje >= 75) {
+      retEl.textContent = `${retencion}%`;
+      if (retencion >= 75) {
         retEl.style.color = "var(--success)";
-      } else if (porcentaje >= 50) {
+      } else if (retencion >= 50) {
         retEl.style.color = "var(--warning)";
       } else {
         retEl.style.color = "var(--danger)";
