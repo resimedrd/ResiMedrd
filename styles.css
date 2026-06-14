@@ -1015,7 +1015,7 @@ select.input option {
   width: 100%;
   max-width: 580px;
   height: 270px;
-  margin: 16px auto;
+  margin: 8px auto;
   cursor: pointer;
 }
 
