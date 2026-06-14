@@ -1393,11 +1393,7 @@
             <span class="eyebrow" style="color: var(--danger);">Competencia Médica Live</span>
             <h2>Arena del Modo Batalla</h2>
             <p>Mide tus destrezas diagnósticas frente a tus colegas en tiempo real. **Nota:** Las respuestas realizadas en batallas no interfieren en tus simulacros o estadísticas académicas generales.</p>
-            <div class="hero-badges">
-              <span class="badge" style="border-color: rgba(239, 68, 68, 0.2); color: var(--danger);">WebSocket Real-Time</span>
-              <span class="badge" style="border-color: rgba(239, 68, 68, 0.2); color: var(--danger);">Matchmaking en Vivo</span>
-              <span class="badge" style="border-color: rgba(239, 68, 68, 0.2); color: var(--danger);">Aislamiento de Perfil</span>
-            </div>
+
           </div>
           <!-- Cola de Búsqueda Integrada HUD (Oculto inicialmente) -->
           <div id="battle-queue-hud" class="hidden" style="background: rgba(15,23,42,0.85); border: 2px solid var(--danger); padding: 24px; border-radius: 20px; text-align: center; box-shadow: 0 10px 30px rgba(239,68,68,0.2);">
@@ -1423,8 +1419,9 @@
               <div>
                 <label for="battle-custom-questions" style="font-size: 13px; font-weight: 600; color: var(--text-soft); display: block; margin-bottom: 6px;">Total de Preguntas (Batalla Aleatoria)</label>
                 <select id="battle-custom-questions" class="input">
+                  <option value="5" selected>5 Preguntas</option>
                   <option value="10">10 Preguntas</option>
-                  <option value="15" selected>15 Preguntas</option>
+                  <option value="15">15 Preguntas</option>
                   <option value="20">20 Preguntas</option>
                   <option value="30">30 Preguntas</option>
                 </select>
@@ -1553,8 +1550,9 @@
               <div class="form-block">
                 <label for="battle-settings-questions">Número de Reactivos</label>
                 <select id="battle-settings-questions" class="input">
+                  <option value="5" selected>5 Preguntas</option>
                   <option value="10">10 Preguntas</option>
-                  <option value="15" selected>15 Preguntas</option>
+                  <option value="15">15 Preguntas</option>
                   <option value="20">20 Preguntas</option>
                   <option value="25">25 Preguntas</option>
                   <option value="30">30 Preguntas</option>
