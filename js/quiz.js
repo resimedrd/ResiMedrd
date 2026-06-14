@@ -509,19 +509,26 @@ const quiz = {
         }
       }
 
-      ui.mostrarPantalla("quiz", false);
-
       // 3. Configuración de Tiempos
       if (modo === "guardia") {
         state.preguntasCargadas = preguntas.slice(0, 10); // Modo guardia siempre 10 preguntas
         state.respuestasUsuario = new Array(state.preguntasCargadas.length).fill(null);
         state.preguntasMarcadas = new Array(state.preguntasCargadas.length).fill(false);
-        
-        if (temporizadorEl) temporizadorEl.classList.remove("hidden");
-        quiz.iniciarTemporizadorGuardia();
       } else if (modo === "simulacro" || modo === "estudio") {
         state.tiempoRestanteSegundos = state.preguntasCargadas.length * 90;
         state.duracionTotalSegundos = 0;
+      }
+
+      // Guardar el estado del examen activo antes de cambiar a la pantalla de quiz
+      quiz.guardarEstadoExamenActivo();
+
+      ui.mostrarPantalla("quiz", false);
+
+      // Iniciar temporizadores visuales y cronómetro
+      if (modo === "guardia") {
+        if (temporizadorEl) temporizadorEl.classList.remove("hidden");
+        quiz.iniciarTemporizadorGuardia();
+      } else if (modo === "simulacro" || modo === "estudio") {
         if (temporizadorEl) {
           temporizadorEl.classList.remove("hidden");
           quiz.actualizarRelojVisual();
