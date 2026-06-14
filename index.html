@@ -799,14 +799,8 @@
       <section id="pantalla-perfil" class="screen">
         <div class="profile-shell" style="max-width: 840px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px;">
           
-          <!-- TABS DEL PERFIL (NUEVO CON DOS SECCIONES) -->
-          <div class="auth-tabs" style="margin-bottom: 0;">
-            <button id="tab-perfil-progreso" class="auth-tab active" type="button" style="border-radius: 12px 12px 0 0;">Estadísticas y Métricas</button>
-            <button id="tab-perfil-errores" class="auth-tab" type="button" style="border-radius: 12px 12px 0 0;">Banco de Errores</button>
-          </div>
-
           <!-- CONTENIDO: MI PROGRESO -->
-          <div id="perfil-contenido-progreso" class="perfil-seccion-tab">
+          <div id="perfil-contenido-progreso">
             <!-- Tarjeta Premium de Datos Personales del Médico (Rediseño AMBOSS Premium) -->
             <article class="panel" style="position: relative; overflow: hidden; border-radius: 28px; padding: 32px; background: var(--hero-bg); border: 1px solid var(--border); margin-bottom: 20px;">
               <div class="profile-header-premium" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 24px;">
@@ -1133,29 +1127,6 @@
 
             
 
-          <!-- CONTENIDO: BANCO DE ERRORES -->
-          <div id="perfil-contenido-errores" class="perfil-seccion-tab hidden" style="margin-top: 20px;">
-            <div class="banco-errores-grid" style="display: flex; flex-direction: column; gap: 24px;">
-              
-              <!-- COBERTURA, RENDIMIENTO Y BANCO DE ERRORES POR ESPECIALIDAD -->
-              <article class="panel panel-acordeon">
-                <div class="panel-head" style="margin-bottom: 24px;">
-                  <h3 style="color: var(--text); font-size: 20px; font-weight: 700; display: flex; align-items: center; gap: 8px;">
-                    Rendimiento y Banco de Errores por Especialidad
-                  </h3>
-                  <p style="font-size: 14px; color: var(--text-dim); margin-top: 4px;">Análisis de cobertura de preguntas vistas, promedio académico, temas dominados, temas a reforzar e historial de fallos.</p>
-                </div>
-                
-                <div id="banco-errores-especialidades-container" style="display: flex; flex-direction: column; gap: 24px;">
-                  <!-- Inyectado dinámicamente desde JS (Especialidades con sus notas, temas específicos y preguntas falladas) -->
-                </div>
-
-                <div id="banco-errores-vacio" class="history-empty hidden" style="margin-top: 16px; text-align: center; padding: 32px; color: var(--text-dim); border: 1px dashed var(--border); border-radius: 16px; background: rgba(255,255,255,0.01);">
-                  No tienes errores registrados actualmente. ¡Felicidades! Mantienes un perfil excelente.
-                </div>
-              </article>
-              
-            </div>
           </div>
 
 
@@ -1164,6 +1135,33 @@
 
             
           </div>
+      </section>
+
+      <!-- SECCIÓN INDEPENDIENTE: BANCO DE ERRORES -->
+      <section id="pantalla-errores" class="screen">
+        <div class="profile-shell" style="max-width: 840px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px;">
+          <div class="banco-errores-grid" style="display: flex; flex-direction: column; gap: 24px;">
+            
+            <!-- COBERTURA, RENDIMIENTO Y BANCO DE ERRORES POR ESPECIALIDAD -->
+            <article class="panel panel-acordeon">
+              <div class="panel-head" style="margin-bottom: 24px;">
+                <h3 style="color: var(--text); font-size: 20px; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+                  Rendimiento y Banco de Errores por Especialidad
+                </h3>
+                <p style="font-size: 14px; color: var(--text-dim); margin-top: 4px;">Análisis de cobertura de preguntas vistas, promedio académico, temas dominados, temas a reforzar e historial de fallos.</p>
+              </div>
+              
+              <div id="banco-errores-especialidades-container" style="display: flex; flex-direction: column; gap: 24px;">
+                <!-- Inyectado dinámicamente desde JS -->
+              </div>
+
+              <div id="banco-errores-vacio" class="history-empty hidden" style="margin-top: 16px; text-align: center; padding: 32px; color: var(--text-dim); border: 1px dashed var(--border); border-radius: 16px; background: rgba(255,255,255,0.01);">
+                No tienes errores registrados actualmente. ¡Felicidades! Mantienes un perfil excelente.
+              </div>
+            </article>
+            
+          </div>
+        </div>
       </section>
 
       <!-- FASE 3: MÓDULO INTERACTIVO DE FLASHCARDS ENURM -->

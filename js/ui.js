@@ -72,12 +72,9 @@ const ui = {
       } else if (nombrePantalla === "flashcards") {
         targetSelector = '.sidebar-item[data-target="preguntas"]';
       } else if (nombrePantalla === "perfil") {
-        const tabErrores = document.getElementById("tab-perfil-errores");
-        if (tabErrores && tabErrores.classList.contains("active")) {
-          targetSelector = '.sidebar-item[data-target="errores"]';
-        } else {
-          targetSelector = '.sidebar-item[data-target="estadisticas"]';
-        }
+        targetSelector = '.sidebar-item[data-target="estadisticas"]';
+      } else if (nombrePantalla === "errores") {
+        targetSelector = '.sidebar-item[data-target="errores"]';
       } else if (nombrePantalla.startsWith("battle")) {
         targetSelector = '.sidebar-item[data-target="ranking"]';
       }
@@ -92,8 +89,8 @@ const ui = {
       ui.cargarHistorialReciente();
     } else if (nombrePantalla === "perfil") {
       ui.actualizarProgresoEstudiante();
-      const tabPerfilProgreso = document.getElementById("tab-perfil-progreso");
-      if (tabPerfilProgreso) tabPerfilProgreso.click();
+    } else if (nombrePantalla === "errores") {
+      ui.actualizarProgresoEstudiante();
     } else if (nombrePantalla === "flashcards") {
       // FASE 1: Cargar mazo por defecto "Todos" inmediatamente al acceder a la pantalla
       if (typeof flashcards !== "undefined" && typeof flashcards.inicializarMazo === "function") {

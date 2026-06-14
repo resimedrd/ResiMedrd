@@ -293,9 +293,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           if (scrollTarget) scrollTarget.scrollIntoView({ behavior: "smooth", block: "start" });
         }, 300);
       } else if (target === "errores") {
-        ui.mostrarPantalla("perfil");
-        const tabErrores = document.getElementById("tab-perfil-errores");
-        if (tabErrores) tabErrores.click();
+        ui.mostrarPantalla("errores");
       } else if (target === "ranking") {
         battle.mostrarPantallaBattle("battle");
         battle.conectarWebSocket();
@@ -364,32 +362,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 
-  // === 5. CONTROLADOR DE PESTAÑAS (TABS) EN MI PERFIL ===
-  const tabProgreso = document.getElementById("tab-perfil-progreso");
-  const tabErrores = document.getElementById("tab-perfil-errores");
 
-  const secProgreso = document.getElementById("perfil-contenido-progreso");
-  const secErrores = document.getElementById("perfil-contenido-errores");
-
-  if (tabProgreso && tabErrores && secProgreso && secErrores) {
-    const alternarTabs = (tabActivo, secActiva) => {
-      [tabProgreso, tabErrores].forEach(t => t.classList.remove("active"));
-      [secProgreso, secErrores].forEach(s => s.classList.add("hidden"));
-      
-      tabActivo.classList.add("active");
-      secActiva.classList.remove("hidden");
-    };
-
-    tabProgreso.addEventListener("click", () => {
-      alternarTabs(tabProgreso, secProgreso);
-      ui.actualizarProgresoEstudiante();
-    });
-
-    tabErrores.addEventListener("click", () => {
-      alternarTabs(tabErrores, secErrores);
-      ui.actualizarProgresoEstudiante();
-    });
-  }
 
   // === 6. MODAL INTERACTIVO DE CREACIÓN DE FLASHCARDS MANUALES ===
   const modalCrearFlashcard = document.getElementById("modal-crear-flashcard");
