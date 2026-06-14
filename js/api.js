@@ -88,7 +88,7 @@ const api = {
     request(`/api/spaced-repetition?usuarioId=${usuarioId}`),
 
   obtenerRepeticionIndividual: (usuarioId, preguntaId, flashcardId) => {
-    const query = flashcardId ? `flashcardId=${flashcardId}` : `preguntaId=${preguntaId}`;
+    const query = flashcardId ? `flashcardId=${encodeURIComponent(flashcardId)}` : `preguntaId=${preguntaId}`;
     return request(`/api/spaced-repetition/individual?usuarioId=${usuarioId}&${query}`);
   },
 

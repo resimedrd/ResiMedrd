@@ -131,6 +131,7 @@ const flashcards = {
     state.modoFlashcard = "classic"; // "classic" or "active"
     state.globalFlashcardsStats = null;
     state.flashcardStates = {};
+    state.todosLosFlashcards = [];
 
     const btnIrFlashcards = document.getElementById("btn-ir-flashcards");
     const btnFlashcardsRegresar = document.getElementById("btn-flashcards-regresar");
@@ -368,6 +369,7 @@ const flashcards = {
 
       // 2. Unir mazos
       const mazoCompleto = [...baseDatosFlashcardsEstaticas, ...personalizadas];
+      state.todosLosFlashcards = mazoCompleto;
 
       // 3. Filtrar por materia de forma insensible a espacios/mayúsculas
       if (filtroTema === "todos") {
@@ -588,11 +590,60 @@ const flashcards = {
     if (!state.usuarioConectado) return;
     try {
       const stats = await api.obtenerResumenStatsFlashcards(state.usuarioConectado.id);
-      state.globalFlashcardsStats = stats;
-      flashcards.actualizarContadores();
+      if (!state.globalFlashcardsStats) {
+        state.globalFlashcardsStats = {};
+      }
+      state.globalFlashcardsStats.retencion = stats.retencion;
+      state.globalFlashcardsStats.totalReviews = stats.totalReviews;
+      state.globalFlashcardsStats.totalAciertos = stats.totalAciertos;
+      
+      // Calcular dominadas y por repasar basadas en el mazo completo y los estados guardados
+      flashcards.recalcularEstadisticas();
     } catch (e) {
       console.error("Error al cargar estadísticas globales de flashcards:", e);
     }
+  },
+
+  // RECALCULAR ESTADISTICAS EN BASE A LOS ESTADOS ACTUALES
+  recalcularEstadisticas() {
+    if (!state.todosLosFlashcards || !state.flashcardStates) return;
+
+    let dominadas = 0;
+    let porRepasar = 0;
+    const ahora = new Date();
+
+    state.todosLosFlashcards.forEach(card => {
+      const estado = state.flashcardStates[card.pregunta];
+      if (estado) {
+        // Dominada si tiene 3 o más repeticiones o intervalo >= 7 días
+        if (estado.repetitions >= 3 || estado.interval >= 7) {
+          dominadas++;
+        }
+        // Por repasar si toca hoy o si su intervalo es 0 (fallada y pendiente)
+        const fechaRevision = estado.next_review ? new Date(estado.next_review) : ahora;
+        if (fechaRevision <= ahora || estado.interval === 0) {
+          porRepasar++;
+        }
+      } else {
+        // Si no tiene estado (nunca vista/repasada), cuenta como por repasar
+        porRepasar++;
+      }
+    });
+
+    if (!state.globalFlashcardsStats) {
+      state.globalFlashcardsStats = {
+        dominadas: 0,
+        porRepasar: 0,
+        retencion: 0,
+        totalReviews: 0,
+        totalAciertos: 0
+      };
+    }
+
+    state.globalFlashcardsStats.dominadas = dominadas;
+    state.globalFlashcardsStats.porRepasar = porRepasar;
+
+    flashcards.actualizarContadores();
   },
 
   // AVANZAR TARJETA CON MOTOR DE SPACED REPETITION (SM-2 / FSRS) PERSISTENTE
@@ -604,38 +655,8 @@ const flashcards = {
     // SeLaSabia: true -> Bien (2), false -> Fallado (0)
     const nuevoEstado = await spacedRepetition.sincronizarEstado(null, card.pregunta, seLaSabia, seLaSabia ? 2 : 0);
 
-    // Obtener estado anterior
-    if (!state.flashcardStates) {
-      state.flashcardStates = {};
-    }
-    const oldEstado = state.flashcardStates[card.pregunta];
-
-    const ahora = new Date();
-
-    // Determinar si era dominada antes
-    const eraDominada = oldEstado && (oldEstado.repetitions >= 3 || oldEstado.interval >= 7);
-    // Determinar si es dominada ahora
-    const esDominadaAhora = nuevoEstado && (nuevoEstado.repetitions >= 3 || nuevoEstado.interval >= 7);
-
-    // Determinar si era pendiente antes
-    const eraPendiente = !oldEstado || !oldEstado.next_review || new Date(oldEstado.next_review) <= ahora || oldEstado.interval === 0;
-    // Determinar si es pendiente ahora
-    const esPendienteAhora = nuevoEstado && (new Date(nuevoEstado.nextReview) <= ahora || nuevoEstado.interval === 0);
-
-    // Actualizar estadísticas globales en memoria de forma reactiva
+    // Actualizar estadísticas de reviews históricas locales
     if (state.globalFlashcardsStats) {
-      if (esDominadaAhora && !eraDominada) {
-        state.globalFlashcardsStats.dominadas++;
-      } else if (!esDominadaAhora && eraDominada) {
-        state.globalFlashcardsStats.dominadas = Math.max(0, state.globalFlashcardsStats.dominadas - 1);
-      }
-
-      if (eraPendiente && !esPendienteAhora) {
-        state.globalFlashcardsStats.porRepasar = Math.max(0, state.globalFlashcardsStats.porRepasar - 1);
-      } else if (!eraPendiente && esPendienteAhora) {
-        state.globalFlashcardsStats.porRepasar++;
-      }
-
       state.globalFlashcardsStats.totalReviews++;
       if (seLaSabia) {
         state.globalFlashcardsStats.totalAciertos++;
@@ -654,6 +675,9 @@ const flashcards = {
       };
     }
 
+    // Recalcular estadísticas globales de forma precisa
+    flashcards.recalcularEstadisticas();
+
     if (seLaSabia) {
       state.dominadasFlashcards++;
     } else {
@@ -661,8 +685,6 @@ const flashcards = {
       // Mazo secundario seguro para evitar fallos de splicing en caliente
       state.mazoFalladasSesion.push(card);
     }
-
-    flashcards.actualizarContadores();
 
     const flashcardClickTrigger = document.getElementById("flashcard-click-trigger");
     const flashcardEvalBox = document.getElementById("flashcard-eval-box");
