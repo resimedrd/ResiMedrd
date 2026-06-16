@@ -3626,10 +3626,13 @@ body.dark-mode .sidebar-item.active {
   transform: scale(1.15);
 }
 
-/* Hide when auth screen is active */
+/* Hide when auth or quiz screen is active */
 body:has(#pantalla-auth.active) #app-sidebar,
 body:has(#pantalla-auth.active) #btn-toggle-sidebar,
-body:has(#pantalla-auth.active) .sidebar-backdrop {
+body:has(#pantalla-auth.active) .sidebar-backdrop,
+body:has(#pantalla-quiz.active) #app-sidebar,
+body:has(#pantalla-quiz.active) #btn-toggle-sidebar,
+body:has(#pantalla-quiz.active) .sidebar-backdrop {
   display: none !important;
 }
 

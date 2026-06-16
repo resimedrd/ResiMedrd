@@ -38,6 +38,14 @@ const ui = {
 
     const nombrePantalla = idReal.replace("pantalla-", "");
 
+    // Si hay un examen activo y se intenta salir de él, bloquear la navegación
+    const tieneExamenActivo = !!localStorage.getItem("resiMed_examen_activo");
+    if (tieneExamenActivo && nombrePantalla !== "quiz" && nombrePantalla !== "resultados") {
+      window.history.pushState({ pantalla: "quiz" }, "", "#quiz");
+      alert("⚠️ Tienes una evaluación en curso. Debes finalizarla primero; no puedes salir de esta pantalla.");
+      return;
+    }
+
     // Protección para evitar entrar a la pantalla de evaluación (quiz) sin un examen activo
     if (nombrePantalla === "quiz" && !localStorage.getItem("resiMed_examen_activo")) {
       ui.mostrarPantalla("home", false);
