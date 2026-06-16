@@ -285,6 +285,7 @@ const quiz = {
     const btnModoEstudio = document.getElementById("btn-modo-estudio");
     const btnModoSimulacro = document.getElementById("btn-modo-simulacro");
     const btnSiguiente = document.getElementById("btn-siguiente");
+    const btnAnterior = document.getElementById("btn-anterior");
     const btnFinalizar = document.getElementById("btn-finalizar");
     const btnFlagPregunta = document.getElementById("btn-flag-pregunta");
     const preguntaTexto = document.getElementById("pregunta-texto");
@@ -297,6 +298,9 @@ const quiz = {
     }
     if (btnSiguiente) {
       btnSiguiente.addEventListener("click", () => quiz.siguientePregunta());
+    }
+    if (btnAnterior) {
+      btnAnterior.addEventListener("click", () => quiz.anteriorPregunta());
     }
     if (btnFinalizar) {
       btnFinalizar.addEventListener("click", () => quiz.finalizarSesion());
@@ -854,11 +858,43 @@ const quiz = {
 
   chequearBotonesNavegacion() {
     const btnSiguiente = document.getElementById("btn-siguiente");
+    const btnAnterior = document.getElementById("btn-anterior");
+
+    // Configuración de botón Siguiente
     if (state.indiceActual < state.preguntasCargadas.length - 1) {
-      if (state.modoActual !== "estudio" || state.respuestasUsuario[state.indiceActual] !== null) {
+      const mostrarSiguienteInmediatamente = (state.modoActual !== "estudio" || state.retroalimentacionInmediata === false);
+      if (mostrarSiguienteInmediatamente || state.respuestasUsuario[state.indiceActual] !== null) {
         if (btnSiguiente) btnSiguiente.classList.remove("hidden");
+      } else {
+        if (btnSiguiente) btnSiguiente.classList.add("hidden");
+      }
+    } else {
+      if (btnSiguiente) btnSiguiente.classList.add("hidden");
+    }
+
+    // Configuración de botón Anterior/Atrás (Solo en simulacro y estudio con corrección al final)
+    const esModoPermitidoAtras = (state.modoActual === "simulacro" || (state.modoActual === "estudio" && state.retroalimentacionInmediata === false));
+    if (btnAnterior) {
+      if (state.indiceActual > 0 && esModoPermitidoAtras) {
+        btnAnterior.classList.remove("hidden");
+      } else {
+        btnAnterior.classList.add("hidden");
       }
     }
+  },
+
+  anteriorPregunta() {
+    clearInterval(guardiaTimerInterval);
+    if (state.indiceActual <= 0) {
+      return;
+    }
+    state.indiceActual--;
+    
+    if (state.modoActual === "guardia") {
+      quiz.iniciarTemporizadorGuardia();
+    }
+    quiz.renderizarPreguntaActual();
+    quiz.guardarEstadoExamenActivo();
   },
 
   siguientePregunta() {
@@ -1164,8 +1200,10 @@ const quiz = {
     });
 
     const btnSiguiente = document.getElementById("btn-siguiente");
+    const btnAnterior = document.getElementById("btn-anterior");
     const btnFinalizar = document.getElementById("btn-finalizar");
     if (btnSiguiente) btnSiguiente.classList.add("hidden");
+    if (btnAnterior) btnAnterior.classList.add("hidden");
     if (btnFinalizar) {
       btnFinalizar.textContent = "Procesando...";
       btnFinalizar.disabled = true;
