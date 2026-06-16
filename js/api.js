@@ -5,7 +5,7 @@ const BASE_URL = "";
 
 // Helper centralizado para inyectar token JWT de forma automática
 async function request(url, options = {}) {
-  const token = localStorage.getItem("resiMed_jwt_token");
+  const token = sessionStorage.getItem("resiMed_jwt_token");
   
   options.headers = {
     "Content-Type": "application/json",
@@ -20,8 +20,8 @@ async function request(url, options = {}) {
   
   if ((respuesta.status === 401 || respuesta.status === 403) && !url.includes("/api/auth/")) {
     // Si la sesión expiró o no está autorizado, forzar logout
-    localStorage.removeItem("resiMed_session");
-    localStorage.removeItem("resiMed_jwt_token");
+    sessionStorage.removeItem("resiMed_session");
+    sessionStorage.removeItem("resiMed_jwt_token");
     sessionStorage.setItem("resiMed_session_expired", "true");
     window.location.reload();
     throw new Error("Sesión expirada. Inicie sesión nuevamente.");

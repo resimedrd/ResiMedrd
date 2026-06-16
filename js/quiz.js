@@ -59,7 +59,8 @@ const quiz = {
         preguntasMarcadas: state.preguntasMarcadas,
         duracionTotalSegundos: state.duracionTotalSegundos,
         tiempoRestanteSegundos: state.tiempoRestanteSegundos,
-        retroalimentacionInmediata: state.retroalimentacionInmediata
+        retroalimentacionInmediata: state.retroalimentacionInmediata,
+        timestamp: Date.now()
       }));
     }
   },
@@ -87,6 +88,26 @@ const quiz = {
       state.duracionTotalSegundos = data.duracionTotalSegundos;
       state.tiempoRestanteSegundos = data.tiempoRestanteSegundos;
       state.retroalimentacionInmediata = data.retroalimentacionInmediata;
+
+      // Restar el tiempo transcurrido desde que se cerró la ventana
+      if (data.timestamp && (state.modoActual === "simulacro" || state.modoActual === "estudio")) {
+        const segundosTranscurridos = Math.floor((Date.now() - data.timestamp) / 1000);
+        if (segundosTranscurridos > 0) {
+          state.tiempoRestanteSegundos -= segundosTranscurridos;
+          state.duracionTotalSegundos += segundosTranscurridos;
+        }
+      }
+
+      // Si el tiempo expiró mientras el usuario estaba fuera, finalizar inmediatamente
+      if ((state.modoActual === "simulacro" || state.modoActual === "estudio") && state.tiempoRestanteSegundos <= 0) {
+        state.tiempoRestanteSegundos = 0;
+        ui.mostrarPantalla("quiz", false);
+        quiz.renderizarPreguntaActual();
+        quiz.congelarControles();
+        alert("El tiempo límite de la evaluación expiró mientras no estabas. Guardando tus respuestas...");
+        quiz.finalizarSesion();
+        return true;
+      }
 
       // Reseteo de intervalos si estaban activos
       clearInterval(state.intervaloTemporizador);
@@ -1019,7 +1040,7 @@ const quiz = {
         state.usuarioConectado.xp = datosFinal.usuarioActualizado.xp;
         state.usuarioConectado.nivel = datosFinal.usuarioActualizado.nivel;
         state.usuarioConectado.streak = datosFinal.usuarioActualizado.streak;
-        localStorage.setItem("resiMed_session", JSON.stringify(state.usuarioConectado));
+        sessionStorage.setItem("resiMed_session", JSON.stringify(state.usuarioConectado));
         
         // Notificación académica formal
         alert(`¡Evaluación finalizada con éxito! Tus respuestas han sido guardadas y sincronizadas con tu historial de estudio.`);

@@ -71,8 +71,8 @@ const auth = {
           const datos = await api.login(email, password);
           state.usuarioConectado = datos.usuario;
           
-          localStorage.setItem("resiMed_session", JSON.stringify(datos.usuario));
-          localStorage.setItem("resiMed_jwt_token", datos.token);
+          sessionStorage.setItem("resiMed_session", JSON.stringify(datos.usuario));
+          sessionStorage.setItem("resiMed_jwt_token", datos.token);
 
           formLogin.reset();
           if (authMensaje) authMensaje.textContent = "";
@@ -102,8 +102,8 @@ const auth = {
 
   async restaurarSesion() {
     try {
-      const sesionGuardada = localStorage.getItem("resiMed_session");
-      const token = localStorage.getItem("resiMed_jwt_token");
+      const sesionGuardada = sessionStorage.getItem("resiMed_session");
+      const token = sessionStorage.getItem("resiMed_jwt_token");
       
       if (sesionGuardada && token) {
         state.usuarioConectado = JSON.parse(sesionGuardada);
@@ -113,8 +113,8 @@ const auth = {
       }
     } catch (err) {
       console.warn("⚠️ Sesión local corrupta o desactualizada. Limpiando almacenamiento...", err);
-      localStorage.removeItem("resiMed_session");
-      localStorage.removeItem("resiMed_jwt_token");
+      sessionStorage.removeItem("resiMed_session");
+      sessionStorage.removeItem("resiMed_jwt_token");
       ui.mostrarPantalla("auth");
     } finally {
       // Ocultar y remover el Boot Loader con una transición suave y premium
@@ -218,8 +218,8 @@ const auth = {
       auth.inactivityTimeout = null;
     }
     state.usuarioConectado = null;
-    localStorage.removeItem("resiMed_session");
-    localStorage.removeItem("resiMed_jwt_token");
+    sessionStorage.removeItem("resiMed_session");
+    sessionStorage.removeItem("resiMed_jwt_token");
     localStorage.removeItem("resiMed_ultimo_resultado");
     
     // FASE 4: Limpiar estado de examen activo al cerrar sesión

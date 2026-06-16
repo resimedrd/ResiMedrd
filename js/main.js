@@ -497,7 +497,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         
         // Actualizar estado global y localStorage
         state.usuarioConectado = data.usuario;
-        localStorage.setItem("resiMed_session", JSON.stringify(data.usuario));
+        sessionStorage.setItem("resiMed_session", JSON.stringify(data.usuario));
 
         modalEditarPerfil.classList.remove("active");
         alert("✓ ¡Datos de perfil guardados de forma segura!");
@@ -548,7 +548,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const data = await api.actualizarPerfil(nombre, especialidadAspirada, metaSemanal, fechaNacimiento, biografia);
         
         state.usuarioConectado = data.usuario;
-        localStorage.setItem("resiMed_session", JSON.stringify(data.usuario));
+        sessionStorage.setItem("resiMed_session", JSON.stringify(data.usuario));
 
         alert("✓ ¡Ajustes de perfil actualizados con éxito!");
         await ui.actualizarProgresoEstudiante();
@@ -794,6 +794,15 @@ document.addEventListener("DOMContentLoaded", async () => {
         const inputId = document.getElementById("modal-reporte-pregunta-id");
         if (inputId) inputId.value = preguntaId;
         modal.classList.add("active");
+      }
+    }
+  });
+
+  // Guardar estado del examen activo en el último milisegundo antes de cerrar la ventana
+  window.addEventListener("beforeunload", () => {
+    if (state.preguntasCargadas && state.preguntasCargadas.length > 0 && (state.modoActual === "simulacro" || state.modoActual === "estudio")) {
+      if (window.quiz && quiz.guardarEstadoExamenActivo) {
+        quiz.guardarEstadoExamenActivo();
       }
     }
   });

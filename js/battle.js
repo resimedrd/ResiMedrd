@@ -238,7 +238,7 @@ const battle = {
     battle.socket.onopen = () => {
       console.log("✅ Conectado a la Arena Multijugador.");
       // Autenticar mediante JWT de forma segura
-      const token = localStorage.getItem("resiMed_jwt_token");
+      const token = sessionStorage.getItem("resiMed_jwt_token");
       if (token) {
         battle.socket.send(JSON.stringify({ type: "auth", token: token }));
       }

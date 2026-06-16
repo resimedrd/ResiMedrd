@@ -687,7 +687,7 @@ const ui = {
       state.usuarioConectado.nivel = datos.nivel;
       state.usuarioConectado.streak = datos.streak;
       state.usuarioConectado.metaSemanal = datos.metaSemanal;
-      localStorage.setItem("resiMed_session", JSON.stringify(state.usuarioConectado));
+      sessionStorage.setItem("resiMed_session", JSON.stringify(state.usuarioConectado));
       document.getElementById("resumen-total-sesiones").textContent = datos.totalSesiones;
       document.getElementById("resumen-promedio-general").textContent = datos.promedioGeneral + "%";
       document.getElementById("dashboard-mejor-porcentaje").textContent = datos.mejorPorcentaje + "%";
@@ -2773,7 +2773,7 @@ const ui = {
 
 // FASE 4: Ruteo e interactividad con el botón Atrás del navegador
 window.addEventListener("popstate", (e) => {
-  const sesion = localStorage.getItem("resiMed_session");
+  const sesion = sessionStorage.getItem("resiMed_session");
   if (!sesion) {
     ui.mostrarPantalla("auth", false);
     return;
