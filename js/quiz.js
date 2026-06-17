@@ -98,15 +98,11 @@ const quiz = {
         }
       }
 
-      // Si el tiempo expiró mientras el usuario estaba fuera, finalizar inmediatamente
+      // Si el tiempo expiró mientras el usuario estaba fuera, finalizar silenciosamente
       if ((state.modoActual === "simulacro" || state.modoActual === "estudio") && state.tiempoRestanteSegundos <= 0) {
         state.tiempoRestanteSegundos = 0;
-        ui.mostrarPantalla("quiz", false);
-        quiz.renderizarPreguntaActual();
-        quiz.congelarControles();
-        alert("El tiempo límite de la evaluación expiró mientras no estabas. Guardando tus respuestas...");
-        quiz.finalizarSesion();
-        return true;
+        quiz.finalizarSesionSilencioso();
+        return false;
       }
 
       // Reseteo de intervalos si estaban activos
@@ -714,7 +710,8 @@ const quiz = {
     if (btnSiguiente) btnSiguiente.classList.add("hidden");
     if (btnFinalizar) {
       btnFinalizar.classList.remove("hidden");
-      btnFinalizar.textContent = "Terminar";
+      btnFinalizar.textContent = "Finalizar";
+      btnFinalizar.disabled = false;
       if (state.indiceActual === state.preguntasCargadas.length - 1) {
         btnFinalizar.classList.add("btn-primary");
         btnFinalizar.classList.remove("btn-secondary");
@@ -722,6 +719,11 @@ const quiz = {
         btnFinalizar.classList.remove("btn-primary");
         btnFinalizar.classList.add("btn-secondary");
       }
+    }
+
+    const btnFlagPregunta = document.getElementById("btn-flag-pregunta");
+    if (btnFlagPregunta) {
+      btnFlagPregunta.disabled = false;
     }
 
 
@@ -996,6 +998,7 @@ const quiz = {
 
   // 🏁 FINALIZAR EVALUACIÓN (CON CONEXIÓN JWT & PROCESO DE GAMIFICACIÓN)
   async finalizarSesion() {
+    quiz.congelarControles();
     quiz.limpiarEstadoExamenActivo();
     clearInterval(state.intervaloTemporizador);
     clearInterval(guardiaTimerInterval);
@@ -1180,6 +1183,96 @@ const quiz = {
 
     ui.filtrarRevision("todas");
     ui.mostrarPantalla("resultados");
+  },
+
+  // 🏁 FINALIZAR EVALUACIÓN SILENCIOSAMENTE (EN SEGUNDO PLANO)
+  async finalizarSesionSilencioso() {
+    quiz.limpiarEstadoExamenActivo();
+    clearInterval(state.intervaloTemporizador);
+    clearInterval(guardiaTimerInterval);
+    
+    let aciertos = 0;
+    state.preguntasCargadas.forEach((p, i) => {
+      if (state.respuestasUsuario[i] === p.correcta) aciertos++;
+    });
+
+    const porcentaje = Math.round((aciertos / state.preguntasCargadas.length) * 100) || 0;
+
+    // Calcular y formatear duración total de la sesión
+    const minutos = Math.floor(state.duracionTotalSegundos / 60);
+    const segundos = state.duracionTotalSegundos % 60;
+    const duracionFormateada = `${minutos.toString().padStart(2, "0")}:${segundos.toString().padStart(2, "0")}`;
+
+    try {
+      const detalleExamen = state.preguntasCargadas.map((p, i) => ({
+        id: p.id,
+        texto: p.texto,
+        opciones: safeParseOpciones(p.opciones),
+        correcta: p.correcta,
+        seleccionada: state.respuestasUsuario[i],
+        explicacion: p.explicacion,
+        fuente: p.fuente,
+        tema: p.tema,
+        subtema: p.subtema,
+        microtema: p.microtema,
+        marcada: !!state.preguntasMarcadas[i],
+        duracionTotalSegundos: state.duracionTotalSegundos,
+        explicacion_correcta: p.explicacion_correcta,
+        explicacion_incorrecta: p.explicacion_incorrecta
+      }));
+
+      // Guardar el último resultado localmente
+      const ultimoResultado = {
+        aciertos: aciertos,
+        totalPreguntas: state.preguntasCargadas.length,
+        porcentaje: porcentaje,
+        duracionFormateada: duracionFormateada,
+        temaTexto: (state.modoActual === "guardia")
+          ? (state.especialidadSeleccionada === "Todos" ? "Urgencias Médicas" : `Guardia: ${state.especialidadSeleccionada}`)
+          : (state.especialidadSeleccionada === "Todos")
+            ? "Examen General"
+            : (state.subtemaSeleccionado && state.subtemaSeleccionado !== "Todos")
+              ? `${state.especialidadSeleccionada} - ${state.subtemaSeleccionado}`
+              : state.especialidadSeleccionada,
+        detalleExamen: detalleExamen
+      };
+      localStorage.setItem("resiMed_ultimo_resultado", JSON.stringify(ultimoResultado));
+
+      // Sincronizar repetición espaciada en segundo plano
+      state.preguntasCargadas.forEach((p, i) => {
+        const esCorrecto = (state.respuestasUsuario[i] === p.correcta);
+        spacedRepetition.sincronizarEstado(p.id, null, esCorrecto, esCorrecto ? 2 : 1).catch(err => {
+          console.warn("Falla silenciosa al sincronizar SR en segundo plano:", err);
+        });
+      });
+
+      // Guardar el examen en el servidor
+      if (state.usuarioConectado && state.usuarioConectado.id) {
+        const datosFinal = await api.guardarSesion({
+          usuarioId: state.usuarioConectado.id,
+          tema: state.especialidadSeleccionada,
+          modo: state.modoActual,
+          cantidadPreguntas: state.preguntasCargadas.length,
+          correctas: aciertos,
+          porcentaje: porcentaje,
+          detalle: JSON.stringify(detalleExamen)
+        });
+
+        // Sincronizar datos del usuario conectados internamente
+        if (datosFinal.usuarioActualizado) {
+          state.usuarioConectado.xp = datosFinal.usuarioActualizado.xp;
+          state.usuarioConectado.nivel = datosFinal.usuarioActualizado.nivel;
+          state.usuarioConectado.streak = datosFinal.usuarioActualizado.streak;
+          sessionStorage.setItem("resiMed_session", JSON.stringify(state.usuarioConectado));
+          
+          if (typeof ui !== "undefined" && typeof ui.actualizarPerfilVisual === "function") {
+            ui.actualizarPerfilVisual();
+          }
+        }
+      }
+    } catch (err) {
+      console.error("Error al guardar la sesión de estudio silenciosa: " + err.message);
+    }
   },
 
   congelarControles() {
