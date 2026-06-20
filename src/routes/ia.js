@@ -240,22 +240,23 @@ router.get("/api/ia/ayudas", async (req, res) => {
     const opcionesArray = parseOpcionesBackend(pregunta.opciones);
     const opcionesText = opcionesArray.map((o, idx) => `${String.fromCharCode(65 + idx)}) ${o}`).join("\n");
 
-    const prompt = `Dado el siguiente caso clínico para un examen de residencia médica:
+    const prompt = `Actúa como un Tutor Médico experto preparando a estudiantes para el ENURM (Examen Nacional de Residencias Médicas).
+Dado el siguiente caso clínico:
 Caso clínico: "${pregunta.texto}"
 Opciones de respuesta:
 ${opcionesText}
 La opción correcta es la de índice ${pregunta.correcta} (0 para A, 1 para B, 2 para C, 3 para D).
 
-Tu tarea es generar dos elementos educativos de nivel premium para ayudar al estudiante:
+Tu tarea es generar dos elementos educativos de nivel premium y altamente académicos para guiar al estudiante:
 
-1. "socratic_tip": Un consejo de tutoría socrática breve (en formato Markdown o HTML simple) que guíe al estudiante hacia la respuesta correcta sin revelar la respuesta final de forma directa ni mencionar la opción correcta explícitamente. Debe estructurarse estrictamente en 3 secciones:
-   - 🔍 Foco Clínico: Cuál es el síntoma pivote o dato clave de entrada.
-   - 🧠 Pregunta Socrática: Una pregunta de fisiopatología o diagnóstico diferencial que haga pensar al estudiante.
-   - 🚫 Pista de Descarte: Una pista para descartar una de las opciones incorrectas basándose en la edad, sexo, temporalidad o manifestación clínica.
+1. "socratic_tip": Un consejo de tutoría socrática avanzado (en formato Markdown con subtítulos en negrita y viñetas) que guíe al estudiante mediante el razonamiento clínico sin revelar la respuesta correcta de forma directa ni citar las opciones explícitamente. Debe ser detallado, riguroso y de alto valor médico. Estructúralo estrictamente de la siguiente manera:
+   - **🔍 Foco Clínico y Síntoma Pivote**: Identifica y explica de forma detallada la relevancia del dato o síntoma pivote (ej. edad del paciente, antecedente clave, o hallazgo de laboratorio crítico) y cómo este acota tus sospechas diagnósticas.
+   - **🧠 Razonamiento Fisiopatológico**: Formula una pregunta reflexiva profunda sobre la fisiopatología, el mecanismo de acción o el diagnóstico diferencial aplicable a este caso específico. Debe conectar los síntomas con la patogenia subyacente.
+   - **🚫 Estrategia de Descarte Clínico**: Proporciona una clave diagnóstica clara para descartar al menos una opción incorrecta (por ejemplo, basándose en la edad típica de presentación, la ausencia de un hallazgo patognomónico, la cronicidad del cuadro, o la presencia de bilis/sangre en secreciones).
 
 2. "key_info_html": El texto del caso clínico original EXACTAMENTE igual, pero enriquecido con etiquetas HTML para los datos clave más relevantes. Envuelve cada dato clínico clave en una etiqueta HTML con el formato:
    <span class="clinical-key-highlight" data-tooltip="EXPLICACIÓN CLÍNICA DE POR QUÉ ESTE DATO ES IMPORTANTE EN ESTE CASO">DATO_CLAVE_ORIGINAL</span>
-   Debes resaltar entre 2 y 4 datos clave esenciales (como la edad/género relevante, signos vitales patológicos, síntomas pivote, o hallazgos de laboratorio clave). La explicación en 'data-tooltip' debe ser concisa, educativa y contextualizada.
+   Debes resaltar entre 2 y 4 datos clave esenciales. Las explicaciones en 'data-tooltip' deben ser explicaciones clínicas concisas, de alto nivel y muy informativas.
    IMPORTANTE: El texto retornado en "key_info_html" debe conservar el resto del contenido del caso clínico exactamente igual al original.
 
 Responde únicamente con un objeto JSON válido con los campos "socratic_tip" y "key_info_html".`;

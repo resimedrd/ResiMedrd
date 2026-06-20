@@ -33,17 +33,41 @@ const quiz = {
   obtenerConsejoSocratico(p) {
     const sub = p.subtema || p.tema || "General";
     const sintomasEncontrados = [];
-    const sintomas = ["fiebre", "dolor", "disnea", "ictericia", "rigidez de nuca", "cefalea", "diarrea", "soplo", "vómitos", "tos"];
-    sintomas.forEach(s => {
-      if (p.texto.toLowerCase().includes(s)) sintomasEncontrados.push(s);
+    const sintomas = {
+      "fiebre": "procesos inflamatorios o infecciosos agudos",
+      "dolor": "síndromes dolorosos nociceptivos o viscerales",
+      "disnea": "insuficiencia respiratoria o compromiso cardiopulmonar",
+      "ictericia": "patologías hepatobiliares o hemólisis",
+      "rigidez de nuca": "síndrome meníngeo o irritación del SNC",
+      "cefalea": "hipertensión endocraneal o cefaleas primarias",
+      "diarrea": "trastornos de absorción o gastroenteritis agudas",
+      "soplo": "valvulopatías o anomalías estructurales cardíacas",
+      "vómitos": "obstrucción gastrointestinal o estimulación del centro emético",
+      "tos": "compromiso de vías aéreas o hiperreactividad bronquial"
+    };
+
+    Object.keys(sintomas).forEach(s => {
+      if (p.texto.toLowerCase().includes(s)) {
+        sintomasEncontrados.push({ sintoma: s, relevancia: sintomas[s] });
+      }
     });
-    
-    let consejo = `Este caso clínico evalúa conceptos clave de **${sub}**. `;
+
+    let focoClinico = "";
     if (sintomasEncontrados.length > 0) {
-      consejo += `Presta especial atención a la presencia de **${sintomasEncontrados.join(", ")}** en el paciente. `;
+      focoClinico = `Identifica la presencia de **${sintomasEncontrados[0].sintoma}** en este cuadro de **${sub}**, lo cual suele orientar hacia ${sintomasEncontrados[0].relevancia}.`;
+    } else {
+      focoClinico = `Analiza la edad del paciente y la forma de inicio de los síntomas (agudo vs. crónico) en el contexto de **${sub}**.`;
     }
-    consejo += `Analiza si los hallazgos sugieren una etiología infecciosa, inflamatoria o mecánica, y descarta las opciones que no coincidan con la velocidad de instauración del cuadro.`;
-    return consejo;
+
+    let preguntaSocratica = `¿Cuál es el mecanismo fisiopatológico primario que explica la presentación clínica? Considera si se trata de un proceso obstructivo, inflamatorio, infeccioso o autoinmune y cómo afecta los órganos diana.`;
+
+    let pistaDescarte = `Evalúa el orden de aparición de los síntomas. Las patologías quirúrgicas suelen iniciar con dolor localizado antes de la fiebre, mientras que los cuadros médicos presentan fiebre de forma concomitante o previa.`;
+
+    return `
+      **🔍 Foco Clínico:** ${focoClinico}<br><br>
+      **🧠 Pregunta Socrática:** ${preguntaSocratica}<br><br>
+      **🚫 Pista de Descarte:** ${pistaDescarte}
+    `;
   },
 
   guardarEstadoExamenActivo() {
