@@ -204,8 +204,10 @@ const quiz = {
       if (cardEstudio) {
         if (state.modoActual === "estudio") {
           cardEstudio.classList.remove("hidden");
+          cardEstudio.style.setProperty("display", "", "");
         } else {
           cardEstudio.classList.add("hidden");
+          cardEstudio.style.setProperty("display", "none", "important");
         }
       }
 
@@ -576,8 +578,10 @@ const quiz = {
       if (cardEstudio) {
         if (modo === "estudio") {
           cardEstudio.classList.remove("hidden");
+          cardEstudio.style.setProperty("display", "", "");
         } else {
           cardEstudio.classList.add("hidden");
+          cardEstudio.style.setProperty("display", "none", "important");
         }
       }
 
@@ -727,8 +731,10 @@ const quiz = {
     if (cardEstudio) {
       if (state.modoActual === "estudio") {
         cardEstudio.classList.remove("hidden");
+        cardEstudio.style.setProperty("display", "", "");
       } else {
         cardEstudio.classList.add("hidden");
+        cardEstudio.style.setProperty("display", "none", "important");
       }
     }
 
