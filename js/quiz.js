@@ -650,8 +650,7 @@ const quiz = {
 
       if (tiempoPorPreguntaRestante <= 0) {
         clearInterval(guardiaTimerInterval);
-        alert("¡Tiempo intensivo agotado en esta pregunta!");
-        // Marcar como no respondida y saltar
+        // Marcar como no respondida y saltar automáticamente a la siguiente pregunta
         state.respuestasUsuario[state.indiceActual] = -1; 
         quiz.siguientePregunta();
       }
