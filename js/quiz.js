@@ -969,15 +969,21 @@ const quiz = {
         btn.classList.add("current");
       }
 
-      btn.addEventListener("click", () => {
-        clearInterval(guardiaTimerInterval);
-        state.indiceActual = idx;
-        if (state.modoActual === "guardia") {
-          quiz.iniciarTemporizadorGuardia();
-        }
-        quiz.renderizarPreguntaActual();
-        quiz.guardarEstadoExamenActivo();
-      });
+      if (state.modoActual === "guardia") {
+        btn.disabled = true;
+        btn.style.cursor = "default";
+        btn.style.opacity = "0.75";
+      } else {
+        btn.addEventListener("click", () => {
+          clearInterval(guardiaTimerInterval);
+          state.indiceActual = idx;
+          if (state.modoActual === "guardia") {
+            quiz.iniciarTemporizadorGuardia();
+          }
+          quiz.renderizarPreguntaActual();
+          quiz.guardarEstadoExamenActivo();
+        });
+      }
 
       gridContainer.appendChild(btn);
     });
