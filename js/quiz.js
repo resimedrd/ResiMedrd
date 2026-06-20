@@ -1208,6 +1208,15 @@ const quiz = {
 
     ui.filtrarRevision("todas");
     ui.mostrarPantalla("resultados");
+
+    // Limpiar estado activo del examen en memoria para evitar restaurarlo al refrescar
+    state.preguntasCargadas = [];
+    state.modoActual = "";
+    state.respuestasUsuario = [];
+    state.preguntasMarcadas = [];
+    state.indiceActual = 0;
+    state.tiempoRestanteSegundos = 0;
+    state.duracionTotalSegundos = 0;
   },
 
   // 🏁 FINALIZAR EVALUACIÓN SILENCIOSAMENTE (EN SEGUNDO PLANO)
@@ -1298,6 +1307,15 @@ const quiz = {
     } catch (err) {
       console.error("Error al guardar la sesión de estudio silenciosa: " + err.message);
     }
+
+    // Limpiar estado activo del examen en memoria para evitar restaurarlo al refrescar
+    state.preguntasCargadas = [];
+    state.modoActual = "";
+    state.respuestasUsuario = [];
+    state.preguntasMarcadas = [];
+    state.indiceActual = 0;
+    state.tiempoRestanteSegundos = 0;
+    state.duracionTotalSegundos = 0;
   },
 
   congelarControles() {
