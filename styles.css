@@ -5239,3 +5239,146 @@ body.dark-mode .premium-metrics-panel {
     font-size: 11px;
   }
 }
+
+/* ==========================================
+   ANIMACIONES Y MICRO-INTERACCIONES PREMIUM 
+   ========================================== */
+
+/* 1. Transición suave de entrada para pantallas activas */
+@keyframes fadeInSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.screen.active {
+  display: block !important;
+  animation: fadeInSlideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* 2. Micro-animación en las opciones del simulador (Respuestas) */
+@keyframes shakeWrong {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-4px); }
+  40%, 80% { transform: translateX(4px); }
+}
+
+@keyframes pulseCorrect {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+  100% { transform: scale(1); }
+}
+
+.option-btn.correct {
+  background: var(--success-soft) !important;
+  border-color: var(--success) !important;
+  color: var(--success) !important;
+  font-weight: 600;
+  animation: pulseCorrect 0.4s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+}
+
+.option-btn.wrong {
+  background: var(--danger-soft) !important;
+  border-color: var(--danger) !important;
+  color: var(--danger) !important;
+  font-weight: 600;
+  animation: shakeWrong 0.4s ease-in-out forwards;
+}
+
+/* 3. Indicador de escritura dinámico para el Tutor IA */
+.ia-typing-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 40px;
+}
+
+.ia-typing-indicator span {
+  width: 10px;
+  height: 10px;
+  background: var(--primary);
+  border-radius: 50%;
+  opacity: 0.4;
+  animation: ia-typing 1.4s infinite both;
+}
+
+.ia-typing-indicator span:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.ia-typing-indicator span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.ia-typing-indicator span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes ia-typing {
+  0%, 100% {
+    transform: scale(0.8);
+    opacity: 0.4;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 1;
+    background: #8b5cf6;
+    box-shadow: 0 0 12px rgba(139, 92, 246, 0.6);
+  }
+}
+
+.ia-typing-text {
+  color: var(--text-soft);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  animation: ia-text-pulse 2s infinite ease-in-out;
+}
+
+@keyframes ia-text-pulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+/* 4. Revelación gradual de la respuesta del Tutor IA */
+.tutor-ia-response {
+  animation: revealResponse 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  opacity: 0;
+  transform: translateY(16px);
+}
+
+@keyframes revealResponse {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 5. Línea brillante de estado activo en la barra lateral */
+.sidebar-item {
+  position: relative;
+  overflow: hidden;
+}
+
+.sidebar-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%) scaleY(0);
+  width: 3px;
+  height: 60%;
+  background: var(--primary);
+  border-radius: 0 4px 4px 0;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.sidebar-item.active::before {
+  transform: translateY(-50%) scaleY(1);
+}

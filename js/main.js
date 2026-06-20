@@ -279,20 +279,20 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
-  // Escuchar llamadas al Tutor IA de forma delegada
-  document.addEventListener("click", async (e) => {
-    const btn = e.target.closest(".btn-consultar-tutor");
-    if (!btn) return;
-    
-    const preguntaTexto = btn.getAttribute("data-texto");
-    const seleccionText = btn.getAttribute("data-seleccion");
-    
+  // === IA TUTOR Y AUTOGENERACIÓN DE FLASHCARDS GLOBALES ===
+  window.consultarTutorIASobrePregunta = async (preguntaTexto, seleccionText) => {
+    const modalTutorIA = document.getElementById("modal-tutor-ia");
+    const modalIABody = document.getElementById("modal-ia-body");
     if (!modalTutorIA || !modalIABody) return;
     
     modalIABody.innerHTML = `
       <div class="spinner-ia-container">
-        <div class="spinner-ia"></div>
-        <p style="color: var(--text-dim); font-size: 14px; font-weight: 500;">El Tutor IA está consultando la literatura médica oficial...</p>
+        <div class="ia-typing-indicator">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+        <p class="ia-typing-text">El Tutor IA está consultando la literatura médica oficial...</p>
       </div>
     `;
     modalTutorIA.classList.add("active");
@@ -300,7 +300,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     try {
       const data = await api.consultarTutorIA(preguntaTexto, seleccionText);
       if (data && data.explicacionIA) {
-        modalIABody.innerHTML = data.explicacionIA;
+        modalIABody.innerHTML = `<div class="tutor-ia-response">${data.explicacionIA}</div>`;
       } else {
         modalIABody.innerHTML = `
           <div style="color: var(--danger); padding: 20px 0; text-align: center;">
@@ -316,6 +316,47 @@ document.addEventListener("DOMContentLoaded", async () => {
           <p style="font-size: 13px; margin-top: 6px;">Ocurrió una falla al conectar con el servidor.</p>
         </div>
       `;
+    }
+  };
+
+  window.crearFlashcardAutogenerada = async (tema, pregunta, respuesta) => {
+    if (!state.usuarioConectado) {
+      alert("Debes iniciar sesión para crear flashcards.");
+      return;
+    }
+
+    try {
+      await api.guardarFlashcardPersonalizada(state.usuarioConectado.id, tema, pregunta, respuesta);
+      alert("✓ ¡Flashcard inyectada al mazo con éxito!");
+      
+      // Recargar mazo de flashcards en caliente
+      if (window.flashcards && flashcards.inicializarMazo) {
+        await flashcards.inicializarMazo();
+      }
+      if (typeof ui !== "undefined" && typeof ui.inicializarFiltrosFlashcards === "function") {
+        await ui.inicializarFiltrosFlashcards();
+      }
+    } catch (err) {
+      alert("✗ Falla al guardar la flashcard: " + err.message);
+    }
+  };
+
+  // Escuchar llamadas al Tutor IA y Autogeneración de Flashcards de forma delegada a nivel de documento
+  document.addEventListener("click", async (e) => {
+    const btnTutor = e.target.closest(".btn-consultar-tutor");
+    const btnFlashcard = e.target.closest(".btn-auto-flashcard");
+    
+    if (btnTutor) {
+      const preguntaTexto = btnTutor.getAttribute("data-texto");
+      const seleccionText = btnTutor.getAttribute("data-seleccion");
+      window.consultarTutorIASobrePregunta(preguntaTexto, seleccionText);
+    }
+    
+    if (btnFlashcard) {
+      const tema = btnFlashcard.getAttribute("data-tema");
+      const pregunta = btnFlashcard.getAttribute("data-pregunta");
+      const respuesta = btnFlashcard.getAttribute("data-respuesta");
+      window.crearFlashcardAutogenerada(tema, pregunta, respuesta);
     }
   });
 
