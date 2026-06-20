@@ -841,7 +841,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // Guardar estado del examen activo en el último milisegundo antes de cerrar la ventana
   window.addEventListener("beforeunload", () => {
-    if (state.preguntasCargadas && state.preguntasCargadas.length > 0 && (state.modoActual === "simulacro" || state.modoActual === "estudio")) {
+    if (state.preguntasCargadas && state.preguntasCargadas.length > 0 && (state.modoActual === "simulacro" || state.modoActual === "estudio" || state.modoActual === "guardia")) {
       if (window.quiz && quiz.guardarEstadoExamenActivo) {
         quiz.guardarEstadoExamenActivo();
       }

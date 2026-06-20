@@ -83,6 +83,7 @@ const quiz = {
         preguntasMarcadas: state.preguntasMarcadas,
         duracionTotalSegundos: state.duracionTotalSegundos,
         tiempoRestanteSegundos: state.tiempoRestanteSegundos,
+        tiempoPorPreguntaRestante: (typeof tiempoPorPreguntaRestante !== "undefined") ? tiempoPorPreguntaRestante : 30,
         retroalimentacionInmediata: state.retroalimentacionInmediata,
         timestamp: Date.now()
       }));
@@ -114,19 +115,44 @@ const quiz = {
       state.retroalimentacionInmediata = data.retroalimentacionInmediata;
 
       // Restar el tiempo transcurrido desde que se cerró la ventana
-      if (data.timestamp && (state.modoActual === "simulacro" || state.modoActual === "estudio")) {
-        const segundosTranscurridos = Math.floor((Date.now() - data.timestamp) / 1000);
+      let segundosTranscurridos = 0;
+      if (data.timestamp) {
+        segundosTranscurridos = Math.floor((Date.now() - data.timestamp) / 1000);
         if (segundosTranscurridos > 0) {
-          state.tiempoRestanteSegundos -= segundosTranscurridos;
           state.duracionTotalSegundos += segundosTranscurridos;
+          if (state.modoActual === "simulacro" || state.modoActual === "estudio") {
+            state.tiempoRestanteSegundos -= segundosTranscurridos;
+          }
         }
       }
 
-      // Si el tiempo expiró mientras el usuario estaba fuera, finalizar silenciosamente
+      // Si el tiempo de simulacro/estudio expiró mientras el usuario estaba fuera, finalizar silenciosamente
       if ((state.modoActual === "simulacro" || state.modoActual === "estudio") && state.tiempoRestanteSegundos <= 0) {
         state.tiempoRestanteSegundos = 0;
         quiz.finalizarSesionSilencioso();
         return false;
+      }
+
+      // Si es modo intensivo (guardia), calcular el tiempo restante de la pregunta activa
+      let tiempoPreguntaGuardiaRestaurado = 30;
+      if (state.modoActual === "guardia") {
+        const tiempoGuardado = data.tiempoPorPreguntaRestante !== undefined ? data.tiempoPorPreguntaRestante : 30;
+        tiempoPreguntaGuardiaRestaurado = tiempoGuardado - segundosTranscurridos;
+
+        // Si expiró el tiempo de la pregunta mientras estaba fuera
+        if (tiempoPreguntaGuardiaRestaurado <= 0) {
+          state.respuestasUsuario[state.indiceActual] = -1; // Marcar como no contestada
+          
+          // Si era la última pregunta, finalizar la sesión silenciosamente
+          if (state.indiceActual >= state.preguntasCargadas.length - 1) {
+            quiz.finalizarSesionSilencioso();
+            return false;
+          } else {
+            // Avanzar a la siguiente pregunta y arrancar su temporizador completo
+            state.indiceActual++;
+            tiempoPreguntaGuardiaRestaurado = 30;
+          }
+        }
       }
 
       // Reseteo de intervalos si estaban activos
@@ -188,8 +214,8 @@ const quiz = {
       // Re-arrancar cronómetros
       if (state.modoActual === "guardia") {
         if (temporizadorEl) temporizadorEl.classList.remove("hidden");
-        // Reiniciar el temporizador para la pregunta actual (30 segundos)
-        quiz.iniciarTemporizadorGuardia();
+        // Reiniciar el temporizador con el tiempo restante calculado
+        quiz.iniciarTemporizadorGuardia(tiempoPreguntaGuardiaRestaurado);
       } else if (state.modoActual === "simulacro" || state.modoActual === "estudio") {
         if (temporizadorEl) {
           temporizadorEl.classList.remove("hidden");
@@ -638,9 +664,13 @@ const quiz = {
   },
 
   // Temporizador Rápido para MODO GUARDIA (30 segundos por pregunta)
-  iniciarTemporizadorGuardia() {
+  iniciarTemporizadorGuardia(tiempoEspecifico) {
     clearInterval(guardiaTimerInterval);
-    tiempoPorPreguntaRestante = 30;
+    if (tiempoEspecifico !== undefined) {
+      tiempoPorPreguntaRestante = tiempoEspecifico;
+    } else {
+      tiempoPorPreguntaRestante = 30;
+    }
     quiz.actualizarRelojGuardiaVisual();
 
     guardiaTimerInterval = setInterval(() => {
