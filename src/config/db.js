@@ -167,6 +167,17 @@ async function iniciarBaseDeDatos(db) {
     )
   `);
 
+  // 8. Tabla de cache_ayudas_ia (Caché local de Socratic Tip y Datos Clave con tooltips de Gemini)
+  await db.exec(`
+    CREATE TABLE IF NOT EXISTS cache_ayudas_ia (
+      pregunta_id INTEGER PRIMARY KEY,
+      socratic_tip TEXT,
+      key_info_html TEXT,
+      fecha_creacion TEXT DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY(pregunta_id) REFERENCES preguntas(id) ON DELETE CASCADE
+    )
+  `);
+
   // Migraciones retrocompatibles para la tabla usuarios
   const columnasUsuarios = [
     { nombre: "xp", definicion: "INTEGER DEFAULT 0" },

@@ -373,18 +373,15 @@ const quiz = {
           if (quiz.keyInfoActivo) {
             btnKeyInfo.style.background = "rgba(59, 130, 246, 0.12)";
             btnKeyInfo.style.borderColor = "var(--primary)";
-            pTexto.innerHTML = quiz.obtenerTextoConClaves(p.texto);
+            if (p.keyInfoTextIA && p.keyInfoTextIA !== "fallback") {
+              pTexto.innerHTML = p.keyInfoTextIA;
+            } else {
+              pTexto.innerHTML = quiz.obtenerTextoConClaves(p.texto);
+            }
           } else {
             btnKeyInfo.style.background = "";
             btnKeyInfo.style.borderColor = "";
             pTexto.innerHTML = p.texto;
-          }
-          
-          // Re-aplicar clase de marcado si la pregunta está marcada (flagged)
-          if (state.preguntasMarcadas[state.indiceActual]) {
-            pTexto.classList.add("flagged-question");
-          } else {
-            pTexto.classList.remove("flagged-question");
           }
         }
       });
@@ -408,7 +405,11 @@ const quiz = {
           if (!estaOculto) {
             btnAttendingTip.style.background = "rgba(59, 130, 246, 0.12)";
             btnAttendingTip.style.borderColor = "var(--primary)";
-            tipTexto.textContent = quiz.obtenerConsejoSocratico(p);
+            if (p.socraticTipIA && p.socraticTipIA !== "fallback") {
+              tipTexto.innerHTML = p.socraticTipIA;
+            } else {
+              tipTexto.textContent = quiz.obtenerConsejoSocratico(p);
+            }
           } else {
             btnAttendingTip.style.background = "";
             btnAttendingTip.style.borderColor = "";
@@ -731,6 +732,9 @@ const quiz = {
     quiz.renderizarMapaNavegacion();
 
     const p = state.preguntasCargadas[state.indiceActual];
+    if (p) {
+      quiz.prefetchAyudasIA(p);
+    }
     if (contadorPregunta) {
       contadorPregunta.textContent = `Pregunta ${state.indiceActual + 1} de ${state.preguntasCargadas.length}`;
     }
@@ -964,6 +968,27 @@ const quiz = {
     } else {
       btnFlagPregunta.classList.remove("active");
       btnFlagPregunta.innerHTML = "Marcar pregunta";
+    }
+  },
+
+  async prefetchAyudasIA(p) {
+    if (!p || p.socraticTipIA !== undefined) return;
+    p.socraticTipIA = null;
+    p.keyInfoTextIA = null;
+
+    try {
+      const res = await api.obtenerAyudasIA(p.id);
+      if (res && !res.useFallback) {
+        p.socraticTipIA = res.socratic_tip;
+        p.keyInfoTextIA = res.key_info_html;
+      } else {
+        p.socraticTipIA = "fallback";
+        p.keyInfoTextIA = "fallback";
+      }
+    } catch (err) {
+      console.warn("Falla al cargar ayudas de IA en segundo plano:", err);
+      p.socraticTipIA = "fallback";
+      p.keyInfoTextIA = "fallback";
     }
   },
 

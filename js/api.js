@@ -83,6 +83,9 @@ const api = {
       body: JSON.stringify({ preguntaTexto, seleccionText })
     }),
 
+  obtenerAyudasIA: (preguntaId) => 
+    request(`/api/ia/ayudas?preguntaId=${preguntaId}`),
+
   // Spaced Repetition (SM-2 / FSRS)
   obtenerRepeticionEspaciada: (usuarioId) => 
     request(`/api/spaced-repetition?usuarioId=${usuarioId}`),
