@@ -13,6 +13,15 @@ async function conectarBaseDeDatos() {
     filename: dbPath,
     driver: sqlite3.Database
   });
+
+  // Habilitar el modo de alta concurrencia Write-Ahead Logging (WAL) inmediatamente después de abrir la conexión
+  try {
+    await dbInstance.exec(`PRAGMA journal_mode = WAL;`);
+    await dbInstance.exec(`PRAGMA synchronous = NORMAL;`);
+  } catch (walErr) {
+    console.warn("Falla al activar modo WAL en SQLite:", walErr);
+  }
+
   await iniciarBaseDeDatos(dbInstance);
   return dbInstance;
 }
@@ -25,14 +34,6 @@ function getDB() {
 }
 
 async function iniciarBaseDeDatos(db) {
-
-  // Habilitar el modo de alta concurrencia Write-Ahead Logging
-  try {
-    await db.exec(`PRAGMA journal_mode = WAL;`);
-    await db.exec(`PRAGMA synchronous = NORMAL;`);
-  } catch (walErr) {
-    console.warn("Falla al activar modo WAL en SQLite:", walErr);
-  }
 
   // 0. Tabla de Exámenes (FASE 3)
   await db.exec(`
