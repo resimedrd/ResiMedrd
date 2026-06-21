@@ -24,239 +24,9 @@ function generarCodigoSala() {
   return codigo;
 }
 
-async function guardarSalaEnBD(room) {
-  if (!dbInstance) return;
-  try {
-    const query = `
-      INSERT INTO salas_activas (
-        codigo, modalidad, settings, host_id, state, 
-        current_question_index, phase, question_time_left, feedback_time_left, 
-        questions, players, corrections_requested, next_questions_requested, podio
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-      ON CONFLICT(codigo) DO UPDATE SET
-        modalidad = excluded.modalidad,
-        settings = excluded.settings,
-        host_id = excluded.host_id,
-        state = excluded.state,
-        current_question_index = excluded.current_question_index,
-        phase = excluded.phase,
-        question_time_left = excluded.question_time_left,
-        feedback_time_left = excluded.feedback_time_left,
-        questions = excluded.questions,
-        players = excluded.players,
-        corrections_requested = excluded.corrections_requested,
-        next_questions_requested = excluded.next_questions_requested,
-        podio = excluded.podio,
-        updated_at = CURRENT_TIMESTAMP
-    `;
-    
-    const settingsStr = JSON.stringify(room.settings);
-    const questionsStr = JSON.stringify(room.questions || []);
-    const playersData = room.players.map(p => ({
-      id: p.id,
-      nombre: p.nombre,
-      score: p.score,
-      answers: p.answers,
-      isBot: p.isBot || false,
-      isConnected: p.isConnected !== false
-    }));
-    const playersStr = JSON.stringify(playersData);
-    const correctionsStr = JSON.stringify(Array.from(room.correctionsRequested || []));
-    const nextQuestionsStr = JSON.stringify(Array.from(room.nextQuestionsRequested || []));
-    const podioStr = room.podio ? JSON.stringify(room.podio) : null;
-
-    await dbInstance.run(query, [
-      room.code,
-      room.modalidad,
-      settingsStr,
-      room.hostId,
-      room.state,
-      room.currentQuestionIndex,
-      room.phase || null,
-      room.questionTimeLeft !== undefined ? room.questionTimeLeft : null,
-      room.feedbackTimeLeft !== undefined ? room.feedbackTimeLeft : null,
-      questionsStr,
-      playersStr,
-      correctionsStr,
-      nextQuestionsStr,
-      podioStr
-    ]);
-  } catch (err) {
-    console.error(`❌ Error al persistir sala ${room.code} en BD:`, err);
-  }
-}
-
-async function eliminarSalaDeBD(code) {
-  if (!dbInstance) return;
-  try {
-    await dbInstance.run("DELETE FROM salas_activas WHERE codigo = ?", [code]);
-  } catch (err) {
-    console.error(`❌ Error al eliminar sala ${code} de BD:`, err);
-  }
-}
-
-async function restaurarSalasActivasDesdeBD(db) {
-  try {
-    const rows = await db.all("SELECT * FROM salas_activas");
-    console.log(`🏰 Restaurando ${rows.length} salas de batalla activas desde SQLite...`);
-    for (const row of rows) {
-      const room = {
-        code: row.codigo,
-        modalidad: row.modalidad,
-        settings: JSON.parse(row.settings),
-        hostId: row.host_id,
-        state: row.state,
-        currentQuestionIndex: row.current_question_index,
-        phase: row.phase,
-        questionTimeLeft: row.question_time_left,
-        feedbackTimeLeft: row.feedback_time_left,
-        questions: JSON.parse(row.questions),
-        players: JSON.parse(row.players).map(p => ({
-          ...p,
-          ws: null,
-          isConnected: false
-        })),
-        correctionsRequested: new Set(JSON.parse(row.corrections_requested || "[]")),
-        nextQuestionsRequested: new Set(JSON.parse(row.next_questions_requested || "[]")),
-        podio: row.podio ? JSON.parse(row.podio) : null
-      };
-
-      activeRooms.set(room.code, room);
-
-      if (room.state === "playing") {
-        resumirBucleDeBatalla(room);
-      }
-    }
-  } catch (err) {
-    console.error("❌ Error al restaurar salas de batalla desde BD:", err);
-  }
-}
-
-function simularRespuestasDeBotsRestaurados(room, qIndex) {
-  const bots = room.players.filter(p => p.isBot);
-  for (const bot of bots) {
-    if (bot.answers.some(ans => ans.questionIndex === qIndex)) {
-      continue;
-    }
-    const timeLeft = room.questionTimeLeft || room.settings.timePerQuestion;
-    const delay = Math.min(timeLeft * 1000, 2000 + Math.floor(Math.random() * 6000));
-    
-    setTimeout(async () => {
-      if (room.state === "playing" && room.currentQuestionIndex === qIndex && room.phase === "question") {
-        const correctIndex = room.questions[qIndex].correcta;
-        const acierta = Math.random() < 0.70;
-        let selectedIndex = correctIndex;
-        if (!acierta) {
-          const opciones = [0, 1, 2, 3].filter(o => o !== correctIndex);
-          selectedIndex = opciones[Math.floor(Math.random() * opciones.length)];
-        }
-
-        bot.answers.push({
-          questionIndex: qIndex,
-          answerIndex: selectedIndex,
-          correct: selectedIndex === correctIndex
-        });
-
-        if (selectedIndex === correctIndex) {
-          bot.score += 1;
-        }
-
-        if (room.modalidad === "amigos") {
-          broadcastToRoom(room, {
-            type: "player_responded",
-            playerId: bot.id
-          });
-        }
-        
-        await guardarSalaEnBD(room);
-      }
-    }, delay);
-  }
-}
-
-function resumirBucleDeBatalla(room) {
-  if (room.timerInterval) {
-    clearInterval(room.timerInterval);
-  }
-
-  const qIndex = room.currentQuestionIndex;
-  if (qIndex < 0 || qIndex >= room.questions.length) {
-    finalizarBatalla(room);
-    return;
-  }
-
-  if (room.phase === "question") {
-    let timeLeft = room.questionTimeLeft !== null ? room.questionTimeLeft : room.settings.timePerQuestion;
-    if (timeLeft <= 0) {
-      procesarAvancePregunta(room);
-      return;
-    }
-
-    simularRespuestasDeBotsRestaurados(room, qIndex);
-
-    room.timerInterval = setInterval(async () => {
-      timeLeft -= 1;
-      room.questionTimeLeft = timeLeft;
-
-      broadcastToRoom(room, {
-        type: "timer_tick",
-        timeLeft: timeLeft
-      });
-
-      if (timeLeft <= 0) {
-        clearInterval(room.timerInterval);
-        
-        for (const p of room.players) {
-          if (!p.answers.some(ans => ans.questionIndex === qIndex)) {
-            p.answers.push({
-              questionIndex: qIndex,
-              answerIndex: -1,
-              correct: false
-            });
-          }
-        }
-        procesarAvancePregunta(room);
-      }
-    }, 1000);
-
-  } else if (room.phase === "feedback") {
-    const isFastMode = room.modalidad === "aleatoria" || (room.settings && room.settings.fastMode === "rapido");
-    if (isFastMode) {
-      let feedbackTimeLeft = room.feedbackTimeLeft !== null ? room.feedbackTimeLeft : 10;
-      if (feedbackTimeLeft <= 0) {
-        avanzarSiguientePregunta(room);
-        return;
-      }
-
-      room.timerInterval = setInterval(() => {
-        feedbackTimeLeft -= 1;
-        room.feedbackTimeLeft = feedbackTimeLeft;
-
-        broadcastToRoom(room, {
-          type: "feedback_tick",
-          timeLeft: feedbackTimeLeft
-        });
-
-        if (feedbackTimeLeft <= 0) {
-          clearInterval(room.timerInterval);
-          avanzarSiguientePregunta(room);
-        }
-      }, 1000);
-    } else {
-      broadcastToRoom(room, {
-        type: "feedback_tick",
-        timeLeft: -1
-      });
-    }
-  }
-}
-
-async function inicializarBatallas(server, db, JWT_SECRET) {
+function inicializarBatallas(server, db, JWT_SECRET) {
   const wss = new ws.Server({ noServer: true });
   dbInstance = db;
-  
-  // Restaurar salas guardadas antes de aceptar conexiones
-  await restaurarSalasActivasDesdeBD(db);
 
   // Manejo de upgrade HTTP a WebSocket de forma segura
   server.on("upgrade", (request, socket, head) => {
@@ -266,11 +36,6 @@ async function inicializarBatallas(server, db, JWT_SECRET) {
   });
 
   wss.on("connection", (wsConn) => {
-    wsConn.isAlive = true;
-    wsConn.on("pong", () => {
-      wsConn.isAlive = true;
-    });
-
     let usuarioAutenticado = null;
     let salaActualCodigo = null;
 
@@ -323,40 +88,18 @@ async function inicializarBatallas(server, db, JWT_SECRET) {
                       players: r.players.map(p => ({ id: p.id, nombre: p.nombre }))
                     }));
                     
-                    // Si la batalla está activa, enviarle la pregunta actual o el feedback de inmediato
+                    // Si la batalla está activa, enviarle la pregunta actual de inmediato
                     if (r.state === "playing" && r.currentQuestionIndex >= 0) {
                       const question = r.questions[r.currentQuestionIndex];
-                      if (r.phase === "question" || !r.phase) {
-                        wsConn.send(JSON.stringify({
-                          type: "new_question",
-                          questionIndex: r.currentQuestionIndex,
-                          totalQuestions: r.questions.length,
-                          texto: question.texto,
-                          opciones: question.opciones,
-                          tema: question.tema,
-                          timeLeft: (r.questionTimeLeft !== undefined) ? r.questionTimeLeft : r.settings.timePerQuestion
-                        }));
-                      } else if (r.phase === "feedback") {
-                        const results = r.players.map(pl => {
-                          const ans = pl.answers.find(a => a.questionIndex === r.currentQuestionIndex);
-                          return {
-                            nombre: pl.nombre,
-                            correct: ans ? ans.correct : false
-                          };
-                        });
-                        wsConn.send(JSON.stringify({
-                          type: "question_feedback",
-                          questionIndex: r.currentQuestionIndex,
-                          correcta: question.correcta,
-                          explicacion: question.explicacion || "Sin desglose.",
-                          fuente: question.fuente || "ENURM Oficial",
-                          results: results
-                        }));
-                        wsConn.send(JSON.stringify({
-                          type: "feedback_tick",
-                          timeLeft: (r.feedbackTimeLeft !== undefined) ? r.feedbackTimeLeft : 10
-                        }));
-                      }
+                      wsConn.send(JSON.stringify({
+                        type: "new_question",
+                        questionIndex: r.currentQuestionIndex,
+                        totalQuestions: r.questions.length,
+                        texto: question.texto,
+                        opciones: question.opciones,
+                        tema: question.tema,
+                        timeLeft: (r.questionTimeLeft !== undefined) ? r.questionTimeLeft : r.settings.timePerQuestion
+                      }));
                     } else if (r.state === "results" && r.podio) {
                       wsConn.send(JSON.stringify({
                         type: "battle_finished",
@@ -371,8 +114,6 @@ async function inicializarBatallas(server, db, JWT_SECRET) {
                       settings: r.settings,
                       players: r.players.map(pl => ({ id: pl.id, nombre: pl.nombre, isHost: pl.id === r.hostId, isConnected: true }))
                     });
-
-                    await guardarSalaEnBD(r);
                     break;
                   }
                 }
@@ -422,7 +163,6 @@ async function inicializarBatallas(server, db, JWT_SECRET) {
               settings: room.settings,
               players: [{ id: userId, nombre: userNombre }]
             }));
-            await guardarSalaEnBD(room);
             break;
           }
 
@@ -463,7 +203,6 @@ async function inicializarBatallas(server, db, JWT_SECRET) {
               settings: room.settings,
               players: room.players.map(p => ({ id: p.id, nombre: p.nombre, isHost: p.id === room.hostId }))
             });
-            await guardarSalaEnBD(room);
             break;
           }
 
@@ -486,7 +225,6 @@ async function inicializarBatallas(server, db, JWT_SECRET) {
               settings: room.settings,
               players: room.players.map(p => ({ id: p.id, nombre: p.nombre, isHost: p.id === room.hostId }))
             });
-            await guardarSalaEnBD(room);
             break;
           }
 
@@ -590,7 +328,6 @@ async function inicializarBatallas(server, db, JWT_SECRET) {
                     clearInterval(room.timerInterval);
                   }
                   activeRooms.delete(room.code);
-                  await eliminarSalaDeBD(room.code);
                   console.log(`🧹 Sala ${room.code} purgada inmediatamente al salir el último jugador real.`);
                 } else {
                   // Reasignar host si el host era el que salía
@@ -611,7 +348,6 @@ async function inicializarBatallas(server, db, JWT_SECRET) {
                       isConnected: p.isConnected !== false
                     }))
                   });
-                  await guardarSalaEnBD(room);
                 }
               }
             }
@@ -637,7 +373,6 @@ async function inicializarBatallas(server, db, JWT_SECRET) {
             if (votesCount >= totalActivePlayers) {
               procesarAvancePregunta(room);
             }
-            await guardarSalaEnBD(room);
             break;
           }
 
@@ -660,7 +395,6 @@ async function inicializarBatallas(server, db, JWT_SECRET) {
             if (votesCount >= totalActivePlayers) {
               avanzarSiguientePregunta(room);
             }
-            await guardarSalaEnBD(room);
             break;
           }
 
@@ -708,7 +442,6 @@ async function inicializarBatallas(server, db, JWT_SECRET) {
                 type: "player_responded",
                 playerId: userId
               });
-              await guardarSalaEnBD(room);
             }
             break;
           }
@@ -732,7 +465,7 @@ async function inicializarBatallas(server, db, JWT_SECRET) {
       }
     });
 
-    wsConn.on("close", async () => {
+    wsConn.on("close", () => {
       // Remover de la cola de emparejamiento si se desconecta
       matchmakingQueue = matchmakingQueue.filter(p => p.ws !== wsConn);
 
@@ -745,11 +478,10 @@ async function inicializarBatallas(server, db, JWT_SECRET) {
           if (player) {
             player.isConnected = false;
             player.ws = null;
-            await guardarSalaEnBD(room);
 
             // Si es la fase de juego, le damos 25s de gracia
             if (room.state === "playing") {
-              setTimeout(async () => {
+              setTimeout(() => {
                 const r = activeRooms.get(salaActualCodigo);
                 if (r) {
                   const p = r.players.find(pl => pl.id === player.id);
@@ -759,7 +491,6 @@ async function inicializarBatallas(server, db, JWT_SECRET) {
                     if (r.players.length === 0 || r.players.every(pl => pl.isBot)) {
                       if (r.timerInterval) clearInterval(r.timerInterval);
                       activeRooms.delete(salaActualCodigo);
-                      await eliminarSalaDeBD(salaActualCodigo);
                     } else {
                       // Si era el host, reasignar host
                       if (r.modalidad === "amigos" && r.hostId === player.id) {
@@ -772,7 +503,6 @@ async function inicializarBatallas(server, db, JWT_SECRET) {
                         settings: r.settings,
                         players: r.players.map(pl => ({ id: pl.id, nombre: pl.nombre, isHost: pl.id === r.hostId, isConnected: pl.isConnected !== false }))
                       });
-                      await guardarSalaEnBD(r);
                     }
                   }
                 }
@@ -783,7 +513,6 @@ async function inicializarBatallas(server, db, JWT_SECRET) {
               if (room.players.length === 0) {
                 if (room.timerInterval) clearInterval(room.timerInterval);
                 activeRooms.delete(salaActualCodigo);
-                await eliminarSalaDeBD(salaActualCodigo);
               } else {
                 if (room.modalidad === "amigos" && room.hostId === player.id) {
                   const nuevoHost = room.players.find(p => !p.isBot);
@@ -795,28 +524,12 @@ async function inicializarBatallas(server, db, JWT_SECRET) {
                   settings: room.settings,
                   players: room.players.map(p => ({ id: p.id, nombre: p.nombre, isHost: p.id === room.hostId, isConnected: true }))
                 });
-                await guardarSalaEnBD(room);
               }
             }
           }
         }
       }
     });
-  });
-
-  const heartbeatInterval = setInterval(() => {
-    wss.clients.forEach((wsConn) => {
-      if (wsConn.isAlive === false) {
-        console.log("WebSocket client inactive, terminating connection.");
-        return wsConn.terminate();
-      }
-      wsConn.isAlive = false;
-      wsConn.ping();
-    });
-  }, 30000);
-
-  wss.on("close", () => {
-    clearInterval(heartbeatInterval);
   });
 }
 
@@ -986,21 +699,18 @@ async function iniciarBatallaAleatoria(db, jugadoresReales, bots = []) {
     }));
 
     room.currentQuestionIndex = 0;
-    await enviarPreguntaSincronizada(room);
+    enviarPreguntaSincronizada(room);
 
   } catch (err) {
     console.error("Error al inicializar batalla aleatoria:", err);
     for (const j of jugadoresReales) {
-      if (j.ws && j.ws.readyState === ws.OPEN) {
-        j.ws.send(JSON.stringify({ type: "error", message: "Falla al iniciar partida multijugador." }));
-      }
+      j.ws.send(JSON.stringify({ type: "error", message: "Falla al iniciar partida multijugador." }));
     }
     activeRooms.delete(roomCode);
-    await eliminarSalaDeBD(roomCode);
   }
 }
 
-async function enviarPreguntaSincronizada(room) {
+function enviarPreguntaSincronizada(room) {
   room.phase = "question";
   room.correctionsRequested = new Set();
   room.nextQuestionsRequested = new Set();
@@ -1011,9 +721,6 @@ async function enviarPreguntaSincronizada(room) {
 
   const qIndex = room.currentQuestionIndex;
   const question = room.questions[qIndex];
-
-  // Set the absolute expiration timestamp
-  room.questionTimeLeft = Date.now() + room.settings.timePerQuestion * 1000;
 
   // Estructura segura de pregunta para el cliente (ocultando respuesta correcta temporalmente)
   const questionPayload = {
@@ -1029,14 +736,16 @@ async function enviarPreguntaSincronizada(room) {
 
   broadcastToRoom(room, questionPayload);
 
-  // Persistir en la BD
-  await guardarSalaEnBD(room);
-
+  // Iniciar temporizador regresivo del lado del servidor
+  let timeLeft = room.settings.timePerQuestion;
+  room.questionTimeLeft = timeLeft;
+  
   // Programar a los bots si es modalidad continua o inmediata
   simularRespuestasDeBots(room, qIndex);
 
-  room.timerInterval = setInterval(async () => {
-    const timeLeft = Math.max(0, Math.round((room.questionTimeLeft - Date.now()) / 1000));
+  room.timerInterval = setInterval(() => {
+    timeLeft -= 1;
+    room.questionTimeLeft = timeLeft;
     
     // Broadcast de tick del temporizador
     broadcastToRoom(room, {
@@ -1058,7 +767,7 @@ async function enviarPreguntaSincronizada(room) {
         }
       }
 
-      await procesarAvancePregunta(room);
+      procesarAvancePregunta(room);
     }
   }, 1000);
 }
@@ -1068,9 +777,9 @@ function simularRespuestasDeBots(room, qIndex) {
   for (const bot of bots) {
     // Los bots responden en un tiempo aleatorio entre 4s y 15s (o antes de que el tiempo expire)
     const delay = 4000 + Math.floor(Math.random() * 8000);
-    setTimeout(async () => {
+    setTimeout(() => {
       // Verificar que la sala sigue activa y jugando esta misma pregunta
-      if (room.state === "playing" && room.currentQuestionIndex === qIndex && room.phase === "question") {
+      if (room.state === "playing" && room.currentQuestionIndex === qIndex) {
         const correctIndex = room.questions[qIndex].correcta;
         // Probabilidad de respuesta correcta basada en dificultad (ej. 70% acierto)
         const acierta = Math.random() < 0.70;
@@ -1098,26 +807,24 @@ function simularRespuestasDeBots(room, qIndex) {
             playerId: bot.id
           });
         }
-
-        await guardarSalaEnBD(room);
       }
     }, delay);
   }
 }
 
-async function procesarAvancePregunta(room) {
+function procesarAvancePregunta(room) {
   if (room.timerInterval) {
     clearInterval(room.timerInterval);
   }
   const isFastMode = room.modalidad === "aleatoria" || (room.settings && room.settings.fastMode === "rapido");
   if (isFastMode) {
-    await avanzarSiguientePregunta(room);
+    avanzarSiguientePregunta(room);
   } else {
-    await iniciarFeedbackPregunta(room);
+    iniciarFeedbackPregunta(room);
   }
 }
 
-async function iniciarFeedbackPregunta(room) {
+function iniciarFeedbackPregunta(room) {
   room.phase = "feedback";
   const qIndex = room.currentQuestionIndex;
   const question = room.questions[qIndex];
@@ -1145,34 +852,29 @@ async function iniciarFeedbackPregunta(room) {
 
   if (isFastMode) {
     // 3. Iniciar cuenta regresiva de feedback automática de 10s
-    room.feedbackTimeLeft = Date.now() + 10 * 1000;
-
-    await guardarSalaEnBD(room);
+    let feedbackTimeLeft = 10;
 
     // Broadcast del tick inicial de feedback
     broadcastToRoom(room, {
       type: "feedback_tick",
-      timeLeft: 10
+      timeLeft: feedbackTimeLeft
     });
 
-    room.timerInterval = setInterval(async () => {
-      const timeLeft = Math.max(0, Math.round((room.feedbackTimeLeft - Date.now()) / 1000));
+    room.timerInterval = setInterval(() => {
+      feedbackTimeLeft -= 1;
 
       broadcastToRoom(room, {
         type: "feedback_tick",
-        timeLeft: timeLeft
+        timeLeft: feedbackTimeLeft
       });
 
-      if (timeLeft <= 0) {
+      if (feedbackTimeLeft <= 0) {
         clearInterval(room.timerInterval);
-        await avanzarSiguientePregunta(room);
+        avanzarSiguientePregunta(room);
       }
     }, 1000);
   } else {
     // Modo Manual: No hay temporizador regresivo automático de avance
-    room.feedbackTimeLeft = null;
-    await guardarSalaEnBD(room);
-
     broadcastToRoom(room, {
       type: "feedback_tick",
       timeLeft: -1
@@ -1180,21 +882,19 @@ async function iniciarFeedbackPregunta(room) {
   }
 }
 
-async function avanzarSiguientePregunta(room) {
+
+function avanzarSiguientePregunta(room) {
   room.currentQuestionIndex += 1;
   if (room.currentQuestionIndex < room.questions.length) {
-    await enviarPreguntaSincronizada(room);
+    enviarPreguntaSincronizada(room);
   } else {
     // Finalizar batalla y calcular podio
-    await finalizarBatalla(room);
+    finalizarBatalla(room);
   }
 }
 
 async function finalizarBatalla(room) {
   room.state = "results";
-
-  // Guardar estado final de la sala
-  await guardarSalaEnBD(room);
 
   // Clasificar posiciones ordenadas por puntuación descendente
   const clasificados = [...room.players].sort((a, b) => b.score - a.score);
@@ -1313,11 +1013,10 @@ async function finalizarBatalla(room) {
   }
 
   // Eliminar la sala después de un delay de gracia
-  setTimeout(async () => {
+  setTimeout(() => {
     if (room.timerInterval) clearInterval(room.timerInterval);
     activeRooms.delete(room.code);
-    await eliminarSalaDeBD(room.code);
-    console.log(`🧹 Sala ${room.code} purgada con éxito de la memoria y base de datos.`);
+    console.log(`🧹 Sala ${room.code} purgada con éxito de la memoria.`);
   }, 5000); // 5 segundos activa en memoria para revisión pospartida
 }
 

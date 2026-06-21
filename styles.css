@@ -64,13 +64,13 @@
 }
 
 body.dark-mode {
-  --bg: hsl(222, 47%, 6%);
-  --bg-2: hsl(222, 47%, 8%);
-  --panel: rgba(15, 23, 42, 0.7);
-  --panel-strong: rgba(15, 23, 42, 0.85);
-  --panel-soft: rgba(255, 255, 255, 0.03);
-  --bg-card: rgba(30, 41, 59, 0.4);
-  --option-bg: rgba(30, 41, 59, 0.3);
+  --bg: #030712;
+  --bg-2: #090d16;
+  --panel: rgba(11, 15, 25, 0.7);
+  --panel-strong: rgba(11, 15, 25, 0.85);
+  --panel-soft: rgba(255, 255, 255, 0.02);
+  --bg-card: rgba(17, 24, 39, 0.45);
+  --option-bg: rgba(17, 24, 39, 0.35);
 
   --border: rgba(255, 255, 255, 0.07);
   --border-strong: rgba(255, 255, 255, 0.15);
@@ -521,6 +521,60 @@ select.input option {
   padding: 40px 40px 48px 40px !important;
 }
 
+.quiz-sticky-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background-color: rgba(255, 255, 255, 0.85);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 20px;
+  margin: -40px -40px 24px -40px;
+  border-top-left-radius: 35px;
+  border-top-right-radius: 35px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+body.dark-mode .quiz-sticky-header {
+  background-color: rgba(15, 23, 42, 0.85);
+}
+
+.quiz-sticky-progress-track {
+  width: 100%;
+  height: 4px;
+  background-color: var(--panel-soft);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.quiz-sticky-progress-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-dim);
+}
+
+.quiz-sticky-title {
+  font-family: 'Outfit', sans-serif;
+  color: var(--text-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 11px;
+}
+
+.quiz-sticky-counter {
+  font-family: 'Outfit', sans-serif;
+  color: var(--primary);
+  background: var(--primary-soft);
+  padding: 2px 8px;
+  border-radius: 8px;
+}
+
 .quiz-header {
   display: flex;
   justify-content: space-between;
@@ -714,17 +768,25 @@ select.input option {
   min-width: 140px;
 }
 
+@keyframes liquidGradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
 .btn-primary {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-2) 100%) !important;
+  background: linear-gradient(135deg, var(--primary) 0%, #3b82f6 25%, #6366f1 50%, #4f46e5 75%, var(--primary) 100%) !important;
+  background-size: 200% auto !important;
+  animation: liquidGradient 6s ease infinite !important;
   color: #fff !important;
   box-shadow: 0 8px 20px -6px rgba(59, 130, 246, 0.4) !important;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
   border: none !important;
 }
 
 .btn-primary:hover:not(:disabled) {
-  transform: translateY(-2px) !important;
-  box-shadow: 0 10px 24px -4px rgba(59, 130, 246, 0.5) !important;
+  transform: translateY(-2px) scale(1.02) !important;
+  box-shadow: 0 12px 24px -4px rgba(59, 130, 246, 0.5), 0 0 15px -3px var(--primary-soft) !important;
 }
 
 .btn-secondary {
@@ -1310,6 +1372,7 @@ select.input option {
 
 .modal-ia-body {
   padding: 28px;
+  max-height: 400px;
   overflow-y: auto;
   font-size: 14.5px;
   line-height: 1.6;
@@ -1401,10 +1464,10 @@ select.input option {
 }
 
 .nav-map-btn.current {
-  background: #0A66C2 !important;
-  border: 2px solid #0A66C2 !important;
+  background: var(--primary) !important;
+  border: 2px solid var(--primary) !important;
   color: #ffffff !important;
-  box-shadow: 0 4px 10px rgba(10, 102, 194, 0.3) !important;
+  box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3) !important;
 }
 
 .nav-map-btn.answered {
@@ -2336,7 +2399,7 @@ select.input option {
 
 /* === ESTILOS DEL INTERRUPTOR SWITCH (FASE 1) === */
 .switch input:checked + .slider {
-  background-color: #0A66C2 !important;
+  background-color: var(--primary) !important;
 }
 
 .slider:before {
@@ -2704,20 +2767,22 @@ body:not(.dark-mode) .modal-ia-overlay {
 
 /* Botón Navegación Superior Modo Batalla */
 #btn-ir-batalla {
-  background: linear-gradient(135deg, var(--danger) 0%, #dc2626 100%) !important;
+  background: linear-gradient(135deg, var(--danger) 0%, #ef4444 25%, #f59e0b 50%, #dc2626 75%, var(--danger) 100%) !important;
+  background-size: 200% auto !important;
+  animation: liquidGradient 6s ease infinite !important;
   color: #ffffff !important;
   font-weight: 700 !important;
   border: none !important;
   box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25) !important;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
   display: inline-flex;
   align-items: center;
   gap: 6px;
 }
 
 #btn-ir-batalla:hover {
-  transform: translateY(-2px) !important;
-  box-shadow: 0 6px 18px rgba(239, 68, 68, 0.4) !important;
+  transform: translateY(-2px) scale(1.02) !important;
+  box-shadow: 0 8px 20px rgba(239, 68, 68, 0.4), 0 0 15px -3px var(--danger-soft) !important;
 }
 
 /* Landing Modo Batalla */
@@ -4184,7 +4249,7 @@ body.dark-mode .premium-metrics-panel {
   }
 
   .option-btn {
-    padding: 12px 14px !important;
+    padding: 16px 16px !important;
     border-radius: 12px !important;
     font-size: 13.5px !important;
   }
@@ -4772,210 +4837,17 @@ body.dark-mode .premium-metrics-panel {
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid var(--border);
   border-radius: 14px;
-  transition: all 0.2s ease;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   cursor: pointer;
   border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
 .specialty-row:hover {
-  background: rgba(255, 255, 255, 0.04);
-  border-color: var(--border-strong);
-  transform: translateY(-1px);
-}
-
-.specialty-info {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  width: 220px;
-  flex-shrink: 0;
-}
-
-.specialty-icon-container {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 16px;
-  flex-shrink: 0;
-}
-
-.specialty-name {
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--text);
-}
-
-.specialty-bars-container {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  flex-grow: 1;
-  margin: 0 24px;
-}
-
-.specialty-bar-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.specialty-bar-label {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text-soft);
-  width: 85px;
-  flex-shrink: 0;
-}
-
-.specialty-bar-bg {
-  height: 8px;
-  background: rgba(255, 255, 255, 0.04);
-  border-radius: 100px;
-  flex-grow: 1;
-  position: relative;
-  overflow: hidden;
-}
-
-.specialty-bar-fill {
-  height: 100%;
-  border-radius: 100px;
-  transition: width 0.6s ease;
-}
-
-.specialty-bar-fill.blue {
-  background: #3b82f6;
-}
-
-.specialty-bar-fill.green {
-  background: #10b981;
-}
-
-.specialty-pct {
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--text);
-  width: 36px;
-  text-align: right;
-}
-
-.specialty-status-wrapper {
-  width: 210px;
-  display: flex;
-  justify-content: flex-end;
-  flex-shrink: 0;
-}
-
-.specialty-diagnostic-card {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding: 8px 12px;
-  border-radius: 12px;
-  min-width: 190px;
-  width: 190px;
-  border: 1px solid var(--border);
-  background: rgba(255, 255, 255, 0.01);
-  text-align: left;
-}
-
-.diagnostic-header {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.diagnostic-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.diagnostic-title {
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.diagnostic-desc {
-  font-size: 10px;
-  color: var(--text-soft);
-  line-height: 1.3;
-}
-
-/* Modificadores de prioridad para la tarjeta */
-.specialty-diagnostic-card.badge-fortaleza {
-  background: rgba(16, 185, 129, 0.04);
-  border-color: rgba(16, 185, 129, 0.18);
-  color: #10b981;
-}
-.specialty-diagnostic-card.badge-fortaleza .diagnostic-desc {
-  color: rgba(255, 255, 255, 0.5);
-}
-
-.specialty-diagnostic-card.badge-inprogress {
-  background: rgba(59, 130, 246, 0.04);
-  border-color: rgba(59, 130, 246, 0.18);
-  color: #3b82f6;
-}
-.specialty-diagnostic-card.badge-inprogress .diagnostic-desc {
-  color: rgba(255, 255, 255, 0.5);
-}
-
-.specialty-diagnostic-card.badge-reforzar {
-  background: rgba(245, 158, 11, 0.04);
-  border-color: rgba(245, 158, 11, 0.18);
-  color: #f59e0b;
-}
-.specialty-diagnostic-card.badge-reforzar .diagnostic-desc {
-  color: rgba(255, 255, 255, 0.5);
-}
-
-.specialty-diagnostic-card.badge-priority {
-  background: rgba(239, 68, 68, 0.04);
-  border-color: rgba(239, 68, 68, 0.18);
-  color: #ef4444;
-}
-.specialty-diagnostic-card.badge-priority .diagnostic-desc {
-  color: rgba(255, 255, 255, 0.5);
-}
-
-@media (max-width: 850px) {
-  .specialty-row {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 16px;
-  }
-  .specialty-info {
-    width: 100%;
-  }
-  .specialty-bars-container {
-    margin: 0;
-  padding-top: 8px;
-  font-size: 11px;
-  color: var(--text-soft);
-  line-height: 1.3;
-}
-
-/* Lista de Especialidades */
-.specialty-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 14px 20px;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  transition: all 0.2s ease;
-  cursor: pointer;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.02);
-}
-
-.specialty-row:hover {
-  background: rgba(255, 255, 255, 0.04);
-  border-color: var(--border-strong);
-  transform: translateY(-1px);
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--primary);
+  transform: translateY(-4px) scale(1.015);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.25), 0 10px 10px -5px rgba(0, 0, 0, 0.2), 0 0 15px -3px var(--primary-soft);
 }
 
 .specialty-info {
@@ -5381,4 +5253,48 @@ body.dark-mode .premium-metrics-panel {
 
 .sidebar-item.active::before {
   transform: translateY(-50%) scaleY(1);
+}
+
+/* ==========================================================================
+   💀 SKELETON LOADERS (FLUID & PREMIUM PRE-LOADING SCREEN)
+   ========================================================================== */
+.skeleton-line,
+.skeleton-button {
+  background: linear-gradient(
+    90deg,
+    var(--panel-soft) 25%,
+    var(--border) 37%,
+    var(--panel-soft) 63%
+  );
+  background-size: 400% 100%;
+  animation: shimmer 1.4s ease infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.skeleton-line {
+  height: 16px;
+  margin-bottom: 12px;
+  border-radius: 8px;
+  width: 100%;
+}
+
+.skeleton-line.title {
+  height: 24px;
+  width: 80%;
+  margin-bottom: 20px;
+}
+
+.skeleton-line.short {
+  width: 50%;
+}
+
+.skeleton-button {
+  height: 52px;
+  margin-bottom: 12px;
+  border-radius: 12px;
+  width: 100%;
 }

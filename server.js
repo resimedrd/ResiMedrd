@@ -78,7 +78,7 @@ async function arrancar() {
     
     // Inicializar servidor de batallas multijugador en tiempo real (WebSocket)
     const { inicializarBatallas } = require("./server_battle.js");
-    inicializarBatallas(server, db, JWT_SECRET);
+    await inicializarBatallas(server, db, JWT_SECRET);
 
     server.listen(PORT, () => {
       const ipLocal = obtenerDireccionIPLocal();

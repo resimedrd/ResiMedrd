@@ -14,12 +14,13 @@ async function conectarBaseDeDatos() {
     driver: sqlite3.Database
   });
 
-  // Habilitar el modo de alta concurrencia Write-Ahead Logging (WAL) inmediatamente después de abrir la conexión
+  // Habilitar el modo de alta concurrencia Write-Ahead Logging (WAL) y llaves foráneas inmediatamente después de abrir la conexión
   try {
     await dbInstance.exec(`PRAGMA journal_mode = WAL;`);
     await dbInstance.exec(`PRAGMA synchronous = NORMAL;`);
+    await dbInstance.exec(`PRAGMA foreign_keys = ON;`);
   } catch (walErr) {
-    console.warn("Falla al activar modo WAL en SQLite:", walErr);
+    console.warn("Falla al configurar pragmas (WAL/Foreign Keys) en SQLite:", walErr);
   }
 
   await iniciarBaseDeDatos(dbInstance);
@@ -176,6 +177,27 @@ async function iniciarBaseDeDatos(db) {
       key_info_html TEXT,
       fecha_creacion TEXT DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY(pregunta_id) REFERENCES preguntas(id) ON DELETE CASCADE
+    )
+  `);
+
+  // 9. Tabla de salas_activas para la persistencia del estado en reinicios del servidor (Modo Batalla FASE 2)
+  await db.exec(`
+    CREATE TABLE IF NOT EXISTS salas_activas (
+      codigo TEXT PRIMARY KEY,
+      modalidad TEXT NOT NULL,
+      settings TEXT NOT NULL,
+      host_id INTEGER,
+      state TEXT NOT NULL,
+      current_question_index INTEGER NOT NULL,
+      phase TEXT,
+      question_time_left INTEGER,
+      feedback_time_left INTEGER,
+      questions TEXT NOT NULL,
+      players TEXT NOT NULL,
+      corrections_requested TEXT,
+      next_questions_requested TEXT,
+      podio TEXT,
+      updated_at TEXT DEFAULT CURRENT_TIMESTAMP
     )
   `);
 

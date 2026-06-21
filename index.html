@@ -701,14 +701,22 @@
           <!-- Columna Principal: Enunciado y Opciones -->
           <div class="quiz-main-column">
             <article class="quiz-shell">
+              <!-- Barra de Progreso Fija Sticky Premium -->
+              <div class="quiz-sticky-header">
+                <div class="quiz-sticky-progress-track">
+                  <div id="progress-fill" class="progress-fill" style="width: 0%;"></div>
+                </div>
+                <div class="quiz-sticky-progress-info">
+                  <span class="quiz-sticky-title">Examen en Curso</span>
+                  <span id="progress-text-counter" class="quiz-sticky-counter">-- / --</span>
+                </div>
+              </div>
+
               <div class="quiz-header" style="margin-bottom: 20px;">
                 <div>
                   <span id="chip-modo" class="chip chip-primary">Modo</span>
                   <span id="chip-tema" class="chip chip-soft">Tema</span>
                 </div>
-              </div>
-              <div class="progress-wrap" style="margin-bottom: 24px;">
-                <div class="progress-track"><div id="progress-fill" class="progress-fill"></div></div>
               </div>
               <div class="question-card">
                 <h3 id="pregunta-texto" class="question-text">Cargando caso clínico...</h3>
@@ -2156,6 +2164,8 @@
   <script src="js/spaced_repetition.js?v=1.7.9"></script>
   <script src="js/analytics.js?v=1.7.9"></script>
   <script src="js/ui.js?v=1.7.9"></script>
+  <script src="js/ui_dashboard.js?v=1.7.9"></script>
+  <script src="js/ui_profile.js?v=1.7.9"></script>
   <script src="js/auth.js?v=1.7.9"></script>
   <script src="js/quiz.js?v=1.7.9"></script>
   <script src="js/flashcards.js?v=1.7.9"></script>

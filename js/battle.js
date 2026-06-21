@@ -13,6 +13,10 @@ const battle = {
   repasoBatallaPreguntas: [], // Almacén para revisión pospartida
   respuestasUsuarioBatalla: [], // Respuestas del usuario para reporte pospartida
   jugadoresDeLaBatalla: [], // Jugadores activos en la partida actual
+  reconnecting: false,
+  reconnectAttempts: 0,
+  maxReconnectAttempts: 7, // 7 intentos * 2 segundos = 14 segundos
+  reconnectTimer: null,
 
   inicializar() {
     // 1. Vincular botones de navegación superior y dashboard
@@ -224,10 +228,16 @@ const battle = {
 
   conectarWebSocket() {
     if (battle.socket) {
+      if (battle.socket.readyState === WebSocket.OPEN || battle.socket.readyState === WebSocket.CONNECTING) {
+        return;
+      }
+      battle.socket.onopen = null;
+      battle.socket.onmessage = null;
+      battle.socket.onclose = null;
+      battle.socket.onerror = null;
       battle.socket.close();
     }
 
-    // Resolver protocolo y host dinámico (Local vs Producción en Railway)
     const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
     const host = window.location.host;
     const wsUrl = `${protocol}//${host}`;
@@ -237,7 +247,8 @@ const battle = {
 
     battle.socket.onopen = () => {
       console.log("✅ Conectado a la Arena Multijugador.");
-      // Autenticar mediante JWT de forma segura
+      battle.limpiarReconexion();
+      
       const token = sessionStorage.getItem("resiMed_jwt_token");
       if (token) {
         battle.socket.send(JSON.stringify({ type: "auth", token: token }));
@@ -255,11 +266,125 @@ const battle = {
 
     battle.socket.onclose = () => {
       console.log("❌ Desconectado de la Arena Multijugador.");
+      if (battle.estadoActual !== "idle" && battle.estaEnPantallaBatalla()) {
+        battle.iniciarReconexion();
+      }
     };
 
     battle.socket.onerror = (err) => {
       console.error("WebSocket Error en Modo Batalla:", err);
     };
+  },
+
+  estaEnPantallaBatalla() {
+    const activeScreen = document.querySelector(".screen.active");
+    if (!activeScreen) return false;
+    return activeScreen.id.startsWith("pantalla-battle");
+  },
+
+  iniciarReconexion() {
+    if (battle.reconnecting) return;
+    battle.reconnecting = true;
+    battle.reconnectAttempts = 0;
+
+    console.log("🔄 Conexión perdida. Iniciando reconexión automática...");
+    battle.mostrarBannerReconexion();
+
+    battle.reconnectTimer = setInterval(() => {
+      battle.reconnectAttempts++;
+      console.log(`🔄 Intento de reconexión ${battle.reconnectAttempts}/${battle.maxReconnectAttempts}...`);
+
+      if (battle.reconnectAttempts > battle.maxReconnectAttempts) {
+        console.log("❌ Margen de reconexión agotado. Conexión perdida definitivamente.");
+        battle.detenerReconexion(true);
+        return;
+      }
+
+      battle.actualizarBannerReconexion();
+      battle.conectarWebSocket();
+    }, 2000);
+  },
+
+  limpiarReconexion() {
+    if (battle.reconnectTimer) {
+      clearInterval(battle.reconnectTimer);
+      battle.reconnectTimer = null;
+    }
+    battle.reconnecting = false;
+    battle.reconnectAttempts = 0;
+    battle.ocultarBannerReconexion();
+  },
+
+  detenerReconexion(mostrarError) {
+    battle.limpiarReconexion();
+    if (mostrarError) {
+      alert("⚠️ Conexión perdida permanentemente. Se ha agotado el margen de reconexión de 15 segundos.");
+      battle.mostrarPantallaBattle("battle");
+      battle.estadoActual = "idle";
+    }
+  },
+
+  mostrarBannerReconexion() {
+    if (document.getElementById("battle-reconnect-banner")) return;
+
+    const banner = document.createElement("div");
+    banner.id = "battle-reconnect-banner";
+    banner.style.position = "fixed";
+    banner.style.top = "20px";
+    banner.style.left = "50%";
+    banner.style.transform = "translateX(-50%)";
+    banner.style.backgroundColor = "var(--warning)";
+    banner.style.color = "#000";
+    banner.style.padding = "12px 24px";
+    banner.style.borderRadius = "8px";
+    banner.style.boxShadow = "0 4px 15px rgba(0,0,0,0.2)";
+    banner.style.zIndex = "99999";
+    banner.style.fontWeight = "700";
+    banner.style.display = "flex";
+    banner.style.alignItems = "center";
+    banner.style.gap = "12px";
+    banner.style.fontSize = "14px";
+    
+    banner.innerHTML = `
+      <span style="
+        border: 3px solid rgba(0,0,0,0.1);
+        border-radius: 50%;
+        border-top: 3px solid #000;
+        width: 16px;
+        height: 16px;
+        animation: battle-spin 1s linear infinite;
+        display: inline-block;
+      "></span>
+      <span id="battle-reconnect-text">Conexión inestable. Reconectando... (Intento 1/${battle.maxReconnectAttempts})</span>
+    `;
+
+    if (!document.getElementById("battle-spin-style")) {
+      const style = document.createElement("style");
+      style.id = "battle-spin-style";
+      style.innerHTML = `
+        @keyframes battle-spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      `;
+      document.head.appendChild(style);
+    }
+
+    document.body.appendChild(banner);
+  },
+
+  actualizarBannerReconexion() {
+    const textEl = document.getElementById("battle-reconnect-text");
+    if (textEl) {
+      textEl.textContent = `Conexión inestable. Reconectando... (Intento ${battle.reconnectAttempts}/${battle.maxReconnectAttempts})`;
+    }
+  },
+
+  ocultarBannerReconexion() {
+    const banner = document.getElementById("battle-reconnect-banner");
+    if (banner) {
+      banner.remove();
+    }
   },
 
   procesarMensajeServidor(payload) {
@@ -585,6 +710,9 @@ const battle = {
       payload.opciones.forEach((opc, index) => {
         const btn = document.createElement("button");
         btn.className = "option-btn";
+        if (battle.respuestasUsuarioBatalla[payload.questionIndex] === index) {
+          btn.classList.add("selected");
+        }
         btn.type = "button";
         btn.innerHTML = `
           <span class="option-letter">${letras[index]})</span>

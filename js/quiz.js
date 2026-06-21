@@ -9,6 +9,27 @@ function safeParseOpciones(opciones) {
 }
 
 const quiz = {
+  mostrarSkeletonLoader() {
+    const preguntaTexto = document.getElementById("pregunta-texto");
+    const opcionesContainer = document.getElementById("opciones-container");
+    if (preguntaTexto) {
+      preguntaTexto.innerHTML = `
+        <div class="skeleton-line title"></div>
+        <div class="skeleton-line"></div>
+        <div class="skeleton-line"></div>
+        <div class="skeleton-line short"></div>
+      `;
+    }
+    if (opcionesContainer) {
+      opcionesContainer.innerHTML = `
+        <div class="skeleton-button"></div>
+        <div class="skeleton-button"></div>
+        <div class="skeleton-button"></div>
+        <div class="skeleton-button"></div>
+      `;
+    }
+  },
+
   keyInfoActivo: false,
 
   obtenerTextoConClaves(texto) {
@@ -489,6 +510,25 @@ const quiz = {
     const temporizadorEl = document.getElementById("temporizador");
     if (temporizadorEl) temporizadorEl.classList.add("hidden");
 
+    // FASE 4: Cambiar a pantalla de evaluación inmediatamente y mostrar skeletons
+    localStorage.setItem("resiMed_examen_activo", JSON.stringify({ loading: true }));
+    ui.mostrarPantalla("quiz", false);
+    
+    // Ocultar elementos de navegación/tiempo/botones mientras carga
+    const mapEl = document.getElementById("simulacro-navigation-map");
+    if (mapEl) mapEl.classList.add("hidden");
+    const stickyCounter = document.getElementById("progress-text-counter");
+    if (stickyCounter) stickyCounter.textContent = "-- / --";
+    const stickyFill = document.getElementById("progress-fill");
+    if (stickyFill) stickyFill.style.width = "0%";
+    
+    const btnSiguiente = document.getElementById("btn-siguiente");
+    const btnFinalizar = document.getElementById("btn-finalizar");
+    if (btnSiguiente) btnSiguiente.classList.add("hidden");
+    if (btnFinalizar) btnFinalizar.classList.add("hidden");
+
+    quiz.mostrarSkeletonLoader();
+
     try {
       // 1. Cargar preguntas desde nuestro nuevo endpoint centralizado POST /api/exam-setup
       let preguntas = [];
@@ -521,6 +561,8 @@ const quiz = {
       }
 
       if (preguntas.length === 0) {
+        quiz.limpiarEstadoExamenActivo();
+        ui.mostrarPantalla("home", false);
         alert("No hay preguntas registradas en este bloque actualmente.");
         return;
       }
@@ -796,6 +838,10 @@ const quiz = {
     }
     if (contadorPregunta) {
       contadorPregunta.textContent = `Pregunta ${state.indiceActual + 1} de ${state.preguntasCargadas.length}`;
+    }
+    const progressCounter = document.getElementById("progress-text-counter");
+    if (progressCounter) {
+      progressCounter.textContent = `${state.indiceActual + 1} / ${state.preguntasCargadas.length}`;
     }
     if (progressFill) {
       progressFill.style.width = `${((state.indiceActual + 1) / state.preguntasCargadas.length) * 100}%`;
