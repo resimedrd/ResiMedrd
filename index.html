@@ -117,435 +117,179 @@
 
       <main class="main-shell">
       
+      <!-- FASE 1: PANTALLA DE INGRESO / REGISTRO / BIENVENIDA (SPLIT LAYOUT) -->
       <section id="pantalla-auth" class="screen">
-        <div class="landing-container" style="max-width: 1200px; margin: 0 auto; padding: 40px 24px; display: flex; flex-direction: column; gap: 80px; font-family: 'Inter', sans-serif;">
+        <div class="auth-split-container">
           
-          <!-- HEADER INICIAL DE LANDING -->
-          <header class="landing-header" style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 20px; border-bottom: 1px solid var(--border-strong);">
-            <div class="brand" style="display: flex; align-items: center; gap: 10px;">
-              <img class="brand-mark-premium" src="logo_resimed.png?v=3" alt="ResiMed Logo" style="width: 42px; height: 42px; border-radius: 12px; object-fit: cover; box-shadow: 0 4px 14px rgba(59, 130, 246, 0.4);">
-              <div>
-                <span style="font-size: 22px; font-weight: 800; font-family: 'Outfit', sans-serif; color: var(--text); display: block; line-height: 1.1;">ResiMed</span>
-                <span style="font-size: 11px; font-weight: 600; color: var(--text-dim); display: block; letter-spacing: 0.3px;">Prepárate. Simula. Destaca.</span>
-              </div>
-            </div>
-            <div>
-              <span class="badge" style="background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.2); color: var(--primary); padding: 6px 14px; border-radius: 100px; font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Plataforma #1 para el ENURM en RD 🇩🇴</span>
-            </div>
-          </header>
-
-          <!-- COLUMNAS PRINCIPALES (HERO + FORMULARIO CARD) -->
-          <div class="landing-hero-grid" style="display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 48px; align-items: start;">
-            
-            <!-- COLUMNA IZQUIERDA: HERO COPY & BENEFICIOS -->
-            <div class="landing-hero-copy" style="display: flex; flex-direction: column; gap: 28px; padding-top: 10px;">
-              <div style="display: flex; flex-direction: column; gap: 14px;">
-                <h1 style="font-size: 46px; font-weight: 800; font-family: 'Outfit', sans-serif; color: var(--text); line-height: 1.15; letter-spacing: -1px; margin: 0;">
-                  Prepárate para el ENURM con <span style="background: linear-gradient(90deg, #3b82f6 0%, #60a5fa 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800;">simulaciones inteligentes</span>.
-                </h1>
-                <p style="font-size: 16px; line-height: 1.6; color: var(--text-soft); font-weight: 500; margin: 0; max-width: 520px;">
-                  Miles de médicos en República Dominicana confían en ResiMed para dominar su examen de residencia y alcanzar su plaza soñada.
-                </p>
-              </div>
-
-              <!-- LISTA DE CARACTERÍSTICAS Sleek -->
-              <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 16px;">
-                <li style="display: flex; align-items: center; gap: 14px;">
-                  <div style="width: 32px; height: 32px; background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.15); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--primary); font-size: 14px;">📁</div>
-                  <span style="font-size: 14.5px; font-weight: 600; color: var(--text);"><span id="mock-stat-preguntas-banco">+6,000</span> preguntas actualizadas</span>
-                </li>
-                <li style="display: flex; align-items: center; gap: 14px;">
-                  <div style="width: 32px; height: 32px; background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.15); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--success); font-size: 14px;">📋</div>
-                  <span style="font-size: 14.5px; font-weight: 600; color: var(--text);">Simulacros tipo ENURM oficiales</span>
-                </li>
-                <li style="display: flex; align-items: center; gap: 14px;">
-                  <div style="width: 32px; height: 32px; background: rgba(139, 92, 246, 0.08); border: 1px solid rgba(139, 92, 246, 0.15); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #8b5cf6; font-size: 14px;">📊</div>
-                  <span style="font-size: 14.5px; font-weight: 600; color: var(--text);">Estadísticas y análisis avanzado de debilidades</span>
-                </li>
-                <li style="display: flex; align-items: center; gap: 14px;">
-                  <div style="width: 32px; height: 32px; background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.15); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--warning); font-size: 14px;">⏱️</div>
-                  <span style="font-size: 14.5px; font-weight: 600; color: var(--text);">Modo examen real con cronómetro estricto</span>
-                </li>
-              </ul>
-
-              <!-- BOTONES DE ACCION DIRECTA -->
-              <div style="display: flex; gap: 14px; flex-wrap: wrap; margin-top: 10px;">
-                <button onclick="document.getElementById('login-email').focus();" class="btn btn-primary" style="padding: 14px 28px; font-size: 14.5px; font-weight: 700; background: linear-gradient(135deg, var(--primary) 0%, #1d4ed8 100%); color: #fff; border: none; border-radius: 14px; box-shadow: 0 10px 24px rgba(59, 130, 246, 0.3); display: flex; align-items: center; gap: 8px; cursor: pointer; transition: all 0.2s;">
-                  Comenzar ahora <span style="font-size: 16px;">→</span>
-                </button>
-                <div style="position: relative; display: inline-block;">
-                  <button onclick="mostrarDemoNoHabilitada(this)" class="btn btn-ghost" style="padding: 14px 28px; font-size: 14.5px; font-weight: 700; border: 1px solid var(--border-strong); border-radius: 14px; background: rgba(255,255,255,0.01); color: var(--text); display: flex; align-items: center; gap: 8px; cursor: pointer; transition: all 0.2s;">
-                    Ver demo <span style="font-size: 16px;">▷</span>
+          <!-- COLUMNA IZQUIERDA: HERO COPY & METRICAS (ESTÁTICA) -->
+          <div class="auth-split-left">
+            <div class="auth-left-content">
+              
+              <!-- Identidad de Marca -->
+              <div class="brand-hero">
+                <img class="brand-logo-large" src="logo_resimed.png?v=3" alt="ResiMed Logo">
+                <h1>ResiMed</h1>
+                <p class="slogan">Prepárate. Simula. Destaca.</p>
+                
+                <!-- Botón de Demo con Badge de No Habilitado -->
+                <div style="position: relative; display: inline-block; margin-top: 8px;">
+                  <button onclick="mostrarDemoNoHabilitada(this)" class="btn btn-ghost" style="padding: 10px 20px; font-size: 13.5px; font-weight: 700; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; background: rgba(255,255,255,0.02); color: #f1f5f9; display: flex; align-items: center; gap: 8px; cursor: pointer; transition: all 0.2s;" type="button">
+                    Ver demo <span style="font-size: 14px;">▷</span>
                   </button>
                   <span id="badge-demo-no-habilitado" style="position: absolute; top: -10px; right: -5px; background: var(--danger-soft); border: 1px solid rgba(239, 68, 68, 0.3); color: var(--danger); font-size: 9px; font-weight: 700; text-transform: uppercase; padding: 2px 6px; border-radius: 6px; letter-spacing: 0.5px; z-index: 10; opacity: 0; pointer-events: none; transition: opacity 0.3s ease;">No Habilitada</span>
                 </div>
               </div>
-            </div>
 
-            <!-- COLUMNA DERECHA: CARD DE AUTENTICACION -->
-            <article class="auth-shell" style="max-width: 100%; margin: 0; background: var(--panel-strong); border: 1px solid var(--border-strong); border-radius: 28px; padding: 36px; box-shadow: 0 20px 48px rgba(0,0,0,0.18); position: relative; overflow: hidden;">
-              
-              <!-- App icon top header -->
-              <div style="display: flex; flex-direction: column; align-items: center; gap: 12px; margin-bottom: 24px; text-align: center;">
-                <img src="logo_resimed.png?v=3" alt="ResiMed Logo" style="width: 52px; height: 52px; border-radius: 16px; object-fit: cover; box-shadow: 0 4px 14px rgba(79, 140, 255, 0.4);">
-                <h2 style="font-size: 22px; font-weight: 800; font-family: 'Outfit', sans-serif; color: var(--text); margin: 0;">ResiMed</h2>
-                <p style="font-size: 13px; color: var(--text-dim); margin: 0;">Inicia sesión para continuar</p>
-              </div>
-
-              <div class="auth-tabs" style="margin-bottom: 24px;">
-                <button id="tab-login" class="auth-tab active" type="button">Iniciar Sesión</button>
-                <button id="tab-registro" class="auth-tab" type="button">Crear Cuenta</button>
-              </div>
-
-              <!-- FORMULARIO DE INICIO DE SESIÓN -->
-              <form id="form-login" class="auth-form" style="display: flex; flex-direction: column; gap: 16px;">
-                <div class="form-block">
-                  <label style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-dim); display: block; margin-bottom: 6px; letter-spacing: 0.5px;">Correo Electrónico</label>
-                  <div style="position: relative;">
-                    <span style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text-dim); font-size: 14px;">✉</span>
-                    <input type="email" id="login-email" class="input" style="padding-left: 44px !important;" placeholder="ejemplo@correo.com" required />
+              <!-- Lista de Métricas Clave (Tarjetas Glassmorphic) -->
+              <div class="auth-metrics-grid">
+                <div class="auth-metric-card">
+                  <div class="metric-icon">📁</div>
+                  <div class="metric-info">
+                    <strong>+6,000 preguntas</strong>
+                    <span>Banco de reactivos actualizados y orientados al ENURM.</span>
                   </div>
                 </div>
-                
-                <div class="form-block">
-                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                    <label style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-dim); display: block; letter-spacing: 0.5px; margin: 0;">Contraseña</label>
-                    <a href="#" onclick="alert('Funcionalidad de recuperación de contraseña disponible en producción oficial.'); return false;" style="font-size: 11.5px; font-weight: 600; color: var(--primary); text-decoration: none;">¿Olvidaste tu contraseña?</a>
-                  </div>
-                  <div style="position: relative;">
-                    <span style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text-dim); font-size: 14px;">🔒</span>
-                    <input type="password" id="login-password" class="input" style="padding-left: 44px !important;" placeholder="••••••••" required />
+                <div class="auth-metric-card">
+                  <div class="metric-icon">📋</div>
+                  <div class="metric-info">
+                    <strong>Simulacros oficiales</strong>
+                    <span>Modo examen real con cronometrado estricto por pregunta.</span>
                   </div>
                 </div>
-                
-                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 14px; font-size: 14px; font-weight: 700; background: #2563eb !important; border: none; border-radius: 12px; margin-top: 6px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px;">
-                  Ingresar al Sistema <span>→</span>
-                </button>
-              </form>
-
-              <!-- FORMULARIO DE REGISTRO -->
-              <form id="form-registro" class="auth-form hidden" style="display: flex; flex-direction: column; gap: 16px;">
-                <div class="form-block">
-                  <label style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-dim); display: block; margin-bottom: 6px; letter-spacing: 0.5px;">Nombre Completo</label>
-                  <div style="position: relative;">
-                    <span style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text-dim); font-size: 14px;">👨‍⚕️</span>
-                    <input type="text" id="reg-nombre" class="input" style="padding-left: 44px !important;" placeholder="Dr. / Dra. Apellido" required />
+                <div class="auth-metric-card">
+                  <div class="metric-icon">📊</div>
+                  <div class="metric-info">
+                    <strong>Análisis avanzado</strong>
+                    <span>Estadísticas de rendimiento y recomendación de bibliografía.</span>
                   </div>
                 </div>
-                
-                <div class="form-block">
-                  <label style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-dim); display: block; margin-bottom: 6px; letter-spacing: 0.5px;">Correo Electrónico</label>
-                  <div style="position: relative;">
-                    <span style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text-dim); font-size: 14px;">✉</span>
-                    <input type="email" id="reg-email" class="input" style="padding-left: 44px !important;" placeholder="medico@correo.com" required />
-                  </div>
-                </div>
-                
-                <div class="form-block">
-                  <label style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-dim); display: block; margin-bottom: 6px; letter-spacing: 0.5px;">Contraseña de Estudio</label>
-                  <div style="position: relative;">
-                    <span style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text-dim); font-size: 14px;">🔒</span>
-                    <input type="password" id="reg-password" class="input" style="padding-left: 44px !important;" placeholder="Mínimo 6 caracteres" required />
-                  </div>
-                </div>
-                
-                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 14px; font-size: 14px; font-weight: 700; background: #2563eb !important; border: none; border-radius: 12px; margin-top: 6px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px;">
-                  Registrar nueva cuenta <span>→</span>
-                </button>
-              </form>
-
-              <p id="auth-mensaje" class="auth-msg" style="margin-top: 14px; margin-bottom: 0;"></p>
-
-              <!-- Social logins divider -->
-              <div style="display: flex; align-items: center; gap: 12px; margin: 20px 0;">
-                <div style="flex-grow: 1; height: 1px; background: var(--border);"></div>
-                <span style="font-size: 11px; font-weight: 600; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px;">o continúa con</span>
-                <div style="flex-grow: 1; height: 1px; background: var(--border);"></div>
               </div>
 
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                <button class="btn btn-ghost" type="button" onclick="alert('Inicio de sesión con Google disponible en producción oficial.');" style="padding: 10px; font-size: 13px; font-weight: 600; border: 1px solid var(--border-strong); border-radius: 10px; background: rgba(255,255,255,0.01); display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; color: var(--text);">
-                  Google
-                </button>
-                <button class="btn btn-ghost" type="button" onclick="alert('Inicio de sesión con Apple disponible en producción oficial.');" style="padding: 10px; font-size: 13px; font-weight: 600; border: 1px solid var(--border-strong); border-radius: 10px; background: rgba(255,255,255,0.01); display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; color: var(--text);">
-                  Apple
-                </button>
-              </div>
-
-              <div style="display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 20px; font-size: 11.5px; color: var(--text-dim); font-weight: 600;">
-                <span style="color: var(--success);">✓</span> Seguro, confiable y hecho para médicos
-              </div>
-
-            </article>
-          </div>
-
-          <!-- SECCIÓN INTERMEDIA: TODO LO QUE NECESITAS -->
-          <div style="display: flex; flex-direction: column; gap: 32px; border-top: 1px dashed var(--border-strong); padding-top: 60px;">
-            <div style="text-align: center; display: flex; flex-direction: column; gap: 8px;">
-              <h2 style="font-size: 28px; font-weight: 800; font-family: 'Outfit', sans-serif; color: var(--text); margin: 0;">Todo lo que necesitas para tu residencia</h2>
-              <div style="width: 40px; height: 3px; background: var(--primary); border-radius: 10px; margin: 0 auto;"></div>
-            </div>
-
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px;">
-              <!-- Card 1 -->
-              <div style="background: var(--panel); border: 1px solid var(--border); border-radius: 20px; padding: 24px; display: flex; flex-direction: column; gap: 12px; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);">
-                <div style="width: 44px; height: 44px; background: rgba(59, 130, 246, 0.08); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; color: var(--primary);">🎓</div>
-                <h3 style="font-size: 14.5px; font-weight: 700; color: var(--text); margin: 0;">Banco de Preguntas Especializado</h3>
-                <p style="font-size: 12.5px; color: var(--text-soft); line-height: 1.4; margin: 0;">Preguntas actualizadas basadas en el ENURM real y clasificadas por especialidad médica.</p>
-              </div>
-              <!-- Card 2 -->
-              <div style="background: var(--panel); border: 1px solid var(--border); border-radius: 20px; padding: 24px; display: flex; flex-direction: column; gap: 12px; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);">
-                <div style="width: 44px; height: 44px; background: rgba(16, 185, 129, 0.08); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; color: var(--success);">🎯</div>
-                <h3 style="font-size: 14.5px; font-weight: 700; color: var(--text); margin: 0;">Simulacros Realistas</h3>
-                <p style="font-size: 12.5px; color: var(--text-soft); line-height: 1.4; margin: 0;">Simula el examen real en tiempo real con tiempos estrictos, ambiente controlado y puntuación precisa.</p>
-              </div>
-              <!-- Card 3 -->
-              <div style="background: var(--panel); border: 1px solid var(--border); border-radius: 20px; padding: 24px; display: flex; flex-direction: column; gap: 12px; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);">
-                <div style="width: 44px; height: 44px; background: rgba(139, 92, 246, 0.08); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; color: #8b5cf6;">📈</div>
-                <h3 style="font-size: 14.5px; font-weight: 700; color: var(--text); margin: 0;">Estadísticas Avanzadas</h3>
-                <p style="font-size: 12.5px; color: var(--text-soft); line-height: 1.4; margin: 0;">Analiza tu rendimiento histórico global, mide tu curva de retención y mejora al instante tus debilidades.</p>
-              </div>
-              <!-- Card 4 -->
-              <div style="background: var(--panel); border: 1px solid var(--border); border-radius: 20px; padding: 24px; display: flex; flex-direction: column; gap: 12px; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);">
-                <div style="width: 44px; height: 44px; background: rgba(239, 68, 68, 0.08); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; color: var(--danger);">🔥</div>
-                <h3 style="font-size: 14.5px; font-weight: 700; color: var(--text); margin: 0;">Rachas y Motivación</h3>
-                <p style="font-size: 12.5px; color: var(--text-soft); line-height: 1.4; margin: 0;">Mantén tu racha diaria de estudio activa, desbloquea metas y compite con otros médicos en la plataforma.</p>
+              <div class="auth-left-footer">
+                <span>Plataforma #1 para el ENURM en RD 🇩🇴</span>
               </div>
             </div>
           </div>
-
-          <!-- SECCIÓN DE CARACTERÍSTICAS AVANZADAS Y FUNCIONALIDADES (Showcase Ancho Completo) -->
-          <div style="display: flex; flex-direction: column; gap: 40px; border-top: 1px dashed var(--border-strong); padding-top: 60px; margin-bottom: 40px; text-align: center;">
-            <div>
-              <span style="font-size: 11px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 8px;">Explora el Entorno ResiMed</span>
-              <h2 style="font-size: 28px; font-weight: 800; font-family: 'Outfit', sans-serif; color: var(--text); margin: 0;">Entrenamiento e Interactividad Médica</h2>
-              <p style="font-size: 14.5px; color: var(--text-soft); max-width: 600px; margin: 8px auto 0 auto; line-height: 1.5;">Prueba una simulación interactiva, conoce las modalidades oficiales y revisa estadísticas de progreso en tiempo real.</p>
-            </div>
-
-            <!-- CUADRÍCULA DE ANCHO COMPLETO (INTERACTIVA) -->
-            <div class="showcase-grid-interactive">
-              
-              <!-- COLUMNA IZQUIERDA: SELECTORES (TARJETAS GLASSMORPHIC) -->
-              <div style="display: flex; flex-direction: column;">
+          
+          <!-- COLUMNA DERECHA: CARD DE AUTENTICACION (CON SCROLL) -->
+          <div class="auth-split-right">
+            <div class="auth-right-content">
+              <article class="auth-shell">
                 
-                <!-- Tarjeta 1: Simulador -->
-                <button class="selector-card-btn active type-simulador" onclick="switchShowcaseTab('simulador')" type="button">
-                  <div class="selector-icon-box">🔬</div>
-                  <div>
-                    <h4 style="font-size: 14.5px; font-weight: 700; color: var(--text); margin: 0 0 4px 0;">Simulador Clínico</h4>
-                    <p style="font-size: 12px; color: var(--text-soft); line-height: 1.4; margin: 0;">Resuelve una pregunta real tipo ENURM con desglose docente interactivo.</p>
-                  </div>
-                </button>
-
-                <!-- Tarjeta 2: Modos de Examen -->
-                <button class="selector-card-btn type-modos" onclick="switchShowcaseTab('modos')" type="button">
-                  <div class="selector-icon-box">⚙️</div>
-                  <div>
-                    <h4 style="font-size: 14.5px; font-weight: 700; color: var(--text); margin: 0 0 4px 0;">Modalidades de Examen</h4>
-                    <p style="font-size: 12px; color: var(--text-soft); line-height: 1.4; margin: 0;">4 modos especializados: Estudio, Simulacro, Guardia y Arena.</p>
-                  </div>
-                </button>
-
-                <!-- Tarjeta 3: Analíticas Avanzadas -->
-                <button class="selector-card-btn type-analiticas" onclick="switchShowcaseTab('analiticas')" type="button">
-                  <div class="selector-icon-box">📊</div>
-                  <div>
-                    <h4 style="font-size: 14.5px; font-weight: 700; color: var(--text); margin: 0 0 4px 0;">Analíticas Académicas</h4>
-                    <p style="font-size: 12px; color: var(--text-soft); line-height: 1.4; margin: 0;">Seguimiento detallado de precisión, percentil y debilidades.</p>
-                  </div>
-                </button>
-
-              </div>
-
-              <!-- COLUMNA DERECHA: PANTALLA TABLET VIRTUAL -->
-              <div class="display-device-shell">
-                
-                <!-- PESTAÑA 1: SIMULADOR INTERACTIVO -->
-                <div id="pane-simulador" class="showcase-content-pane active">
-                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid var(--border); padding-bottom: 10px;">
-                    <span class="badge" style="background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.2); color: var(--primary); font-size: 10.5px; font-weight: 700; border-radius: 100px; padding: 4px 10px;">PEDIATRÍA | INFECTOLOGÍA</span>
-                    <span style="font-size: 11.5px; font-weight: 600; color: var(--text-dim);">Dificultad: <span style="color: var(--success);">Fácil (0.3)</span></span>
-                  </div>
-                  
-                  <h3 style="font-size: 15px; font-weight: 700; color: var(--text); line-height: 1.5; margin-bottom: 18px; margin-top: 0;">
-                    Un lactante de 10 meses presenta fiebre de 3 días (hasta 39.5°C) sin foco evidente. Al cuarto día la fiebre cede abruptamente y aparece un exantema maculopapular eritematoso, no pruriginoso en tronco y cuello, que se extiende a extremidades y cede en 48 horas sin descamación. El paciente luce activo y en buen estado general. ¿Cuál es el diagnóstico?
-                  </h3>
-                  
-                  <div id="mock-quiz-options" style="display: flex; flex-direction: column; gap: 8px;">
-                    <button class="mock-opt-btn" onclick="selectMockOption(this, true)" type="button">
-                      <span style="width: 24px; height: 24px; border-radius: 50%; background: rgba(255,255,255,0.05); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 11px; flex-shrink: 0;">A</span>
-                      <span>Roséola infantil (Exantema súbito)</span>
-                    </button>
-                    <button class="mock-opt-btn" onclick="selectMockOption(this, false)" type="button">
-                      <span style="width: 24px; height: 24px; border-radius: 50%; background: rgba(255,255,255,0.05); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 11px; flex-shrink: 0;">B</span>
-                      <span>Sarampión</span>
-                    </button>
-                    <button class="mock-opt-btn" onclick="selectMockOption(this, false)" type="button">
-                      <span style="width: 24px; height: 24px; border-radius: 50%; background: rgba(255,255,255,0.05); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 11px; flex-shrink: 0;">C</span>
-                      <span>Rubéola</span>
-                    </button>
-                    <button class="mock-opt-btn" onclick="selectMockOption(this, false)" type="button">
-                      <span style="width: 24px; height: 24px; border-radius: 50%; background: rgba(255,255,255,0.05); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 11px; flex-shrink: 0;">D</span>
-                      <span>Eritema infeccioso (Quinta enfermedad)</span>
-                    </button>
-                  </div>
-
-                  <!-- Explicación Clínica -->
-                  <div id="mock-explanation-box" style="display: none; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border); border-radius: 16px; padding: 16px; margin-top: 16px; animation: fadeInShowcase 0.3s ease;">
-                    <h4 style="font-size: 13px; font-weight: 700; color: var(--success); margin: 0 0 6px 0; display: flex; align-items: center; gap: 6px;">
-                      🔬 Justificación Académica
-                    </h4>
-                    <p style="font-size: 12px; color: var(--text-soft); line-height: 1.45; margin: 0;">
-                      La <strong>Roséola infantil (HHV-6)</strong> se caracteriza de forma clásica por fiebre elevada de 3 días que desaparece bruscamente con la aparición simultánea del exantema maculopapular no descamativo en tronco, manteniendo al lactante en buen estado general.
-                    </p>
-                  </div>
+                <!-- Identidad Compacta para Móviles / Encabezado -->
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 12px; margin-bottom: 24px; text-align: center;">
+                  <img src="logo_resimed.png?v=3" alt="ResiMed Logo" style="width: 52px; height: 52px; border-radius: 16px; object-fit: cover; box-shadow: 0 4px 14px rgba(79, 140, 255, 0.4);">
+                  <h2 style="font-size: 22px; font-weight: 800; font-family: 'Outfit', sans-serif; color: var(--text); margin: 0;">ResiMed</h2>
+                  <p style="font-size: 13px; color: var(--text-dim); margin: 0;">Inicia sesión para continuar</p>
                 </div>
 
-                <!-- PESTAÑA 2: MODOS DE EXAMEN -->
-                <div id="pane-modos" class="showcase-content-pane">
-                  <h3 style="font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 16px; margin-top: 0;">
-                    ⚙️ Modalidades Oficiales de Entrenamiento
-                  </h3>
-                  <div class="mode-preview-grid">
-                    
-                    <!-- Estudio -->
-                    <div class="mode-preview-card" style="border-left: 3px solid hsl(217, 91%, 60%);">
-                      <div style="display: flex; align-items: center; gap: 8px;">
-                        <span style="font-size: 16px;">🔵</span>
-                        <h4 style="font-size: 13.5px; font-weight: 700; color: var(--text); margin: 0;">Estudio</h4>
-                      </div>
-                      <p style="font-size: 11.5px; color: var(--text-soft); line-height: 1.4; margin: 0;">
-                        Sin presiones de tiempo. Obtén desgloses bibliográficos y explicaciones de cada opción al instante.
-                      </p>
-                    </div>
-
-                    <!-- Simulacro -->
-                    <div class="mode-preview-card" style="border-left: 3px solid hsl(271, 91%, 65%);">
-                      <div style="display: flex; align-items: center; gap: 8px;">
-                        <span style="font-size: 16px;">🟣</span>
-                        <h4 style="font-size: 13.5px; font-weight: 700; color: var(--text); margin: 0;">Simulacro</h4>
-                      </div>
-                      <p style="font-size: 11.5px; color: var(--text-soft); line-height: 1.4; margin: 0;">
-                        100 preguntas integradas, cronómetro estricto de 1.2m por reactivo y visual idéntica al ENURM real.
-                      </p>
-                    </div>
-
-                    <!-- Guardia -->
-                    <div class="mode-preview-card" style="border-left: 3px solid hsl(0, 84%, 60%);">
-                      <div style="display: flex; align-items: center; gap: 8px;">
-                        <span style="font-size: 16px;">🔴</span>
-                        <h4 style="font-size: 13.5px; font-weight: 700; color: var(--text); margin: 0;">Intensivo</h4>
-                      </div>
-                      <p style="font-size: 11.5px; color: var(--text-soft); line-height: 1.4; margin: 0;">
-                        Sesiones cortas y dinámicas de 10-20 preguntas de alta rentabilidad del temario médico nacional.
-                      </p>
-                    </div>
-
-                    <!-- Arena -->
-                    <div class="mode-preview-card" style="border-left: 3px solid hsl(38, 92%, 50%);">
-                      <div style="display: flex; align-items: center; gap: 8px;">
-                        <span style="font-size: 16px;">🟡</span>
-                        <h4 style="font-size: 13.5px; font-weight: 700; color: var(--text); margin: 0;">Arena de Batalla</h4>
-                      </div>
-                      <p style="font-size: 11.5px; color: var(--text-soft); line-height: 1.4; margin: 0;">
-                        Batallas en vivo de velocidad. Compite contra otros médicos dominicanos y sube en el ranking nacional.
-                      </p>
-                    </div>
-
-                  </div>
+                <!-- Pestañas de Alternancia -->
+                <div class="auth-tabs">
+                  <button id="tab-login" class="auth-tab active" type="button">Iniciar Sesión</button>
+                  <button id="tab-registro" class="auth-tab" type="button">Crear Cuenta</button>
                 </div>
 
-                <!-- PESTAÑA 3: ANALÍTICAS AVANZADAS -->
-                <div id="pane-analiticas" class="showcase-content-pane">
-                  <h3 style="font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 16px; margin-top: 0;">
-                    📊 Métricas Académicas y Cobertura de Temas
-                  </h3>
+                <!-- FORMULARIO DE INICIO DE SESIÓN -->
+                <form id="form-login" class="auth-form">
+                  <div class="form-block">
+                    <label style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-dim); display: block; margin-bottom: 6px; letter-spacing: 0.5px;">Correo Electrónico</label>
+                    <div style="position: relative;">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="input-icon-svg"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                      <input type="email" id="login-email" class="input" style="padding-left: 44px !important;" placeholder="ejemplo@correo.com" required />
+                    </div>
+                  </div>
                   
-                  <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 20px; align-items: center; flex-grow: 1;">
-                    
-                    <!-- Barras de especialidad -->
-                    <div style="display: flex; flex-direction: column; gap: 10px;">
-                      <!-- Pediatría -->
-                      <div>
-                        <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; margin-bottom: 3px;">
-                          <span style="color: var(--text-soft);">Pediatría</span>
-                          <span style="color: var(--success);">85%</span>
-                        </div>
-                        <div style="width: 100%; height: 6px; background: rgba(255,255,255,0.05); border-radius: 8px; overflow: hidden;">
-                          <div style="width: 85%; height: 100%; background: var(--success); border-radius: 8px;"></div>
-                        </div>
-                      </div>
-
-                      <!-- Medicina Interna -->
-                      <div>
-                        <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; margin-bottom: 3px;">
-                          <span style="color: var(--text-soft);">Medicina Interna</span>
-                          <span style="color: var(--primary);">78%</span>
-                        </div>
-                        <div style="width: 100%; height: 6px; background: rgba(255,255,255,0.05); border-radius: 8px; overflow: hidden;">
-                          <div style="width: 78%; height: 100%; background: var(--primary); border-radius: 8px;"></div>
-                        </div>
-                      </div>
-
-                      <!-- Cirugía General -->
-                      <div>
-                        <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; margin-bottom: 3px;">
-                          <span style="color: var(--text-soft);">Cirugía General</span>
-                          <span style="color: var(--warning);">67%</span>
-                        </div>
-                        <div style="width: 100%; height: 6px; background: rgba(255,255,255,0.05); border-radius: 8px; overflow: hidden;">
-                          <div style="width: 67%; height: 100%; background: var(--warning); border-radius: 8px;"></div>
-                        </div>
-                      </div>
-
-                      <!-- Gineco-Obstetricia -->
-                      <div>
-                        <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; margin-bottom: 3px;">
-                          <span style="color: var(--text-soft);">Gineco-Obstetricia</span>
-                          <span style="color: #8b5cf6;">72%</span>
-                        </div>
-                        <div style="width: 100%; height: 6px; background: rgba(255,255,255,0.05); border-radius: 8px; overflow: hidden;">
-                          <div style="width: 72%; height: 100%; background: #8b5cf6; border-radius: 8px;"></div>
-                        </div>
-                      </div>
+                  <div class="form-block">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                      <label style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-dim); display: block; letter-spacing: 0.5px; margin: 0;">Contraseña</label>
+                      <a href="#" onclick="alert('Funcionalidad de recuperación de contraseña disponible en producción oficial.'); return false;" style="font-size: 11.5px; font-weight: 600; color: var(--primary); text-decoration: none;">¿Olvidaste tu contraseña?</a>
                     </div>
-
-                    <!-- SVG Circular Gauge (Percentil) -->
-                    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; background: rgba(255,255,255,0.01); border: 1px solid var(--border); border-radius: 20px; padding: 16px;">
-                      <div style="position: relative; width: 100px; height: 100px;">
-                        <svg width="100" height="100" viewBox="0 0 100 100">
-                          <circle cx="50" cy="50" r="45" stroke="rgba(255,255,255,0.03)" stroke-width="8" fill="transparent" />
-                          <circle class="svg-ring-circle" cx="50" cy="50" r="45" stroke="var(--success)" stroke-width="8" fill="transparent" stroke-linecap="round" transform="rotate(-90 50 50)" />
-                        </svg>
-                        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                          <span style="font-size: 18px; font-weight: 800; color: var(--text); font-family: 'Outfit'; line-height: 1;">82.5</span>
-                          <span style="font-size: 8px; font-weight: 700; color: var(--text-dim); text-transform: uppercase; margin-top: 2px;">Percentil</span>
-                        </div>
-                      </div>
-                      <div style="display: flex; gap: 10px; width: 100%; justify-content: center; border-top: 1px solid var(--border); padding-top: 8px; margin-top: 2px;">
-                        <div style="text-align: center;">
-                          <span style="font-size: 7.5px; font-weight: 700; color: var(--text-dim); display: block;">PROMEDIO</span>
-                          <span style="font-size: 11px; font-weight: 800; color: var(--primary);">78.4%</span>
-                        </div>
-                        <div style="text-align: center; border-left: 1px solid var(--border); padding-left: 10px;">
-                          <span style="font-size: 7.5px; font-weight: 700; color: var(--text-dim); display: block;">PROGRESO</span>
-                          <span style="font-size: 11px; font-weight: 800; color: #8b5cf6;">+12.3%</span>
-                        </div>
-                      </div>
+                    <div style="position: relative;">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="input-icon-svg"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                      <input type="password" id="login-password" class="input" style="padding-left: 44px !important;" placeholder="••••••••" required />
                     </div>
-
                   </div>
+                  
+                  <button type="submit" class="btn btn-primary" style="width: 100%; padding: 14px; font-size: 14px; font-weight: 700; background: #2563eb !important; border: none; border-radius: 12px; margin-top: 6px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    Ingresar al Sistema
+                  </button>
+                  
+                  <!-- Cierre psicológico de confianza -->
+                  <p style="font-size: 11px; text-align: center; color: var(--text-dim); margin: 4px 0 0 0; font-weight: 600;">
+                    <span style="color: var(--success);">✓</span> Seguro, confiable y hecho para médicos
+                  </p>
+                </form>
+
+                <!-- FORMULARIO DE REGISTRO -->
+                <form id="form-registro" class="auth-form hidden">
+                  <div class="form-block">
+                    <label style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-dim); display: block; margin-bottom: 6px; letter-spacing: 0.5px;">Nombre Completo</label>
+                    <div style="position: relative;">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="input-icon-svg"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                      <input type="text" id="reg-nombre" class="input" style="padding-left: 44px !important;" placeholder="Dr. / Dra. Apellido" required />
+                    </div>
+                  </div>
+                  
+                  <div class="form-block">
+                    <label style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-dim); display: block; margin-bottom: 6px; letter-spacing: 0.5px;">Correo Electrónico</label>
+                    <div style="position: relative;">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="input-icon-svg"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                      <input type="email" id="reg-email" class="input" style="padding-left: 44px !important;" placeholder="medico@correo.com" required />
+                    </div>
+                  </div>
+                  
+                  <div class="form-block">
+                    <label style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-dim); display: block; margin-bottom: 6px; letter-spacing: 0.5px;">Crea tu contraseña</label>
+                    <div style="position: relative;">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="input-icon-svg"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                      <input type="password" id="reg-password" class="input" style="padding-left: 44px !important;" placeholder="Mínimo 6 caracteres" required />
+                    </div>
+                  </div>
+                  
+                  <button type="submit" class="btn btn-primary" style="width: 100%; padding: 14px; font-size: 14px; font-weight: 700; background: #2563eb !important; border: none; border-radius: 12px; margin-top: 6px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    Registrar nueva cuenta
+                  </button>
+                  
+                  <!-- Cierre psicológico de confianza -->
+                  <p style="font-size: 11px; text-align: center; color: var(--text-dim); margin: 4px 0 0 0; font-weight: 600;">
+                    <span style="color: var(--success);">✓</span> Seguro, confiable y hecho para médicos
+                  </p>
+                </form>
+
+                <p id="auth-mensaje" class="auth-msg"></p>
+
+                <!-- Divisor de inicio de sesión alternativo -->
+                <div style="display: flex; align-items: center; gap: 12px; margin: 24px 0 18px 0;">
+                  <div style="flex-grow: 1; height: 1px; background: var(--border);"></div>
+                  <span style="font-size: 11px; font-weight: 600; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px;">o continúa con</span>
+                  <div style="flex-grow: 1; height: 1px; background: var(--border);"></div>
                 </div>
 
-              </div>
+                <!-- Botones OAuth con logotipos oficiales en SVG -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                  <button class="oauth-btn-premium" type="button" onclick="alert('Inicio de sesión con Google disponible en producción oficial.');">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" style="flex-shrink: 0; margin-right: 4px;">
+                      <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                      <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                      <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                      <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+                    </svg>
+                    <span>Google</span>
+                  </button>
+                  <button class="oauth-btn-premium" type="button" onclick="alert('Inicio de sesión con Apple disponible en producción oficial.');">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="flex-shrink: 0; color: var(--text); margin-right: 4px;">
+                      <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 4.17c.66-.81 1.11-1.93.99-3.06-1 .04-2.21.67-2.93 1.49-.62.69-1.16 1.84-1.01 2.96 1.12.09 2.27-.57 2.95-1.39z"/>
+                    </svg>
+                    <span>Apple</span>
+                  </button>
+                </div>
 
+              </article>
             </div>
-
           </div>
 
         </div>
       </section>
-
       <section id="pantalla-home" class="screen">
         <section class="hero-card" style="grid-template-columns: 1fr;">
           <div class="hero-copy">
