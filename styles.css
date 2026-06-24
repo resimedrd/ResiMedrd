@@ -4198,39 +4198,101 @@ body.dark-mode .premium-metrics-panel {
   .quiz-layout {
     display: flex !important;
     flex-direction: column !important;
-    gap: 12px !important;
+    gap: 16px !important;
     padding: 8px !important;
   }
 
+  .quiz-main-column {
+    order: 1 !important;
+    margin-top: 48px !important; /* Deja espacio para el contador y temporizador fijos */
+  }
+
   .quiz-side-column {
-    order: -1 !important; /* Mueve el temporizador y el contador arriba de la pregunta */
-    position: sticky !important;
-    top: 70px !important;
-    z-index: 100 !important;
+    order: 2 !important; /* Mueve el mapa del examen y las herramientas abajo de la pregunta */
+    position: static !important;
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 16px !important;
+  }
+
+  /* Barra de temporizador y contador fija en la parte superior */
+  .sidebar-counter-row {
+    position: fixed !important;
+    top: 50px !important; /* Justo debajo de la topbar */
+    left: 0 !important;
+    right: 0 !important;
+    height: 48px !important;
+    background: rgba(11, 15, 25, 0.85) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    border-bottom: 1px solid var(--border-strong) !important;
+    display: flex !important;
+    flex-direction: row !important; /* Mostrar Pregunta a la izquierda y Tiempo a la derecha */
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 0 16px !important;
+    margin: 0 !important;
+    z-index: 999 !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
     width: 100% !important;
   }
 
-  .sidebar-unified-card-v2 {
-    background: var(--panel-strong) !important;
-    border: 1px solid var(--border-strong) !important;
-    border-radius: 16px !important;
-    padding: 12px 18px !important;
-    display: flex !important;
-    flex-direction: row !important;
+  .quiz-timer {
+    font-size: 13.5px !important;
+    font-weight: 700 !important;
+    background: rgba(245, 158, 11, 0.1) !important;
+    color: var(--warning) !important;
+    border: 1px solid rgba(245, 158, 11, 0.2) !important;
+    padding: 4px 10px !important;
+    border-radius: 8px !important;
+    display: inline-flex !important;
     align-items: center !important;
-    justify-content: space-between !important;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15) !important;
   }
 
-  .sidebar-counter-row {
+  .quiz-counter {
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    color: var(--text-soft) !important;
+  }
+
+  /* Ocultar el HUD duplicado del main column en móviles */
+  .quiz-sticky-header {
+    display: none !important;
+  }
+
+  /* Tarjetas del sidebar reposicionadas abajo */
+  .sidebar-unified-card-v2 {
+    background: var(--panel) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 20px !important;
+    padding: 20px !important;
     display: flex !important;
-    flex-direction: row-reverse !important;
+    flex-direction: column !important; /* Volver a apilar verticalmente */
+    align-items: stretch !important;
+    justify-content: flex-start !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05) !important;
+    gap: 14px !important;
+  }
+
+  .sidebar-flag-btn {
+    width: 100% !important;
+    min-height: var(--touch-target-min) !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    display: flex !important;
     align-items: center !important;
+    justify-content: center !important;
+  }
+
+  #study-tools-card {
+    margin-top: 0 !important;
+  }
+
+  #study-tools-card > div {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important; /* Botones de herramientas lado a lado */
     gap: 10px !important;
-    border-bottom: none !important;
-    padding-bottom: 0 !important;
-    width: auto !important;
-    margin: 0 !important;
   }
 
   .quiz-container {
