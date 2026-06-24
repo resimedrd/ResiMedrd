@@ -174,10 +174,10 @@
                   Comenzar ahora <span style="font-size: 16px;">→</span>
                 </button>
                 <div style="position: relative; display: inline-block;">
-                  <button class="btn btn-ghost" style="padding: 14px 28px; font-size: 14.5px; font-weight: 700; border: 1px solid var(--border-strong); border-radius: 14px; background: rgba(255,255,255,0.01); color: var(--text-dim); display: flex; align-items: center; gap: 8px; cursor: not-allowed; opacity: 0.5;" disabled>
+                  <button onclick="mostrarDemoNoHabilitada(this)" class="btn btn-ghost" style="padding: 14px 28px; font-size: 14.5px; font-weight: 700; border: 1px solid var(--border-strong); border-radius: 14px; background: rgba(255,255,255,0.01); color: var(--text); display: flex; align-items: center; gap: 8px; cursor: pointer; transition: all 0.2s;">
                     Ver demo <span style="font-size: 16px;">▷</span>
                   </button>
-                  <span style="position: absolute; top: -10px; right: -5px; background: var(--danger-soft); border: 1px solid rgba(239, 68, 68, 0.3); color: var(--danger); font-size: 9px; font-weight: 700; text-transform: uppercase; padding: 2px 6px; border-radius: 6px; letter-spacing: 0.5px; z-index: 10;">No Habilitada</span>
+                  <span id="badge-demo-no-habilitado" style="position: absolute; top: -10px; right: -5px; background: var(--danger-soft); border: 1px solid rgba(239, 68, 68, 0.3); color: var(--danger); font-size: 9px; font-weight: 700; text-transform: uppercase; padding: 2px 6px; border-radius: 6px; letter-spacing: 0.5px; z-index: 10; opacity: 0; pointer-events: none; transition: opacity 0.3s ease;">No Habilitada</span>
                 </div>
               </div>
             </div>
@@ -317,54 +317,194 @@
           <!-- SECCIÓN DE CARACTERÍSTICAS AVANZADAS Y FUNCIONALIDADES -->
           <div style="display: flex; flex-direction: column; gap: 40px; border-top: 1px dashed var(--border-strong); padding-top: 60px; margin-bottom: 40px; text-align: center;">
             <div>
-              <span style="font-size: 11px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 8px;">Tecnología Médica de Vanguardia</span>
-              <h2 style="font-size: 28px; font-weight: 800; font-family: 'Outfit', sans-serif; color: var(--text); margin: 0;">Herramientas Premium Diseñadas para tu Éxito</h2>
-              <p style="font-size: 14.5px; color: var(--text-soft); max-width: 600px; margin: 8px auto 0 auto; line-height: 1.5;">Una suite completa con todo lo necesario para optimizar tu estudio del ENURM y asegurar tu plaza de residencia.</p>
+              <span style="font-size: 11px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 8px;">Explora el Entorno ResiMed</span>
+              <h2 style="font-size: 28px; font-weight: 800; font-family: 'Outfit', sans-serif; color: var(--text); margin: 0;">Entrenamiento e Interactividad Médica</h2>
+              <p style="font-size: 14.5px; color: var(--text-soft); max-width: 600px; margin: 8px auto 0 auto; line-height: 1.5;">Prueba una simulación interactiva, conoce las modalidades oficiales y revisa estadísticas de progreso en tiempo real.</p>
             </div>
 
-            <div class="features-showcase-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px;">
-              <!-- Funcionalidad 1 -->
-              <div class="feature-showcase-card" style="background: var(--panel); border: 1px solid var(--border); border-radius: 20px; padding: 24px; text-align: left; display: flex; flex-direction: column; gap: 12px; transition: all 0.3s ease;">
-                <div style="width: 44px; height: 44px; background: rgba(59, 130, 246, 0.08); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; color: var(--primary);">📋</div>
-                <h3 style="font-size: 15px; font-weight: 700; color: var(--text); margin: 0;">Simulacros Oficiales</h3>
-                <p style="font-size: 13px; color: var(--text-soft); line-height: 1.5; margin: 0;">Simula la experiencia real del ENURM con temporizador estricto, o crea simulacros adaptados a las especialidades que necesitas reforzar.</p>
-              </div>
-
-              <!-- Funcionalidad 2 -->
-              <div class="feature-showcase-card" style="background: var(--panel); border: 1px solid var(--border); border-radius: 20px; padding: 24px; text-align: left; display: flex; flex-direction: column; gap: 12px; transition: all 0.3s ease;">
-                <div style="width: 44px; height: 44px; background: rgba(139, 92, 246, 0.08); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; color: #8b5cf6;">🧠</div>
-                <h3 style="font-size: 15px; font-weight: 700; color: var(--text); margin: 0;">Repetición Espaciada</h3>
-                <p style="font-size: 13px; color: var(--text-soft); line-height: 1.5; margin: 0;">Fija conceptos de memoria pura a largo plazo mediante nuestro mazo inteligente de Flashcards basado en algoritmos de retención cognitiva.</p>
-              </div>
-
-              <!-- Funcionalidad 3 -->
-              <div class="feature-showcase-card" style="background: var(--panel); border: 1px solid var(--border); border-radius: 20px; padding: 24px; text-align: left; display: flex; flex-direction: column; gap: 12px; transition: all 0.3s ease;">
-                <div style="width: 44px; height: 44px; background: rgba(16, 185, 129, 0.08); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; color: var(--success);">⚡</div>
-                <h3 style="font-size: 15px; font-weight: 700; color: var(--text); margin: 0;">Tutor de Inteligencia Artificial</h3>
-                <p style="font-size: 13px; color: var(--text-soft); line-height: 1.5; margin: 0;">Consulta dudas clínicas, solicita resúmenes clínicos, nemotecnias y explicaciones personalizadas a nuestro tutor interactivo integrado.</p>
-              </div>
-
-              <!-- Funcionalidad 4 -->
-              <div class="feature-showcase-card" style="background: var(--panel); border: 1px solid var(--border); border-radius: 20px; padding: 24px; text-align: left; display: flex; flex-direction: column; gap: 12px; transition: all 0.3s ease;">
-                <div style="width: 44px; height: 44px; background: rgba(239, 68, 68, 0.08); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; color: var(--danger);">⚠️</div>
-                <h3 style="font-size: 15px; font-weight: 700; color: var(--text); margin: 0;">Banco de Errores Activo</h3>
-                <p style="font-size: 13px; color: var(--text-soft); line-height: 1.5; margin: 0;">Las preguntas falladas se agrupan automáticamente por materia, permitiéndote repasar tus puntos débiles y convertirlos en aciertos seguros.</p>
-              </div>
-
-              <!-- Funcionalidad 5 -->
-              <div class="feature-showcase-card" style="background: var(--panel); border: 1px solid var(--border); border-radius: 20px; padding: 24px; text-align: left; display: flex; flex-direction: column; gap: 12px; transition: all 0.3s ease;">
-                <div style="width: 44px; height: 44px; background: rgba(245, 158, 11, 0.08); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; color: var(--warning);">⚔️</div>
-                <h3 style="font-size: 15px; font-weight: 700; color: var(--text); margin: 0;">Arena de Batalla en Vivo</h3>
-                <p style="font-size: 13px; color: var(--text-soft); line-height: 1.5; margin: 0;">Compite en tiempo real contra otros colegas en el ranking. Resuelve casos clínicos a alta velocidad y escala posiciones en el podio dominicano.</p>
-              </div>
-
-              <!-- Funcionalidad 6 -->
-              <div class="feature-showcase-card" style="background: var(--panel); border: 1px solid var(--border); border-radius: 20px; padding: 24px; text-align: left; display: flex; flex-direction: column; gap: 12px; transition: all 0.3s ease;">
-                <div style="width: 44px; height: 44px; background: rgba(6, 182, 212, 0.08); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; color: #06b6d4;">📊</div>
-                <h3 style="font-size: 15px; font-weight: 700; color: var(--text); margin: 0;">Métricas e Historial Académico</h3>
-                <p style="font-size: 13px; color: var(--text-soft); line-height: 1.5; margin: 0;">Visualiza gráficos interactivos de tu evolución de aciertos diaria, promedio general, percentil y nivel de cobertura de todo el temario ENURM.</p>
-              </div>
+            <!-- CONTENEDOR DE PESTAÑAS (TABS) -->
+            <div class="showcase-tabs-container">
+              <button class="showcase-tab-btn active" onclick="switchShowcaseTab('simulador')" type="button">
+                🔬 Simulador Interactivo
+              </button>
+              <button class="showcase-tab-btn" onclick="switchShowcaseTab('modos')" type="button">
+                ⚙️ Modos de Examen
+              </button>
+              <button class="showcase-tab-btn" onclick="switchShowcaseTab('analiticas')" type="button">
+                📊 Estadísticas Avanzadas
+              </button>
             </div>
+
+            <!-- CONTENIDO DE LAS PESTAÑAS -->
+            <div class="showcase-panes-container" style="max-width: 800px; margin: 0 auto; width: 100%; text-align: left;">
+              
+              <!-- PESTAÑA 1: SIMULADOR -->
+              <div id="pane-simulador" class="showcase-content-pane active" style="background: var(--panel); border: 1px solid var(--border); border-radius: 24px; padding: 32px; box-shadow: 0 10px 30px rgba(0,0,0,0.15);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; border-bottom: 1px solid var(--border); padding-bottom: 12px;">
+                  <span class="badge" style="background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.2); color: var(--primary); font-size: 11px; font-weight: 700; border-radius: 100px; padding: 4px 10px;">PEDIATRÍA | INFECTOLOGÍA</span>
+                  <span style="font-size: 12px; font-weight: 600; color: var(--text-dim);">Dificultad: <span style="color: var(--success);">Fácil (0.3)</span></span>
+                </div>
+                
+                <h3 style="font-size: 16px; font-weight: 700; color: var(--text); line-height: 1.5; margin-bottom: 20px;">
+                  Un lactante de 10 meses presenta fiebre aguda de 3 días de duración (hasta 39.5°C) sin foco clínico aparente. Al cuarto día la fiebre cede abruptamente y aparece un exantema maculopapular eritematoso, no pruriginoso en tronco y cuello, que se extiende levemente a extremidades y desaparece en 48 horas sin descamación. El paciente luce activo y en buen estado general. ¿Cuál es el diagnóstico más probable?
+                </h3>
+                
+                <div id="mock-quiz-options" style="display: flex; flex-direction: column; gap: 10px;">
+                  <button class="mock-opt-btn" onclick="selectMockOption(this, true)" type="button">
+                    <span style="width: 24px; height: 24px; border-radius: 50%; background: rgba(255,255,255,0.05); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 11px; flex-shrink: 0;">A</span>
+                    <span>Roséola infantil (Exantema súbito)</span>
+                  </button>
+                  <button class="mock-opt-btn" onclick="selectMockOption(this, false)" type="button">
+                    <span style="width: 24px; height: 24px; border-radius: 50%; background: rgba(255,255,255,0.05); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 11px; flex-shrink: 0;">B</span>
+                    <span>Sarampión</span>
+                  </button>
+                  <button class="mock-opt-btn" onclick="selectMockOption(this, false)" type="button">
+                    <span style="width: 24px; height: 24px; border-radius: 50%; background: rgba(255,255,255,0.05); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 11px; flex-shrink: 0;">C</span>
+                    <span>Rubéola</span>
+                  </button>
+                  <button class="mock-opt-btn" onclick="selectMockOption(this, false)" type="button">
+                    <span style="width: 24px; height: 24px; border-radius: 50%; background: rgba(255,255,255,0.05); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 11px; flex-shrink: 0;">D</span>
+                    <span>Eritema infeccioso (Quinta enfermedad)</span>
+                  </button>
+                </div>
+
+                <!-- Explicación Clínica Oculta -->
+                <div id="mock-explanation-box" style="display: none; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border); border-radius: 16px; padding: 18px; margin-top: 20px; animation: fadeInShowcase 0.3s ease;">
+                  <h4 style="font-size: 13px; font-weight: 700; color: var(--success); margin: 0 0 8px 0; display: flex; align-items: center; gap: 6px;">
+                    🔬 Justificación Académica
+                  </h4>
+                  <p style="font-size: 12.5px; color: var(--text-soft); line-height: 1.5; margin: 0;">
+                    El caso clínico describe de forma típica la <strong>Roséola infantil (Exantema Súbito)</strong>, producida por el <strong>Virus Herpes Humano 6 (HHV-6)</strong>. Su sello distintivo es la presencia de fiebre elevada que cede abruptamente (defervescencia) y de forma inmediata coincide con la aparición del exantema maculopapular eritematoso no pruriginoso, que desaparece rápido sin descamación y con excelente estado general del paciente.
+                  </p>
+                </div>
+              </div>
+
+              <!-- PESTAÑA 2: MODOS DE EXAMEN -->
+              <div id="pane-modos" class="showcase-content-pane" style="display: none;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                  
+                  <!-- Modo Estudio -->
+                  <div style="background: var(--panel); border: 1px solid rgba(59, 130, 246, 0.2); border-radius: 20px; padding: 20px; display: flex; flex-direction: column; gap: 10px;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                      <span style="width: 32px; height: 32px; background: rgba(59, 130, 246, 0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; color: hsl(217, 91%, 60%);">🔵</span>
+                      <h4 style="font-size: 14.5px; font-weight: 700; color: var(--text); margin: 0;">Modo Estudio</h4>
+                    </div>
+                    <p style="font-size: 12.5px; color: var(--text-soft); line-height: 1.5; margin: 0;">
+                      Estudia a tu propio ritmo. Obtén retroalimentación inmediata con justificación clínica y referencias bibliográficas al contestar cada pregunta. Ideal para aprendizaje activo y repaso de conceptos clave.
+                    </p>
+                  </div>
+
+                  <!-- Modo Simulacro -->
+                  <div style="background: var(--panel); border: 1px solid rgba(139, 92, 246, 0.2); border-radius: 20px; padding: 20px; display: flex; flex-direction: column; gap: 10px;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                      <span style="width: 32px; height: 32px; background: rgba(139, 92, 246, 0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; color: hsl(271, 91%, 65%);">🟣</span>
+                      <h4 style="font-size: 14.5px; font-weight: 700; color: var(--text); margin: 0;">Modo Simulacro</h4>
+                    </div>
+                    <p style="font-size: 12.5px; color: var(--text-soft); line-height: 1.5; margin: 0;">
+                      Recrea el rigor del examen ENURM original. 100 preguntas integradas, con cronómetro estricto de 1.2 minutos por pregunta, sin retroalimentación hasta finalizar. Mide tu velocidad y resistencia mental.
+                    </p>
+                  </div>
+
+                  <!-- Modo Guardia / Intensivo -->
+                  <div style="background: var(--panel); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 20px; padding: 20px; display: flex; flex-direction: column; gap: 10px;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                      <span style="width: 32px; height: 32px; background: rgba(239, 68, 68, 0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; color: hsl(0, 84%, 60%);">🔴</span>
+                      <h4 style="font-size: 14.5px; font-weight: 700; color: var(--text); margin: 0;">Modo Guardia (Intensivo)</h4>
+                    </div>
+                    <p style="font-size: 12.5px; color: var(--text-soft); line-height: 1.5; margin: 0;">
+                      Entrenamiento enfocado de alta densidad. Diseñado para sesiones de 10 a 20 preguntas seleccionadas de temas altamente rentables, optimizando el tiempo libre durante las rotaciones clínicas.
+                    </p>
+                  </div>
+
+                  <!-- Arena de Batalla -->
+                  <div style="background: var(--panel); border: 1px solid rgba(245, 158, 11, 0.2); border-radius: 20px; padding: 20px; display: flex; flex-direction: column; gap: 10px;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                      <span style="width: 32px; height: 32px; background: rgba(245, 158, 11, 0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; color: hsl(38, 92%, 50%);">🟡</span>
+                      <h4 style="font-size: 14.5px; font-weight: 700; color: var(--text); margin: 0;">Arena de Batalla</h4>
+                    </div>
+                    <p style="font-size: 12.5px; color: var(--text-soft); line-height: 1.5; margin: 0;">
+                      Compite en tiempo real con otros médicos de la República Dominicana. Resuelve casos clínicos a gran velocidad, gana puntos de experiencia (XP) y lidera el podio nacional ENURM.
+                    </p>
+                  </div>
+
+                </div>
+              </div>
+
+              <!-- PESTAÑA 3: ANALÍTICAS AVANZADAS -->
+              <div id="pane-analiticas" class="showcase-content-pane" style="display: none; background: var(--panel); border: 1px solid var(--border); border-radius: 24px; padding: 28px;">
+                <h3 style="font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 18px; display: flex; align-items: center; gap: 8px;">
+                  📊 Rendimiento de Usuario (Simulado)
+                </h3>
+                
+                <!-- Tarjetas de métricas -->
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 24px;">
+                  <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 14px; padding: 14px; text-align: center;">
+                    <span style="font-size: 10px; font-weight: 700; color: var(--text-dim); text-transform: uppercase; display: block; margin-bottom: 4px;">Promedio General</span>
+                    <span style="font-size: 22px; font-weight: 800; color: var(--primary); font-family: 'Outfit', sans-serif;">78.4%</span>
+                  </div>
+                  <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 14px; padding: 14px; text-align: center;">
+                    <span style="font-size: 10px; font-weight: 700; color: var(--text-dim); text-transform: uppercase; display: block; margin-bottom: 4px;">Percentil Nacional</span>
+                    <span style="font-size: 22px; font-weight: 800; color: var(--success); font-family: 'Outfit', sans-serif;">82.5</span>
+                  </div>
+                  <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 14px; padding: 14px; text-align: center;">
+                    <span style="font-size: 10px; font-weight: 700; color: var(--text-dim); text-transform: uppercase; display: block; margin-bottom: 4px;">Progreso Semanal</span>
+                    <span style="font-size: 22px; font-weight: 800; color: #8b5cf6; font-family: 'Outfit', sans-serif;">+12.3%</span>
+                  </div>
+                </div>
+
+                <!-- Gráficos de barra por especialidad -->
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                  <span style="font-size: 11px; font-weight: 700; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 4px;">Precisión por Materia</span>
+                  
+                  <!-- Pediatría -->
+                  <div>
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; margin-bottom: 4px;">
+                      <span style="color: var(--text);">Pediatría</span>
+                      <span style="color: var(--success);">85%</span>
+                    </div>
+                    <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.05); border-radius: 10px; overflow: hidden;">
+                      <div style="width: 85%; height: 100%; background: var(--success); border-radius: 10px;"></div>
+                    </div>
+                  </div>
+
+                  <!-- Medicina Interna -->
+                  <div>
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; margin-bottom: 4px;">
+                      <span style="color: var(--text);">Medicina Interna</span>
+                      <span style="color: var(--primary);">78%</span>
+                    </div>
+                    <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.05); border-radius: 10px; overflow: hidden;">
+                      <div style="width: 78%; height: 100%; background: var(--primary); border-radius: 10px;"></div>
+                    </div>
+                  </div>
+
+                  <!-- Cirugía General -->
+                  <div>
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; margin-bottom: 4px;">
+                      <span style="color: var(--text);">Cirugía General</span>
+                      <span style="color: var(--warning);">67%</span>
+                    </div>
+                    <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.05); border-radius: 10px; overflow: hidden;">
+                      <div style="width: 67%; height: 100%; background: var(--warning); border-radius: 10px;"></div>
+                    </div>
+                  </div>
+
+                  <!-- Ginecología y Obstetricia -->
+                  <div>
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; margin-bottom: 4px;">
+                      <span style="color: var(--text);">Ginecología y Obstetricia</span>
+                      <span style="color: #8b5cf6;">72%</span>
+                    </div>
+                    <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.05); border-radius: 10px; overflow: hidden;">
+                      <div style="width: 72%; height: 100%; background: #8b5cf6; border-radius: 10px;"></div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
+            </div>
+
           </div>
 
         </div>
@@ -2116,5 +2256,94 @@
   <script src="js/flashcards.js?v=1.7.9"></script>
   <script src="js/battle.js?v=1.7.9"></script>
   <script src="js/main.js?v=1.7.9"></script>
+
+  <script>
+    // Funciones del Showcase Interactivo de Landing Page
+    let demoToastTimeout = null;
+    function mostrarDemoNoHabilitada(btn) {
+      const badge = document.getElementById('badge-demo-no-habilitado');
+      if (!badge) return;
+      
+      // Mostrar etiqueta
+      badge.style.opacity = '1';
+      
+      if (demoToastTimeout) {
+        clearTimeout(demoToastTimeout);
+      }
+      
+      demoToastTimeout = setTimeout(() => {
+        badge.style.opacity = '0';
+      }, 2500);
+    }
+
+    function switchShowcaseTab(tabName) {
+      // Ocultar todos los paneles
+      const panes = document.querySelectorAll('.showcase-content-pane');
+      panes.forEach(pane => {
+        pane.style.display = 'none';
+        pane.classList.remove('active');
+      });
+      
+      // Mostrar el panel activo
+      const activePane = document.getElementById('pane-' + tabName);
+      if (activePane) {
+        activePane.style.display = 'block';
+        // Usar un micro-timeout para asegurar la transición de fadeIn
+        setTimeout(() => {
+          activePane.classList.add('active');
+        }, 10);
+      }
+      
+      // Remover active de todos los botones de pestaña
+      const btns = document.querySelectorAll('.showcase-tab-btn');
+      btns.forEach(btn => {
+        btn.classList.remove('active');
+      });
+      
+      // Activar el botón clicado
+      const clickedBtn = Array.from(btns).find(btn => {
+        const text = btn.textContent.toLowerCase();
+        if (tabName === 'simulador' && text.includes('simulador')) return true;
+        if (tabName === 'modos' && text.includes('modos')) return true;
+        if (tabName === 'analiticas' && text.includes('estadísticas')) return true;
+        return false;
+      });
+      if (clickedBtn) {
+        clickedBtn.classList.add('active');
+      }
+    }
+
+    function selectMockOption(btn, isCorrect) {
+      const optionsContainer = document.getElementById('mock-quiz-options');
+      if (!optionsContainer || optionsContainer.classList.contains('answered')) return;
+      
+      // Marcar el contenedor como respondido
+      optionsContainer.classList.add('answered');
+      
+      // Obtener todos los botones de opción
+      const buttons = optionsContainer.querySelectorAll('.mock-opt-btn');
+      buttons.forEach(b => {
+        // Quitar efectos de hover y deshabilitar interacción
+        b.style.pointerEvents = 'none';
+        b.style.transform = 'none';
+        
+        // Si es la opción correcta A, marcar como verde
+        if (b.textContent.trim().startsWith('A') || b.querySelector('span').textContent.trim() === 'A') {
+          b.classList.add('correct');
+        }
+      });
+      
+      // Si la opción seleccionada es incorrecta, marcar como roja
+      if (!isCorrect) {
+        btn.classList.add('wrong');
+      }
+      
+      // Mostrar la justificación clínica con fade-in
+      const explanation = document.getElementById('mock-explanation-box');
+      if (explanation) {
+        explanation.style.display = 'block';
+      }
+    }
+  </script>
 </body>
 </html>

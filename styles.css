@@ -5787,3 +5787,95 @@ body.dark-mode .premium-metrics-panel {
   background: rgba(255, 255, 255, 0.02) !important;
 }
 
+/* Showcase Tabs & Interactive Elements */
+.showcase-tabs-container {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.showcase-tab-btn {
+  background: rgba(255, 255, 255, 0.01);
+  border: 1px solid var(--border);
+  color: var(--text-soft);
+  padding: 10px 20px;
+  font-size: 13.5px;
+  font-weight: 700;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.showcase-tab-btn:hover {
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text);
+  border-color: var(--text-dim);
+}
+
+.showcase-tab-btn.active {
+  background: var(--primary-soft);
+  color: var(--primary);
+  border-color: var(--primary);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+}
+
+.showcase-content-pane {
+  display: none;
+  animation: fadeInShowcase 0.4s ease;
+}
+
+.showcase-content-pane.active {
+  display: block;
+}
+
+@keyframes fadeInShowcase {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Interactive Question Options */
+.mock-opt-btn {
+  background: rgba(255, 255, 255, 0.01);
+  border: 1px solid var(--border);
+  color: var(--text-soft);
+  padding: 14px 18px;
+  border-radius: 12px;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 13.5px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.mock-opt-btn:hover {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: var(--text-dim);
+  color: var(--text);
+  transform: translateX(4px);
+}
+
+.mock-opt-btn.correct {
+  background: var(--success-soft) !important;
+  border-color: var(--success) !important;
+  color: var(--success) !important;
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.1) !important;
+}
+
+.mock-opt-btn.wrong {
+  background: var(--danger-soft) !important;
+  border-color: var(--danger) !important;
+  color: var(--danger) !important;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.1) !important;
+}
+
