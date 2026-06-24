@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css?v=1.7.9" />
+  <link rel="icon" type="image/jpeg" href="logo_resimed.jpg?v=2" />
   <style>
     /* Evitar parpadeo de pantallas no deseadas antes de cargar el CSS/JS (FOUC) */
     .screen {
@@ -45,7 +46,7 @@
   <!-- Boot Loader Premium (Evita el parpadeo de inicio de sesión en recargas) -->
   <div id="boot-loader" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 99999; transition: opacity 0.4s ease, visibility 0.4s ease;">
     <div class="brand" style="margin-bottom: 24px; text-align: center; display: flex; flex-direction: column; align-items: center;">
-      <div class="brand-mark" style="width: 60px; height: 60px; font-size: 28px; line-height: 60px; margin: 0 auto;">R</div>
+      <img class="brand-logo-img" src="logo_resimed.jpg?v=2" alt="ResiMed Logo" style="width: 60px; height: 60px; border-radius: 14px; object-fit: cover; margin: 0 auto; box-shadow: 0 4px 14px rgba(79, 140, 255, 0.4);">
       <h1 style="font-size: 26px; font-weight: 800; margin-top: 12px; color: var(--text);">ResiMed</h1>
       <p style="font-size: 13.5px; color: var(--text-dim); margin-top: 4px;">Iniciando entorno médico...</p>
     </div>
@@ -59,7 +60,7 @@
       <div style="display: flex; align-items: center; gap: 8px;">
         <button id="btn-toggle-sidebar" class="btn btn-ghost hidden" type="button" style="min-width: auto; padding: 8px 12px; font-size: 20px; border-radius: 50%;" title="Menú lateral">☰</button>
         <div class="brand" id="topbar-brand-home" style="cursor: pointer;" title="Ir al Inicio">
-          <div class="brand-mark">R</div>
+          <img class="brand-mark" src="logo_resimed.jpg?v=2" alt="ResiMed Logo" style="object-fit: cover;">
           <div class="brand-copy">
             <h1>ResiMed</h1>
             <p id="saludo-usuario">Cargando entorno médico...</p>
@@ -85,7 +86,7 @@
     <div class="app-container">
       <aside id="app-sidebar" class="app-sidebar hidden">
         <div class="sidebar-brand" id="sidebar-brand-home" style="cursor: pointer; margin-bottom: 24px;" title="Ir al Inicio">
-          <div class="brand-mark-premium" style="width: 32px; height: 32px; background: linear-gradient(135deg, var(--primary) 0%, #3b82f6 100%); color: #fff; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 800; font-family: 'Outfit', sans-serif; box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);">R</div>
+          <img class="brand-mark-premium" src="logo_resimed.jpg?v=2" alt="ResiMed Logo" style="width: 32px; height: 32px; border-radius: 8px; object-fit: cover; box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);">
           <span class="sidebar-brand-text">ResiMed</span>
         </div>
         
@@ -122,7 +123,7 @@
           <!-- HEADER INICIAL DE LANDING -->
           <header class="landing-header" style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 20px; border-bottom: 1px solid var(--border-strong);">
             <div class="brand" style="display: flex; align-items: center; gap: 10px;">
-              <div class="brand-mark-premium" style="width: 42px; height: 42px; background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); color: #fff; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 800; font-family: 'Outfit', sans-serif; box-shadow: 0 4px 14px rgba(59, 130, 246, 0.4);">R</div>
+              <img class="brand-mark-premium" src="logo_resimed.jpg?v=2" alt="ResiMed Logo" style="width: 42px; height: 42px; border-radius: 12px; object-fit: cover; box-shadow: 0 4px 14px rgba(59, 130, 246, 0.4);">
               <div>
                 <span style="font-size: 22px; font-weight: 800; font-family: 'Outfit', sans-serif; color: var(--text); display: block; line-height: 1.1;">ResiMed</span>
                 <span style="font-size: 11px; font-weight: 600; color: var(--text-dim); display: block; letter-spacing: 0.3px;">Prepárate. Simula. Destaca.</span>
@@ -183,7 +184,7 @@
               
               <!-- App icon top header -->
               <div style="display: flex; flex-direction: column; align-items: center; gap: 12px; margin-bottom: 24px; text-align: center;">
-                <div style="width: 52px; height: 52px; background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%); color: #fff; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 900; font-family: 'Outfit', sans-serif;">R</div>
+                <img src="logo_resimed.jpg?v=2" alt="ResiMed Logo" style="width: 52px; height: 52px; border-radius: 16px; object-fit: cover; box-shadow: 0 4px 14px rgba(79, 140, 255, 0.4);">
                 <h2 style="font-size: 22px; font-weight: 800; font-family: 'Outfit', sans-serif; color: var(--text); margin: 0;">ResiMed</h2>
                 <p style="font-size: 13px; color: var(--text-dim); margin: 0;">Inicia sesión para continuar</p>
               </div>
@@ -323,7 +324,7 @@
               <!-- SIDEBAR DE MOCK -->
               <aside style="border-right: 1px solid var(--border); padding-right: 16px; display: flex; flex-direction: column; gap: 18px;">
                 <div style="display: flex; align-items: center; gap: 8px;">
-                  <div style="width: 24px; height: 24px; background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%); color: #fff; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800;">R</div>
+                  <img src="logo_resimed.jpg?v=2" alt="ResiMed Logo" style="width: 24px; height: 24px; border-radius: 6px; object-fit: cover;">
                   <span style="font-size: 13px; font-weight: 800; color: var(--text);">ResiMed</span>
                 </div>
                 
@@ -2126,6 +2127,30 @@
         <button type="submit" class="btn btn-primary" style="background: var(--warning); color: #000; font-weight: bold; width: 100%; margin-top: 4px;">💾 Guardar Cambios y Resolver Reporte</button>
       </form>
     </div>
+    
+    <!-- Barra de Navegación Móvil Ergonómica -->
+    <nav class="bottom-nav">
+      <button class="bottom-nav-item active" data-target="simulacros" type="button">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span>Inicio</span>
+      </button>
+      <button class="bottom-nav-item" data-target="preguntas" type="button">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+        <span>Flashcards</span>
+      </button>
+      <button class="bottom-nav-item" data-target="estadisticas" type="button">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        <span>Progreso</span>
+      </button>
+      <button class="bottom-nav-item" data-target="historial" type="button">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <span>Historial</span>
+      </button>
+      <button class="bottom-nav-item" data-target="errores" type="button">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <span>Errores</span>
+      </button>
+    </nav>
   </div>
 
   <!-- MODAL DE CONFIRMACIÓN DE INICIO DE EXAMEN (Fase 1) -->

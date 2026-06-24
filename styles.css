@@ -4418,23 +4418,27 @@ body.dark-mode .premium-metrics-panel {
   }
 
   table#tabla-progreso-historial,
-  table#tabla-progreso-diario-flashcards {
+  table#tabla-progreso-diario-flashcards,
+  #pantalla-battle-results .table-container table {
     display: block !important;
   }
 
   table#tabla-progreso-historial thead,
-  table#tabla-progreso-diario-flashcards thead {
+  table#tabla-progreso-diario-flashcards thead,
+  #pantalla-battle-results .table-container table thead {
     display: none !important; /* Esconde la cabecera original en móvil */
   }
 
   table#tabla-progreso-historial tbody,
-  table#tabla-progreso-diario-flashcards tbody {
+  table#tabla-progreso-diario-flashcards tbody,
+  #pantalla-battle-results .table-container table tbody {
     display: block !important;
     width: 100% !important;
   }
 
   table#tabla-progreso-historial tbody tr,
-  table#tabla-progreso-diario-flashcards tbody tr {
+  table#tabla-progreso-diario-flashcards tbody tr,
+  #pantalla-battle-results .table-container table tbody tr {
     display: block !important;
     background: var(--panel-strong) !important;
     border: 1px solid var(--border-strong) !important;
@@ -4445,7 +4449,8 @@ body.dark-mode .premium-metrics-panel {
   }
 
   table#tabla-progreso-historial tbody td,
-  table#tabla-progreso-diario-flashcards tbody td {
+  table#tabla-progreso-diario-flashcards tbody td,
+  #pantalla-battle-results .table-container table tbody td {
     display: flex !important;
     justify-content: space-between !important;
     align-items: center !important;
@@ -4457,7 +4462,8 @@ body.dark-mode .premium-metrics-panel {
   }
 
   table#tabla-progreso-historial tbody td:last-child,
-  table#tabla-progreso-diario-flashcards tbody td:last-child {
+  table#tabla-progreso-diario-flashcards tbody td:last-child,
+  #pantalla-battle-results .table-container table tbody td:last-child {
     border-bottom: none !important;
   }
 
@@ -4494,6 +4500,21 @@ body.dark-mode .premium-metrics-panel {
   table#tabla-progreso-diario-flashcards tbody td:nth-child(3)::before { content: "Lo Sabía"; }
   table#tabla-progreso-diario-flashcards tbody td:nth-child(4)::before { content: "No Lo Sabía"; }
   table#tabla-progreso-diario-flashcards tbody td:nth-child(5)::before { content: "Retención"; }
+
+  /* Inyección de etiquetas de datos para clasificación de batallas */
+  #pantalla-battle-results .table-container table tbody td::before {
+    content: "Dato:";
+    font-weight: 700 !important;
+    color: var(--text-dim) !important;
+    float: left;
+    text-transform: uppercase;
+    font-size: 10px;
+  }
+
+  #pantalla-battle-results .table-container table tbody td:nth-child(1)::before { content: "Posición"; }
+  #pantalla-battle-results .table-container table tbody td:nth-child(2)::before { content: "Médico"; }
+  #pantalla-battle-results .table-container table tbody td:nth-child(3)::before { content: "Aciertos"; }
+  #pantalla-battle-results .table-container table tbody td:nth-child(4)::before { content: "Resultado"; }
 
   /* Evitar zoom automático desagradable en inputs para iOS Safari */
   input, select, textarea {
@@ -5298,3 +5319,459 @@ body.dark-mode .premium-metrics-panel {
   border-radius: 12px;
   width: 100%;
 }
+
+/* ==========================================================================
+   📱 OPTIMIZACIONES ERGONÓMICAS Y VISUALES PARA DISPOSITIVOS MÓVILES
+   ========================================================================== */
+
+/* Variables CSS para Mobile-First */
+:root {
+  --touch-target-min: 48px;
+  --mobile-safe-bottom: env(safe-area-inset-bottom, 16px);
+}
+
+/* Barra de Navegación Inferior (Bottom Navigation Bar) */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 64px;
+  background: var(--panel-strong);
+  border-top: 1px solid var(--border);
+  display: none; /* Oculto en pantallas grandes */
+  grid-template-columns: repeat(5, 1fr);
+  align-items: center;
+  justify-content: space-around;
+  z-index: 1000;
+  box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.04);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.bottom-nav-item {
+  background: none;
+  border: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  color: var(--text-dim);
+  cursor: pointer;
+  padding: 8px 0;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  font-family: inherit;
+  font-size: 10px;
+  font-weight: 600;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.bottom-nav-item svg {
+  stroke: var(--text-dim);
+  transition: all 0.2s ease;
+  width: 20px;
+  height: 20px;
+}
+
+.bottom-nav-item.active {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.bottom-nav-item.active svg {
+  stroke: var(--primary);
+  transform: translateY(-2px);
+}
+
+.bottom-nav-item:active {
+  transform: scale(0.9);
+}
+
+/* Adaptación responsiva general y ocultamiento de barra lateral */
+@media (max-width: 768px) {
+  .bottom-nav {
+    display: grid;
+  }
+  
+  /* Evitar que el contenido quede tapado por la barra de navegación */
+  .layout {
+    padding-bottom: calc(70px + env(safe-area-inset-bottom)) !important;
+  }
+
+  /* Ocultar barra lateral en móviles */
+  #app-sidebar {
+    display: none !important;
+  }
+
+  /* Ocultar barra lateral Backdrop */
+  .sidebar-backdrop {
+    display: none !important;
+  }
+
+  /* Hacer el main-shell fluido */
+  .main-shell {
+    margin-left: 0 !important;
+    padding: 16px !important;
+    max-width: 100% !important;
+  }
+
+  /* Cabecera superior compacta */
+  .topbar {
+    padding: 12px 16px !important;
+    height: auto !important;
+    position: sticky !important;
+    top: 0;
+    z-index: 999;
+    background: var(--panel-strong);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+  }
+  
+  .topbar #btn-toggle-sidebar {
+    display: none !important; /* Ya no es necesario con el menú inferior */
+  }
+
+  /* Ajustar cuadrícula de la página de inicio */
+  .home-grid {
+    grid-template-columns: 1fr !important;
+    gap: 20px !important;
+  }
+
+  .side-panel-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  /* Tarjetas de modo de examen táctiles premium */
+  .mode-grid {
+    grid-template-columns: 1fr !important; /* Tarjetas completas de una columna para facilidad de toque */
+    gap: 12px !important;
+  }
+
+  .mode-card {
+    min-height: 90px !important;
+    padding: 16px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    text-align: left !important;
+    border-radius: 14px !important;
+    border: 1px solid var(--border) !important;
+    background: var(--bg-card) !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.01) !important;
+    transition: all 0.2s ease !important;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .mode-card:active {
+    transform: scale(0.97);
+  }
+  .mode-card#btn-modo-estudio:active {
+    border-color: var(--estudio-color) !important;
+    background: var(--primary-soft) !important;
+  }
+  .mode-card#btn-modo-simulacro:active {
+    border-color: var(--simulacro-color) !important;
+    background: rgba(139, 92, 246, 0.08) !important;
+  }
+  .mode-card#btn-modo-guardia:active {
+    border-color: var(--intensivo-color) !important;
+    background: var(--danger-soft) !important;
+  }
+  .mode-card#btn-modo-batalla:active {
+    border-color: var(--batalla-color) !important;
+    background: var(--warning-soft) !important;
+  }
+  
+  .mode-card .mode-badge {
+    margin-bottom: 6px !important;
+  }
+
+  .mode-card .mode-title {
+    font-size: 15px !important;
+    font-weight: 700 !important;
+    margin-bottom: 4px !important;
+  }
+
+  .mode-card .mode-desc {
+    font-size: 12px !important;
+    line-height: 1.4 !important;
+    color: var(--text-dim) !important;
+    display: block !important;
+  }
+  
+  /* Ajustar selects e inputs para móviles (evitar zoom en iOS) */
+  .input, select, textarea {
+    font-size: 16px !important; /* 16px evita zoom automático de iOS */
+    padding: 12px 14px !important;
+    min-height: var(--touch-target-min) !important;
+    border-radius: 10px !important;
+  }
+}
+
+/* Optimización para el simulador activo (Quiz Screen) en móviles */
+@media (max-width: 600px) {
+  /* Panel del simulador */
+  #pantalla-quiz {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  /* HUD fijo superior del quiz */
+  .quiz-sticky-header {
+    position: sticky;
+    top: 50px;
+    background: var(--panel-strong);
+    z-index: 10;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .question-card {
+    padding: 20px 16px !important;
+    border-radius: 16px !important;
+  }
+
+  .question-text {
+    font-size: 16px !important;
+    line-height: 1.5 !important;
+  }
+
+  /* Opciones de respuesta como tarjetas de toque */
+  .options-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 10px !important;
+    margin-top: 20px !important;
+  }
+
+  .option-btn {
+    min-height: 52px !important;
+    padding: 14px 16px !important;
+    border-radius: 12px !important;
+    font-size: 14.5px !important;
+    line-height: 1.4 !important;
+    display: flex !important;
+    align-items: center !important;
+    text-align: left !important;
+    border: 1px solid var(--border) !important;
+    background: var(--option-bg) !important;
+    color: var(--text) !important;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .option-btn:active {
+    transform: scale(0.98);
+  }
+
+  .option-btn.selected {
+    border-color: var(--primary) !important;
+    background: var(--primary-soft) !important;
+    box-shadow: 0 0 0 1px var(--primary) !important;
+  }
+
+  .option-btn.correct {
+    border-color: var(--success) !important;
+    background: var(--success-soft) !important;
+    color: var(--success) !important;
+    font-weight: 700;
+  }
+
+  .option-btn.incorrect {
+    border-color: var(--danger) !important;
+    background: var(--danger-soft) !important;
+    color: var(--danger) !important;
+  }
+
+  /* Acciones del Quiz */
+  .quiz-actions {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 10px !important;
+    margin-top: 16px !important;
+  }
+
+  .quiz-actions button {
+    width: 100% !important;
+    min-height: 48px !important;
+  }
+
+  /* Ayudas de IA en la parte inferior */
+  .ia-triggers-container {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px !important;
+    margin-top: 12px;
+  }
+
+  .ia-trigger-btn {
+    min-height: 44px !important;
+    font-size: 12px !important;
+    justify-content: center !important;
+  }
+}
+
+/* Optimización para Flashcards en Móviles */
+@media (max-width: 520px) {
+  /* Tarjeta física */
+  .flashcard-container, .flashcard-front, .flashcard-back {
+    min-height: 320px !important;
+    border-radius: 20px !important;
+  }
+  
+  .flashcard-front, .flashcard-back {
+    padding: 24px 20px !important;
+  }
+
+  .flashcard-q {
+    font-size: 17px !important;
+    line-height: 1.5 !important;
+  }
+
+  .flashcard-a {
+    font-size: 15px !important;
+    line-height: 1.5 !important;
+  }
+
+  /* Botones de autoevaluación en la base */
+  .self-eval-box {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-top: 20px !important;
+  }
+
+  .self-eval-box button, .btn-eval {
+    width: 100% !important;
+    min-height: 48px !important;
+    font-size: 14px !important;
+    border-radius: 12px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin: 0 !important;
+  }
+}
+
+/* Optimización para Tablas de Historial, Errores y Ranking */
+@media (max-width: 600px) {
+  /* Convertir layouts de tablas a tarjetas colapsables */
+  .mobile-table-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px;
+    margin-bottom: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.01);
+  }
+
+  .mobile-table-card-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13.5px;
+  }
+
+  .mobile-table-card-label {
+    color: var(--text-dim);
+    font-weight: 500;
+  }
+
+  .mobile-table-card-value {
+    color: var(--text);
+    font-weight: 600;
+  }
+
+  .mobile-table-card-header {
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 8px;
+    margin-bottom: 4px;
+    font-weight: 700;
+    font-size: 14.5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  /* Ranking en lista compacta */
+  .ranking-list-mobile {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .ranking-row-mobile {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    transition: all 0.2s ease;
+  }
+
+  .ranking-row-mobile.my-rank {
+    background: linear-gradient(90deg, var(--primary-soft) 0%, rgba(255,255,255,0.01) 100%);
+    border-color: var(--primary);
+  }
+
+  .ranking-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .ranking-pos {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 800;
+    background: var(--panel-soft);
+    color: var(--text-soft);
+  }
+
+  .ranking-pos.pos-1 {
+    background: var(--gold-gradient);
+    color: #000;
+  }
+
+  .ranking-pos.pos-2 {
+    background: var(--silver-gradient);
+    color: #000;
+  }
+
+  .ranking-pos.pos-3 {
+    background: var(--bronze-gradient);
+    color: #fff;
+  }
+
+  .ranking-name {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .ranking-xp {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--primary-2);
+  }
+}
+

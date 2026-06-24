@@ -262,6 +262,32 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   });
 
+  const bottomNavItems = document.querySelectorAll(".bottom-nav-item");
+  bottomNavItems.forEach(item => {
+    item.addEventListener("click", () => {
+      bottomNavItems.forEach(i => i.classList.remove("active"));
+      item.classList.add("active");
+      
+      const target = item.dataset.target;
+      if (target === "simulacros") {
+        ui.mostrarPantalla("home");
+      } else if (target === "preguntas") {
+        ui.mostrarPantalla("flashcards");
+      } else if (target === "estadisticas") {
+        ui.mostrarPantalla("perfil");
+      } else if (target === "historial") {
+        ui.mostrarPantalla("historial");
+      } else if (target === "errores") {
+        ui.mostrarPantalla("errores");
+      } else if (target === "ranking") {
+        battle.mostrarPantallaBattle("battle");
+        battle.conectarWebSocket();
+      } else if (target === "ajustes") {
+        ui.mostrarPantalla("ajustes");
+      }
+    });
+  });
+
   // 4. Modal del Tutor IA - Vincular Cerrar e interactividad de fondo
   const modalTutorIA = document.getElementById("modal-tutor-ia");
   const modalIABody = document.getElementById("modal-ia-body");

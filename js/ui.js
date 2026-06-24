@@ -102,6 +102,30 @@ const ui = {
       if (targetItem) targetItem.classList.add("active");
     }
 
+    // Sincronizar item activo de la barra de navegación inferior móvil
+    const bottomNavItems = document.querySelectorAll(".bottom-nav-item");
+    if (bottomNavItems.length > 0) {
+      bottomNavItems.forEach(i => i.classList.remove("active"));
+      
+      let targetSelectorBottom = '.bottom-nav-item[data-target="simulacros"]'; // Por defecto
+      if (nombrePantalla === "home" || nombrePantalla === "quiz" || nombrePantalla === "resultados") {
+        targetSelectorBottom = '.bottom-nav-item[data-target="simulacros"]';
+      } else if (nombrePantalla === "flashcards") {
+        targetSelectorBottom = '.bottom-nav-item[data-target="preguntas"]';
+      } else if (nombrePantalla === "perfil") {
+        targetSelectorBottom = '.bottom-nav-item[data-target="estadisticas"]';
+      } else if (nombrePantalla === "historial") {
+        targetSelectorBottom = '.bottom-nav-item[data-target="historial"]';
+      } else if (nombrePantalla === "errores") {
+        targetSelectorBottom = '.bottom-nav-item[data-target="errores"]';
+      } else if (nombrePantalla.startsWith("battle")) {
+        targetSelectorBottom = '.bottom-nav-item[data-target="ranking"]';
+      }
+      
+      const targetItemBottom = document.querySelector(targetSelectorBottom);
+      if (targetItemBottom) targetItemBottom.classList.add("active");
+    }
+
     // Refrescar analíticas y gamificación al cambiar al Home o Perfil
     if (nombrePantalla === "home") {
       ui.cargarDashboardHome();
