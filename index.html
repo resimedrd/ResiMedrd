@@ -314,7 +314,7 @@
             </div>
           </div>
 
-          <!-- SECCIÓN DE CARACTERÍSTICAS AVANZADAS Y FUNCIONALIDADES -->
+          <!-- SECCIÓN DE CARACTERÍSTICAS AVANZADAS Y FUNCIONALIDADES (Showcase Ancho Completo) -->
           <div style="display: flex; flex-direction: column; gap: 40px; border-top: 1px dashed var(--border-strong); padding-top: 60px; margin-bottom: 40px; text-align: center;">
             <div>
               <span style="font-size: 11px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 8px;">Explora el Entorno ResiMed</span>
@@ -322,185 +322,221 @@
               <p style="font-size: 14.5px; color: var(--text-soft); max-width: 600px; margin: 8px auto 0 auto; line-height: 1.5;">Prueba una simulación interactiva, conoce las modalidades oficiales y revisa estadísticas de progreso en tiempo real.</p>
             </div>
 
-            <!-- CONTENEDOR DE PESTAÑAS (TABS) -->
-            <div class="showcase-tabs-container">
-              <button class="showcase-tab-btn active" onclick="switchShowcaseTab('simulador')" type="button">
-                🔬 Simulador Interactivo
-              </button>
-              <button class="showcase-tab-btn" onclick="switchShowcaseTab('modos')" type="button">
-                ⚙️ Modos de Examen
-              </button>
-              <button class="showcase-tab-btn" onclick="switchShowcaseTab('analiticas')" type="button">
-                📊 Estadísticas Avanzadas
-              </button>
-            </div>
-
-            <!-- CONTENIDO DE LAS PESTAÑAS -->
-            <div class="showcase-panes-container" style="max-width: 800px; margin: 0 auto; width: 100%; text-align: left;">
+            <!-- CUADRÍCULA DE ANCHO COMPLETO (INTERACTIVA) -->
+            <div class="showcase-grid-interactive">
               
-              <!-- PESTAÑA 1: SIMULADOR -->
-              <div id="pane-simulador" class="showcase-content-pane active" style="background: var(--panel); border: 1px solid var(--border); border-radius: 24px; padding: 32px; box-shadow: 0 10px 30px rgba(0,0,0,0.15);">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; border-bottom: 1px solid var(--border); padding-bottom: 12px;">
-                  <span class="badge" style="background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.2); color: var(--primary); font-size: 11px; font-weight: 700; border-radius: 100px; padding: 4px 10px;">PEDIATRÍA | INFECTOLOGÍA</span>
-                  <span style="font-size: 12px; font-weight: 600; color: var(--text-dim);">Dificultad: <span style="color: var(--success);">Fácil (0.3)</span></span>
-                </div>
+              <!-- COLUMNA IZQUIERDA: SELECTORES (TARJETAS GLASSMORPHIC) -->
+              <div style="display: flex; flex-direction: column;">
                 
-                <h3 style="font-size: 16px; font-weight: 700; color: var(--text); line-height: 1.5; margin-bottom: 20px;">
-                  Un lactante de 10 meses presenta fiebre aguda de 3 días de duración (hasta 39.5°C) sin foco clínico aparente. Al cuarto día la fiebre cede abruptamente y aparece un exantema maculopapular eritematoso, no pruriginoso en tronco y cuello, que se extiende levemente a extremidades y desaparece en 48 horas sin descamación. El paciente luce activo y en buen estado general. ¿Cuál es el diagnóstico más probable?
-                </h3>
-                
-                <div id="mock-quiz-options" style="display: flex; flex-direction: column; gap: 10px;">
-                  <button class="mock-opt-btn" onclick="selectMockOption(this, true)" type="button">
-                    <span style="width: 24px; height: 24px; border-radius: 50%; background: rgba(255,255,255,0.05); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 11px; flex-shrink: 0;">A</span>
-                    <span>Roséola infantil (Exantema súbito)</span>
-                  </button>
-                  <button class="mock-opt-btn" onclick="selectMockOption(this, false)" type="button">
-                    <span style="width: 24px; height: 24px; border-radius: 50%; background: rgba(255,255,255,0.05); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 11px; flex-shrink: 0;">B</span>
-                    <span>Sarampión</span>
-                  </button>
-                  <button class="mock-opt-btn" onclick="selectMockOption(this, false)" type="button">
-                    <span style="width: 24px; height: 24px; border-radius: 50%; background: rgba(255,255,255,0.05); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 11px; flex-shrink: 0;">C</span>
-                    <span>Rubéola</span>
-                  </button>
-                  <button class="mock-opt-btn" onclick="selectMockOption(this, false)" type="button">
-                    <span style="width: 24px; height: 24px; border-radius: 50%; background: rgba(255,255,255,0.05); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 11px; flex-shrink: 0;">D</span>
-                    <span>Eritema infeccioso (Quinta enfermedad)</span>
-                  </button>
-                </div>
+                <!-- Tarjeta 1: Simulador -->
+                <button class="selector-card-btn active type-simulador" onclick="switchShowcaseTab('simulador')" type="button">
+                  <div class="selector-icon-box">🔬</div>
+                  <div>
+                    <h4 style="font-size: 14.5px; font-weight: 700; color: var(--text); margin: 0 0 4px 0;">Simulador Clínico</h4>
+                    <p style="font-size: 12px; color: var(--text-soft); line-height: 1.4; margin: 0;">Resuelve una pregunta real tipo ENURM con desglose docente interactivo.</p>
+                  </div>
+                </button>
 
-                <!-- Explicación Clínica Oculta -->
-                <div id="mock-explanation-box" style="display: none; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border); border-radius: 16px; padding: 18px; margin-top: 20px; animation: fadeInShowcase 0.3s ease;">
-                  <h4 style="font-size: 13px; font-weight: 700; color: var(--success); margin: 0 0 8px 0; display: flex; align-items: center; gap: 6px;">
-                    🔬 Justificación Académica
-                  </h4>
-                  <p style="font-size: 12.5px; color: var(--text-soft); line-height: 1.5; margin: 0;">
-                    El caso clínico describe de forma típica la <strong>Roséola infantil (Exantema Súbito)</strong>, producida por el <strong>Virus Herpes Humano 6 (HHV-6)</strong>. Su sello distintivo es la presencia de fiebre elevada que cede abruptamente (defervescencia) y de forma inmediata coincide con la aparición del exantema maculopapular eritematoso no pruriginoso, que desaparece rápido sin descamación y con excelente estado general del paciente.
-                  </p>
-                </div>
+                <!-- Tarjeta 2: Modos de Examen -->
+                <button class="selector-card-btn type-modos" onclick="switchShowcaseTab('modos')" type="button">
+                  <div class="selector-icon-box">⚙️</div>
+                  <div>
+                    <h4 style="font-size: 14.5px; font-weight: 700; color: var(--text); margin: 0 0 4px 0;">Modalidades de Examen</h4>
+                    <p style="font-size: 12px; color: var(--text-soft); line-height: 1.4; margin: 0;">4 modos especializados: Estudio, Simulacro, Guardia y Arena.</p>
+                  </div>
+                </button>
+
+                <!-- Tarjeta 3: Analíticas Avanzadas -->
+                <button class="selector-card-btn type-analiticas" onclick="switchShowcaseTab('analiticas')" type="button">
+                  <div class="selector-icon-box">📊</div>
+                  <div>
+                    <h4 style="font-size: 14.5px; font-weight: 700; color: var(--text); margin: 0 0 4px 0;">Analíticas Académicas</h4>
+                    <p style="font-size: 12px; color: var(--text-soft); line-height: 1.4; margin: 0;">Seguimiento detallado de precisión, percentil y debilidades.</p>
+                  </div>
+                </button>
+
               </div>
 
-              <!-- PESTAÑA 2: MODOS DE EXAMEN -->
-              <div id="pane-modos" class="showcase-content-pane" style="display: none;">
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-                  
-                  <!-- Modo Estudio -->
-                  <div style="background: var(--panel); border: 1px solid rgba(59, 130, 246, 0.2); border-radius: 20px; padding: 20px; display: flex; flex-direction: column; gap: 10px;">
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                      <span style="width: 32px; height: 32px; background: rgba(59, 130, 246, 0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; color: hsl(217, 91%, 60%);">🔵</span>
-                      <h4 style="font-size: 14.5px; font-weight: 700; color: var(--text); margin: 0;">Modo Estudio</h4>
-                    </div>
-                    <p style="font-size: 12.5px; color: var(--text-soft); line-height: 1.5; margin: 0;">
-                      Estudia a tu propio ritmo. Obtén retroalimentación inmediata con justificación clínica y referencias bibliográficas al contestar cada pregunta. Ideal para aprendizaje activo y repaso de conceptos clave.
-                    </p>
-                  </div>
-
-                  <!-- Modo Simulacro -->
-                  <div style="background: var(--panel); border: 1px solid rgba(139, 92, 246, 0.2); border-radius: 20px; padding: 20px; display: flex; flex-direction: column; gap: 10px;">
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                      <span style="width: 32px; height: 32px; background: rgba(139, 92, 246, 0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; color: hsl(271, 91%, 65%);">🟣</span>
-                      <h4 style="font-size: 14.5px; font-weight: 700; color: var(--text); margin: 0;">Modo Simulacro</h4>
-                    </div>
-                    <p style="font-size: 12.5px; color: var(--text-soft); line-height: 1.5; margin: 0;">
-                      Recrea el rigor del examen ENURM original. 100 preguntas integradas, con cronómetro estricto de 1.2 minutos por pregunta, sin retroalimentación hasta finalizar. Mide tu velocidad y resistencia mental.
-                    </p>
-                  </div>
-
-                  <!-- Modo Guardia / Intensivo -->
-                  <div style="background: var(--panel); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 20px; padding: 20px; display: flex; flex-direction: column; gap: 10px;">
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                      <span style="width: 32px; height: 32px; background: rgba(239, 68, 68, 0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; color: hsl(0, 84%, 60%);">🔴</span>
-                      <h4 style="font-size: 14.5px; font-weight: 700; color: var(--text); margin: 0;">Modo Guardia (Intensivo)</h4>
-                    </div>
-                    <p style="font-size: 12.5px; color: var(--text-soft); line-height: 1.5; margin: 0;">
-                      Entrenamiento enfocado de alta densidad. Diseñado para sesiones de 10 a 20 preguntas seleccionadas de temas altamente rentables, optimizando el tiempo libre durante las rotaciones clínicas.
-                    </p>
-                  </div>
-
-                  <!-- Arena de Batalla -->
-                  <div style="background: var(--panel); border: 1px solid rgba(245, 158, 11, 0.2); border-radius: 20px; padding: 20px; display: flex; flex-direction: column; gap: 10px;">
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                      <span style="width: 32px; height: 32px; background: rgba(245, 158, 11, 0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; color: hsl(38, 92%, 50%);">🟡</span>
-                      <h4 style="font-size: 14.5px; font-weight: 700; color: var(--text); margin: 0;">Arena de Batalla</h4>
-                    </div>
-                    <p style="font-size: 12.5px; color: var(--text-soft); line-height: 1.5; margin: 0;">
-                      Compite en tiempo real con otros médicos de la República Dominicana. Resuelve casos clínicos a gran velocidad, gana puntos de experiencia (XP) y lidera el podio nacional ENURM.
-                    </p>
-                  </div>
-
-                </div>
-              </div>
-
-              <!-- PESTAÑA 3: ANALÍTICAS AVANZADAS -->
-              <div id="pane-analiticas" class="showcase-content-pane" style="display: none; background: var(--panel); border: 1px solid var(--border); border-radius: 24px; padding: 28px;">
-                <h3 style="font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 18px; display: flex; align-items: center; gap: 8px;">
-                  📊 Rendimiento de Usuario (Simulado)
-                </h3>
+              <!-- COLUMNA DERECHA: PANTALLA TABLET VIRTUAL -->
+              <div class="display-device-shell">
                 
-                <!-- Tarjetas de métricas -->
-                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 24px;">
-                  <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 14px; padding: 14px; text-align: center;">
-                    <span style="font-size: 10px; font-weight: 700; color: var(--text-dim); text-transform: uppercase; display: block; margin-bottom: 4px;">Promedio General</span>
-                    <span style="font-size: 22px; font-weight: 800; color: var(--primary); font-family: 'Outfit', sans-serif;">78.4%</span>
+                <!-- PESTAÑA 1: SIMULADOR INTERACTIVO -->
+                <div id="pane-simulador" class="showcase-content-pane active">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid var(--border); padding-bottom: 10px;">
+                    <span class="badge" style="background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.2); color: var(--primary); font-size: 10.5px; font-weight: 700; border-radius: 100px; padding: 4px 10px;">PEDIATRÍA | INFECTOLOGÍA</span>
+                    <span style="font-size: 11.5px; font-weight: 600; color: var(--text-dim);">Dificultad: <span style="color: var(--success);">Fácil (0.3)</span></span>
                   </div>
-                  <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 14px; padding: 14px; text-align: center;">
-                    <span style="font-size: 10px; font-weight: 700; color: var(--text-dim); text-transform: uppercase; display: block; margin-bottom: 4px;">Percentil Nacional</span>
-                    <span style="font-size: 22px; font-weight: 800; color: var(--success); font-family: 'Outfit', sans-serif;">82.5</span>
-                  </div>
-                  <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 14px; padding: 14px; text-align: center;">
-                    <span style="font-size: 10px; font-weight: 700; color: var(--text-dim); text-transform: uppercase; display: block; margin-bottom: 4px;">Progreso Semanal</span>
-                    <span style="font-size: 22px; font-weight: 800; color: #8b5cf6; font-family: 'Outfit', sans-serif;">+12.3%</span>
-                  </div>
-                </div>
-
-                <!-- Gráficos de barra por especialidad -->
-                <div style="display: flex; flex-direction: column; gap: 12px;">
-                  <span style="font-size: 11px; font-weight: 700; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 4px;">Precisión por Materia</span>
                   
-                  <!-- Pediatría -->
-                  <div>
-                    <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; margin-bottom: 4px;">
-                      <span style="color: var(--text);">Pediatría</span>
-                      <span style="color: var(--success);">85%</span>
-                    </div>
-                    <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.05); border-radius: 10px; overflow: hidden;">
-                      <div style="width: 85%; height: 100%; background: var(--success); border-radius: 10px;"></div>
-                    </div>
+                  <h3 style="font-size: 15px; font-weight: 700; color: var(--text); line-height: 1.5; margin-bottom: 18px; margin-top: 0;">
+                    Un lactante de 10 meses presenta fiebre de 3 días (hasta 39.5°C) sin foco evidente. Al cuarto día la fiebre cede abruptamente y aparece un exantema maculopapular eritematoso, no pruriginoso en tronco y cuello, que se extiende a extremidades y cede en 48 horas sin descamación. El paciente luce activo y en buen estado general. ¿Cuál es el diagnóstico?
+                  </h3>
+                  
+                  <div id="mock-quiz-options" style="display: flex; flex-direction: column; gap: 8px;">
+                    <button class="mock-opt-btn" onclick="selectMockOption(this, true)" type="button">
+                      <span style="width: 24px; height: 24px; border-radius: 50%; background: rgba(255,255,255,0.05); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 11px; flex-shrink: 0;">A</span>
+                      <span>Roséola infantil (Exantema súbito)</span>
+                    </button>
+                    <button class="mock-opt-btn" onclick="selectMockOption(this, false)" type="button">
+                      <span style="width: 24px; height: 24px; border-radius: 50%; background: rgba(255,255,255,0.05); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 11px; flex-shrink: 0;">B</span>
+                      <span>Sarampión</span>
+                    </button>
+                    <button class="mock-opt-btn" onclick="selectMockOption(this, false)" type="button">
+                      <span style="width: 24px; height: 24px; border-radius: 50%; background: rgba(255,255,255,0.05); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 11px; flex-shrink: 0;">C</span>
+                      <span>Rubéola</span>
+                    </button>
+                    <button class="mock-opt-btn" onclick="selectMockOption(this, false)" type="button">
+                      <span style="width: 24px; height: 24px; border-radius: 50%; background: rgba(255,255,255,0.05); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 11px; flex-shrink: 0;">D</span>
+                      <span>Eritema infeccioso (Quinta enfermedad)</span>
+                    </button>
                   </div>
 
-                  <!-- Medicina Interna -->
-                  <div>
-                    <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; margin-bottom: 4px;">
-                      <span style="color: var(--text);">Medicina Interna</span>
-                      <span style="color: var(--primary);">78%</span>
-                    </div>
-                    <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.05); border-radius: 10px; overflow: hidden;">
-                      <div style="width: 78%; height: 100%; background: var(--primary); border-radius: 10px;"></div>
-                    </div>
+                  <!-- Explicación Clínica -->
+                  <div id="mock-explanation-box" style="display: none; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border); border-radius: 16px; padding: 16px; margin-top: 16px; animation: fadeInShowcase 0.3s ease;">
+                    <h4 style="font-size: 13px; font-weight: 700; color: var(--success); margin: 0 0 6px 0; display: flex; align-items: center; gap: 6px;">
+                      🔬 Justificación Académica
+                    </h4>
+                    <p style="font-size: 12px; color: var(--text-soft); line-height: 1.45; margin: 0;">
+                      La <strong>Roséola infantil (HHV-6)</strong> se caracteriza de forma clásica por fiebre elevada de 3 días que desaparece bruscamente con la aparición simultánea del exantema maculopapular no descamativo en tronco, manteniendo al lactante en buen estado general.
+                    </p>
                   </div>
-
-                  <!-- Cirugía General -->
-                  <div>
-                    <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; margin-bottom: 4px;">
-                      <span style="color: var(--text);">Cirugía General</span>
-                      <span style="color: var(--warning);">67%</span>
-                    </div>
-                    <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.05); border-radius: 10px; overflow: hidden;">
-                      <div style="width: 67%; height: 100%; background: var(--warning); border-radius: 10px;"></div>
-                    </div>
-                  </div>
-
-                  <!-- Ginecología y Obstetricia -->
-                  <div>
-                    <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; margin-bottom: 4px;">
-                      <span style="color: var(--text);">Ginecología y Obstetricia</span>
-                      <span style="color: #8b5cf6;">72%</span>
-                    </div>
-                    <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.05); border-radius: 10px; overflow: hidden;">
-                      <div style="width: 72%; height: 100%; background: #8b5cf6; border-radius: 10px;"></div>
-                    </div>
-                  </div>
-
                 </div>
+
+                <!-- PESTAÑA 2: MODOS DE EXAMEN -->
+                <div id="pane-modos" class="showcase-content-pane">
+                  <h3 style="font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 16px; margin-top: 0;">
+                    ⚙️ Modalidades Oficiales de Entrenamiento
+                  </h3>
+                  <div class="mode-preview-grid">
+                    
+                    <!-- Estudio -->
+                    <div class="mode-preview-card" style="border-left: 3px solid hsl(217, 91%, 60%);">
+                      <div style="display: flex; align-items: center; gap: 8px;">
+                        <span style="font-size: 16px;">🔵</span>
+                        <h4 style="font-size: 13.5px; font-weight: 700; color: var(--text); margin: 0;">Estudio</h4>
+                      </div>
+                      <p style="font-size: 11.5px; color: var(--text-soft); line-height: 1.4; margin: 0;">
+                        Sin presiones de tiempo. Obtén desgloses bibliográficos y explicaciones de cada opción al instante.
+                      </p>
+                    </div>
+
+                    <!-- Simulacro -->
+                    <div class="mode-preview-card" style="border-left: 3px solid hsl(271, 91%, 65%);">
+                      <div style="display: flex; align-items: center; gap: 8px;">
+                        <span style="font-size: 16px;">🟣</span>
+                        <h4 style="font-size: 13.5px; font-weight: 700; color: var(--text); margin: 0;">Simulacro</h4>
+                      </div>
+                      <p style="font-size: 11.5px; color: var(--text-soft); line-height: 1.4; margin: 0;">
+                        100 preguntas integradas, cronómetro estricto de 1.2m por reactivo y visual idéntica al ENURM real.
+                      </p>
+                    </div>
+
+                    <!-- Guardia -->
+                    <div class="mode-preview-card" style="border-left: 3px solid hsl(0, 84%, 60%);">
+                      <div style="display: flex; align-items: center; gap: 8px;">
+                        <span style="font-size: 16px;">🔴</span>
+                        <h4 style="font-size: 13.5px; font-weight: 700; color: var(--text); margin: 0;">Intensivo</h4>
+                      </div>
+                      <p style="font-size: 11.5px; color: var(--text-soft); line-height: 1.4; margin: 0;">
+                        Sesiones cortas y dinámicas de 10-20 preguntas de alta rentabilidad del temario médico nacional.
+                      </p>
+                    </div>
+
+                    <!-- Arena -->
+                    <div class="mode-preview-card" style="border-left: 3px solid hsl(38, 92%, 50%);">
+                      <div style="display: flex; align-items: center; gap: 8px;">
+                        <span style="font-size: 16px;">🟡</span>
+                        <h4 style="font-size: 13.5px; font-weight: 700; color: var(--text); margin: 0;">Arena de Batalla</h4>
+                      </div>
+                      <p style="font-size: 11.5px; color: var(--text-soft); line-height: 1.4; margin: 0;">
+                        Batallas en vivo de velocidad. Compite contra otros médicos dominicanos y sube en el ranking nacional.
+                      </p>
+                    </div>
+
+                  </div>
+                </div>
+
+                <!-- PESTAÑA 3: ANALÍTICAS AVANZADAS -->
+                <div id="pane-analiticas" class="showcase-content-pane">
+                  <h3 style="font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 16px; margin-top: 0;">
+                    📊 Métricas Académicas y Cobertura de Temas
+                  </h3>
+                  
+                  <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 20px; align-items: center; flex-grow: 1;">
+                    
+                    <!-- Barras de especialidad -->
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                      <!-- Pediatría -->
+                      <div>
+                        <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; margin-bottom: 3px;">
+                          <span style="color: var(--text-soft);">Pediatría</span>
+                          <span style="color: var(--success);">85%</span>
+                        </div>
+                        <div style="width: 100%; height: 6px; background: rgba(255,255,255,0.05); border-radius: 8px; overflow: hidden;">
+                          <div style="width: 85%; height: 100%; background: var(--success); border-radius: 8px;"></div>
+                        </div>
+                      </div>
+
+                      <!-- Medicina Interna -->
+                      <div>
+                        <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; margin-bottom: 3px;">
+                          <span style="color: var(--text-soft);">Medicina Interna</span>
+                          <span style="color: var(--primary);">78%</span>
+                        </div>
+                        <div style="width: 100%; height: 6px; background: rgba(255,255,255,0.05); border-radius: 8px; overflow: hidden;">
+                          <div style="width: 78%; height: 100%; background: var(--primary); border-radius: 8px;"></div>
+                        </div>
+                      </div>
+
+                      <!-- Cirugía General -->
+                      <div>
+                        <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; margin-bottom: 3px;">
+                          <span style="color: var(--text-soft);">Cirugía General</span>
+                          <span style="color: var(--warning);">67%</span>
+                        </div>
+                        <div style="width: 100%; height: 6px; background: rgba(255,255,255,0.05); border-radius: 8px; overflow: hidden;">
+                          <div style="width: 67%; height: 100%; background: var(--warning); border-radius: 8px;"></div>
+                        </div>
+                      </div>
+
+                      <!-- Gineco-Obstetricia -->
+                      <div>
+                        <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; margin-bottom: 3px;">
+                          <span style="color: var(--text-soft);">Gineco-Obstetricia</span>
+                          <span style="color: #8b5cf6;">72%</span>
+                        </div>
+                        <div style="width: 100%; height: 6px; background: rgba(255,255,255,0.05); border-radius: 8px; overflow: hidden;">
+                          <div style="width: 72%; height: 100%; background: #8b5cf6; border-radius: 8px;"></div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- SVG Circular Gauge (Percentil) -->
+                    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; background: rgba(255,255,255,0.01); border: 1px solid var(--border); border-radius: 20px; padding: 16px;">
+                      <div style="position: relative; width: 100px; height: 100px;">
+                        <svg width="100" height="100" viewBox="0 0 100 100">
+                          <circle cx="50" cy="50" r="45" stroke="rgba(255,255,255,0.03)" stroke-width="8" fill="transparent" />
+                          <circle class="svg-ring-circle" cx="50" cy="50" r="45" stroke="var(--success)" stroke-width="8" fill="transparent" stroke-linecap="round" transform="rotate(-90 50 50)" />
+                        </svg>
+                        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                          <span style="font-size: 18px; font-weight: 800; color: var(--text); font-family: 'Outfit'; line-height: 1;">82.5</span>
+                          <span style="font-size: 8px; font-weight: 700; color: var(--text-dim); text-transform: uppercase; margin-top: 2px;">Percentil</span>
+                        </div>
+                      </div>
+                      <div style="display: flex; gap: 10px; width: 100%; justify-content: center; border-top: 1px solid var(--border); padding-top: 8px; margin-top: 2px;">
+                        <div style="text-align: center;">
+                          <span style="font-size: 7.5px; font-weight: 700; color: var(--text-dim); display: block;">PROMEDIO</span>
+                          <span style="font-size: 11px; font-weight: 800; color: var(--primary);">78.4%</span>
+                        </div>
+                        <div style="text-align: center; border-left: 1px solid var(--border); padding-left: 10px;">
+                          <span style="font-size: 7.5px; font-weight: 700; color: var(--text-dim); display: block;">PROGRESO</span>
+                          <span style="font-size: 11px; font-weight: 800; color: #8b5cf6;">+12.3%</span>
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+
               </div>
 
             </div>
@@ -2295,7 +2331,7 @@
       }
       
       // Remover active de todos los botones de pestaña
-      const btns = document.querySelectorAll('.showcase-tab-btn');
+      const btns = document.querySelectorAll('.selector-card-btn');
       btns.forEach(btn => {
         btn.classList.remove('active');
       });
@@ -2304,8 +2340,8 @@
       const clickedBtn = Array.from(btns).find(btn => {
         const text = btn.textContent.toLowerCase();
         if (tabName === 'simulador' && text.includes('simulador')) return true;
-        if (tabName === 'modos' && text.includes('modos')) return true;
-        if (tabName === 'analiticas' && text.includes('estadísticas')) return true;
+        if (tabName === 'modos' && text.includes('modalidades')) return true;
+        if (tabName === 'analiticas' && text.includes('analíticas')) return true;
         return false;
       });
       if (clickedBtn) {
