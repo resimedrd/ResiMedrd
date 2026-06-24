@@ -61,6 +61,7 @@ const auth = {
             email,
             password,
             options: {
+              emailRedirectTo: window.location.origin,
               data: {
                 nombre: nombre
               }
