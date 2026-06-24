@@ -34,7 +34,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   };
 
-  const temaGuardado = localStorage.getItem("resiMed_theme") || "light";
+  const temaGuardado = localStorage.getItem("resiMed_theme") || "dark";
   aplicarTema(temaGuardado);
 
   if (btnToggleTheme) {

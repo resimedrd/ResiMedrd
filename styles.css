@@ -4199,12 +4199,38 @@ body.dark-mode .premium-metrics-panel {
     display: flex !important;
     flex-direction: column !important;
     gap: 16px !important;
-    padding: 8px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
   }
 
   .quiz-main-column {
     order: 1 !important;
     margin-top: 48px !important; /* Deja espacio para el contador y temporizador fijos */
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0 !important;
+  }
+
+  .quiz-shell {
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    padding: 12px !important; /* Margen interno suave para los bordes de la pantalla */
+    margin: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .question-card {
+    background: var(--panel-strong) !important; /* Fondo de tarjeta de pregunta */
+    border: 1px solid var(--border-strong) !important;
+    border-radius: 20px !important;
+    padding: 24px 20px !important;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2) !important;
+    margin-bottom: 20px !important;
   }
 
   .quiz-side-column {
@@ -4214,6 +4240,7 @@ body.dark-mode .premium-metrics-panel {
     display: flex !important;
     flex-direction: column !important;
     gap: 16px !important;
+    padding: 0 12px 32px 12px !important; /* Coincide con el padding de .quiz-shell */
   }
 
   /* Barra de temporizador y contador fija en la parte superior */
@@ -4263,16 +4290,17 @@ body.dark-mode .premium-metrics-panel {
 
   /* Tarjetas del sidebar reposicionadas abajo */
   .sidebar-unified-card-v2 {
-    background: var(--panel) !important;
-    border: 1px solid var(--border) !important;
+    background: var(--panel-strong) !important;
+    border: 1px solid var(--border-strong) !important;
     border-radius: 20px !important;
     padding: 20px !important;
     display: flex !important;
     flex-direction: column !important; /* Volver a apilar verticalmente */
     align-items: stretch !important;
     justify-content: flex-start !important;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05) !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1) !important;
     gap: 14px !important;
+    width: 100% !important;
   }
 
   .sidebar-flag-btn {
@@ -5462,21 +5490,19 @@ body.dark-mode .premium-metrics-panel {
     padding-bottom: calc(70px + env(safe-area-inset-bottom)) !important;
   }
 
-  /* Ocultar barra lateral en móviles */
-  #app-sidebar {
-    display: none !important;
-  }
-
-  /* Ocultar barra lateral Backdrop */
-  .sidebar-backdrop {
-    display: none !important;
-  }
+  /* Barra lateral y Backdrop habilitados en móviles */
 
   /* Hacer el main-shell fluido */
   .main-shell {
     margin-left: 0 !important;
     padding: 16px !important;
     max-width: 100% !important;
+  }
+
+  /* Arena del Modo Batalla - Apilar en vertical en móviles */
+  .battle-hero {
+    grid-template-columns: 1fr !important;
+    padding: 20px 24px !important;
   }
 
   /* Cabecera superior compacta */
@@ -5492,9 +5518,7 @@ body.dark-mode .premium-metrics-panel {
     box-shadow: 0 4px 12px rgba(0,0,0,0.02);
   }
   
-  .topbar #btn-toggle-sidebar {
-    display: none !important; /* Ya no es necesario con el menú inferior */
-  }
+  /* Botón de barra lateral habilitado en móviles */
 
   /* Ajustar cuadrícula de la página de inicio */
   .home-grid {
@@ -5944,6 +5968,16 @@ body.dark-mode .premium-metrics-panel {
 
 /* Tablet Device Display Shell (Right Column) */
 .display-device-shell {
+  /* Sobrescribir variables de tema para asegurar legibilidad en el dispositivo (siempre oscuro) */
+  --text: hsl(210, 40%, 98%);
+  --text-soft: hsl(215, 20%, 75%);
+  --text-dim: hsl(215, 16%, 55%);
+  --border: rgba(255, 255, 255, 0.07);
+  --border-strong: rgba(255, 255, 255, 0.15);
+  --panel-strong: rgba(11, 15, 25, 0.85);
+  --bg-card: rgba(17, 24, 39, 0.45);
+  --panel: rgba(11, 15, 25, 0.7);
+
   background: rgba(9, 13, 22, 0.65);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
@@ -6057,4 +6091,11 @@ body.dark-mode .premium-metrics-panel {
   background: rgba(255, 255, 255, 0.02);
 }
 
-
+@media (max-width: 600px) {
+  .landing-header {
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 12px !important;
+    text-align: center !important;
+  }
+}
