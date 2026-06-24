@@ -3580,7 +3580,7 @@ body:has(#pantalla-auth.active) .main-shell {
 .main-shell {
   flex-grow: 1;
   min-width: 0;
-  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: margin-left 0.35s cubic-bezier(0.16, 1, 0.3, 1), padding 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .app-sidebar {
@@ -3595,7 +3595,7 @@ body:has(#pantalla-auth.active) .main-shell {
   display: flex;
   flex-direction: column;
   gap: 24px;
-  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), width 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
   z-index: 100;
   position: sticky;
@@ -5497,6 +5497,7 @@ body.dark-mode .premium-metrics-panel {
     margin-left: 0 !important;
     padding: 16px !important;
     max-width: 100% !important;
+    transition: none !important;
   }
 
   /* Arena del Modo Batalla - Apilar en vertical en móviles */

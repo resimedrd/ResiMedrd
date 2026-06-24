@@ -611,9 +611,11 @@ const ui = {
       const seccionGraficos = document.getElementById("seccion-graficos-desplegable");
       if (seccionGraficos && seccionGraficos.classList.contains("activo")) {
         ui.renderizarGraficosAvanzados(historial, srEstados, personalizadas.length);
-        seccionGraficos.style.maxHeight = seccionGraficos.scrollHeight + "px";
         seccionGraficos.style.opacity = "1";
         seccionGraficos.style.marginTop = "10px";
+        setTimeout(() => {
+          seccionGraficos.style.maxHeight = seccionGraficos.scrollHeight + "px";
+        }, 150);
       }
 
       // Vincular toggle del Cajón Desplegable del Historial de Evaluaciones
