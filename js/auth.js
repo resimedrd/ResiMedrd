@@ -355,7 +355,7 @@ const auth = {
       }
       if (promedioEl) promedioEl.textContent = `${data.promedioGeneral}%`;
       if (totalPreguntasEl) {
-        totalPreguntasEl.textContent = `+${data.totalPreguntas}`;
+        totalPreguntasEl.textContent = `+${Math.max(6000, data.totalPreguntas || 0).toLocaleString("es-ES")}`;
       }
     } catch (err) {
       console.warn("Falla al cargar estadísticas públicas del backend:", err);

@@ -5775,3 +5775,15 @@ body.dark-mode .premium-metrics-panel {
   }
 }
 
+/* Card Showcase Hover States */
+.feature-showcase-card {
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.feature-showcase-card:hover {
+  transform: translateY(-5px);
+  border-color: var(--primary) !important;
+  box-shadow: 0 12px 30px rgba(59, 130, 246, 0.08) !important;
+  background: rgba(255, 255, 255, 0.02) !important;
+}
+

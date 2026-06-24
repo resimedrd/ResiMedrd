@@ -152,7 +152,7 @@
               <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 16px;">
                 <li style="display: flex; align-items: center; gap: 14px;">
                   <div style="width: 32px; height: 32px; background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.15); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--primary); font-size: 14px;">📁</div>
-                  <span style="font-size: 14.5px; font-weight: 600; color: var(--text);"><span id="mock-stat-preguntas-banco">+10,000</span> preguntas actualizadas</span>
+                  <span style="font-size: 14.5px; font-weight: 600; color: var(--text);"><span id="mock-stat-preguntas-banco">+6,000</span> preguntas actualizadas</span>
                 </li>
                 <li style="display: flex; align-items: center; gap: 14px;">
                   <div style="width: 32px; height: 32px; background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.15); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--success); font-size: 14px;">📋</div>
@@ -173,9 +173,12 @@
                 <button onclick="document.getElementById('login-email').focus();" class="btn btn-primary" style="padding: 14px 28px; font-size: 14.5px; font-weight: 700; background: linear-gradient(135deg, var(--primary) 0%, #1d4ed8 100%); color: #fff; border: none; border-radius: 14px; box-shadow: 0 10px 24px rgba(59, 130, 246, 0.3); display: flex; align-items: center; gap: 8px; cursor: pointer; transition: all 0.2s;">
                   Comenzar ahora <span style="font-size: 16px;">→</span>
                 </button>
-                <button onclick="document.getElementById('tab-registro').click(); document.getElementById('reg-nombre').focus();" class="btn btn-ghost" style="padding: 14px 28px; font-size: 14.5px; font-weight: 700; border: 1px solid var(--border-strong); border-radius: 14px; background: rgba(255,255,255,0.01); color: var(--text); display: flex; align-items: center; gap: 8px; cursor: pointer; transition: all 0.2s;">
-                  Ver demo <span style="font-size: 16px;">▷</span>
-                </button>
+                <div style="position: relative; display: inline-block;">
+                  <button class="btn btn-ghost" style="padding: 14px 28px; font-size: 14.5px; font-weight: 700; border: 1px solid var(--border-strong); border-radius: 14px; background: rgba(255,255,255,0.01); color: var(--text-dim); display: flex; align-items: center; gap: 8px; cursor: not-allowed; opacity: 0.5;" disabled>
+                    Ver demo <span style="font-size: 16px;">▷</span>
+                  </button>
+                  <span style="position: absolute; top: -10px; right: -5px; background: var(--danger-soft); border: 1px solid rgba(239, 68, 68, 0.3); color: var(--danger); font-size: 9px; font-weight: 700; text-transform: uppercase; padding: 2px 6px; border-radius: 6px; letter-spacing: 0.5px; z-index: 10;">No Habilitada</span>
+                </div>
               </div>
             </div>
 
@@ -311,140 +314,56 @@
             </div>
           </div>
 
-          <!-- SECCIÓN DE MOCK DASHBOARD INTEGRADO DE PREVISUALIZACIÓN -->
-          <div style="display: flex; flex-direction: column; gap: 28px; border-top: 1px dashed var(--border-strong); padding-top: 60px; margin-bottom: 20px;">
-            <div style="text-align: center;">
-              <span style="font-size: 11px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">Previsualización de la Plataforma</span>
-              <h2 style="font-size: 26px; font-weight: 800; font-family: 'Outfit', sans-serif; color: var(--text); margin: 0;">Explora el Dashboard Premium de ResiMed</h2>
+          <!-- SECCIÓN DE CARACTERÍSTICAS AVANZADAS Y FUNCIONALIDADES -->
+          <div style="display: flex; flex-direction: column; gap: 40px; border-top: 1px dashed var(--border-strong); padding-top: 60px; margin-bottom: 40px; text-align: center;">
+            <div>
+              <span style="font-size: 11px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 8px;">Tecnología Médica de Vanguardia</span>
+              <h2 style="font-size: 28px; font-weight: 800; font-family: 'Outfit', sans-serif; color: var(--text); margin: 0;">Herramientas Premium Diseñadas para tu Éxito</h2>
+              <p style="font-size: 14.5px; color: var(--text-soft); max-width: 600px; margin: 8px auto 0 auto; line-height: 1.5;">Una suite completa con todo lo necesario para optimizar tu estudio del ENURM y asegurar tu plaza de residencia.</p>
             </div>
 
-            <!-- EL DASHBOARD MOCK CON ESTILO PREMIUM COMPLETO (Copiar exactamente el diseño de la imagen) -->
-            <div class="mock-dashboard-wrapper" style="background: #08080c; border: 1px solid var(--border-strong); border-radius: 24px; padding: 18px; box-shadow: 0 30px 60px rgba(0,0,0,0.3); overflow: hidden; display: grid; grid-template-columns: 180px 1fr; gap: 16px; min-height: 480px; position: relative; text-align: left;">
-              
-              <!-- SIDEBAR DE MOCK -->
-              <aside style="border-right: 1px solid var(--border); padding-right: 16px; display: flex; flex-direction: column; gap: 18px;">
-                <div style="display: flex; align-items: center; gap: 8px;">
-                  <img src="logo_resimed.png?v=3" alt="ResiMed Logo" style="width: 24px; height: 24px; border-radius: 6px; object-fit: cover;">
-                  <span style="font-size: 13px; font-weight: 800; color: var(--text);">ResiMed</span>
-                </div>
-                
-                <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 4px;">
-                  <li style="padding: 8px 12px; background: rgba(59, 130, 246, 0.08); border-radius: 8px; font-size: 11.5px; font-weight: 700; color: var(--primary); display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                    <span>🏠</span> Inicio
-                  </li>
-                  <li style="padding: 8px 12px; border-radius: 8px; font-size: 11.5px; font-weight: 600; color: var(--text-dim); display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                    <span>⏱️</span> Simulacros
-                  </li>
-                  <li style="padding: 8px 12px; border-radius: 8px; font-size: 11.5px; font-weight: 600; color: var(--text-dim); display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                    <span>📁</span> Preguntas
-                  </li>
-                  <li style="padding: 8px 12px; border-radius: 8px; font-size: 11.5px; font-weight: 600; color: var(--text-dim); display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                    <span>📈</span> Estadísticas
-                  </li>
-                  <li style="padding: 8px 12px; border-radius: 8px; font-size: 11.5px; font-weight: 600; color: var(--text-dim); display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                    <span>📋</span> Historial
-                  </li>
-                  <li style="padding: 8px 12px; border-radius: 8px; font-size: 11.5px; font-weight: 600; color: var(--text-dim); display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                    <span>👑</span> Ranking
-                  </li>
-                  <li style="padding: 8px 12px; border-radius: 8px; font-size: 11.5px; font-weight: 600; color: var(--text-dim); display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                    <span>⚙️</span> Ajustes
-                  </li>
-                </ul>
-              </aside>
+            <div class="features-showcase-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px;">
+              <!-- Funcionalidad 1 -->
+              <div class="feature-showcase-card" style="background: var(--panel); border: 1px solid var(--border); border-radius: 20px; padding: 24px; text-align: left; display: flex; flex-direction: column; gap: 12px; transition: all 0.3s ease;">
+                <div style="width: 44px; height: 44px; background: rgba(59, 130, 246, 0.08); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; color: var(--primary);">📋</div>
+                <h3 style="font-size: 15px; font-weight: 700; color: var(--text); margin: 0;">Simulacros Oficiales</h3>
+                <p style="font-size: 13px; color: var(--text-soft); line-height: 1.5; margin: 0;">Simula la experiencia real del ENURM con temporizador estricto, o crea simulacros adaptados a las especialidades que necesitas reforzar.</p>
+              </div>
 
-              <!-- MAIN AREA DE MOCK -->
-              <main style="display: flex; flex-direction: column; gap: 20px;">
-                
-                <!-- Mock Header bar -->
-                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
-                  <div>
-                    <h3 style="font-size: 16px; font-weight: 800; color: var(--text); margin: 0;">¡Hola, Dr. Martínez! 👋</h3>
-                    <p style="font-size: 11px; color: var(--text-dim); margin: 2px 0 0 0;">Vamos a por esa residencia.</p>
-                  </div>
-                  
-                  <div style="display: flex; align-items: center; gap: 8px; background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.15); padding: 6px 12px; border-radius: 100px;">
-                    <span style="font-size: 12px;">🔥</span>
-                    <span style="font-size: 11px; font-weight: 700; color: var(--warning);">Racha: 12 días</span>
-                  </div>
-                </div>
+              <!-- Funcionalidad 2 -->
+              <div class="feature-showcase-card" style="background: var(--panel); border: 1px solid var(--border); border-radius: 20px; padding: 24px; text-align: left; display: flex; flex-direction: column; gap: 12px; transition: all 0.3s ease;">
+                <div style="width: 44px; height: 44px; background: rgba(139, 92, 246, 0.08); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; color: #8b5cf6;">🧠</div>
+                <h3 style="font-size: 15px; font-weight: 700; color: var(--text); margin: 0;">Repetición Espaciada</h3>
+                <p style="font-size: 13px; color: var(--text-soft); line-height: 1.5; margin: 0;">Fija conceptos de memoria pura a largo plazo mediante nuestro mazo inteligente de Flashcards basado en algoritmos de retención cognitiva.</p>
+              </div>
 
-                <!-- Mock Key Cards row -->
-                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
-                  <div style="background: rgba(255,255,255,0.01); border: 1px solid var(--border); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 4px;">
-                    <span style="font-size: 9.5px; font-weight: 600; color: var(--text-dim); text-transform: uppercase;">Simulacros</span>
-                    <span id="mock-stat-sesiones" style="font-size: 18px; font-weight: 800; color: var(--text);">24</span>
-                  </div>
-                  <div style="background: rgba(255,255,255,0.01); border: 1px solid var(--border); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 4px;">
-                    <span style="font-size: 9.5px; font-weight: 600; color: var(--text-dim); text-transform: uppercase;">Respondidas</span>
-                    <span id="mock-stat-contestadas" style="font-size: 18px; font-weight: 800; color: var(--text);">1,248</span>
-                  </div>
-                  <div style="background: rgba(255,255,255,0.01); border: 1px solid var(--border); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 4px;">
-                    <span style="font-size: 9.5px; font-weight: 600; color: var(--text-dim); text-transform: uppercase;">Promedio</span>
-                    <span id="mock-stat-promedio" style="font-size: 18px; font-weight: 800; color: var(--success);">78%</span>
-                  </div>
-                  <div style="background: rgba(255,255,255,0.01); border: 1px solid var(--border); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 4px;">
-                    <span style="font-size: 9.5px; font-weight: 600; color: var(--text-dim); text-transform: uppercase;">Percentil</span>
-                    <span id="mock-stat-percentil" style="font-size: 18px; font-weight: 800; color: var(--primary);">82</span>
-                  </div>
-                </div>
+              <!-- Funcionalidad 3 -->
+              <div class="feature-showcase-card" style="background: var(--panel); border: 1px solid var(--border); border-radius: 20px; padding: 24px; text-align: left; display: flex; flex-direction: column; gap: 12px; transition: all 0.3s ease;">
+                <div style="width: 44px; height: 44px; background: rgba(16, 185, 129, 0.08); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; color: var(--success);">⚡</div>
+                <h3 style="font-size: 15px; font-weight: 700; color: var(--text); margin: 0;">Tutor de Inteligencia Artificial</h3>
+                <p style="font-size: 13px; color: var(--text-soft); line-height: 1.5; margin: 0;">Consulta dudas clínicas, solicita resúmenes clínicos, nemotecnias y explicaciones personalizadas a nuestro tutor interactivo integrado.</p>
+              </div>
 
-                <!-- Bottom Grid of mock: Progress and Specialty score -->
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-                  <!-- Progress tracking widget mock -->
-                  <div style="background: rgba(255,255,255,0.01); border: 1px solid var(--border); border-radius: 16px; padding: 16px; display: flex; flex-direction: column; justify-content: space-between;">
-                    <div>
-                      <span style="font-size: 10px; font-weight: 700; color: var(--success); text-transform: uppercase; letter-spacing: 0.5px;">Tu Progreso Semanal</span>
-                      <span style="font-size: 20px; font-weight: 800; color: var(--text); display: block; margin-top: 6px;">+12% aciertos</span>
-                    </div>
-                    <div style="margin-top: 12px;">
-                      <div style="height: 6px; background: var(--panel-soft); border-radius: 100px; overflow: hidden; margin-bottom: 6px;">
-                        <div style="height: 100%; width: 75%; background: var(--success); border-radius: 100px;"></div>
-                      </div>
-                      <span style="font-size: 10px; color: var(--text-dim);">¡Buen trabajo! Sigue así 🩺</span>
-                    </div>
-                  </div>
+              <!-- Funcionalidad 4 -->
+              <div class="feature-showcase-card" style="background: var(--panel); border: 1px solid var(--border); border-radius: 20px; padding: 24px; text-align: left; display: flex; flex-direction: column; gap: 12px; transition: all 0.3s ease;">
+                <div style="width: 44px; height: 44px; background: rgba(239, 68, 68, 0.08); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; color: var(--danger);">⚠️</div>
+                <h3 style="font-size: 15px; font-weight: 700; color: var(--text); margin: 0;">Banco de Errores Activo</h3>
+                <p style="font-size: 13px; color: var(--text-soft); line-height: 1.5; margin: 0;">Las preguntas falladas se agrupan automáticamente por materia, permitiéndote repasar tus puntos débiles y convertirlos en aciertos seguros.</p>
+              </div>
 
-                  <!-- Specialty scores mock -->
-                  <div style="background: rgba(255,255,255,0.01); border: 1px solid var(--border); border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 10px;">
-                    <span style="font-size: 10px; font-weight: 700; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px;">Rendimiento por Especialidad</span>
-                    
-                    <div style="display: flex; flex-direction: column; gap: 8px;">
-                      <!-- Specialty 1 -->
-                      <div>
-                        <div style="display: flex; justify-content: space-between; font-size: 10.5px; font-weight: 600; color: var(--text); margin-bottom: 2px;">
-                          <span>Pediatría</span>
-                          <span style="color: var(--success);">85%</span>
-                        </div>
-                        <div style="height: 4px; background: var(--panel-soft); border-radius: 100px; overflow: hidden;">
-                          <div style="height: 100%; width: 85%; background: var(--success); border-radius: 100px;"></div>
-                        </div>
-                      </div>
-                      <!-- Specialty 2 -->
-                      <div>
-                        <div style="display: flex; justify-content: space-between; font-size: 10.5px; font-weight: 600; color: var(--text); margin-bottom: 2px;">
-                          <span>Medicina Interna</span>
-                          <span style="color: var(--primary);">78%</span>
-                        </div>
-                        <div style="height: 4px; background: var(--panel-soft); border-radius: 100px; overflow: hidden;">
-                          <div style="height: 100%; width: 78%; background: var(--primary); border-radius: 100px;"></div>
-                        </div>
-                      </div>
-                      <!-- Specialty 3 -->
-                      <div>
-                        <div style="display: flex; justify-content: space-between; font-size: 10.5px; font-weight: 600; color: var(--text); margin-bottom: 2px;">
-                          <span>Cirugía General</span>
-                          <span style="color: var(--warning);">67%</span>
-                        </div>
-                        <div style="height: 4px; background: var(--panel-soft); border-radius: 100px; overflow: hidden;">
-                          <div style="height: 100%; width: 67%; background: var(--warning); border-radius: 100px;"></div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+              <!-- Funcionalidad 5 -->
+              <div class="feature-showcase-card" style="background: var(--panel); border: 1px solid var(--border); border-radius: 20px; padding: 24px; text-align: left; display: flex; flex-direction: column; gap: 12px; transition: all 0.3s ease;">
+                <div style="width: 44px; height: 44px; background: rgba(245, 158, 11, 0.08); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; color: var(--warning);">⚔️</div>
+                <h3 style="font-size: 15px; font-weight: 700; color: var(--text); margin: 0;">Arena de Batalla en Vivo</h3>
+                <p style="font-size: 13px; color: var(--text-soft); line-height: 1.5; margin: 0;">Compite en tiempo real contra otros colegas en el ranking. Resuelve casos clínicos a alta velocidad y escala posiciones en el podio dominicano.</p>
+              </div>
 
-              </main>
+              <!-- Funcionalidad 6 -->
+              <div class="feature-showcase-card" style="background: var(--panel); border: 1px solid var(--border); border-radius: 20px; padding: 24px; text-align: left; display: flex; flex-direction: column; gap: 12px; transition: all 0.3s ease;">
+                <div style="width: 44px; height: 44px; background: rgba(6, 182, 212, 0.08); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; color: #06b6d4;">📊</div>
+                <h3 style="font-size: 15px; font-weight: 700; color: var(--text); margin: 0;">Métricas e Historial Académico</h3>
+                <p style="font-size: 13px; color: var(--text-soft); line-height: 1.5; margin: 0;">Visualiza gráficos interactivos de tu evolución de aciertos diaria, promedio general, percentil y nivel de cobertura de todo el temario ENURM.</p>
+              </div>
             </div>
           </div>
 
