@@ -96,9 +96,7 @@ router.post("/api/admin/cargar-masivo", autenticarToken, exigirAdmin, async (req
     }
 
     // Iniciar transacción de base de datos para alta velocidad y prevención de bloqueos de archivo
-    await db.run("BEGIN TRANSACTION");
-
-    try {
+    await db.transaction(async (tx) => {
       // Si todo está bien, guardamos el bloque completo de preguntas
       for (const p of preguntas) {
         const opcionesJSON = JSON.stringify(p.opciones);
@@ -126,7 +124,7 @@ router.post("/api/admin/cargar-masivo", autenticarToken, exigirAdmin, async (req
           }
         }
 
-        await db.run(
+        await tx.run(
           `INSERT INTO preguntas (texto, opciones, correcta, explicacion, tema, subtema, microtema, tags, difficulty, fuente, especialidad, ano_examen, explicacion_correcta, explicacion_incorrecta, activo, examen_id) 
            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?)`,
           [
@@ -148,12 +146,7 @@ router.post("/api/admin/cargar-masivo", autenticarToken, exigirAdmin, async (req
           ]
         );
       }
-      
-      await db.run("COMMIT");
-    } catch (transactionError) {
-      await db.run("ROLLBACK");
-      throw transactionError;
-    }
+    });
 
     // Recalcular cantidad de preguntas del examen
     if (finalExamenId) {

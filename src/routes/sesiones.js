@@ -10,7 +10,7 @@ router.post("/api/sesiones", autenticarToken, async (req, res) => {
   try {
     const { usuarioId, tema, modo, cantidadPreguntas, correctas, porcentaje, detalle } = req.body;
     
-    if (parseInt(usuarioId) !== req.usuario.id) {
+    if (String(usuarioId) !== String(req.usuario.id)) {
       return res.status(403).json({ error: "Acceso no autorizado." });
     }
 
@@ -71,7 +71,7 @@ router.get("/api/sesiones", autenticarToken, async (req, res) => {
   const db = getDB();
   try {
     const { usuarioId } = req.query;
-    if (parseInt(usuarioId) !== req.usuario.id) {
+    if (String(usuarioId) !== String(req.usuario.id)) {
       return res.status(403).json({ error: "Acceso no autorizado." });
     }
     const filas = await db.all(`SELECT * FROM sesiones WHERE usuario_id = ? ORDER BY fecha DESC LIMIT 5`, [usuarioId]);
@@ -118,7 +118,7 @@ router.get("/api/historial", autenticarToken, async (req, res) => {
     if (req.usuario.rol === "admin") {
       filas = await db.all(`SELECT * FROM sesiones ORDER BY fecha DESC`);
     } else {
-      if (parseInt(usuarioId) !== req.usuario.id) {
+      if (String(usuarioId) !== String(req.usuario.id)) {
         return res.status(403).json({ error: "Acceso no autorizado." });
       }
       filas = await db.all(`SELECT * FROM sesiones WHERE usuario_id = ? ORDER BY fecha DESC`, [usuarioId]);
@@ -165,7 +165,7 @@ router.get("/api/dashboard/resumen", autenticarToken, async (req, res) => {
   const db = getDB();
   try {
     const { usuarioId } = req.query;
-    if (parseInt(usuarioId) !== req.usuario.id) {
+    if (String(usuarioId) !== String(req.usuario.id)) {
       return res.status(403).json({ error: "Acceso no autorizado." });
     }
     const totalSesionesRow = await db.get(`SELECT COUNT(*) AS total FROM sesiones WHERE usuario_id = ?`, [usuarioId]);
@@ -200,7 +200,7 @@ router.get("/api/dashboard/cobertura", autenticarToken, async (req, res) => {
     if (!usuarioId) {
       return res.status(400).json({ error: "Falta el ID de usuario." });
     }
-    if (parseInt(usuarioId) !== req.usuario.id) {
+    if (String(usuarioId) !== String(req.usuario.id)) {
       return res.status(403).json({ error: "Acceso no autorizado." });
     }
 
@@ -268,8 +268,8 @@ router.get("/api/dashboard/cobertura", autenticarToken, async (req, res) => {
           COUNT(DISTINCT q.pregunta_id) as total_vistas
         FROM preguntas p
         JOIN (
-          SELECT distinct CAST(json_extract(value, '$.id') AS INTEGER) as pregunta_id
-          FROM sesiones, json_each(sesiones.detalle)
+          SELECT distinct (val->>'id')::integer as pregunta_id
+          FROM sesiones, json_array_elements(sesiones.detalle::json) as val
           WHERE sesiones.usuario_id = ? AND sesiones.detalle IS NOT NULL
         ) q ON p.id = q.pregunta_id
         WHERE p.activo = 1

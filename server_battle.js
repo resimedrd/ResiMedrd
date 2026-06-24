@@ -1,5 +1,14 @@
 const ws = require("ws");
 const jwt = require("jsonwebtoken");
+const fs = require("fs");
+const path = require("path");
+
+let publicKey = null;
+try {
+  publicKey = fs.readFileSync(path.join(__dirname, "src/config/supabase_public_key.pem"), "utf8");
+} catch (err) {
+  console.error("❌ ERROR AL CARGAR CLAVE PÚBLICA DE SUPABASE EN SERVER_BATTLE:", err);
+}
 
 // Estado global de salas y cola en memoria
 const activeRooms = new Map(); // code -> room
@@ -280,20 +289,22 @@ async function inicializarBatallas(server, db, JWT_SECRET) {
 
         // 1. Manejo exclusivo de Autenticación
         if (message.type === "auth") {
-          jwt.verify(message.token, JWT_SECRET, async (err, decoded) => {
+          jwt.verify(message.token, publicKey, { algorithms: ["ES256"] }, async (err, decoded) => {
             if (err) {
               wsConn.send(JSON.stringify({ type: "error", message: "Token inválido o expirado." }));
               wsConn.close();
             } else {
               try {
-                // Recuperar el nombre real del usuario de la base de datos SQLite para evitar undefined
-                const userRow = await db.get("SELECT nombre FROM usuarios WHERE id = ?", [decoded.id]);
+                decoded.id = decoded.sub; // Map UUID to decoded.id for compatibility
+                // Recuperar el nombre real y rol del usuario de la base de datos para evitar undefined
+                const userRow = await db.get("SELECT nombre, rol FROM usuarios WHERE id = ?", [decoded.id]);
                 const nombreUsuario = userRow ? userRow.nombre : "Colega Médico";
+                const userRol = userRow ? userRow.rol : "usuario";
 
                 usuarioAutenticado = {
                   id: decoded.id,
                   nombre: nombreUsuario,
-                  rol: decoded.rol
+                  rol: userRol
                 };
 
                 wsConn.send(JSON.stringify({ 

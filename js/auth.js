@@ -1,13 +1,28 @@
 // ====== CONTROLADOR DE AUTENTICACIÓN (auth.js) ======
 
 const auth = {
-  inicializar() {
+  supabase: null,
+
+  async inicializar() {
     const formLogin = document.getElementById("form-login");
     const formRegistro = document.getElementById("form-registro");
     const btnCerrarSesion = document.getElementById("btn-cerrar-sesion");
     const tabLogin = document.getElementById("tab-login");
     const tabRegistro = document.getElementById("tab-registro");
     const authMensaje = document.getElementById("auth-mensaje");
+
+    // Inicializar cliente Supabase dinámicamente desde el backend
+    try {
+      const res = await fetch("/api/config");
+      const config = await res.json();
+      auth.supabase = supabase.createClient(config.supabaseUrl, config.supabaseAnonKey);
+    } catch (err) {
+      console.error("❌ Falla al inicializar cliente Supabase en el frontend:", err);
+      if (authMensaje) {
+        authMensaje.textContent = "Error de comunicación con el servidor de seguridad.";
+        authMensaje.style.color = "var(--danger)";
+      }
+    }
 
     if (tabLogin && tabRegistro && formLogin && formRegistro) {
       tabLogin.addEventListener("click", () => {
@@ -31,7 +46,7 @@ const auth = {
       formRegistro.addEventListener("submit", async (e) => {
         e.preventDefault();
         if (authMensaje) {
-          authMensaje.textContent = "Registrando profesional médico...";
+          authMensaje.textContent = "Registrando profesional médico en Supabase...";
           authMensaje.style.color = "var(--text-soft)";
         }
 
@@ -40,9 +55,22 @@ const auth = {
         const password = document.getElementById("reg-password").value;
 
         try {
-          const datos = await api.registro(nombre, email, password);
+          if (!auth.supabase) throw new Error("El sistema de autenticación no está listo.");
+
+          const { data, error } = await auth.supabase.auth.signUp({
+            email,
+            password,
+            options: {
+              data: {
+                nombre: nombre
+              }
+            }
+          });
+
+          if (error) throw error;
+
           if (authMensaje) {
-            authMensaje.textContent = "✓ Registro completado. Ya puedes iniciar sesión.";
+            authMensaje.textContent = "✓ Registro completado. Por favor, verifica tu correo electrónico para activar tu cuenta.";
             authMensaje.style.color = "var(--success)";
           }
           formRegistro.reset();
@@ -60,7 +88,7 @@ const auth = {
       formLogin.addEventListener("submit", async (e) => {
         e.preventDefault();
         if (authMensaje) {
-          authMensaje.textContent = "Verificando credenciales médicas...";
+          authMensaje.textContent = "Verificando credenciales con Supabase...";
           authMensaje.style.color = "var(--text-soft)";
         }
 
@@ -68,11 +96,33 @@ const auth = {
         const password = document.getElementById("login-password").value;
 
         try {
-          const datos = await api.login(email, password);
-          state.usuarioConectado = datos.usuario;
+          if (!auth.supabase) throw new Error("El sistema de autenticación no está listo.");
+
+          const { data, error } = await auth.supabase.auth.signInWithPassword({
+            email,
+            password
+          });
+
+          if (error) {
+            if (error.message.toLowerCase().includes("email not confirmed") || error.message.toLowerCase().includes("confirm")) {
+              throw new Error("Debes confirmar tu correo electrónico antes de poder entrar. Revisa tu correo (bandeja de entrada o spam).");
+            }
+            throw error;
+          }
+
+          const session = data.session;
+          if (!session) {
+            throw new Error("Por favor, verifica tu correo electrónico para activar tu cuenta.");
+          }
+
+          // Guardar el token JWT de acceso de Supabase
+          sessionStorage.setItem("resiMed_jwt_token", session.access_token);
+
+          // Recuperar el perfil público desde nuestro backend
+          const perfilRes = await api.obtenerPerfil();
+          state.usuarioConectado = perfilRes.usuario;
           
-          sessionStorage.setItem("resiMed_session", JSON.stringify(datos.usuario));
-          sessionStorage.setItem("resiMed_jwt_token", datos.token);
+          sessionStorage.setItem("resiMed_session", JSON.stringify(perfilRes.usuario));
 
           formLogin.reset();
           if (authMensaje) authMensaje.textContent = "";
@@ -102,20 +152,30 @@ const auth = {
 
   async restaurarSesion() {
     try {
-      const sesionGuardada = sessionStorage.getItem("resiMed_session");
-      const token = sessionStorage.getItem("resiMed_jwt_token");
+      if (!auth.supabase) {
+        const res = await fetch("/api/config");
+        const config = await res.json();
+        auth.supabase = supabase.createClient(config.supabaseUrl, config.supabaseAnonKey);
+      }
+
+      // Obtener la sesión activa de Supabase
+      const { data: { session } } = await auth.supabase.auth.getSession();
       
-      if (sesionGuardada && token) {
-        state.usuarioConectado = JSON.parse(sesionGuardada);
+      if (session) {
+        sessionStorage.setItem("resiMed_jwt_token", session.access_token);
+
+        // Recuperar perfil actualizado de la base de datos de backend
+        const perfilRes = await api.obtenerPerfil();
+        state.usuarioConectado = perfilRes.usuario;
+        sessionStorage.setItem("resiMed_session", JSON.stringify(perfilRes.usuario));
+
         await auth.inicializarEntornoUsuario();
       } else {
-        ui.mostrarPantalla("auth");
+        auth.logout();
       }
     } catch (err) {
-      console.warn("⚠️ Sesión local corrupta o desactualizada. Limpiando almacenamiento...", err);
-      sessionStorage.removeItem("resiMed_session");
-      sessionStorage.removeItem("resiMed_jwt_token");
-      ui.mostrarPantalla("auth");
+      console.warn("⚠️ Sesión local expirada o no iniciada en Supabase. Redirigiendo...", err);
+      auth.logout();
     } finally {
       // Ocultar y remover el Boot Loader con una transición suave y premium
       const loader = document.getElementById("boot-loader");
@@ -222,6 +282,11 @@ const auth = {
     sessionStorage.removeItem("resiMed_jwt_token");
     localStorage.removeItem("resiMed_ultimo_resultado");
     
+    // Cerrar sesión en Supabase si está disponible
+    if (auth.supabase) {
+      auth.supabase.auth.signOut().catch(err => console.warn("Error al desloguearse en Supabase:", err));
+    }
+
     // FASE 4: Limpiar estado de examen activo al cerrar sesión
     if (window.quiz && quiz.limpiarEstadoExamenActivo) {
       quiz.limpiarEstadoExamenActivo();

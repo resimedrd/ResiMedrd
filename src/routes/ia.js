@@ -165,7 +165,9 @@ Responde únicamente con un objeto JSON válido con los campos "socratic_tip" y 
 
     // 5. Guardar en caché local
     await db.run(
-      `INSERT OR REPLACE INTO cache_ayudas_ia (pregunta_id, socratic_tip, key_info_html) VALUES (?, ?, ?)`,
+      `INSERT INTO cache_ayudas_ia (pregunta_id, socratic_tip, key_info_html) 
+       VALUES (?, ?, ?) 
+       ON CONFLICT (pregunta_id) DO UPDATE SET socratic_tip = EXCLUDED.socratic_tip, key_info_html = EXCLUDED.key_info_html`,
       [preguntaId, socraticTip, keyInfoHtml]
     );
 

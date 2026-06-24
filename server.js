@@ -46,6 +46,13 @@ const srRouter = require("./src/routes/spacedRepetition");
 const adminRouter = require("./src/routes/admin");
 const iaRouter = require("./src/routes/ia");
 
+app.get("/api/config", (req, res) => {
+  res.json({
+    supabaseUrl: process.env.SUPABASE_URL,
+    supabaseAnonKey: process.env.SUPABASE_ANON_KEY
+  });
+});
+
 app.use(authRouter);
 app.use(preguntasRouter);
 app.use(sesionesRouter);

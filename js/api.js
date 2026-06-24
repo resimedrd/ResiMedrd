@@ -129,6 +129,9 @@ const api = {
       body: JSON.stringify({ nombre, especialidadAspirada, metaSemanal, fechaNacimiento, biografia })
     }),
 
+  obtenerPerfil: () => 
+    request("/api/usuario/perfil"),
+
   cambiarPassword: (passwordActual, passwordNueva) => 
     request("/api/usuario/cambiar-password", {
       method: "PUT",

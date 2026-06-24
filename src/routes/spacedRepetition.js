@@ -8,7 +8,7 @@ router.get("/api/spaced-repetition", autenticarToken, async (req, res) => {
   const db = getDB();
   try {
     const { usuarioId } = req.query;
-    if (parseInt(usuarioId) !== req.usuario.id) {
+    if (String(usuarioId) !== String(req.usuario.id)) {
       return res.status(403).json({ error: "Acceso no autorizado." });
     }
 
@@ -23,7 +23,7 @@ router.get("/api/spaced-repetition/individual", autenticarToken, async (req, res
   const db = getDB();
   try {
     const { usuarioId, preguntaId, flashcardId } = req.query;
-    if (parseInt(usuarioId) !== req.usuario.id) {
+    if (String(usuarioId) !== String(req.usuario.id)) {
       return res.status(403).json({ error: "Acceso no autorizado." });
     }
 
@@ -46,7 +46,7 @@ router.post("/api/spaced-repetition", autenticarToken, async (req, res) => {
   try {
     const { usuarioId, preguntaId, flashcardId, stability, difficulty, ease, repetitions, interval, nextReview, lastReviewedDate } = req.body;
     
-    if (parseInt(usuarioId) !== req.usuario.id) {
+    if (String(usuarioId) !== String(req.usuario.id)) {
       return res.status(403).json({ error: "Acceso no autorizado." });
     }
 
@@ -81,7 +81,7 @@ router.get("/api/flashcards/personalizadas", autenticarToken, async (req, res) =
   const db = getDB();
   try {
     const { usuarioId } = req.query;
-    if (parseInt(usuarioId) !== req.usuario.id) {
+    if (String(usuarioId) !== String(req.usuario.id)) {
       return res.status(403).json({ error: "Acceso no autorizado." });
     }
 
@@ -97,7 +97,7 @@ router.post("/api/flashcards/personalizadas", autenticarToken, async (req, res) 
   try {
     const { usuarioId, tema, pregunta, respuesta } = req.body;
     
-    if (parseInt(usuarioId) !== req.usuario.id) {
+    if (String(usuarioId) !== String(req.usuario.id)) {
       return res.status(403).json({ error: "Acceso no autorizado." });
     }
 
@@ -120,7 +120,7 @@ router.post("/api/flashcards/historial", autenticarToken, async (req, res) => {
   const db = getDB();
   try {
     const { usuarioId, flashcardId, tema, seLaSabia, dificultad } = req.body;
-    if (parseInt(usuarioId) !== req.usuario.id) {
+    if (String(usuarioId) !== String(req.usuario.id)) {
       return res.status(403).json({ error: "Acceso no autorizado." });
     }
     await db.run(
@@ -138,12 +138,12 @@ router.get("/api/flashcards/historial-diario", autenticarToken, async (req, res)
   const db = getDB();
   try {
     const { usuarioId } = req.query;
-    if (parseInt(usuarioId) !== req.usuario.id) {
+    if (String(usuarioId) !== String(req.usuario.id)) {
       return res.status(403).json({ error: "Acceso no autorizado." });
     }
     const filas = await db.all(
       `SELECT 
-         date(fecha, 'localtime') AS dia,
+         fecha::date AS dia,
          COUNT(*) AS total,
          SUM(CASE WHEN se_la_sabia = 1 THEN 1 ELSE 0 END) AS aciertos,
          SUM(CASE WHEN se_la_sabia = 0 THEN 1 ELSE 0 END) AS fallos
@@ -164,7 +164,7 @@ router.get("/api/flashcards/resumen-stats", autenticarToken, async (req, res) =>
   const db = getDB();
   try {
     const { usuarioId } = req.query;
-    if (parseInt(usuarioId) !== req.usuario.id) {
+    if (String(usuarioId) !== String(req.usuario.id)) {
       return res.status(403).json({ error: "Acceso no autorizado." });
     }
 

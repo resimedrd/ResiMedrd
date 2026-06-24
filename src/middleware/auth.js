@@ -1,7 +1,16 @@
 const jwt = require("jsonwebtoken");
+const fs = require("fs");
+const path = require("path");
 const { getDB } = require("../config/db");
 
-const JWT_SECRET = "resiMed_secret_key_ultra_premium_amboss";
+// Cargar la clave pública de Supabase desde el archivo PEM
+let publicKey = null;
+try {
+  const pemPath = path.join(__dirname, "../config/supabase_public_key.pem");
+  publicKey = fs.readFileSync(pemPath, "utf8");
+} catch (err) {
+  console.error("❌ ERROR AL CARGAR CLAVE PÚBLICA DE SUPABASE EN EL MIDDLEWARE:", err);
+}
 
 function autenticarToken(req, res, next) {
   const authHeader = req.headers["authorization"];
@@ -11,11 +20,21 @@ function autenticarToken(req, res, next) {
     return res.status(401).json({ error: "Acceso denegado. Token no proporcionado." });
   }
 
-  jwt.verify(token, JWT_SECRET, (err, usuario) => {
+  if (!publicKey) {
+    return res.status(500).json({ error: "Error de configuración de seguridad en el servidor." });
+  }
+
+  jwt.verify(token, publicKey, { algorithms: ["ES256"] }, (err, decoded) => {
     if (err) {
+      console.warn("⚠️ Token inválido o falló verificación asimétrica ES256:", err.message);
       return res.status(403).json({ error: "Sesión inválida o expirada. Inicia sesión nuevamente." });
     }
-    req.usuario = usuario;
+    
+    // Mapear decoded.sub (UUID de Supabase) a req.usuario.id
+    req.usuario = {
+      id: decoded.sub,
+      email: decoded.email
+    };
     next();
   });
 }
@@ -38,6 +57,5 @@ async function exigirAdmin(req, res, next) {
 
 module.exports = {
   autenticarToken,
-  exigirAdmin,
-  JWT_SECRET
+  exigirAdmin
 };
