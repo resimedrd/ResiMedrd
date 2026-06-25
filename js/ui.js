@@ -1549,27 +1549,54 @@ const ui = {
 
         panel.innerHTML = `
           <!-- CABECERA PRINCIPAL DE LA ESPECIALIDAD (Fila Compacta Activa) -->
-          <div class="especialidad-header-clickable" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; cursor: pointer; padding: 14px 20px; user-select: none;">
-            <div style="display: flex; align-items: center; gap: 12px;">
+          <div class="especialidad-header-clickable" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; cursor: pointer; padding: 16px 20px; user-select: none;">
+            <!-- Info principal: Emoji, Título y Errores Activos -->
+            <div style="display: flex; align-items: center; gap: 12px; flex: 1; min-width: 220px;">
+              <span style="font-size: 20px;">${esp.emoji}</span>
               <div style="text-align: left;">
-                <h4 style="margin: 0; font-size: 15px; color: var(--text); font-weight: 700;">${esp.emoji} ${esp.nombre}</h4>
-                <p style="margin: 2px 0 0 0; font-size: 11.5px; color: var(--text-soft); font-weight: 500;">${coberturaTexto}</p>
+                <h4 style="margin: 0; font-size: 15px; color: var(--text); font-weight: 700;">${esp.nombre}</h4>
+                <div style="display: flex; align-items: center; gap: 6px; margin-top: 4px;">
+                  <span style="display: inline-flex; align-items: center; gap: 5px; font-size: 11px; color: var(--danger); font-weight: 600; background: rgba(239, 68, 68, 0.1); padding: 2px 8px; border-radius: 6px;">
+                    <span style="width: 5px; height: 5px; background: var(--danger); border-radius: 50%; display: inline-block;"></span>
+                    ${preguntasEsp.length} ${preguntasEsp.length === 1 ? 'pregunta fallada' : 'preguntas falladas'}
+                  </span>
+                </div>
               </div>
             </div>
-            <div style="display: flex; align-items: center; gap: 12px;">
-              <span class="chip" style="background: ${totalRespondidas > 0 ? colorNota : 'rgba(255,255,255,0.02)'}; border-color: ${colorNota}; color: ${totalRespondidas > 0 ? '#fff' : 'var(--text-dim)'}; font-size: 11.5px; font-weight: 700; padding: 3px 10px; margin: 0; border-radius: 12px; display: inline-block;">
-                ${notaTexto}
-              </span>
-              <span class="chip chip-soft" style="font-size: 11px; padding: 2px 8px; margin: 0; border-color: var(--border); display: inline-block;">
-                Fallos: ${preguntasEsp.length}
-              </span>
-              <span class="icono-toggle-especialidad" style="transition: transform 0.25s ease; font-size: 11px; color: var(--text-soft); transform: rotate(0deg);">▼</span>
-            </div>
-          </div>
 
-          <!-- BARRA DE PROGRESO DE LA ESPECIALIDAD DE 3PX (COMPACTA) -->
-          <div style="background: rgba(255,255,255,0.03); height: 3px; width: 100%; overflow: hidden; position: relative;">
-            <div style="background: ${colorNota}; height: 100%; width: ${totalRespondidas > 0 ? nota : 0}%; transition: width 0.4s ease;"></div>
+            <!-- Métricas Claras -->
+            <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
+              <!-- Métrica 1: Cobertura de Estudio -->
+              <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 3px; min-width: 130px;">
+                <span style="font-size: 9.5px; color: var(--text-soft); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Estudiado (Cobertura)</span>
+                <div style="display: flex; align-items: center; gap: 6px; width: 100%;">
+                  <span style="font-size: 12.5px; color: var(--text); font-weight: 700;">${dataCob.porcentaje}%</span>
+                  <!-- Barra de Cobertura -->
+                  <div style="background: rgba(255,255,255,0.06); height: 5px; width: 50px; border-radius: 3px; overflow: hidden; position: relative;">
+                    <div style="background: var(--primary); height: 100%; width: ${dataCob.porcentaje}%; border-radius: 3px;"></div>
+                  </div>
+                </div>
+                <span style="font-size: 10.5px; color: var(--text-dim);">${dataCob.respondidas} de ${dataCob.totalBanco} preg.</span>
+              </div>
+
+              <!-- Métrica 2: Precisión (Tasa de Aciertos) -->
+              <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 3px; min-width: 130px;">
+                <span style="font-size: 9.5px; color: var(--text-soft); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Precisión (Aciertos)</span>
+                <div style="display: flex; align-items: center; gap: 6px; width: 100%;">
+                  <span style="font-size: 12.5px; color: ${totalRespondidas > 0 ? colorNota : 'var(--text-dim)'}; font-weight: 700;">${totalRespondidas > 0 ? notaTexto : 'Sin datos'}</span>
+                  <!-- Barra de Precisión -->
+                  <div style="background: rgba(255,255,255,0.06); height: 5px; width: 50px; border-radius: 3px; overflow: hidden; position: relative;">
+                    <div style="background: ${totalRespondidas > 0 ? colorNota : 'rgba(255,255,255,0.1)'}; height: 100%; width: ${totalRespondidas > 0 ? nota : 0}%; border-radius: 3px;"></div>
+                  </div>
+                </div>
+                <span style="font-size: 10.5px; color: var(--text-dim);">${totalRespondidas > 0 ? `${totalCorrectas} de ${totalRespondidas} correctas` : 'Ninguna respondida'}</span>
+              </div>
+
+              <!-- Icono Desplegar -->
+              <div style="display: flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 50%; background: rgba(255,255,255,0.03); border: 1px solid var(--border);">
+                <span class="icono-toggle-especialidad" style="transition: transform 0.25s ease; font-size: 10px; color: var(--text-soft); transform: rotate(0deg);">▼</span>
+              </div>
+            </div>
           </div>
 
           <!-- CONTENIDO DESPLEGABLE DE LA ESPECIALIDAD -->
