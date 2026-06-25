@@ -45,8 +45,17 @@ async function conectarBaseDeDatos() {
           finalSql = `${pgSql} RETURNING id`;
         }
       }
-      const res = await poolInstance.query(finalSql, params);
-      const lastRow = res.rows[0];
+      let res;
+      try {
+        res = await poolInstance.query(finalSql, params);
+      } catch (err) {
+        if (err.code === "42703" && finalSql !== pgSql) {
+          res = await poolInstance.query(pgSql, params);
+        } else {
+          throw err;
+        }
+      }
+      const lastRow = res.rows ? res.rows[0] : null;
       return {
         lastID: lastRow ? lastRow.id : null,
         changes: res.rowCount
@@ -76,8 +85,17 @@ async function conectarBaseDeDatos() {
               finalSql = `${pgSql} RETURNING id`;
             }
           }
-          const res = await client.query(finalSql, params);
-          const lastRow = res.rows[0];
+          let res;
+          try {
+            res = await client.query(finalSql, params);
+          } catch (err) {
+            if (err.code === "42703" && finalSql !== pgSql) {
+              res = await client.query(pgSql, params);
+            } else {
+              throw err;
+            }
+          }
+          const lastRow = res.rows ? res.rows[0] : null;
           return {
             lastID: lastRow ? lastRow.id : null,
             changes: res.rowCount
