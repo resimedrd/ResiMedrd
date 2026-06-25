@@ -286,6 +286,9 @@ async function inicializarBatallas(server, db, JWT_SECRET) {
     wsConn.on("message", async (messageStr) => {
       try {
         const message = JSON.parse(messageStr);
+        if (wsConn.salaCodigo) {
+          salaActualCodigo = wsConn.salaCodigo;
+        }
 
         // 1. Manejo exclusivo de Autenticación
         if (message.type === "auth") {
@@ -322,6 +325,7 @@ async function inicializarBatallas(server, db, JWT_SECRET) {
                     existingPlayer.ws = wsConn;
                     existingPlayer.isConnected = true;
                     salaActualCodigo = code;
+                    wsConn.salaCodigo = code;
                     
                     wsConn.send(JSON.stringify({
                       type: "reconnected",
@@ -426,6 +430,7 @@ async function inicializarBatallas(server, db, JWT_SECRET) {
 
             activeRooms.set(roomCode, room);
             salaActualCodigo = roomCode;
+            wsConn.salaCodigo = roomCode;
 
             wsConn.send(JSON.stringify({
               type: "room_created",
@@ -467,6 +472,7 @@ async function inicializarBatallas(server, db, JWT_SECRET) {
             }
 
             salaActualCodigo = code;
+            wsConn.salaCodigo = code;
 
             broadcastToRoom(room, {
               type: "room_updated",
@@ -593,6 +599,7 @@ async function inicializarBatallas(server, db, JWT_SECRET) {
                 // Remover al jugador inmediatamente de la sala en memoria
                 room.players = room.players.filter(p => p.id !== userId);
                 salaActualCodigo = null;
+                wsConn.salaCodigo = null;
 
                 // Si la sala se queda vacía de jugadores reales, purgarla
                 const tieneReales = room.players.some(p => !p.isBot);
@@ -747,9 +754,11 @@ async function inicializarBatallas(server, db, JWT_SECRET) {
       // Remover de la cola de emparejamiento si se desconecta
       matchmakingQueue = matchmakingQueue.filter(p => p.ws !== wsConn);
 
+      const salaCodigoFinal = wsConn.salaCodigo || salaActualCodigo;
+
       // Si estaba en una sala
-      if (salaActualCodigo) {
-        const room = activeRooms.get(salaActualCodigo);
+      if (salaCodigoFinal) {
+        const room = activeRooms.get(salaCodigoFinal);
         if (room) {
           // Desconectar o marcar desconectado
           const player = room.players.find(p => p.ws === wsConn);
@@ -761,7 +770,7 @@ async function inicializarBatallas(server, db, JWT_SECRET) {
             // Si es la fase de juego, le damos 25s de gracia
             if (room.state === "playing") {
               setTimeout(async () => {
-                const r = activeRooms.get(salaActualCodigo);
+                const r = activeRooms.get(salaCodigoFinal);
                 if (r) {
                   const p = r.players.find(pl => pl.id === player.id);
                   if (p && !p.isConnected) {
@@ -769,8 +778,8 @@ async function inicializarBatallas(server, db, JWT_SECRET) {
                     r.players = r.players.filter(pl => pl.id !== player.id);
                     if (r.players.length === 0 || r.players.every(pl => pl.isBot)) {
                       if (r.timerInterval) clearInterval(r.timerInterval);
-                      activeRooms.delete(salaActualCodigo);
-                      await eliminarSalaDeBD(salaActualCodigo);
+                      activeRooms.delete(salaCodigoFinal);
+                      await eliminarSalaDeBD(salaCodigoFinal);
                     } else {
                       // Si era el host, reasignar host
                       if (r.modalidad === "amigos" && r.hostId === player.id) {
@@ -793,8 +802,8 @@ async function inicializarBatallas(server, db, JWT_SECRET) {
               room.players = room.players.filter(p => p.id !== player.id);
               if (room.players.length === 0) {
                 if (room.timerInterval) clearInterval(room.timerInterval);
-                activeRooms.delete(salaActualCodigo);
-                await eliminarSalaDeBD(salaActualCodigo);
+                activeRooms.delete(salaCodigoFinal);
+                await eliminarSalaDeBD(salaCodigoFinal);
               } else {
                 if (room.modalidad === "amigos" && room.hostId === player.id) {
                   const nuevoHost = room.players.find(p => !p.isBot);
@@ -955,6 +964,9 @@ async function iniciarBatallaAleatoria(db, jugadoresReales, bots = []) {
       score: 0,
       answers: []
     });
+    if (j.ws) {
+      j.ws.salaCodigo = roomCode;
+    }
   }
 
   // Agregar bots
@@ -1254,58 +1266,56 @@ async function finalizarBatalla(room) {
         .map(p => p.nombre);
 
       try {
-        await dbInstance.run("BEGIN TRANSACTION");
-
-        // 1. Guardar en el historial
-        await dbInstance.run(`
-          INSERT INTO batalla_historial (usuario_id, modalidad, contrincantes, correctas, total_preguntas, posicion)
-          VALUES (?, ?, ?, ?, ?, ?)
-        `, [
-          player.id, 
-          room.modalidad, 
-          JSON.stringify(contrincantes), 
-          player.score, 
-          room.questions.length, 
-          posicion
-        ]);
-
-        // 2. Recuperar stats actuales
-        const user = await dbInstance.get(
-          "SELECT battle_jugadas, battle_ganadas, battle_perdidas, battle_racha_actual, battle_racha_mejor FROM usuarios WHERE id = ?",
-          [player.id]
-        );
-
-        if (user) {
-          const nuevasJugadas = (user.battle_jugadas || 0) + 1;
-          const nuevasGanadas = (user.battle_ganadas || 0) + (gano ? 1 : 0);
-          const nuevasPerdidas = (user.battle_perdidas || 0) + (gano ? 0 : 1);
-          
-          let nuevaRacha = 0;
-          if (gano) {
-            nuevaRacha = (user.battle_racha_actual || 0) + 1;
-          } else {
-            nuevaRacha = 0; // Se corta la racha
-          }
-
-          const mejorRacha = Math.max(user.battle_racha_mejor || 0, nuevaRacha);
-
-          // 3. Actualizar perfil competitivo independiente del usuario
-          await dbInstance.run(`
-            UPDATE usuarios 
-            SET battle_jugadas = ?, battle_ganadas = ?, battle_perdidas = ?, battle_racha_actual = ?, battle_racha_mejor = ?
-            WHERE id = ?
+        await dbInstance.transaction(async (tx) => {
+          // 1. Guardar en el historial
+          await tx.run(`
+            INSERT INTO batalla_historial (usuario_id, modalidad, contrincantes, correctas, total_preguntas, posicion)
+            VALUES (?, ?, ?, ?, ?, ?)
           `, [
-            nuevasJugadas, 
-            nuevasGanadas, 
-            nuevasPerdidas, 
-            nuevaRacha, 
-            mejorRacha, 
-            player.id
+            player.id, 
+            room.modalidad, 
+            JSON.stringify(contrincantes), 
+            player.score, 
+            room.questions.length, 
+            posicion
           ]);
-        }
 
-        await dbInstance.run("COMMIT");
-        
+          // 2. Recuperar stats actuales
+          const user = await tx.get(
+            "SELECT battle_jugadas, battle_ganadas, battle_perdidas, battle_racha_actual, battle_racha_mejor FROM usuarios WHERE id = ?",
+            [player.id]
+          );
+
+          if (user) {
+            const nuevasJugadas = (user.battle_jugadas || 0) + 1;
+            const nuevasGanadas = (user.battle_ganadas || 0) + (gano ? 1 : 0);
+            const nuevasPerdidas = (user.battle_perdidas || 0) + (gano ? 0 : 1);
+            
+            let nuevaRacha = 0;
+            if (gano) {
+              nuevaRacha = (user.battle_racha_actual || 0) + 1;
+            } else {
+              nuevaRacha = 0; // Se corta la racha
+            }
+
+            const mejorRacha = Math.max(user.battle_racha_mejor || 0, nuevaRacha);
+
+            // 3. Actualizar perfil competitivo independiente del usuario
+            await tx.run(`
+              UPDATE usuarios 
+              SET battle_jugadas = ?, battle_ganadas = ?, battle_perdidas = ?, battle_racha_actual = ?, battle_racha_mejor = ?
+              WHERE id = ?
+            `, [
+              nuevasJugadas, 
+              nuevasGanadas, 
+              nuevasPerdidas, 
+              nuevaRacha, 
+              mejorRacha, 
+              player.id
+            ]);
+          }
+        });
+
         // Reconectar estadísticas actualizadas
         const updatedSocket = room.players.find(p => p.id === player.id).ws;
         if (updatedSocket && updatedSocket.readyState === ws.OPEN) {
@@ -1313,11 +1323,6 @@ async function finalizarBatalla(room) {
         }
 
       } catch (dbErr) {
-        try {
-          await dbInstance.run("ROLLBACK");
-        } catch (rollbackErr) {
-          console.error("Falla al hacer rollback:", rollbackErr);
-        }
         console.error("Falla al registrar resultados de la batalla para el usuario:", player.id, dbErr);
       }
     }
