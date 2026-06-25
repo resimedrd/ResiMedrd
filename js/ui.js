@@ -1490,6 +1490,47 @@ const ui = {
 
         const coberturaTexto = `Estudiado: ${dataCob.respondidas} de ${dataCob.totalBanco} preguntas (${dataCob.porcentaje}%)`;
 
+        // Determinar estado de la especialidad para el badge (Prioridad, Reforzar, Fortaleza, En progreso)
+        let estadoLabel = "En progreso";
+        let estadoColor = "#3b82f6";
+        let estadoBg = "rgba(59, 130, 246, 0.08)";
+        let estadoBorder = "rgba(59, 130, 246, 0.18)";
+
+        const haIniciado = totalRespondidas > 0 || dataCob.respondidas > 0;
+        if (!haIniciado) {
+          estadoLabel = "Sin iniciar";
+          estadoColor = "var(--text-dim)";
+          estadoBg = "rgba(255, 255, 255, 0.04)";
+          estadoBorder = "rgba(255, 255, 255, 0.1)";
+        } else if (dataCob.porcentaje < 10 && nota < 40) {
+          estadoLabel = "Prioridad";
+          estadoColor = "#ef4444";
+          estadoBg = "rgba(239, 68, 68, 0.08)";
+          estadoBorder = "rgba(239, 68, 68, 0.18)";
+        } else if (nota >= 70) {
+          if (dataCob.porcentaje >= 20) {
+            estadoLabel = "Fortaleza";
+            estadoColor = "#10b981";
+            estadoBg = "rgba(16, 185, 129, 0.08)";
+            estadoBorder = "rgba(16, 185, 129, 0.18)";
+          } else {
+            estadoLabel = "En progreso";
+            estadoColor = "#3b82f6";
+            estadoBg = "rgba(59, 130, 246, 0.08)";
+            estadoBorder = "rgba(59, 130, 246, 0.18)";
+          }
+        } else if (nota < 50) {
+          estadoLabel = "Reforzar";
+          estadoColor = "#f59e0b";
+          estadoBg = "rgba(245, 158, 11, 0.08)";
+          estadoBorder = "rgba(245, 158, 11, 0.18)";
+        } else {
+          estadoLabel = "En progreso";
+          estadoColor = "#3b82f6";
+          estadoBg = "rgba(59, 130, 246, 0.08)";
+          estadoBorder = "rgba(59, 130, 246, 0.18)";
+        }
+
         // Clasificar subtemas en Dominados vs A Reforzar (Obviando IA)
         const temasDominados = [];
         const temasAReforzar = [];
@@ -1550,13 +1591,18 @@ const ui = {
         panel.innerHTML = `
           <!-- CABECERA PRINCIPAL DE LA ESPECIALIDAD (Fila Compacta Activa) -->
           <div class="especialidad-header-clickable" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; cursor: pointer; padding: 16px 20px; user-select: none;">
-            <!-- Info principal: Emoji, Título y Errores Activos -->
+            <!-- Info principal: Emoji, Título, Estado y Errores Activos -->
             <div style="display: flex; align-items: center; gap: 12px; flex: 1; min-width: 220px;">
               <span style="font-size: 20px;">${esp.emoji}</span>
               <div style="text-align: left;">
                 <h4 style="margin: 0; font-size: 15px; color: var(--text); font-weight: 700;">${esp.nombre}</h4>
-                <div style="display: flex; align-items: center; gap: 6px; margin-top: 4px;">
-                  <span style="display: inline-flex; align-items: center; gap: 5px; font-size: 11px; color: var(--danger); font-weight: 600; background: rgba(239, 68, 68, 0.1); padding: 2px 8px; border-radius: 6px;">
+                <div style="display: flex; align-items: center; gap: 6px; margin-top: 4px; flex-wrap: wrap;">
+                  <!-- Badge de Estado (Prioridad, Reforzar, Fortaleza) -->
+                  <span style="display: inline-flex; align-items: center; gap: 4px; font-size: 9.5px; color: ${estadoColor}; font-weight: 700; background: ${estadoBg}; border: 1px solid ${estadoBorder}; padding: 2px 8px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.3px;">
+                    ${estadoLabel}
+                  </span>
+                  <!-- Badge de Preguntas Falladas -->
+                  <span style="display: inline-flex; align-items: center; gap: 5px; font-size: 10px; color: var(--danger); font-weight: 600; background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.15); padding: 2px 8px; border-radius: 6px;">
                     <span style="width: 5px; height: 5px; background: var(--danger); border-radius: 50%; display: inline-block;"></span>
                     ${preguntasEsp.length} ${preguntasEsp.length === 1 ? 'pregunta fallada' : 'preguntas falladas'}
                   </span>
