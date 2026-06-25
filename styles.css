@@ -5119,7 +5119,7 @@ body.dark-mode .premium-metrics-panel {
   color: rgba(255, 255, 255, 0.5);
 }
 
-@media (max-width: 850px) {
+@media (max-width: 1024px) {
   .specialty-row {
     flex-direction: column;
     align-items: stretch;

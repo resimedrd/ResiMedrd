@@ -458,6 +458,12 @@ const ui = {
     if (!state.usuarioConectado) return;
 
     try {
+      // Asegurar que la grilla de especialidades esté inicializada (Fail-safe)
+      const listContainer = document.getElementById("perfil-especialidades-lista");
+      if (listContainer && listContainer.children.length === 0) {
+        await ui.inicializarGridEspecialidades();
+      }
+
       const user = state.usuarioConectado;
       
       // Sincronizar datos personales en cabecera del Perfil
@@ -501,22 +507,10 @@ const ui = {
       if (pPreguntas) pPreguntas.textContent = (datosResumen && datosResumen.totalPreguntasRespondidas) || 0;
       
       const totalContestadas = (datosResumen && datosResumen.totalPreguntasRespondidas) || 0;
+      // Las métricas avanzadas y gráficos permanecen desbloqueados permanentemente
       const overlayBloqueo = document.getElementById("seccion-graficos-metricas-bloqueo");
       if (overlayBloqueo) {
-        if (totalContestadas < 50) {
-          overlayBloqueo.classList.remove("hidden");
-          const progressText = document.getElementById("locked-progress-text");
-          const progressBarFill = document.getElementById("locked-progress-bar-fill");
-          if (progressText) {
-            progressText.textContent = `${totalContestadas} / 50 preguntas contestadas`;
-          }
-          if (progressBarFill) {
-            const pct = Math.min(100, Math.round((totalContestadas / 50) * 100));
-            progressBarFill.style.width = `${pct}%`;
-          }
-        } else {
-          overlayBloqueo.classList.add("hidden");
-        }
+        overlayBloqueo.classList.add("hidden");
       }
       
       if (pPromedio) {
@@ -581,41 +575,10 @@ const ui = {
         }
       };
 
-      // Vincular toggle del Cajón Desplegable de Gráficos Analíticos
-      const btnToggle = document.getElementById("btn-toggle-graficos");
-      if (btnToggle && !btnToggle.dataset.hasListener) {
-        btnToggle.dataset.hasListener = "true";
-        btnToggle.addEventListener("click", () => {
-          const seccion = document.getElementById("seccion-graficos-desplegable");
-          if (seccion) {
-            const estaActivo = !seccion.classList.contains("activo");
-            toggleCajon(seccion, estaActivo);
-            btnToggle.classList.toggle("activo", estaActivo);
-            const icono = document.getElementById("icono-toggle-graficos");
-            if (icono) {
-              icono.textContent = estaActivo ? "▲" : "▼";
-            }
-            if (estaActivo) {
-              // Dibujar los gráficos dinámicos con Chart.js
-              ui.renderizarGraficosAvanzados(historial, srEstados, personalizadas.length);
-              // Forzar ajuste de altura después de dibujar los gráficos
-              setTimeout(() => {
-                seccion.style.maxHeight = seccion.scrollHeight + "px";
-              }, 50);
-            }
-          }
-        });
-      }
-      
-      // Si la sección de gráficos ya está activa al recargar el perfil, refrescarlos en caliente y ajustar altura
+      // Renderizar los gráficos analíticos avanzados (siempre visibles)
       const seccionGraficos = document.getElementById("seccion-graficos-desplegable");
-      if (seccionGraficos && seccionGraficos.classList.contains("activo")) {
+      if (seccionGraficos) {
         ui.renderizarGraficosAvanzados(historial, srEstados, personalizadas.length);
-        seccionGraficos.style.opacity = "1";
-        seccionGraficos.style.marginTop = "10px";
-        setTimeout(() => {
-          seccionGraficos.style.maxHeight = seccionGraficos.scrollHeight + "px";
-        }, 150);
       }
 
       // Vincular toggle del Cajón Desplegable del Historial de Evaluaciones
