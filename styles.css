@@ -3695,15 +3695,22 @@ body.dark-mode .sidebar-item.active {
   transform: scale(1.15);
 }
 
-/* Hide when auth or quiz screen is active */
+/* Hide when auth, quiz, battle-quiz or battle-lobby screen is active */
 body:has(#pantalla-auth.active) #app-sidebar,
 body:has(#pantalla-auth.active) #btn-toggle-sidebar,
 body:has(#pantalla-auth.active) .sidebar-backdrop,
 body:has(#pantalla-quiz.active) #app-sidebar,
 body:has(#pantalla-quiz.active) #btn-toggle-sidebar,
-body:has(#pantalla-quiz.active) .sidebar-backdrop {
+body:has(#pantalla-quiz.active) .sidebar-backdrop,
+body:has(#pantalla-battle-quiz.active) #app-sidebar,
+body:has(#pantalla-battle-quiz.active) #btn-toggle-sidebar,
+body:has(#pantalla-battle-quiz.active) .sidebar-backdrop,
+body:has(#pantalla-battle-lobby.active) #app-sidebar,
+body:has(#pantalla-battle-lobby.active) #btn-toggle-sidebar,
+body:has(#pantalla-battle-lobby.active) .sidebar-backdrop {
   display: none !important;
 }
+
 
 /* Responsive sidebar drawer for tablet/mobile */
 @media (max-width: 850px) {
@@ -6156,13 +6163,70 @@ body.dark-mode .premium-metrics-panel {
     margin: 0 !important;
   }
 
-  /* El seguimiento de oponentes en vivo fluye abajo del quiz en móviles */
+  /* El seguimiento de oponentes en vivo fluye abajo del quiz en móviles y se hace horizontal y compacto */
   .opponents-track-panel {
-    padding: 16px !important;
+    padding: 10px !important;
     border-radius: 16px !important;
-    gap: 12px !important;
-    margin-top: 12px !important;
-    order: 3 !important; /* Asegura que quede abajo */
+    gap: 8px !important;
+    margin-top: 16px !important;
+    order: 3 !important; /* Asegura que quede abajo de las opciones */
+    display: flex !important;
+    flex-direction: row !important;
+    overflow-x: auto !important;
+    white-space: nowrap !important;
+    -webkit-overflow-scrolling: touch;
+    width: 100% !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  .opponents-track-panel h4 {
+    display: none !important; /* Ocultar título en móviles para ahorrar espacio */
+  }
+
+  .opponent-track-row {
+    flex-direction: column !important;
+    width: 110px !important;
+    min-width: 110px !important;
+    flex-shrink: 0 !important;
+    padding: 8px 10px !important;
+    border-radius: 12px !important;
+    gap: 4px !important;
+    text-align: center !important;
+    background: var(--panel-soft) !important;
+    border: 1px solid var(--border) !important;
+  }
+
+  .opponent-track-info {
+    width: 100% !important;
+  }
+
+  .opponent-track-info span {
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    display: block !important;
+    text-overflow: ellipsis !important;
+    overflow: hidden !important;
+    white-space: nowrap !important;
+    margin-bottom: 2px !important;
+  }
+
+  .opponent-track-bar-bg {
+    height: 4px !important;
+    border-radius: 100px !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+  }
+
+  .opponent-responded-indicator {
+    font-size: 10px !important;
+    justify-content: center !important;
+    margin-top: 2px !important;
+  }
+
+  .opponent-pulse-dot {
+    width: 5px !important;
+    height: 5px !important;
   }
 }
 

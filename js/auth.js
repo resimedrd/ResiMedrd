@@ -222,8 +222,14 @@ const auth = {
     // Decidir inmediatamente la pantalla de destino en primer plano para un inicio instantáneo (Non-blocking Boot)
     let enrutadoExamen = false;
     const tieneExamenActivo = localStorage.getItem("resiMed_examen_activo");
+    const tieneBattleActiva = localStorage.getItem("resiMed_battle_active") === "true";
+
     if (tieneExamenActivo) {
       enrutadoExamen = quiz.restaurarExamenActivo();
+    } else if (tieneBattleActiva) {
+      enrutadoExamen = true;
+      battle.mostrarPantallaBattle("battle-quiz");
+      battle.conectarWebSocket();
     }
 
     if (!enrutadoExamen) {
@@ -238,7 +244,8 @@ const auth = {
           ui.mostrarPantalla("home", false);
         }
       } else if (hash.startsWith("battle")) {
-        battle.mostrarPantallaBattle("battle");
+        const screenDest = (hash === "battle-quiz" || hash === "battle-lobby") ? hash : "battle";
+        battle.mostrarPantallaBattle(screenDest);
         battle.conectarWebSocket();
       } else if (pantallasValidas.includes(hash)) {
         ui.mostrarPantalla(hash, false);

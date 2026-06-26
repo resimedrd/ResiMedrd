@@ -5,7 +5,18 @@ const battle = {
   salaCodigo: null,
   isHost: false,
   modalidadActual: null, // "amigos" o "aleatoria"
-  estadoActual: "idle", // "idle", "queue", "lobby", "playing", "results"
+  _estadoActual: "idle",
+  get estadoActual() {
+    return this._estadoActual;
+  },
+  set estadoActual(val) {
+    this._estadoActual = val;
+    if (val === "playing" || val === "lobby") {
+      localStorage.setItem("resiMed_battle_active", "true");
+    } else {
+      localStorage.removeItem("resiMed_battle_active");
+    }
+  },
   preguntasBatalla: [],
   preguntaActualIndex: 0,
   timePerQuestion: 60,

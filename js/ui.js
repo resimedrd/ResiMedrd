@@ -47,6 +47,20 @@ const ui = {
       return;
     }
 
+    // Bloquear navegación si está en batalla activa o lobby de batalla
+    const estaEnBatallaActiva = (window.battle && (window.battle.estadoActual === "playing" || window.battle.estadoActual === "lobby"));
+    if (estaEnBatallaActiva && nombrePantalla !== "battle-quiz" && nombrePantalla !== "battle-lobby" && nombrePantalla !== "battle-results") {
+      const pantallaOrigen = window.battle.estadoActual === "playing" ? "battle-quiz" : "battle-lobby";
+      window.history.pushState({ pantalla: pantallaOrigen }, "", "#" + pantallaOrigen);
+      if (window.auth && typeof window.auth.mostrarToast === "function") {
+        window.auth.mostrarToast("⚠️ Tienes una batalla en curso. Debes finalizarla primero para poder salir.", "error");
+      } else {
+        alert("⚠️ Tienes una batalla en curso. Debes finalizarla primero para poder salir.");
+      }
+      return;
+    }
+
+
     // Protección para evitar entrar a la pantalla de evaluación (quiz) sin un examen activo
     if (nombrePantalla === "quiz" && !localStorage.getItem("resiMed_examen_activo")) {
       ui.mostrarPantalla("home", false);
