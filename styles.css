@@ -6100,3 +6100,69 @@ body.dark-mode .premium-metrics-panel {
     text-align: center !important;
   }
 }
+
+/* Optimización de la Arena de Batalla y Temporizador en Móviles */
+@media (max-width: 850px) {
+  .battle-arena-shell {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+    padding-top: 66px !important; /* Deja espacio para el temporizador fijo superior */
+  }
+
+  .battle-arena-shell aside {
+    display: contents !important; /* Desacopla el aside para que sus hijos directos fluyan en la cuadrícula */
+  }
+
+  .battle-timer-container {
+    position: fixed !important;
+    top: 50px !important; /* Se alinea debajo de la barra de navegación principal */
+    left: 0 !important;
+    right: 0 !important;
+    height: 52px !important;
+    z-index: 999 !important;
+    background: var(--panel-strong) !important;
+    border: none !important;
+    border-bottom: 1px solid var(--border) !important;
+    border-radius: 0 !important;
+    padding: 0 16px !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 12px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  }
+
+  /* Ocultar la etiqueta descriptiva para ahorrar espacio vertical en móvil */
+  .battle-timer-container > span:last-of-type {
+    display: none !important;
+  }
+
+  /* Temporizador Circular SVG más compacto en móvil */
+  .battle-timer-radial-wrap {
+    width: 40px !important;
+    height: 40px !important;
+    margin: 0 !important;
+    flex-shrink: 0 !important;
+  }
+
+  .timer-digits {
+    font-size: 13px !important;
+  }
+
+  .battle-timer-container .quiz-counter {
+    font-size: 13px !important;
+    color: var(--text-soft) !important;
+    margin: 0 !important;
+  }
+
+  /* El seguimiento de oponentes en vivo fluye abajo del quiz en móviles */
+  .opponents-track-panel {
+    padding: 16px !important;
+    border-radius: 16px !important;
+    gap: 12px !important;
+    margin-top: 12px !important;
+    order: 3 !important; /* Asegura que quede abajo */
+  }
+}
+
