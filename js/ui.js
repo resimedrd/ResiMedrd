@@ -2265,19 +2265,171 @@ const ui = {
     return card;
   },
 
+  adminBancoPage: 1,
+  adminBancoTotalPages: 1,
+
+  async cargarBancoPreguntasAdmin(page = 1) {
+    const listaEl = document.getElementById("admin-banco-lista");
+    const totalEl = document.getElementById("admin-banco-total");
+    const pageInfoEl = document.getElementById("admin-banco-page-info");
+    const btnPrev = document.getElementById("btn-admin-page-prev");
+    const btnNext = document.getElementById("btn-admin-page-next");
+    const selectEsp = document.getElementById("admin-banco-especialidad");
+    const inputSearch = document.getElementById("admin-banco-search");
+
+    if (!listaEl) return;
+
+    // Poblar selector de especialidades la primera vez
+    if (selectEsp && selectEsp.options.length <= 1) {
+      try {
+        const especialidades = await api.obtenerEspecialidades();
+        if (Array.isArray(especialidades)) {
+          especialidades.forEach(esp => {
+            const nombre = typeof esp === "object" ? esp.tema : esp;
+            if (nombre) {
+              const opt = document.createElement("option");
+              opt.value = nombre;
+              opt.textContent = nombre;
+              selectEsp.appendChild(opt);
+            }
+          });
+        }
+      } catch (e) {
+        console.warn("No se pudieron cargar especialidades para filtro admin:", e);
+      }
+    }
+
+    const search = inputSearch ? inputSearch.value.trim() : "";
+    const especialidad = selectEsp ? selectEsp.value : "Todos";
+
+    listaEl.innerHTML = `<div class="history-empty" style="padding: 24px; text-align: center; color: var(--text-dim);">Cargando banco de preguntas...</div>`;
+
+    try {
+      const data = await api.obtenerPreguntasAdmin(page, 20, search, especialidad);
+      const preguntas = data.preguntas || [];
+      ui.adminBancoPage = data.page || 1;
+      ui.adminBancoTotalPages = data.totalPages || 1;
+
+      if (totalEl) totalEl.textContent = `${data.total || 0} Preguntas`;
+      if (pageInfoEl) pageInfoEl.textContent = `Página ${ui.adminBancoPage} de ${ui.adminBancoTotalPages}`;
+      if (btnPrev) btnPrev.disabled = ui.adminBancoPage <= 1;
+      if (btnNext) btnNext.disabled = ui.adminBancoPage >= ui.adminBancoTotalPages;
+
+      listaEl.innerHTML = "";
+      if (preguntas.length === 0) {
+        listaEl.innerHTML = `<div class="history-empty" style="padding: 24px; text-align: center; color: var(--text-dim);">No se encontraron preguntas con los filtros seleccionados.</div>`;
+        return;
+      }
+
+      preguntas.forEach(p => {
+        const row = document.createElement("div");
+        row.className = "admin-q-row";
+        const estaActiva = p.activo === 1 || p.activo === undefined;
+
+        const infoDiv = document.createElement("div");
+        infoDiv.className = "admin-q-info";
+
+        const titleP = document.createElement("p");
+        titleP.className = "admin-q-title";
+        titleP.textContent = `#${p.id} — ${p.texto || ""}`;
+
+        const metaDiv = document.createElement("div");
+        metaDiv.className = "admin-q-meta";
+        metaDiv.innerHTML = `
+          <span class="badge" style="font-size: 11px; padding: 3px 8px;">${p.tema || "Sin especialidad"}</span>
+          ${p.subtema ? `<span class="badge" style="font-size: 11px; padding: 3px 8px; background: var(--panel); color: var(--text-soft); border: 1px solid var(--border);">${p.subtema}</span>` : ""}
+          <span class="badge" style="font-size: 11px; padding: 3px 8px; background: ${estaActiva ? "rgba(16, 185, 129, 0.15)" : "rgba(239, 68, 68, 0.15)"}; color: ${estaActiva ? "var(--success)" : "var(--danger)"};">
+            ${estaActiva ? "● Activa" : "○ Inactiva"}
+          </span>
+        `;
+
+        infoDiv.appendChild(titleP);
+        infoDiv.appendChild(metaDiv);
+
+        const actionsDiv = document.createElement("div");
+        actionsDiv.className = "admin-q-actions";
+
+        const btnEditar = document.createElement("button");
+        btnEditar.type = "button";
+        btnEditar.className = "btn btn-ghost";
+        btnEditar.style.cssText = "padding: 6px 12px; font-size: 12px; min-width: auto;";
+        btnEditar.textContent = "✏️ Editar";
+        btnEditar.addEventListener("click", () => ui.abrirModalCorreccionPregunta(p));
+
+        const btnToggle = document.createElement("button");
+        btnToggle.type = "button";
+        btnToggle.className = "btn btn-ghost";
+        btnToggle.style.cssText = "padding: 6px 12px; font-size: 12px; min-width: auto;";
+        btnToggle.textContent = estaActiva ? "Desactivar" : "Activar";
+        btnToggle.addEventListener("click", async () => {
+          try {
+            btnToggle.disabled = true;
+            await api.toggleActivoPregunta(p.id);
+            await ui.cargarBancoPreguntasAdmin(ui.adminBancoPage);
+          } catch (err) {
+            alert("Error al cambiar estado: " + err.message);
+            btnToggle.disabled = false;
+          }
+        });
+
+        const btnEliminar = document.createElement("button");
+        btnEliminar.type = "button";
+        btnEliminar.className = "btn btn-ghost";
+        btnEliminar.style.cssText = "padding: 6px 12px; font-size: 12px; min-width: auto; color: var(--danger); border-color: rgba(239, 68, 68, 0.3);";
+        btnEliminar.textContent = "🗑️ Eliminar";
+        btnEliminar.addEventListener("click", async () => {
+          if (!confirm(`¿Seguro que deseas eliminar permanentemente la pregunta #${p.id}? Esta acción no se puede deshacer.`)) return;
+          try {
+            btnEliminar.disabled = true;
+            await api.eliminarPregunta(p.id);
+            await ui.cargarBancoPreguntasAdmin(ui.adminBancoPage);
+            await ui.cargarFiltrosEspecialidad();
+          } catch (err) {
+            alert("Error al eliminar pregunta: " + err.message);
+            btnEliminar.disabled = false;
+          }
+        });
+
+        actionsDiv.appendChild(btnEditar);
+        actionsDiv.appendChild(btnToggle);
+        actionsDiv.appendChild(btnEliminar);
+
+        row.appendChild(infoDiv);
+        row.appendChild(actionsDiv);
+        listaEl.appendChild(row);
+      });
+    } catch (err) {
+      console.error("Error al cargar banco de preguntas admin:", err);
+      listaEl.innerHTML = `<div class="history-empty" style="padding: 20px; color: var(--danger);">Error al cargar preguntas: ${err.message}</div>`;
+    }
+  },
+
   abrirModalCorreccionPregunta(r) {
     const modal = document.getElementById("modal-corregir-pregunta");
     if (!modal) return;
 
+    const esReporte = r.pregunta_id !== undefined;
+    const preguntaId = esReporte ? r.pregunta_id : r.id;
+    const reporteId = esReporte ? r.id : "";
+    const texto = esReporte ? r.pregunta_texto : r.texto;
+    const opcionesRaw = esReporte ? r.pregunta_opciones : r.opciones;
+    const correcta = esReporte ? r.pregunta_correcta : r.correcta;
+    const tema = esReporte ? r.pregunta_tema : r.tema;
+    const subtema = esReporte ? r.pregunta_subtema : r.subtema;
+    const explicacion = esReporte ? r.pregunta_explicacion : r.explicacion;
+    const fuente = esReporte ? r.pregunta_fuente : r.fuente;
+    const examenId = esReporte ? r.pregunta_examen_id : r.examen_id;
+    const difficulty = esReporte ? r.pregunta_difficulty : r.difficulty;
+
     // Poblar IDs
-    document.getElementById("modal-corregir-pregunta-id").value = r.pregunta_id;
-    document.getElementById("modal-corregir-reporte-id").value = r.id;
+    document.getElementById("modal-corregir-pregunta-id").value = preguntaId;
+    document.getElementById("modal-corregir-reporte-id").value = reporteId;
 
     // Poblar Enunciado
-    document.getElementById("modal-corregir-texto").value = r.pregunta_texto;
+    document.getElementById("modal-corregir-texto").value = texto || "";
 
     // Parsear Opciones
-    let opcionesArray = state.safeParseOpciones(r.pregunta_opciones);
+    let opcionesArray = state.safeParseOpciones(opcionesRaw);
 
     // Poblar Opciones en los inputs correspondientes
     for (let i = 0; i < 4; i++) {
@@ -2288,32 +2440,32 @@ const ui = {
     }
 
     // Poblar el resto de campos
-    document.getElementById("modal-corregir-correcta").value = r.pregunta_correcta;
-    document.getElementById("modal-corregir-tema").value = r.pregunta_tema;
-    document.getElementById("modal-corregir-subtema").value = r.pregunta_subtema || "";
-    document.getElementById("modal-corregir-explicacion").value = r.pregunta_explicacion || "";
-    document.getElementById("modal-corregir-fuente").value = r.pregunta_fuente || "";
+    document.getElementById("modal-corregir-correcta").value = correcta !== undefined ? correcta : 0;
+    document.getElementById("modal-corregir-tema").value = tema || "";
+    document.getElementById("modal-corregir-subtema").value = subtema || "";
+    document.getElementById("modal-corregir-explicacion").value = explicacion || "";
+    document.getElementById("modal-corregir-fuente").value = fuente || "";
 
     // Poblar nuevos campos FASE 3 (Examen y Dificultad)
     const selectExamen = document.getElementById("modal-corregir-examen-id");
     if (selectExamen) {
-      if (r.pregunta_examen_id) {
+      if (examenId) {
         let existeOpcion = false;
         for (let idxOpt = 0; idxOpt < selectExamen.options.length; idxOpt++) {
-          if (parseInt(selectExamen.options[idxOpt].value) === parseInt(r.pregunta_examen_id)) {
+          if (parseInt(selectExamen.options[idxOpt].value) === parseInt(examenId)) {
             existeOpcion = true;
             break;
           }
         }
         if (!existeOpcion) {
-          selectExamen.innerHTML += `<option value="${r.pregunta_examen_id}">${r.pregunta_fuente || 'Examen asociado'}</option>`;
+          selectExamen.innerHTML += `<option value="${examenId}">${fuente || 'Examen asociado'}</option>`;
         }
       }
-      selectExamen.value = r.pregunta_examen_id || "";
+      selectExamen.value = examenId || "";
     }
     const inputDificultad = document.getElementById("modal-corregir-dificultad");
     if (inputDificultad) {
-      inputDificultad.value = r.pregunta_difficulty !== undefined ? r.pregunta_difficulty : 0.5;
+      inputDificultad.value = difficulty !== undefined && difficulty !== null ? difficulty : 0.5;
     }
 
     // Abrir Modal

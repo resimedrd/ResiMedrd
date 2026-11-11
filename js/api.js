@@ -208,6 +208,14 @@ const api = {
   toggleActivoPregunta: (id) =>
     request(`/api/admin/preguntas/${id}/toggle-activo`, {
       method: "PUT"
+    }),
+
+  obtenerPreguntasAdmin: (page = 1, limit = 20, search = "", especialidad = "") =>
+    request(`/api/admin/preguntas?page=${page}&limit=${limit}&search=${encodeURIComponent(search)}&especialidad=${encodeURIComponent(especialidad)}`),
+
+  eliminarPregunta: (id) =>
+    request(`/api/admin/preguntas/${id}`, {
+      method: "DELETE"
     })
 };
 

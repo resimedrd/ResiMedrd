@@ -204,14 +204,40 @@ const auth = {
     const btnToggleSidebar = document.getElementById("btn-toggle-sidebar");
     const appSidebar = document.getElementById("app-sidebar");
     
+    const esAdmin = state.usuarioConectado.rol === "admin";
+    const targetsEstudiante = ["preguntas", "estadisticas", "historial", "errores", "ranking"];
+
     if (btnToggleSidebar) btnToggleSidebar.classList.remove("hidden");
     if (appSidebar) {
       appSidebar.classList.remove("hidden");
       const sidebarItems = appSidebar.querySelectorAll(".sidebar-item");
-      sidebarItems.forEach(i => i.classList.remove("active"));
+      sidebarItems.forEach(i => {
+        i.classList.remove("active");
+        const target = i.getAttribute("data-target");
+        if (targetsEstudiante.includes(target)) {
+          i.classList.toggle("hidden", esAdmin);
+        }
+      });
       const simItem = appSidebar.querySelector('.sidebar-item[data-target="simulacros"]');
       if (simItem) simItem.classList.add("active");
     }
+
+    document.querySelectorAll(".bottom-nav-item").forEach(btn => {
+      const target = btn.getAttribute("data-target");
+      if (targetsEstudiante.includes(target)) {
+        btn.classList.toggle("hidden", esAdmin);
+      }
+    });
+
+    const heroEstudiante = document.getElementById("home-hero-estudiante");
+    const panelConfigEntrenamiento = document.getElementById("panel-configurar-entrenamiento");
+    const panelMetricasEstudiante = document.getElementById("panel-metricas-estudiante");
+    const homeGridMain = document.getElementById("home-grid-main");
+
+    if (heroEstudiante) heroEstudiante.classList.toggle("hidden", esAdmin);
+    if (panelConfigEntrenamiento) panelConfigEntrenamiento.classList.toggle("hidden", esAdmin);
+    if (panelMetricasEstudiante) panelMetricasEstudiante.classList.toggle("hidden", esAdmin);
+    if (homeGridMain) homeGridMain.style.gridTemplateColumns = esAdmin ? "1fr" : "";
     
     // Mostrar Inicio en el header y ocultar Mi Perfil (pues se accede de forma profunda)
     if (btnIrInicio) btnIrInicio.classList.remove("hidden");
@@ -255,8 +281,11 @@ const auth = {
     }
 
     // Inicializar y cargar datos en segundo plano sin bloquear el hilo principal (Non-blocking Background Queries)
-    if (state.usuarioConectado.rol === "admin") {
+    if (esAdmin) {
       if (panelAdministrador) panelAdministrador.classList.remove("hidden");
+      if (ui.cargarBancoPreguntasAdmin) {
+        ui.cargarBancoPreguntasAdmin(1).catch(err => console.error("Error al cargar banco admin:", err));
+      }
       ui.cargarReportesAdministrador().catch(err => console.error("Error al cargar reportes admin:", err));
       ui.cargarExamenesAdministrador().catch(err => console.error("Error al cargar exámenes admin:", err));
     } else {

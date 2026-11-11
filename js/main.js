@@ -649,6 +649,48 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   // === 8. MANEJO EXCLUSIVO DEL PANEL DE ADMINISTRACIÓN (FASE 4) ===
+  document.querySelectorAll(".admin-tab-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const targetTab = btn.getAttribute("data-admin-tab");
+      document.querySelectorAll(".admin-tab-btn").forEach(b => b.classList.remove("active"));
+      document.querySelectorAll(".admin-tab-pane").forEach(p => p.classList.remove("active"));
+      btn.classList.add("active");
+      const pane = document.getElementById(`admin-tab-${targetTab}`);
+      if (pane) pane.classList.add("active");
+    });
+  });
+
+  const btnAdminBancoBuscar = document.getElementById("btn-admin-banco-buscar");
+  const inputAdminBancoSearch = document.getElementById("admin-banco-search");
+  const selectAdminBancoEsp = document.getElementById("admin-banco-especialidad");
+  const btnAdminPagePrev = document.getElementById("btn-admin-page-prev");
+  const btnAdminPageNext = document.getElementById("btn-admin-page-next");
+
+  if (btnAdminBancoBuscar) {
+    btnAdminBancoBuscar.addEventListener("click", () => ui.cargarBancoPreguntasAdmin(1));
+  }
+  if (inputAdminBancoSearch) {
+    inputAdminBancoSearch.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        ui.cargarBancoPreguntasAdmin(1);
+      }
+    });
+  }
+  if (selectAdminBancoEsp) {
+    selectAdminBancoEsp.addEventListener("change", () => ui.cargarBancoPreguntasAdmin(1));
+  }
+  if (btnAdminPagePrev) {
+    btnAdminPagePrev.addEventListener("click", () => {
+      if (ui.adminBancoPage > 1) ui.cargarBancoPreguntasAdmin(ui.adminBancoPage - 1);
+    });
+  }
+  if (btnAdminPageNext) {
+    btnAdminPageNext.addEventListener("click", () => {
+      if (ui.adminBancoPage < ui.adminBancoTotalPages) ui.cargarBancoPreguntasAdmin(ui.adminBancoPage + 1);
+    });
+  }
+
   const formNuevaPregunta = document.getElementById("form-nueva-pregunta");
   const adminMensaje = document.getElementById("admin-mensaje");
 
@@ -686,6 +728,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         
         // Recargar dashboard e indicadores
         await ui.cargarFiltrosEspecialidad();
+        if (ui.cargarBancoPreguntasAdmin) await ui.cargarBancoPreguntasAdmin(1);
       } catch (err) {
         if (adminMensaje) {
           adminMensaje.textContent = "✗ Error: " + err.message;
@@ -734,6 +777,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           
           await ui.cargarFiltrosEspecialidad();
           await ui.cargarExamenesAdministrador();
+          if (ui.cargarBancoPreguntasAdmin) await ui.cargarBancoPreguntasAdmin(1);
         } catch (err) {
           if (mensajeCargaMasiva) {
             mensajeCargaMasiva.textContent = "✗ Falla al procesar: " + err.message;
@@ -830,13 +874,20 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       try {
         await api.editarPregunta(preguntaId, data);
-        await api.resolverReporteError(reporteId);
+        if (reporteId) {
+          await api.resolverReporteError(reporteId);
+        }
         
-        alert("✓ Pregunta corregida y reporte resuelto con éxito.");
+        alert(reporteId ? "✓ Pregunta corregida y reporte resuelto con éxito." : "✓ Pregunta actualizada con éxito.");
         modalCorregirPregunta.classList.remove("active");
         formCorregirPregunta.reset();
         
-        await ui.cargarReportesAdministrador();
+        if (reporteId) {
+          await ui.cargarReportesAdministrador();
+        }
+        if (ui.cargarBancoPreguntasAdmin) {
+          await ui.cargarBancoPreguntasAdmin(ui.adminBancoPage || 1);
+        }
         await ui.cargarFiltrosEspecialidad();
       } catch (err) {
         alert("✗ Falla al guardar la corrección: " + err.message);

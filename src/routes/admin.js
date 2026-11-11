@@ -1,6 +1,7 @@
 const express = require("express");
 const { getDB } = require("../config/db");
 const { autenticarToken, exigirAdmin } = require("../middleware/auth");
+const { normalizarTema } = require("../utils/normalizar");
 
 const router = express.Router();
 
@@ -430,5 +431,89 @@ router.put("/api/admin/preguntas/:id/toggle-activo", autenticarToken, exigirAdmi
   }
 });
 
+// 5. Listar preguntas del banco con paginación y filtros (Solo para Administrador)
+router.get("/api/admin/preguntas", autenticarToken, exigirAdmin, async (req, res) => {
+  const db = getDB();
+  try {
+    const usuarioId = req.usuario.id;
+    const usuarioReal = await db.get(`SELECT rol FROM usuarios WHERE id = ?`, [usuarioId]);
+    if (!usuarioReal || usuarioReal.rol !== "admin") {
+      return res.status(403).json({ error: "Acceso denegado. No eres administrador." });
+    }
+
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.max(1, parseInt(req.query.limit) || 20);
+    const search = (req.query.search || "").trim().toLowerCase();
+    const especialidad = (req.query.especialidad || "").trim();
+
+    const todas = await db.all(`SELECT * FROM preguntas ORDER BY id DESC`);
+
+    const esTodasEsp = !especialidad || especialidad.toLowerCase() === "todos" || especialidad.toLowerCase() === "todas";
+    const espNorm = esTodasEsp ? "" : normalizarTema(especialidad);
+
+    const filtradas = todas.filter(p => {
+      if (!esTodasEsp) {
+        const pEspNorm = normalizarTema(p.tema);
+        const coincideEsp = (pEspNorm === espNorm) || ((p.tema || "").trim().toLowerCase() === especialidad.toLowerCase());
+        if (!coincideEsp) return false;
+      }
+      if (search) {
+        const enTexto = (p.texto || "").toLowerCase().includes(search);
+        const enTema = (p.tema || "").toLowerCase().includes(search);
+        const enSubtema = (p.subtema || "").toLowerCase().includes(search);
+        if (!enTexto && !enTema && !enSubtema) return false;
+      }
+      return true;
+    });
+
+    const total = filtradas.length;
+    const totalPages = Math.max(1, Math.ceil(total / limit));
+    const offset = (page - 1) * limit;
+    const preguntas = filtradas.slice(offset, offset + limit);
+
+    res.json({ preguntas, total, page, totalPages });
+  } catch (error) {
+    console.error("Error al listar preguntas para admin:", error);
+    res.status(500).json({ error: "Error interno al obtener el banco de preguntas." });
+  }
+});
+
+// 6. Eliminar físicamente una pregunta del banco (Solo para Administrador)
+router.delete("/api/admin/preguntas/:id", autenticarToken, exigirAdmin, async (req, res) => {
+  const db = getDB();
+  try {
+    const preguntaId = req.params.id;
+    const usuarioId = req.usuario.id;
+    const usuarioReal = await db.get(`SELECT rol FROM usuarios WHERE id = ?`, [usuarioId]);
+    if (!usuarioReal || usuarioReal.rol !== "admin") {
+      return res.status(403).json({ error: "Acceso denegado. No eres administrador." });
+    }
+
+    const pregunta = await db.get(`SELECT id, examen_id FROM preguntas WHERE id = ?`, [preguntaId]);
+    if (!pregunta) {
+      return res.status(404).json({ error: "Pregunta no encontrada." });
+    }
+
+    await db.transaction(async (tx) => {
+      await tx.run(`DELETE FROM reportes_error WHERE pregunta_id = ?`, [preguntaId]);
+      await tx.run(`DELETE FROM spaced_repetition WHERE pregunta_id = ?`, [preguntaId]);
+      await tx.run(`DELETE FROM preguntas WHERE id = ?`, [preguntaId]);
+    });
+
+    if (pregunta.examen_id) {
+      const countRow = await db.get(
+        `SELECT COUNT(*) as total FROM preguntas WHERE examen_id = ? AND (activo = 1 OR activo IS NULL)`,
+        [pregunta.examen_id]
+      );
+      const cantidad = countRow ? countRow.total : 0;
+      await db.run(`UPDATE examenes SET cantidad_preguntas = ? WHERE id = ?`, [cantidad, pregunta.examen_id]);
+    }
+
+    res.json({ mensaje: "Pregunta eliminada permanentemente del banco.", id: preguntaId });
+  } catch (error) {
+    console.error("Error al eliminar pregunta:", error);
+    res.status(500).json({ error: "Error interno al eliminar la pregunta." });
+  }
+});
 
 module.exports = router;

@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=1.8.1" />
+  <link rel="stylesheet" href="styles.css?v=1.8.2" />
   <link rel="icon" type="image/png" href="logo_resimed.png?v=3" />
   <style>
     /* Evitar parpadeo de pantallas no deseadas antes de cargar el CSS/JS (FOUC) */
@@ -547,7 +547,7 @@
       </section>
 
       <section id="pantalla-home" class="screen">
-        <section class="hero-card" style="grid-template-columns: 1fr;">
+        <section id="home-hero-estudiante" class="hero-card" style="grid-template-columns: 1fr;">
           <div class="hero-copy">
             <span class="eyebrow">Preparación ENURM Profesional</span>
             <h2>Entrena con el rigor del examen real.</h2>
@@ -564,8 +564,8 @@
           </div>
         </section>
 
-        <div class="home-grid">
-          <article class="panel">
+        <div id="home-grid-main" class="home-grid">
+          <article id="panel-configurar-entrenamiento" class="panel">
             <div class="panel-head">
               <h3>Configurar Entrenamiento</h3>
               <p>Escoge tus parámetros de simulación médica.</p>
@@ -664,124 +664,168 @@
           <div class="side-panel-container">
             
             <article id="panel-administrador" class="panel hidden" style="border-color: var(--warning); margin-bottom: 24px;">
-              <div class="panel-head">
-                <h3 style="color: var(--warning);">Panel de Gestión del Banco</h3>
-                <p>Módulo administrativo exclusivo para inyección de casos clínicos.</p>
+              <div class="panel-head" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 16px;">
+                <div>
+                  <h3 style="color: var(--warning); font-size: 20px;">Panel de Gestión del Banco de Preguntas</h3>
+                  <p>Administración centralizada de preguntas, exámenes oficiales y reportes clínicos.</p>
+                </div>
+                <span id="admin-banco-total" class="badge" style="background: rgba(245, 158, 11, 0.15); color: var(--warning); font-weight: 700; font-size: 13px; padding: 6px 14px;">0 Preguntas</span>
               </div>
-              <form id="form-nueva-pregunta" style="display: flex; flex-direction: column; gap: 12px;">
-                <div>
-                  <label class="admin-label">Enunciado o Caso Clínico</label>
-                  <textarea id="admin-texto" class="input" style="min-height: 70px; font-family: inherit;" required></textarea>
-                </div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-                  <input type="text" id="admin-opc0" class="input" placeholder="Opción A" required />
-                  <input type="text" id="admin-opc1" class="input" placeholder="Opción B" required />
-                  <input type="text" id="admin-opc2" class="input" placeholder="Opción C" required />
-                  <input type="text" id="admin-opc3" class="input" placeholder="Opción D" required />
-                </div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-                  <div>
-                    <label class="admin-label">Respuesta Correcta</label>
-                    <select id="admin-correcta" class="input">
-                      <option value="0">Opción A</option>
-                      <option value="1">Opción B</option>
-                      <option value="2">Opción C</option>
-                      <option value="3">Opción D</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label class="admin-label">Especialidad Temática</label>
-                    <input type="text" id="admin-tema" class="input" placeholder="Ej: Cardiología" required />
-                  </div>
-                </div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-                   <div>
-                     <label class="admin-label">Asociar a Examen Oficial</label>
-                     <select id="admin-pregunta-examen-id" class="input">
-                       <option value="">-- Banco General (Sin Examen) --</option>
-                     </select>
-                   </div>
-                   <div>
-                     <label class="admin-label">Dificultad (0.0 - 1.0)</label>
-                     <input type="number" id="admin-dificultad" class="input" step="0.1" min="0" max="1" placeholder="Ej: 0.5" value="0.5" />
-                   </div>
-                 </div>
-                <div>
-                  <label class="admin-label">Explicación Clínica / Desglose Docente</label>
-                  <textarea id="admin-explicacion" class="input" style="min-height: 50px; font-family: inherit;" placeholder="Usa 🔬 JUSTIFICACIÓN (Por qué SÍ): y 🚫 DESCARTE (Por qué NO): para visual premium" required></textarea>
-                </div>
-                <div>
-                  <label class="admin-label">Fuente Bibliográfica de Información (Fase 4)</label>
-                  <input type="text" id="admin-fuente" class="input" placeholder="Ej: Nelson Tratado de Pediatría, 21.ª Edición - Cap. 385" required />
-                </div>
-                <button type="submit" class="btn btn-primary" style="background: var(--warning); color: #000; font-weight: bold; width: 100%;">Agregar al Banco Oficial</button>
-                <p id="admin-mensaje" style="font-size: 13px; text-align: center; margin: 0; font-weight: bold;"></p>
-              </form>
-<div class="admin-box" style="margin-top: 24px; padding: 20px; border: 2px dashed var(--border-strong); border-radius: 8px; background: var(--panel-soft);">
-            <h3 style="color: var(--warning); margin-bottom: 8px;">Carga Masiva de Preguntas (Formato JSON)</h3>
-            <p style="font-size: 13px; color: var(--text-soft); margin-bottom: 16px;">Selecciona tu archivo de texto con las preguntas ordenadas en bloque para indexarlas al instante.</p>
-            
-            <div style="margin-bottom: 16px;">
-              <label class="admin-label" style="display: block; margin-bottom: 6px;">Asociar Lote a un Examen Oficial</label>
-              <select id="select-carga-masiva-examen-id" class="input">
-                <option value="">-- Banco General (Sin Examen) --</option>
-              </select>
-            </div>
 
-            <input type="file" id="input-archivo-masivo" accept=".txt,.json" style="margin-bottom: 16px; display: block; color: var(--text);" />
-            <button id="btn-subir-masivo" class="btn btn-primary" type="button" style="background: var(--warning); color: #000;">⚡ Procesar e Inyectar Banco</button>
-            
-            <p id="mensaje-carga-masiva" style="margin-top: 12px; font-size: 14px; font-weight: 600;"></p>
-          </div>
-
-          <!-- FASE 3: GESTIÓN DE EXÁMENES OFICIALES (ENURM) -->
-          <div class="admin-box" style="margin-top: 24px; padding: 20px; border: 1px solid var(--border-strong); border-radius: 12px; background: var(--panel-soft);">
-            <h3 style="color: var(--warning); margin-bottom: 8px; font-size: 15px; display: flex; align-items: center; gap: 8px;">
-              Gestión de Exámenes Oficiales
-            </h3>
-            <p style="font-size: 12.5px; color: var(--text-soft); margin-bottom: 16px;">
-              Crea, edita y administra los exámenes oficiales del ENURM por año de forma consolidada.
-            </p>
-
-            <!-- Formulario nuevo examen integrado -->
-            <form id="form-nuevo-examen" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; padding: 12px; border: 1px dashed var(--border-strong); border-radius: 8px;">
-              <h4 style="font-size: 12px; margin: 0; color: var(--text);">Agregar Nuevo Examen</h4>
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-                <input type="text" id="admin-examen-nombre" class="input" placeholder="Nombre (ej: ENURM 2023)" required />
-                <input type="number" id="admin-examen-ano" class="input" placeholder="Año (ej: 2023)" required />
+              <!-- NAVEGACIÓN POR PESTAÑAS DEL ADMINISTRADOR -->
+              <div class="admin-tabs-bar">
+                <button type="button" class="admin-tab-btn active" data-admin-tab="banco">📚 Banco de Preguntas</button>
+                <button type="button" class="admin-tab-btn" data-admin-tab="agregar">➕ Agregar / Carga Masiva</button>
+                <button type="button" class="admin-tab-btn" data-admin-tab="examenes">🏛️ Exámenes Oficiales</button>
+                <button type="button" class="admin-tab-btn" data-admin-tab="reportes">
+                  🚩 Reportes de Error
+                  <span id="admin-reportes-badge" class="admin-badge-count hidden">0</span>
+                </button>
               </div>
-              <button type="submit" class="btn btn-primary" style="background: var(--warning); color: #000; font-size: 12px; padding: 6px 12px; font-weight: bold; align-self: flex-end;">Crear Examen</button>
-            </form>
 
-            <!-- Lista de exámenes activos/inactivos -->
-            <div id="admin-examenes-lista" style="display: flex; flex-direction: column; gap: 10px; max-height: 250px; overflow-y: auto;">
-              <!-- Se inyecta dinámicamente -->
-            </div>
-          </div>
+              <!-- PESTAÑA 1: BANCO DE PREGUNTAS (VISTA POR DEFECTO) -->
+              <div id="admin-tab-banco" class="admin-tab-pane active">
+                <div style="display: grid; grid-template-columns: 1fr 260px auto; gap: 12px; margin-bottom: 18px; align-items: center;">
+                  <input type="text" id="admin-banco-search" class="input" placeholder="🔍 Buscar por enunciado, especialidad o subtema..." />
+                  <select id="admin-banco-especialidad" class="input">
+                    <option value="Todos">Todas las especialidades</option>
+                  </select>
+                  <button id="btn-admin-banco-buscar" type="button" class="btn btn-primary" style="background: var(--warning); color: #000; font-weight: 700; min-width: auto; padding: 11px 18px;">Filtrar</button>
+                </div>
 
-          <!-- FASE 6: BANCO DE REPORTES DE ERROR DE LA COMUNIDAD -->
-          <div class="admin-box" style="margin-top: 24px; padding: 20px; border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 12px; background: rgba(239, 68, 68, 0.02);">
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 8px;">
-              <h3 style="color: var(--danger); margin: 0; display: flex; align-items: center; gap: 8px; font-size: 15px;">
-                Reportes de Error de la Comunidad
-                <span id="admin-reportes-badge" class="admin-badge-count hidden">0</span>
-              </h3>
-              <button id="btn-admin-refrescar-reportes" class="btn btn-ghost" style="padding: 4px 8px; font-size: 11px; border-color: rgba(239,68,68,0.2); color: var(--danger); min-width: auto;" type="button">Refrescar</button>
-            </div>
-            <p style="font-size: 12.5px; color: var(--text-soft); margin-bottom: 16px;">Revisa y resuelve las fallas en preguntas reportadas por los estudiantes en tiempo real.</p>
-            
-            <div id="admin-reportes-lista" style="display: flex; flex-direction: column; gap: 12px; max-height: 400px; overflow-y: auto; padding-right: 4px;">
-              <!-- Inyectado dinámicamente -->
-            </div>
-            <div id="admin-reportes-vacio" class="history-empty" style="padding: 20px; border-color: rgba(255,255,255,0.05); font-size: 12.5px; color: var(--text-dim);">
-              ✓ No hay reportes de error pendientes en la plataforma.
-            </div>
-          </div>
+                <div id="admin-banco-lista" style="display: flex; flex-direction: column; gap: 10px; min-height: 220px;">
+                  <!-- Se inyecta dinámicamente desde ui.cargarBancoPreguntasAdmin() -->
+                </div>
+
+                <div id="admin-banco-paginacion" style="display: flex; align-items: center; justify-content: space-between; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border);">
+                  <button id="btn-admin-page-prev" type="button" class="btn btn-ghost" style="min-width: auto; padding: 8px 16px; font-size: 13px;">← Anterior</button>
+                  <span id="admin-banco-page-info" style="font-size: 13px; font-weight: 600; color: var(--text-soft);">Página 1 de 1</span>
+                  <button id="btn-admin-page-next" type="button" class="btn btn-ghost" style="min-width: auto; padding: 8px 16px; font-size: 13px;">Siguiente →</button>
+                </div>
+              </div>
+
+              <!-- PESTAÑA 2: AGREGAR / CARGA MASIVA -->
+              <div id="admin-tab-agregar" class="admin-tab-pane">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 24px; align-items: start;">
+                  <form id="form-nueva-pregunta" style="display: flex; flex-direction: column; gap: 12px; padding: 20px; border: 1px solid var(--border); border-radius: 12px; background: var(--panel-soft);">
+                    <h4 style="margin: 0 0 4px 0; color: var(--warning); font-size: 15px;">Agregar Pregunta Individual</h4>
+                    <div>
+                      <label class="admin-label">Enunciado o Caso Clínico</label>
+                      <textarea id="admin-texto" class="input" style="min-height: 70px; font-family: inherit;" required></textarea>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                      <input type="text" id="admin-opc0" class="input" placeholder="Opción A" required />
+                      <input type="text" id="admin-opc1" class="input" placeholder="Opción B" required />
+                      <input type="text" id="admin-opc2" class="input" placeholder="Opción C" required />
+                      <input type="text" id="admin-opc3" class="input" placeholder="Opción D" required />
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                      <div>
+                        <label class="admin-label">Respuesta Correcta</label>
+                        <select id="admin-correcta" class="input">
+                          <option value="0">Opción A</option>
+                          <option value="1">Opción B</option>
+                          <option value="2">Opción C</option>
+                          <option value="3">Opción D</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label class="admin-label">Especialidad Temática</label>
+                        <input type="text" id="admin-tema" class="input" placeholder="Ej: Cardiología" required />
+                      </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                      <div>
+                        <label class="admin-label">Asociar a Examen Oficial</label>
+                        <select id="admin-pregunta-examen-id" class="input">
+                          <option value="">-- Banco General (Sin Examen) --</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label class="admin-label">Dificultad (0.0 - 1.0)</label>
+                        <input type="number" id="admin-dificultad" class="input" step="0.1" min="0" max="1" placeholder="Ej: 0.5" value="0.5" />
+                      </div>
+                    </div>
+                    <div>
+                      <label class="admin-label">Explicación Clínica / Desglose Docente</label>
+                      <textarea id="admin-explicacion" class="input" style="min-height: 50px; font-family: inherit;" placeholder="Usa 🔬 JUSTIFICACIÓN (Por qué SÍ): y 🚫 DESCARTE (Por qué NO): para visual premium" required></textarea>
+                    </div>
+                    <div>
+                      <label class="admin-label">Fuente Bibliográfica de Información</label>
+                      <input type="text" id="admin-fuente" class="input" placeholder="Ej: Nelson Tratado de Pediatría, 21.ª Edición - Cap. 385" required />
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="background: var(--warning); color: #000; font-weight: bold; width: 100%;">Agregar al Banco Oficial</button>
+                    <p id="admin-mensaje" style="font-size: 13px; text-align: center; margin: 0; font-weight: bold;"></p>
+                  </form>
+
+                  <div class="admin-box" style="padding: 20px; border: 2px dashed var(--border-strong); border-radius: 12px; background: var(--panel-soft);">
+                    <h3 style="color: var(--warning); margin-bottom: 8px; font-size: 15px;">Carga Masiva de Preguntas (Formato JSON)</h3>
+                    <p style="font-size: 13px; color: var(--text-soft); margin-bottom: 16px;">Selecciona tu archivo de texto con las preguntas ordenadas en bloque para indexarlas al instante.</p>
+                    
+                    <div style="margin-bottom: 16px;">
+                      <label class="admin-label" style="display: block; margin-bottom: 6px;">Asociar Lote a un Examen Oficial</label>
+                      <select id="select-carga-masiva-examen-id" class="input">
+                        <option value="">-- Banco General (Sin Examen) --</option>
+                      </select>
+                    </div>
+
+                    <input type="file" id="input-archivo-masivo" accept=".txt,.json" style="margin-bottom: 16px; display: block; color: var(--text);" />
+                    <button id="btn-subir-masivo" class="btn btn-primary" type="button" style="background: var(--warning); color: #000;">⚡ Procesar e Inyectar Banco</button>
+                    
+                    <p id="mensaje-carga-masiva" style="margin-top: 12px; font-size: 14px; font-weight: 600;"></p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- PESTAÑA 3: EXÁMENES OFICIALES -->
+              <div id="admin-tab-examenes" class="admin-tab-pane">
+                <div class="admin-box" style="padding: 20px; border: 1px solid var(--border-strong); border-radius: 12px; background: var(--panel-soft);">
+                  <h3 style="color: var(--warning); margin-bottom: 8px; font-size: 15px; display: flex; align-items: center; gap: 8px;">
+                    Gestión de Exámenes Oficiales
+                  </h3>
+                  <p style="font-size: 12.5px; color: var(--text-soft); margin-bottom: 16px;">
+                    Crea, edita y administra los exámenes oficiales del ENURM por año de forma consolidada.
+                  </p>
+
+                  <form id="form-nuevo-examen" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; padding: 14px; border: 1px dashed var(--border-strong); border-radius: 8px;">
+                    <h4 style="font-size: 12px; margin: 0; color: var(--text);">Agregar Nuevo Examen</h4>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr auto; gap: 8px; align-items: center;">
+                      <input type="text" id="admin-examen-nombre" class="input" placeholder="Nombre (ej: ENURM 2023)" required />
+                      <input type="number" id="admin-examen-ano" class="input" placeholder="Año (ej: 2023)" required />
+                      <button type="submit" class="btn btn-primary" style="background: var(--warning); color: #000; font-size: 13px; padding: 10px 16px; font-weight: bold;">Crear Examen</button>
+                    </div>
+                  </form>
+
+                  <div id="admin-examenes-lista" style="display: flex; flex-direction: column; gap: 10px; max-height: 450px; overflow-y: auto;">
+                    <!-- Se inyecta dinámicamente -->
+                  </div>
+                </div>
+              </div>
+
+              <!-- PESTAÑA 4: REPORTES DE ERROR -->
+              <div id="admin-tab-reportes" class="admin-tab-pane">
+                <div class="admin-box" style="padding: 20px; border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 12px; background: rgba(239, 68, 68, 0.02);">
+                  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 8px;">
+                    <h3 style="color: var(--danger); margin: 0; display: flex; align-items: center; gap: 8px; font-size: 15px;">
+                      Reportes de Error de la Comunidad
+                    </h3>
+                    <button id="btn-admin-refrescar-reportes" class="btn btn-ghost" style="padding: 6px 12px; font-size: 12px; border-color: rgba(239,68,68,0.2); color: var(--danger); min-width: auto;" type="button">🔄 Refrescar</button>
+                  </div>
+                  <p style="font-size: 12.5px; color: var(--text-soft); margin-bottom: 16px;">Revisa y resuelve las fallas en preguntas reportadas por los estudiantes en tiempo real.</p>
+                  
+                  <div id="admin-reportes-lista" style="display: flex; flex-direction: column; gap: 12px; max-height: 520px; overflow-y: auto; padding-right: 4px;">
+                    <!-- Inyectado dinámicamente -->
+                  </div>
+                  <div id="admin-reportes-vacio" class="history-empty" style="padding: 20px; border-color: rgba(255,255,255,0.05); font-size: 12.5px; color: var(--text-dim);">
+                    ✓ No hay reportes de error pendientes en la plataforma.
+                  </div>
+                </div>
+              </div>
 
             </article>
 
             <!-- CARD DE EVOLUCIÓN CLÍNICA PREMIUM Y GAMIFICADA -->
-            <article class="panel">
+            <article id="panel-metricas-estudiante" class="panel">
               <div class="panel-head">
                 <h3>Métricas de Rendimiento</h3>
                 <p>Tus datos históricos individuales en esta PC.</p>
@@ -2312,18 +2356,18 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="js/state.js?v=1.8.1"></script>
-  <script src="js/api.js?v=1.8.1"></script>
-  <script src="js/spaced_repetition.js?v=1.8.1"></script>
-  <script src="js/analytics.js?v=1.8.1"></script>
-  <script src="js/ui.js?v=1.8.1"></script>
-  <script src="js/ui_dashboard.js?v=1.8.1"></script>
-  <script src="js/ui_profile.js?v=1.8.1"></script>
-  <script src="js/auth.js?v=1.8.1"></script>
-  <script src="js/quiz.js?v=1.8.1"></script>
-  <script src="js/flashcards.js?v=1.8.1"></script>
-  <script src="js/battle.js?v=1.8.1"></script>
-  <script src="js/main.js?v=1.8.1"></script>
+  <script src="js/state.js?v=1.8.2"></script>
+  <script src="js/api.js?v=1.8.2"></script>
+  <script src="js/spaced_repetition.js?v=1.8.2"></script>
+  <script src="js/analytics.js?v=1.8.2"></script>
+  <script src="js/ui.js?v=1.8.2"></script>
+  <script src="js/ui_dashboard.js?v=1.8.2"></script>
+  <script src="js/ui_profile.js?v=1.8.2"></script>
+  <script src="js/auth.js?v=1.8.2"></script>
+  <script src="js/quiz.js?v=1.8.2"></script>
+  <script src="js/flashcards.js?v=1.8.2"></script>
+  <script src="js/battle.js?v=1.8.2"></script>
+  <script src="js/main.js?v=1.8.2"></script>
 
   <script>
     // Funciones del Showcase Interactivo de Landing Page
