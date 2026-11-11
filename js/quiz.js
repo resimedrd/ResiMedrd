@@ -203,21 +203,9 @@ const quiz = {
       }
 
       if (chipTema) {
-        if (state.modoActual === "guardia") {
-          if (state.especialidadSeleccionada === "Todos") {
-            chipTema.textContent = "Urgencias Médicas";
-          } else {
-            chipTema.textContent = (state.subtemaSeleccionado && state.subtemaSeleccionado !== "Todos")
-              ? `Guardia: ${state.especialidadSeleccionada} - ${state.subtemaSeleccionado}`
-              : `Guardia: ${state.especialidadSeleccionada}`;
-          }
-        } else if (state.especialidadSeleccionada === "Todos") {
-          chipTema.textContent = "Examen General";
-        } else {
-          chipTema.textContent = (state.subtemaSeleccionado && state.subtemaSeleccionado !== "Todos")
-            ? `${state.especialidadSeleccionada} - ${state.subtemaSeleccionado}`
-            : state.especialidadSeleccionada;
-        }
+        const infoChip = ui.formatearResumenEspecialidades(state.especialidadSeleccionada, state.modoActual === "guardia", true);
+        chipTema.textContent = infoChip.texto;
+        chipTema.title = infoChip.tooltip;
       }
 
       if (mapEl) mapEl.classList.remove("hidden");
@@ -625,21 +613,9 @@ const quiz = {
         }
       }
       if (chipTema) {
-        if (modo === "guardia") {
-          if (state.especialidadSeleccionada === "Todos") {
-            chipTema.textContent = "Urgencias Médicas";
-          } else {
-            chipTema.textContent = (state.subtemaSeleccionado && state.subtemaSeleccionado !== "Todos")
-              ? `Guardia: ${state.especialidadSeleccionada} - ${state.subtemaSeleccionado}`
-              : `Guardia: ${state.especialidadSeleccionada}`;
-          }
-        } else if (state.especialidadSeleccionada === "Todos") {
-          chipTema.textContent = "Examen General";
-        } else {
-          chipTema.textContent = (state.subtemaSeleccionado && state.subtemaSeleccionado !== "Todos")
-            ? `${state.especialidadSeleccionada} - ${state.subtemaSeleccionado}`
-            : state.especialidadSeleccionada;
-        }
+        const infoChip = ui.formatearResumenEspecialidades(state.especialidadSeleccionada, modo === "guardia", true);
+        chipTema.textContent = infoChip.texto;
+        chipTema.title = infoChip.tooltip;
       }
       if (mapEl) mapEl.classList.remove("hidden");
 
@@ -1209,18 +1185,14 @@ const quiz = {
       }));
 
       // Guardar el último resultado localmente para persistencia en recarga F5
+      const infoResTema = ui.formatearResumenEspecialidades(state.especialidadSeleccionada, state.modoActual === "guardia", false);
       const ultimoResultado = {
         aciertos: aciertos,
         totalPreguntas: state.preguntasCargadas.length,
         porcentaje: porcentaje,
         duracionFormateada: duracionFormateada,
-        temaTexto: (state.modoActual === "guardia")
-          ? (state.especialidadSeleccionada === "Todos" ? "Urgencias Médicas" : `Guardia: ${state.especialidadSeleccionada}`)
-          : (state.especialidadSeleccionada === "Todos")
-            ? "Examen General"
-            : (state.subtemaSeleccionado && state.subtemaSeleccionado !== "Todos")
-              ? `${state.especialidadSeleccionada} - ${state.subtemaSeleccionado}`
-              : state.especialidadSeleccionada,
+        temaTexto: infoResTema.texto,
+        temaTooltip: infoResTema.tooltip,
         detalleExamen: detalleExamen
       };
       localStorage.setItem("resiMed_ultimo_resultado", JSON.stringify(ultimoResultado));
@@ -1262,18 +1234,12 @@ const quiz = {
     document.getElementById("resultado-puntaje").textContent = `${aciertos} / ${state.preguntasCargadas.length}`;
     document.getElementById("resultado-porcentaje").textContent = `${porcentaje}%`;
     
-    // FASE 3: Detalle dinámico y completo en el informe de rendimiento
+    // FASE 3: Detalle dinámico y compacto en el informe de rendimiento
     const resultadoTemaEl = document.getElementById("resultado-tema");
     if (resultadoTemaEl) {
-      if (state.modoActual === "guardia") {
-        resultadoTemaEl.textContent = "Urgencias Médicas";
-      } else if (state.especialidadSeleccionada === "Todos") {
-        resultadoTemaEl.textContent = "Examen General";
-      } else {
-        resultadoTemaEl.textContent = (state.subtemaSeleccionado && state.subtemaSeleccionado !== "Todos")
-          ? `${state.especialidadSeleccionada} - ${state.subtemaSeleccionado}`
-          : state.especialidadSeleccionada;
-      }
+      const infoRes = ui.formatearResumenEspecialidades(state.especialidadSeleccionada, state.modoActual === "guardia", false);
+      resultadoTemaEl.textContent = infoRes.texto;
+      resultadoTemaEl.title = infoRes.tooltip;
     }
 
     const revisionContainer = document.getElementById("revision-container");
@@ -1401,18 +1367,14 @@ const quiz = {
       }));
 
       // Guardar el último resultado localmente
+      const infoResTema = ui.formatearResumenEspecialidades(state.especialidadSeleccionada, state.modoActual === "guardia", false);
       const ultimoResultado = {
         aciertos: aciertos,
         totalPreguntas: state.preguntasCargadas.length,
         porcentaje: porcentaje,
         duracionFormateada: duracionFormateada,
-        temaTexto: (state.modoActual === "guardia")
-          ? (state.especialidadSeleccionada === "Todos" ? "Urgencias Médicas" : `Guardia: ${state.especialidadSeleccionada}`)
-          : (state.especialidadSeleccionada === "Todos")
-            ? "Examen General"
-            : (state.subtemaSeleccionado && state.subtemaSeleccionado !== "Todos")
-              ? `${state.especialidadSeleccionada} - ${state.subtemaSeleccionado}`
-              : state.especialidadSeleccionada,
+        temaTexto: infoResTema.texto,
+        temaTooltip: infoResTema.tooltip,
         detalleExamen: detalleExamen
       };
       localStorage.setItem("resiMed_ultimo_resultado", JSON.stringify(ultimoResultado));
@@ -1509,7 +1471,11 @@ const quiz = {
       if (resultadoTiempoEl) resultadoTiempoEl.textContent = data.duracionFormateada;
 
       const resultadoTemaEl = document.getElementById("resultado-tema");
-      if (resultadoTemaEl) resultadoTemaEl.textContent = data.temaTexto;
+      if (resultadoTemaEl) {
+        const infoRes = ui.formatearResumenEspecialidades(data.temaTooltip || data.temaTexto, false, false);
+        resultadoTemaEl.textContent = infoRes.texto;
+        resultadoTemaEl.title = data.temaTooltip || infoRes.tooltip;
+      }
 
       // Reconstruir la disección del examen (revisionContainer)
       const revisionContainer = document.getElementById("revision-container");

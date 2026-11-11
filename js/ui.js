@@ -232,6 +232,28 @@ const ui = {
     return checked;
   },
 
+  formatearResumenEspecialidades(especialidadStr, esGuardia = false, conPrefijoGuardia = false) {
+    if (!especialidadStr || especialidadStr === "Todos") {
+      return {
+        texto: esGuardia ? "Urgencias Médicas" : "Examen General",
+        tooltip: "Todas las especialidades"
+      };
+    }
+    const baseEsp = String(especialidadStr).split(" - ")[0].replace(/^Guardia:\s*/i, "").trim();
+    const lista = baseEsp.split(",").map(s => s.trim()).filter(Boolean);
+    if (lista.length <= 1) {
+      const unica = lista[0] || baseEsp;
+      return {
+        texto: (esGuardia && conPrefijoGuardia) ? `Guardia: ${unica}` : unica,
+        tooltip: unica
+      };
+    }
+    return {
+      texto: (esGuardia && conPrefijoGuardia) ? `Guardia: ${lista.length} Especialidades` : `${lista.length} Especialidades`,
+      tooltip: lista.join(", ")
+    };
+  },
+
   async cargarFiltrosEspecialidad() {
     try {
       const temasDisponibles = await api.obtenerTemas();
@@ -378,6 +400,10 @@ const ui = {
         subTriggerBtn.dataset.hasToggleListener = "true";
         subTriggerBtn.addEventListener("click", (e) => {
           e.stopPropagation();
+          // Cerrar el menú de especialidades si está abierto
+          container.classList.add("hidden");
+          if (triggerBtn) triggerBtn.classList.remove("open");
+
           const isHidden = selectorSubtema.classList.toggle("hidden");
           subTriggerBtn.classList.toggle("open", !isHidden);
         });
@@ -422,6 +448,10 @@ const ui = {
         triggerBtn.dataset.hasToggleListener = "true";
         triggerBtn.addEventListener("click", (e) => {
           e.stopPropagation();
+          // Cerrar el menú de temas/subtemas si está abierto
+          if (selectorSubtema) selectorSubtema.classList.add("hidden");
+          if (subTriggerBtn) subTriggerBtn.classList.remove("open");
+
           const isHidden = container.classList.toggle("hidden");
           triggerBtn.classList.toggle("open", !isHidden);
         });
@@ -529,7 +559,12 @@ const ui = {
 
       document.getElementById("resultado-puntaje").textContent = `${sesion.correctas} / ${sesion.cantidad_preguntas}`;
       document.getElementById("resultado-porcentaje").textContent = `${sesion.porcentaje}%`;
-      document.getElementById("resultado-tema").textContent = sesion.tema === "Todos" ? "Examen General" : sesion.tema;
+      const resTemaEl = document.getElementById("resultado-tema");
+      if (resTemaEl) {
+        const infoResTema = ui.formatearResumenEspecialidades(sesion.tema, sesion.modo === "guardia", false);
+        resTemaEl.textContent = infoResTema.texto;
+        resTemaEl.title = infoResTema.tooltip;
+      }
 
       // Recuperar y formatear la duración de la sesión
       const segundosTotales = preguntas[0]?.duracionTotalSegundos || 0;

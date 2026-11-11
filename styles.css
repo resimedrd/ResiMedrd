@@ -6231,6 +6231,19 @@ body.dark-mode .premium-metrics-panel {
 }
 
 /* === SELECTOR MÚLTIPLE DE ESPECIALIDADES Y TEMAS === */
+#block-especialidad {
+  z-index: 30;
+}
+
+#block-subtema {
+  z-index: 20;
+}
+
+#block-especialidad:has(.multiselect-trigger.open),
+#block-subtema:has(.multiselect-trigger.open) {
+  z-index: 1005 !important;
+}
+
 .multiselect-trigger {
   display: flex;
   align-items: center;
@@ -6266,14 +6279,27 @@ body.dark-mode .premium-metrics-panel {
   width: 100%;
   max-height: 260px;
   overflow-y: auto;
-  background: var(--panel-strong, var(--panel));
+  background: #ffffff !important;
   border: 1px solid var(--border-strong);
   border-radius: 14px;
   padding: 6px;
-  z-index: 120;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  z-index: 1010 !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+}
+
+body.dark-mode .multiselect-menu,
+html.dark-mode .multiselect-menu {
+  background: #0f172a !important;
+  border-color: rgba(255, 255, 255, 0.18) !important;
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.65) !important;
+}
+
+#resultado-tema {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 
 .multiselect-option {
