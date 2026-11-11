@@ -122,6 +122,17 @@ router.get("/api/temas", async (req, res) => {
       total: conteo[esp.id] || 0
     }));
 
+    const idsOficiales = new Set(ESPECIALIDADES_OFICIALES.map(e => e.id));
+    Object.keys(conteo).forEach(espId => {
+      if (espId && !idsOficiales.has(espId)) {
+        const nombreFormateado = espId.charAt(0).toUpperCase() + espId.slice(1);
+        resultado.push({
+          tema: nombreFormateado,
+          total: conteo[espId]
+        });
+      }
+    });
+
     res.json(resultado);
   } catch (error) {
     console.error("Error al obtener temas:", error);
@@ -129,25 +140,39 @@ router.get("/api/temas", async (req, res) => {
   }
 });
 
-// FASE 3: Endpoint para recuperar subtemas de forma autónoma
+function normalizarClaveSubtema(str) {
+  if (!str) return "";
+  return String(str).trim().replace(/\s+/g, " ").toLowerCase();
+}
+
+// FASE 3: Endpoint para recuperar subtemas de forma autónoma (soporta 1 o varias especialidades)
 router.get("/api/especialidades/:especialidad/subtemas", async (req, res) => {
   const db = getDB();
   try {
-    const { especialidad } = req.params;
-    const requestedEspId = normalizarTema(especialidad);
+    const rawEsp = req.params.especialidad || "Todos";
+    const listaEsp = rawEsp.split(",").map(s => s.trim()).filter(Boolean);
+    const esTodos = listaEsp.length === 0 || listaEsp.some(s => s.toLowerCase() === "todos");
+    const requestedEspIds = new Set(listaEsp.map(s => normalizarTema(s)));
 
     const todas = await db.all(
       `SELECT DISTINCT subtema, tema FROM preguntas WHERE (activo = 1 OR activo IS NULL)`
     );
 
-    const subtemasSet = new Set();
+    const subtemasMap = new Map();
     todas.forEach(p => {
-      if (normalizarTema(p.tema) === requestedEspId && p.subtema && p.subtema.trim() !== "") {
-        subtemasSet.add(p.subtema.trim());
+      const coincideEsp = esTodos || requestedEspIds.has(normalizarTema(p.tema));
+      if (coincideEsp && p.subtema && p.subtema.trim() !== "") {
+        const limpio = p.subtema.trim().replace(/\s+/g, " ");
+        const clave = normalizarClaveSubtema(limpio);
+        if (clave && !subtemasMap.has(clave)) {
+          subtemasMap.set(clave, limpio);
+        }
       }
     });
 
-    const subtemas = Array.from(subtemasSet).sort();
+    const subtemas = Array.from(subtemasMap.values()).sort((a, b) =>
+      a.localeCompare(b, "es", { sensitivity: "base" })
+    );
     res.json(subtemas);
   } catch (error) {
     console.error("Error al obtener subtemas:", error);
@@ -208,28 +233,30 @@ router.post("/api/exam-setup", autenticarToken, async (req, res) => {
 
     let preguntas = [];
 
-    const esTodos = !valor || valor.trim().toLowerCase() === "todos";
-    const esTodosSub = !subtema || subtema.trim().toLowerCase() === "todos";
+    const valoresEsp = Array.isArray(valor)
+      ? valor.map(v => String(v).trim()).filter(Boolean)
+      : (valor ? [String(valor).trim()] : []);
+    const esTodos = valoresEsp.length === 0 || valoresEsp.some(v => v.toLowerCase() === "todos");
 
-    if (tipo === "especialidad" && !esTodos) {
-      const requestedEspId = normalizarTema(valor);
+    const valoresSub = Array.isArray(subtema)
+      ? subtema.map(s => normalizarClaveSubtema(s)).filter(Boolean)
+      : (subtema ? [normalizarClaveSubtema(subtema)].filter(Boolean) : []);
+    const esTodosSub = valoresSub.length === 0 || valoresSub.includes("todos");
+
+    if (tipo === "especialidad" && (!esTodos || !esTodosSub)) {
+      const requestedEspIds = new Set(valoresEsp.map(v => normalizarTema(v)));
+      const requestedSubKeys = new Set(valoresSub);
       
       // Obtener todas las preguntas activas
       const todas = await db.all(
         `SELECT * FROM preguntas WHERE (activo = 1 OR activo IS NULL)`
       );
       
-      // Filtrar por especialidad normalizada y subtema si se requiere
+      // Filtrar por especialidades y subtemas normalizados
       let filtradas = todas.filter(p => {
-        const espId = normalizarTema(p.tema);
-        const matchesEsp = (espId === requestedEspId);
-        
-        if (!esTodosSub) {
-          const subTemaLower = (p.subtema || "").trim().toLowerCase();
-          const reqSubLower = subtema.trim().toLowerCase();
-          return matchesEsp && (subTemaLower === reqSubLower);
-        }
-        return matchesEsp;
+        const matchesEsp = esTodos ? true : requestedEspIds.has(normalizarTema(p.tema));
+        const matchesSub = esTodosSub ? true : requestedSubKeys.has(normalizarClaveSubtema(p.subtema));
+        return matchesEsp && matchesSub;
       });
       
       // Barajar y limitar a maxPreguntas

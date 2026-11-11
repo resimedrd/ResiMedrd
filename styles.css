@@ -6230,3 +6230,85 @@ body.dark-mode .premium-metrics-panel {
   }
 }
 
+/* === SELECTOR MÚLTIPLE DE ESPECIALIDADES Y TEMAS === */
+.multiselect-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  text-align: left;
+  cursor: pointer;
+  gap: 10px;
+  user-select: none;
+}
+
+.multiselect-trigger span:first-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+}
+
+.multiselect-arrow {
+  font-size: 14px;
+  color: var(--text-dim);
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+.multiselect-trigger.open .multiselect-arrow {
+  transform: rotate(180deg);
+}
+
+.multiselect-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  width: 100%;
+  max-height: 260px;
+  overflow-y: auto;
+  background: var(--panel-strong, var(--panel));
+  border: 1px solid var(--border-strong);
+  border-radius: 14px;
+  padding: 6px;
+  z-index: 120;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.multiselect-option {
+  display: flex !important;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 13.5px !important;
+  font-weight: 500 !important;
+  color: var(--text) !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+  margin-bottom: 2px !important;
+  transition: background 0.15s ease;
+  user-select: none;
+}
+
+.multiselect-option:hover {
+  background: rgba(59, 130, 246, 0.08);
+}
+
+.multiselect-option.selected {
+  background: rgba(59, 130, 246, 0.14);
+  color: var(--primary) !important;
+  font-weight: 600 !important;
+}
+
+.multiselect-option input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--primary);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+

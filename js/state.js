@@ -28,6 +28,7 @@ const state = {
   },
 
   // Temporizadores
+  tiempoPersonalizadoPorPregunta: 90,
   tiempoRestanteSegundos: 0,
   intervaloTemporizador: null,
   duracionTotalSegundos: 0,

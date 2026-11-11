@@ -7,7 +7,7 @@ const router = express.Router();
 router.post("/api/preguntas", autenticarToken, exigirAdmin, async (req, res) => {
   const db = getDB();
   try {
-    const { texto, opciones, correcta, tema, explicacion, fuente, examen_id, difficulty } = req.body;
+    const { texto, opciones, correcta, tema, subtema, explicacion, fuente, examen_id, difficulty } = req.body;
     const usuarioId = req.usuario.id;
 
     // REVISIÓN INTEGRAL: En vez de creerle al texto "admin", le preguntamos directamente 
@@ -33,13 +33,14 @@ router.post("/api/preguntas", autenticarToken, exigirAdmin, async (req, res) => 
     }
 
     await db.run(
-      `INSERT INTO preguntas (texto, opciones, correcta, tema, explicacion, fuente, especialidad, difficulty, activo, examen_id, ano_examen) 
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?)`,
+      `INSERT INTO preguntas (texto, opciones, correcta, tema, subtema, explicacion, fuente, especialidad, difficulty, activo, examen_id, ano_examen) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?)`,
       [
         texto, 
         opcionesJSON, 
         correcta, 
         tema, 
+        (subtema || "").trim(),
         explicacion, 
         fuente || "ENURM Referencia Académica Oficial",
         tema,

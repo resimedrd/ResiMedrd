@@ -177,9 +177,11 @@ const api = {
   obtenerAnosExamen: () =>
     request("/api/examenes/anos"),
 
-  // FASE 3: Endpoint dinámico para recuperar subtemas de una especialidad
-  obtenerSubtemas: (especialidad) =>
-    request(`/api/especialidades/${encodeURIComponent(especialidad)}/subtemas`),
+  // FASE 3: Endpoint dinámico para recuperar subtemas de una o varias especialidades
+  obtenerSubtemas: (especialidad) => {
+    const param = Array.isArray(especialidad) ? especialidad.join(",") : (especialidad || "Todos");
+    return request(`/api/especialidades/${encodeURIComponent(param)}/subtemas`);
+  },
 
   prepararExamen: (tipo, valor, cantidad, subtema = "Todos") =>
     request("/api/exam-setup", {

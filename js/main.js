@@ -135,10 +135,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       blockEspecialidad.classList.remove("hidden");
       blockAno.classList.add("hidden");
       
-      const selectEsp = document.getElementById("especialidad");
       const blockSubtema = document.getElementById("block-subtema");
       const selectorSubtema = document.getElementById("selector-subtema");
-      if (selectEsp && blockSubtema && selectorSubtema && selectEsp.value !== "Todos" && selectorSubtema.options.length > 0) {
+      if (blockSubtema && selectorSubtema && selectorSubtema.children.length > 0) {
         blockSubtema.classList.remove("hidden");
       }
       
@@ -838,6 +837,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         formCorregirPregunta.reset();
         
         await ui.cargarReportesAdministrador();
+        await ui.cargarFiltrosEspecialidad();
       } catch (err) {
         alert("✗ Falla al guardar la corrección: " + err.message);
       }

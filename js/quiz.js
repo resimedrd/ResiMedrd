@@ -93,6 +93,8 @@ const quiz = {
 
   guardarEstadoExamenActivo() {
     if (state.preguntasCargadas && state.preguntasCargadas.length > 0) {
+      const tiempoConfigurado = state.tiempoPersonalizadoPorPregunta || 90;
+      sessionStorage.setItem("resiMed_tiempo_personalizado", String(tiempoConfigurado));
       localStorage.setItem("resiMed_examen_activo", JSON.stringify({
         modoActual: state.modoActual,
         especialidadSeleccionada: state.especialidadSeleccionada,
@@ -102,6 +104,7 @@ const quiz = {
         indiceActual: state.indiceActual,
         respuestasUsuario: state.respuestasUsuario,
         preguntasMarcadas: state.preguntasMarcadas,
+        tiempoPersonalizadoPorPregunta: tiempoConfigurado,
         duracionTotalSegundos: state.duracionTotalSegundos,
         tiempoRestanteSegundos: state.tiempoRestanteSegundos,
         tiempoPorPreguntaRestante: (typeof tiempoPorPreguntaRestante !== "undefined") ? tiempoPorPreguntaRestante : 30,
@@ -113,6 +116,7 @@ const quiz = {
 
   limpiarEstadoExamenActivo() {
     localStorage.removeItem("resiMed_examen_activo");
+    sessionStorage.removeItem("resiMed_tiempo_personalizado");
   },
 
   restaurarExamenActivo() {
@@ -131,6 +135,7 @@ const quiz = {
       state.indiceActual = data.indiceActual;
       state.respuestasUsuario = data.respuestasUsuario;
       state.preguntasMarcadas = data.preguntasMarcadas;
+      state.tiempoPersonalizadoPorPregunta = data.tiempoPersonalizadoPorPregunta || parseInt(sessionStorage.getItem("resiMed_tiempo_personalizado")) || 90;
       state.duracionTotalSegundos = data.duracionTotalSegundos;
       state.tiempoRestanteSegundos = data.tiempoRestanteSegundos;
       state.retroalimentacionInmediata = data.retroalimentacionInmediata;
@@ -279,10 +284,17 @@ const quiz = {
     const btnCancelar = document.getElementById("btn-confirmar-cerrar");
     const toggleBox = document.getElementById("modal-confirmar-estudio-toggle-box");
     const chkRetro = document.getElementById("chk-retroalimentacion-inmediata");
+    const tiempoBox = document.getElementById("modal-confirmar-tiempo-box");
+    const selectModalTiempo = document.getElementById("modal-tiempo-por-pregunta");
+    const selectMainTiempo = document.getElementById("tiempo-por-pregunta");
 
     if (!modal) {
       quiz.iniciarSesion(modo);
       return;
+    }
+
+    if (selectModalTiempo && selectMainTiempo) {
+      selectModalTiempo.value = selectMainTiempo.value || "90";
     }
 
     // Mostrar u ocultar el switch de retroalimentación según corresponda
@@ -290,51 +302,65 @@ const quiz = {
       toggleBox.style.display = (modo === "estudio") ? "flex" : "none";
     }
 
-    const actualizarTextoEstudio = () => {
-      if (!chkRetro) return;
-      if (chkRetro.checked) {
-        tituloEl.textContent = "Modo Estudio (Respuestas al Instante)";
-        descEl.textContent = "Sesión de aprendizaje adaptativo con respuestas y justificaciones clínicas al instante al contestar cada pregunta. Límite de 90 segundos por pregunta.";
-      } else {
-        tituloEl.textContent = "Modo Estudio (Respuestas al Final)";
-        descEl.textContent = "Sesión de aprendizaje adaptativo con respuestas y justificaciones clínicas consolidadas al finalizar el bloque de preguntas. Límite de 90 segundos por pregunta.";
+    // Mostrar selector de tiempo en Estudio y Simulacro; oculto/fijo en Modo Intensivo (guardia)
+    if (tiempoBox) {
+      tiempoBox.style.display = (modo === "estudio" || modo === "simulacro") ? "flex" : "none";
+    }
+
+    const obtenerSegundosSeleccionados = () => {
+      if (selectModalTiempo) return parseInt(selectModalTiempo.value) || 90;
+      if (selectMainTiempo) return parseInt(selectMainTiempo.value) || 90;
+      return 90;
+    };
+
+    const actualizarTextoModal = () => {
+      const segs = obtenerSegundosSeleccionados();
+      if (selectMainTiempo && selectModalTiempo) {
+        selectMainTiempo.value = selectModalTiempo.value;
+      }
+      if (modo === "estudio") {
+        if (chkRetro && chkRetro.checked) {
+          tituloEl.textContent = "Modo Estudio (Respuestas al Instante)";
+          descEl.textContent = `Sesión de aprendizaje adaptativo con respuestas y justificaciones clínicas al instante al contestar cada pregunta. Límite de ${segs} segundos por pregunta.`;
+        } else {
+          tituloEl.textContent = "Modo Estudio (Respuestas al Final)";
+          descEl.textContent = `Sesión de aprendizaje adaptativo con respuestas y justificaciones clínicas consolidadas al finalizar el bloque de preguntas. Límite de ${segs} segundos por pregunta.`;
+        }
+      } else if (modo === "simulacro") {
+        tituloEl.textContent = "Modo Simulacro";
+        descEl.textContent = `Evaluación formal y estricta bajo condiciones reales de examen (cuenta regresiva de ${segs} segundos por pregunta) con respuestas y resultados bloqueados hasta finalizar el test.`;
+      } else if (modo === "guardia") {
+        tituloEl.textContent = "Modo Intensivo";
+        descEl.textContent = "Entrenamiento intensivo y acelerado de 10 preguntas con límite estricto fijo de 30 segundos por pregunta.";
       }
     };
 
-    // Configurar contenidos sobrios y ultra-resumidos por modo
-    if (modo === "estudio") {
-      actualizarTextoEstudio();
-      if (chkRetro) {
-        chkRetro.addEventListener("change", actualizarTextoEstudio);
-      }
-    } else if (modo === "simulacro") {
-      tituloEl.textContent = "Modo Simulacro";
-      descEl.textContent = "Evaluación formal y estricta bajo condiciones reales de examen (cuenta regresiva de 90 segundos por pregunta) con respuestas y resultados bloqueados hasta finalizar el test.";
-    } else if (modo === "guardia") {
-      tituloEl.textContent = "Modo Intensivo";
-      descEl.textContent = "Entrenamiento intensivo y acelerado de 10 preguntas con límite estricto de 30 segundos por pregunta.";
+    actualizarTextoModal();
+    if (chkRetro && modo === "estudio") {
+      chkRetro.addEventListener("change", actualizarTextoModal);
+    }
+    if (selectModalTiempo && (modo === "estudio" || modo === "simulacro")) {
+      selectModalTiempo.addEventListener("change", actualizarTextoModal);
     }
 
     // Manejar eventos de forma limpia libres de acumulaciones
-    const alAceptar = () => {
-      modal.classList.remove("active");
+    const limpiarListenersModal = () => {
       btnAceptar.removeEventListener("click", alAceptar);
       btnCancelar.removeEventListener("click", alCancelar);
       modal.removeEventListener("click", alFondo);
-      if (chkRetro) {
-        chkRetro.removeEventListener("change", actualizarTextoEstudio);
-      }
+      if (chkRetro) chkRetro.removeEventListener("change", actualizarTextoModal);
+      if (selectModalTiempo) selectModalTiempo.removeEventListener("change", actualizarTextoModal);
+    };
+
+    const alAceptar = () => {
+      modal.classList.remove("active");
+      limpiarListenersModal();
       quiz.iniciarSesion(modo);
     };
 
     const alCancelar = () => {
       modal.classList.remove("active");
-      btnAceptar.removeEventListener("click", alAceptar);
-      btnCancelar.removeEventListener("click", alCancelar);
-      modal.removeEventListener("click", alFondo);
-      if (chkRetro) {
-        chkRetro.removeEventListener("change", actualizarTextoEstudio);
-      }
+      limpiarListenersModal();
     };
 
     const alFondo = (e) => {
@@ -537,8 +563,9 @@ const quiz = {
       let nombreParaEstado = "";
       
       if (tipo === "especialidad") {
-        valor = document.getElementById("especialidad").value;
-        nombreParaEstado = valor;
+        const seleccionadas = ui.obtenerEspecialidadesSeleccionadas ? ui.obtenerEspecialidadesSeleccionadas() : ["Todos"];
+        valor = seleccionadas.includes("Todos") ? "Todos" : seleccionadas;
+        nombreParaEstado = seleccionadas.includes("Todos") ? "Todos" : seleccionadas.join(", ");
       } else {
         const selectAno = document.getElementById("selector-ano");
         valor = selectAno.value;
@@ -546,12 +573,15 @@ const quiz = {
         nombreParaEstado = valor === "Todos" ? "Todos" : (opcionSeleccionada ? opcionSeleccionada.textContent.split(" (")[0] : "Examen Oficial");
       }
       
-      const selectorSub = document.getElementById("selector-subtema");
-      const subtema = (tipo === "especialidad" && selectorSub) ? selectorSub.value : "Todos";
+      const subSeleccionados = (tipo === "especialidad" && ui.obtenerSubtemasSeleccionados)
+        ? ui.obtenerSubtemasSeleccionados()
+        : ["Todos"];
+      const subtema = subSeleccionados.includes("Todos") ? "Todos" : subSeleccionados;
+      const subtemaParaEstado = subSeleccionados.includes("Todos") ? "Todos" : subSeleccionados.join(", ");
 
       // FASE 3: Guardar en el estado para consistencia visual premium
       state.especialidadSeleccionada = nombreParaEstado;
-      state.subtemaSeleccionado = subtema;
+      state.subtemaSeleccionado = subtemaParaEstado;
 
       if (modo === "guardia") {
         state.cantidadSolicitada = 10;
@@ -629,11 +659,15 @@ const quiz = {
 
       // 3. Configuración de Tiempos
       if (modo === "guardia") {
+        state.tiempoPersonalizadoPorPregunta = 30;
         state.preguntasCargadas = preguntas.slice(0, 10); // Modo guardia siempre 10 preguntas
         state.respuestasUsuario = new Array(state.preguntasCargadas.length).fill(null);
         state.preguntasMarcadas = new Array(state.preguntasCargadas.length).fill(false);
       } else if (modo === "simulacro" || modo === "estudio") {
-        state.tiempoRestanteSegundos = state.preguntasCargadas.length * 90;
+        const selectTiempo = document.getElementById("tiempo-por-pregunta") || document.getElementById("modal-tiempo-por-pregunta");
+        const segPorPregunta = selectTiempo ? (parseInt(selectTiempo.value) || 90) : 90;
+        state.tiempoPersonalizadoPorPregunta = segPorPregunta;
+        state.tiempoRestanteSegundos = state.preguntasCargadas.length * segPorPregunta;
         state.duracionTotalSegundos = 0;
       }
 

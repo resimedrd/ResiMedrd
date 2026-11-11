@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=1.7.9" />
+  <link rel="stylesheet" href="styles.css?v=1.8.0" />
   <link rel="icon" type="image/png" href="logo_resimed.png?v=3" />
   <style>
     /* Evitar parpadeo de pantallas no deseadas antes de cargar el CSS/JS (FOUC) */
@@ -580,16 +580,24 @@
               </div>
             </div>
 
-            <!-- SELECTOR DINÁMICO DE ESPECIALIDAD -->
-            <div id="block-especialidad" class="form-block">
-              <label for="especialidad">Especialidad Temática</label>
-              <select id="especialidad" class="input"></select>
+            <!-- SELECTOR DINÁMICO DE ESPECIALIDAD (MULTISELECCIÓN) -->
+            <div id="block-especialidad" class="form-block" style="position: relative;">
+              <label for="especialidad-dropdown-btn">Especialidad Temática (Selección Múltiple)</label>
+              <button id="especialidad-dropdown-btn" class="input multiselect-trigger" type="button">
+                <span id="especialidad-selected-text">Todas las especialidades (Examen General)</span>
+                <span class="multiselect-arrow">▾</span>
+              </button>
+              <div id="especialidad" class="multiselect-menu hidden"></div>
             </div>
 
-            <!-- FASE 3: SELECTOR DINÁMICO DE TEMA / SUBTEMA (INICIALMENTE OCULTO) -->
-            <div id="block-subtema" class="form-block hidden" style="margin-top: 16px;">
-              <label for="selector-subtema">Tema o Subtema Específico</label>
-              <select id="selector-subtema" class="input"></select>
+            <!-- FASE 3: SELECTOR DINÁMICO DE TEMA / SUBTEMA (MULTISELECCIÓN) -->
+            <div id="block-subtema" class="form-block hidden" style="margin-top: 16px; position: relative;">
+              <label for="subtema-dropdown-btn">Tema o Subtema Específico (Selección Múltiple)</label>
+              <button id="subtema-dropdown-btn" class="input multiselect-trigger" type="button">
+                <span id="subtema-selected-text">Todos los temas disponibles</span>
+                <span class="multiselect-arrow">▾</span>
+              </button>
+              <div id="selector-subtema" class="multiselect-menu hidden"></div>
             </div>
 
             <!-- SELECTOR DINÁMICO DE AÑO (INICIALMENTE OCULTO) -->
@@ -610,6 +618,19 @@
                 <option value="75">75 Preguntas</option>
                 <option value="100">100 Preguntas</option>
               </select>
+            </div>
+
+            <div id="block-tiempo-pregunta" class="form-block">
+              <label for="tiempo-por-pregunta">Tiempo por Pregunta (Estudio / Simulacro)</label>
+              <select id="tiempo-por-pregunta" class="input">
+                <option value="30">30 segundos por pregunta</option>
+                <option value="45">45 segundos por pregunta</option>
+                <option value="60">60 segundos (1 min) por pregunta</option>
+                <option value="90" selected>90 segundos (1.5 min) por pregunta (Estándar)</option>
+                <option value="120">120 segundos (2 min) por pregunta</option>
+                <option value="180">180 segundos (3 min) por pregunta</option>
+              </select>
+              <span style="font-size: 11px; color: var(--text-dim); display: block; margin-top: 6px;">* El Modo Intensivo mantiene fijo su límite estricto de 30s por pregunta.</span>
             </div>
 
             <!-- SELECCIONAR MODALIDAD -->
@@ -2269,6 +2290,18 @@
           </label>
         </div>
         
+        <div id="modal-confirmar-tiempo-box" style="background: var(--panel-soft); border: 1px solid var(--border); border-radius: 12px; padding: 14px; display: none; flex-direction: column; gap: 8px;">
+          <label for="modal-tiempo-por-pregunta" style="font-weight: 600; font-size: 13px; color: var(--text); margin: 0; text-transform: none;">Duración del Tiempo (Por Pregunta)</label>
+          <select id="modal-tiempo-por-pregunta" class="input" style="padding: 10px 14px; font-size: 13.5px;">
+            <option value="30">30 segundos por pregunta</option>
+            <option value="45">45 segundos por pregunta</option>
+            <option value="60">60 segundos (1 min) por pregunta</option>
+            <option value="90" selected>90 segundos (1.5 min) por pregunta (Estándar)</option>
+            <option value="120">120 segundos (2 min) por pregunta</option>
+            <option value="180">180 segundos (3 min) por pregunta</option>
+          </select>
+        </div>
+
         <div id="modal-confirmar-descripcion-box" style="line-height: 1.6; font-size: 13.5px; color: var(--text-soft); font-weight: 500;">
           <!-- Explicación dinámica de la modalidad de examen inyectada por JS -->
         </div>
@@ -2279,18 +2312,18 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="js/state.js?v=1.7.9"></script>
-  <script src="js/api.js?v=1.7.9"></script>
-  <script src="js/spaced_repetition.js?v=1.7.9"></script>
-  <script src="js/analytics.js?v=1.7.9"></script>
-  <script src="js/ui.js?v=1.7.9"></script>
-  <script src="js/ui_dashboard.js?v=1.7.9"></script>
-  <script src="js/ui_profile.js?v=1.7.9"></script>
-  <script src="js/auth.js?v=1.7.9"></script>
-  <script src="js/quiz.js?v=1.7.9"></script>
-  <script src="js/flashcards.js?v=1.7.9"></script>
-  <script src="js/battle.js?v=1.7.9"></script>
-  <script src="js/main.js?v=1.7.9"></script>
+  <script src="js/state.js?v=1.8.0"></script>
+  <script src="js/api.js?v=1.8.0"></script>
+  <script src="js/spaced_repetition.js?v=1.8.0"></script>
+  <script src="js/analytics.js?v=1.8.0"></script>
+  <script src="js/ui.js?v=1.8.0"></script>
+  <script src="js/ui_dashboard.js?v=1.8.0"></script>
+  <script src="js/ui_profile.js?v=1.8.0"></script>
+  <script src="js/auth.js?v=1.8.0"></script>
+  <script src="js/quiz.js?v=1.8.0"></script>
+  <script src="js/flashcards.js?v=1.8.0"></script>
+  <script src="js/battle.js?v=1.8.0"></script>
+  <script src="js/main.js?v=1.8.0"></script>
 
   <script>
     // Funciones del Showcase Interactivo de Landing Page

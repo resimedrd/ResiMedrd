@@ -216,13 +216,31 @@ const ui = {
     });
   },
 
+  obtenerEspecialidadesSeleccionadas() {
+    const container = document.getElementById("especialidad");
+    if (!container) return ["Todos"];
+    const checked = Array.from(container.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value);
+    if (checked.length === 0 || checked.includes("Todos")) return ["Todos"];
+    return checked;
+  },
+
+  obtenerSubtemasSeleccionados() {
+    const container = document.getElementById("selector-subtema");
+    if (!container) return ["Todos"];
+    const checked = Array.from(container.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value);
+    if (checked.length === 0 || checked.includes("Todos")) return ["Todos"];
+    return checked;
+  },
+
   async cargarFiltrosEspecialidad() {
     try {
       const temasDisponibles = await api.obtenerTemas();
-      const select = document.getElementById("especialidad");
-      if (!select) return;
+      const container = document.getElementById("especialidad");
+      const triggerBtn = document.getElementById("especialidad-dropdown-btn");
+      const selectedText = document.getElementById("especialidad-selected-text");
+      if (!container) return;
       
-      select.innerHTML = '<option value="Todos" selected>Todas las especialidades (Examen General)</option>';
+      container.innerHTML = "";
       
       const mapaTemas = {};
       temasDisponibles.forEach(t => {
@@ -231,51 +249,187 @@ const ui = {
         }
       });
 
+      const crearOpcionCheckbox = (valor, etiqueta, isChecked = false) => {
+        const label = document.createElement("label");
+        label.className = `multiselect-option${isChecked ? " selected" : ""}`;
+        const cb = document.createElement("input");
+        cb.type = "checkbox";
+        cb.value = valor;
+        cb.checked = isChecked;
+        const span = document.createElement("span");
+        span.textContent = etiqueta;
+        label.appendChild(cb);
+        label.appendChild(span);
+        return label;
+      };
+
+      container.appendChild(crearOpcionCheckbox("Todos", "Todas las especialidades (Examen General)", true));
+
+      const nombresOficiales = new Set();
       state.LISTA_ESPECIALIDADES.forEach(esp => {
         const key = esp.nombre.trim().toLowerCase();
+        nombresOficiales.add(key);
         const totalPreguntas = mapaTemas[key] || 0;
-        
-        const opt = document.createElement("option");
-        opt.value = esp.nombre;
-        opt.textContent = `${esp.nombre} (${totalPreguntas})`;
-        select.appendChild(opt);
+        container.appendChild(crearOpcionCheckbox(esp.nombre, `${esp.nombre} (${totalPreguntas})`, false));
       });
 
-      // FASE 3: Carga dinámica y autónoma de subtemas al cambiar de especialidad
-      if (!select.dataset.hasChangeListener) {
-        select.dataset.hasChangeListener = "true";
-        select.addEventListener("change", async () => {
-          const especialidad = select.value;
-          const blockSubtema = document.getElementById("block-subtema");
-          const selectorSubtema = document.getElementById("selector-subtema");
-          
-          if (!blockSubtema || !selectorSubtema) return;
-          
-          if (especialidad === "Todos") {
-            blockSubtema.classList.add("hidden");
-            selectorSubtema.innerHTML = "";
-            return;
+      // Agregar especialidades dinámicas adicionales que existan en BD
+      temasDisponibles.forEach(t => {
+        if (t && t.tema) {
+          const key = t.tema.trim().toLowerCase();
+          if (!nombresOficiales.has(key) && t.total > 0) {
+            container.appendChild(crearOpcionCheckbox(t.tema.trim(), `${t.tema.trim()} (${t.total})`, false));
           }
-          
-          try {
-            const subtemas = await api.obtenerSubtemas(especialidad);
-            if (subtemas && subtemas.length > 0) {
-              selectorSubtema.innerHTML = '<option value="Todos" selected>Todos los temas de esta especialidad</option>';
-              subtemas.forEach(s => {
-                const opt = document.createElement("option");
-                opt.value = s;
-                opt.textContent = s;
-                selectorSubtema.appendChild(opt);
-              });
+        }
+      });
+
+      const subTriggerBtn = document.getElementById("subtema-dropdown-btn");
+      const subSelectedText = document.getElementById("subtema-selected-text");
+      const selectorSubtema = document.getElementById("selector-subtema");
+
+      const actualizarResumenSubtema = () => {
+        if (!selectorSubtema) return;
+        const subSeleccionados = ui.obtenerSubtemasSeleccionados();
+        selectorSubtema.querySelectorAll(".multiselect-option").forEach(lbl => {
+          const input = lbl.querySelector("input");
+          lbl.classList.toggle("selected", !!(input && input.checked));
+        });
+        if (subSelectedText) {
+          if (subSeleccionados.includes("Todos")) {
+            subSelectedText.textContent = "Todos los temas disponibles";
+          } else if (subSeleccionados.length <= 2) {
+            subSelectedText.textContent = subSeleccionados.join(", ");
+          } else {
+            subSelectedText.textContent = `${subSeleccionados.length} temas (${subSeleccionados.slice(0, 2).join(", ")}...)`;
+          }
+        }
+      };
+
+      const actualizarResumenEspecialidad = async () => {
+        const seleccionadas = ui.obtenerEspecialidadesSeleccionadas();
+        container.querySelectorAll(".multiselect-option").forEach(lbl => {
+          const input = lbl.querySelector("input");
+          lbl.classList.toggle("selected", !!(input && input.checked));
+        });
+
+        if (selectedText) {
+          if (seleccionadas.includes("Todos")) {
+            selectedText.textContent = "Todas las especialidades (Examen General)";
+          } else if (seleccionadas.length <= 2) {
+            selectedText.textContent = seleccionadas.join(", ");
+          } else {
+            selectedText.textContent = `${seleccionadas.length} especialidades (${seleccionadas.slice(0, 2).join(", ")}...)`;
+          }
+        }
+
+        const blockSubtema = document.getElementById("block-subtema");
+        if (!blockSubtema || !selectorSubtema) return;
+
+        try {
+          const subtemas = await api.obtenerSubtemas(seleccionadas);
+          if (subtemas && subtemas.length > 0) {
+            selectorSubtema.innerHTML = "";
+            selectorSubtema.appendChild(crearOpcionCheckbox("Todos", "Todos los temas disponibles", true));
+            subtemas.forEach(s => {
+              selectorSubtema.appendChild(crearOpcionCheckbox(s, s, false));
+            });
+            actualizarResumenSubtema();
+            if (state.tipoSimulacroSeleccionado !== "ano") {
               blockSubtema.classList.remove("hidden");
-            } else {
-              blockSubtema.classList.add("hidden");
-              selectorSubtema.innerHTML = "";
             }
-          } catch (err) {
-            console.error("Error al cargar subtemas autónomamente:", err);
+          } else {
             blockSubtema.classList.add("hidden");
             selectorSubtema.innerHTML = "";
+          }
+        } catch (err) {
+          console.error("Error al cargar subtemas autónomamente:", err);
+          blockSubtema.classList.add("hidden");
+          selectorSubtema.innerHTML = "";
+        }
+      };
+
+      if (selectorSubtema && !selectorSubtema.dataset.hasChangeListener) {
+        selectorSubtema.dataset.hasChangeListener = "true";
+        selectorSubtema.addEventListener("change", (e) => {
+          const target = e.target;
+          if (target.tagName !== "INPUT") return;
+          const allCheckboxes = Array.from(selectorSubtema.querySelectorAll('input[type="checkbox"]'));
+          const cbTodos = allCheckboxes.find(cb => cb.value === "Todos");
+          const individuales = allCheckboxes.filter(cb => cb.value !== "Todos");
+
+          if (target.value === "Todos") {
+            if (target.checked) {
+              individuales.forEach(cb => cb.checked = false);
+            } else if (!individuales.some(cb => cb.checked)) {
+              target.checked = true;
+            }
+          } else {
+            if (target.checked && cbTodos) {
+              cbTodos.checked = false;
+            } else if (!individuales.some(cb => cb.checked) && cbTodos) {
+              cbTodos.checked = true;
+            }
+          }
+          actualizarResumenSubtema();
+        });
+      }
+
+      if (subTriggerBtn && selectorSubtema && !subTriggerBtn.dataset.hasToggleListener) {
+        subTriggerBtn.dataset.hasToggleListener = "true";
+        subTriggerBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          const isHidden = selectorSubtema.classList.toggle("hidden");
+          subTriggerBtn.classList.toggle("open", !isHidden);
+        });
+        document.addEventListener("click", (e) => {
+          const blockSub = document.getElementById("block-subtema");
+          if (blockSub && !blockSub.contains(e.target)) {
+            selectorSubtema.classList.add("hidden");
+            subTriggerBtn.classList.remove("open");
+          }
+        });
+      }
+
+      await actualizarResumenEspecialidad();
+
+      if (!container.dataset.hasChangeListener) {
+        container.dataset.hasChangeListener = "true";
+        container.addEventListener("change", (e) => {
+          const target = e.target;
+          if (target.tagName !== "INPUT") return;
+          const allCheckboxes = Array.from(container.querySelectorAll('input[type="checkbox"]'));
+          const cbTodos = allCheckboxes.find(cb => cb.value === "Todos");
+          const individuales = allCheckboxes.filter(cb => cb.value !== "Todos");
+
+          if (target.value === "Todos") {
+            if (target.checked) {
+              individuales.forEach(cb => cb.checked = false);
+            } else if (!individuales.some(cb => cb.checked)) {
+              target.checked = true;
+            }
+          } else {
+            if (target.checked && cbTodos) {
+              cbTodos.checked = false;
+            } else if (!individuales.some(cb => cb.checked) && cbTodos) {
+              cbTodos.checked = true;
+            }
+          }
+          actualizarResumenEspecialidad();
+        });
+      }
+
+      if (triggerBtn && !triggerBtn.dataset.hasToggleListener) {
+        triggerBtn.dataset.hasToggleListener = "true";
+        triggerBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          const isHidden = container.classList.toggle("hidden");
+          triggerBtn.classList.toggle("open", !isHidden);
+        });
+        document.addEventListener("click", (e) => {
+          const blockEsp = document.getElementById("block-especialidad");
+          if (blockEsp && !blockEsp.contains(e.target)) {
+            container.classList.add("hidden");
+            triggerBtn.classList.remove("open");
           }
         });
       }
