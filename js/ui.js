@@ -2416,10 +2416,25 @@ const ui = {
     const correcta = esReporte ? r.pregunta_correcta : r.correcta;
     const tema = esReporte ? r.pregunta_tema : r.tema;
     const subtema = esReporte ? r.pregunta_subtema : r.subtema;
-    const explicacion = esReporte ? r.pregunta_explicacion : r.explicacion;
+    const explicacionRaw = esReporte ? r.pregunta_explicacion : r.explicacion;
+    const expCorrecta = esReporte ? r.pregunta_explicacion_correcta : r.explicacion_correcta;
+    const expIncorrecta = esReporte ? r.pregunta_explicacion_incorrecta : r.explicacion_incorrecta;
     const fuente = esReporte ? r.pregunta_fuente : r.fuente;
     const examenId = esReporte ? r.pregunta_examen_id : r.examen_id;
     const difficulty = esReporte ? r.pregunta_difficulty : r.difficulty;
+
+    // Reconstruir explicación si viene separada en explicacion_correcta / explicacion_incorrecta
+    let explicacion = (explicacionRaw || "").trim();
+    if (!explicacion && (expCorrecta || expIncorrecta)) {
+      const bloques = [];
+      if (expCorrecta && String(expCorrecta).trim()) {
+        bloques.push(`🔬 JUSTIFICACIÓN (Por qué SÍ):\n${String(expCorrecta).trim()}`);
+      }
+      if (expIncorrecta && String(expIncorrecta).trim() && String(expIncorrecta).trim() !== "No disponible.") {
+        bloques.push(`🚫 DESCARTE (Por qué NO):\n${String(expIncorrecta).trim()}`);
+      }
+      explicacion = bloques.join("\n\n");
+    }
 
     // Poblar IDs
     document.getElementById("modal-corregir-pregunta-id").value = preguntaId;

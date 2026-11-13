@@ -112,9 +112,9 @@ router.post("/api/admin/cargar-masivo", autenticarToken, exigirAdmin, async (req
 
         let explicacionCorrecta = "";
         let explicacionIncorrecta = "";
-        if (p.explicacion_correcta || p.explicacion_incorrecta) {
-          explicacionCorrecta = p.explicacion_correcta || "";
-          explicacionIncorrecta = p.explicacion_incorrecta || "";
+        if (p.explicacion_correcta || p.explicacion_incorrecta || p.justificacion || p.descarte) {
+          explicacionCorrecta = p.explicacion_correcta || p.justificacion || "";
+          explicacionIncorrecta = p.explicacion_incorrecta || p.descarte || "";
         } else if (p.explicacion) {
           const partes = p.explicacion.split("🚫 DESCARTE (Por qué NO):");
           if (partes.length > 1) {
@@ -126,6 +126,18 @@ router.post("/api/admin/cargar-masivo", autenticarToken, exigirAdmin, async (req
           }
         }
 
+        let explicacionCompleta = (p.explicacion || "").trim();
+        if (!explicacionCompleta && (explicacionCorrecta || explicacionIncorrecta)) {
+          const bloques = [];
+          if (String(explicacionCorrecta).trim()) {
+            bloques.push(`🔬 JUSTIFICACIÓN (Por qué SÍ):\n${String(explicacionCorrecta).trim()}`);
+          }
+          if (String(explicacionIncorrecta).trim() && String(explicacionIncorrecta).trim() !== "No disponible.") {
+            bloques.push(`🚫 DESCARTE (Por qué NO):\n${String(explicacionIncorrecta).trim()}`);
+          }
+          explicacionCompleta = bloques.join("\n\n");
+        }
+
         await tx.run(
           `INSERT INTO preguntas (texto, opciones, correcta, explicacion, tema, subtema, microtema, tags, difficulty, fuente, especialidad, ano_examen, explicacion_correcta, explicacion_incorrecta, activo, examen_id) 
            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?)`,
@@ -133,7 +145,7 @@ router.post("/api/admin/cargar-masivo", autenticarToken, exigirAdmin, async (req
             p.texto, 
             opcionesJSON, 
             p.correcta, 
-            p.explicacion || "", 
+            explicacionCompleta, 
             p.tema || "General", 
             subtema, 
             microtema, 
@@ -208,6 +220,8 @@ router.get("/api/admin/reportes-error", autenticarToken, exigirAdmin, async (req
         p.texto AS pregunta_texto, p.tema AS pregunta_tema,
         p.opciones AS pregunta_opciones, p.correcta AS pregunta_correcta,
         p.subtema AS pregunta_subtema, p.explicacion AS pregunta_explicacion,
+        p.explicacion_correcta AS pregunta_explicacion_correcta,
+        p.explicacion_incorrecta AS pregunta_explicacion_incorrecta,
         p.fuente AS pregunta_fuente,
         p.examen_id AS pregunta_examen_id, p.difficulty AS pregunta_difficulty,
         u.nombre AS usuario_nombre, u.email AS usuario_email
@@ -216,6 +230,19 @@ router.get("/api/admin/reportes-error", autenticarToken, exigirAdmin, async (req
       JOIN usuarios u ON r.usuario_id = u.id
       ORDER BY r.leido ASC, r.fecha DESC
     `);
+
+    reportes.forEach(r => {
+      if ((!r.pregunta_explicacion || !String(r.pregunta_explicacion).trim()) && (r.pregunta_explicacion_correcta || r.pregunta_explicacion_incorrecta)) {
+        const bloques = [];
+        if (r.pregunta_explicacion_correcta && String(r.pregunta_explicacion_correcta).trim()) {
+          bloques.push(`🔬 JUSTIFICACIÓN (Por qué SÍ):\n${String(r.pregunta_explicacion_correcta).trim()}`);
+        }
+        if (r.pregunta_explicacion_incorrecta && String(r.pregunta_explicacion_incorrecta).trim() && String(r.pregunta_explicacion_incorrecta).trim() !== "No disponible.") {
+          bloques.push(`🚫 DESCARTE (Por qué NO):\n${String(r.pregunta_explicacion_incorrecta).trim()}`);
+        }
+        r.pregunta_explicacion = bloques.join("\n\n");
+      }
+    });
 
     res.json(reportes);
   } catch (error) {
@@ -270,6 +297,44 @@ router.put("/api/admin/preguntas/:id", autenticarToken, exigirAdmin, async (req,
     }
 
     const opcionesStr = Array.isArray(opciones) ? JSON.stringify(opciones) : opciones;
+    const actual = await db.get(`SELECT * FROM preguntas WHERE id = ?`, [preguntaId]);
+
+    let finalExpCorrecta = explicacion_correcta !== undefined ? explicacion_correcta : "";
+    let finalExpIncorrecta = explicacion_incorrecta !== undefined ? explicacion_incorrecta : "";
+
+    if (!finalExpCorrecta && !finalExpIncorrecta && explicacion) {
+      const regexJust = /(?:🔬\s*)?JUSTIFICACIÓN\s*\((?:Por\s+qué\s+SÍ|Por\s+que\s+SI)\):?/i;
+      const regexDesc = /(?:🚫\s*)?DESCARTE\s*\((?:Por\s+qué\s+NO|Por\s+que\s+NO)\):?/i;
+      const matchJust = explicacion.match(regexJust);
+      const matchDesc = explicacion.match(regexDesc);
+
+      if (matchJust && matchDesc) {
+        const idxJust = matchJust.index;
+        const lenJust = matchJust[0].length;
+        const idxDesc = matchDesc.index;
+        const lenDesc = matchDesc[0].length;
+        if (idxJust < idxDesc) {
+          finalExpCorrecta = explicacion.substring(idxJust + lenJust, idxDesc).trim();
+          finalExpIncorrecta = explicacion.substring(idxDesc + lenDesc).trim();
+        } else {
+          finalExpIncorrecta = explicacion.substring(idxDesc + lenDesc, idxJust).trim();
+          finalExpCorrecta = explicacion.substring(idxJust + lenJust).trim();
+        }
+      } else if (matchJust) {
+        finalExpCorrecta = explicacion.substring(matchJust.index + matchJust[0].length).trim();
+      } else if (matchDesc) {
+        finalExpIncorrecta = explicacion.substring(matchDesc.index + matchDesc[0].length).trim();
+      } else {
+        finalExpCorrecta = explicacion.trim();
+      }
+    }
+
+    const finalExamenId = examen_id !== undefined ? (examen_id ? parseInt(examen_id) : null) : (actual ? actual.examen_id : null);
+    let finalAnoExamen = ano_examen !== undefined ? (ano_examen ? parseInt(ano_examen) : null) : (actual ? actual.ano_examen : null);
+    if (finalExamenId && ano_examen === undefined) {
+      const exObj = await db.get(`SELECT ano FROM examenes WHERE id = ?`, [finalExamenId]);
+      if (exObj) finalAnoExamen = exObj.ano;
+    }
 
     const query = `
       UPDATE preguntas 
@@ -284,17 +349,17 @@ router.put("/api/admin/preguntas/:id", autenticarToken, exigirAdmin, async (req,
       opcionesStr, 
       correcta, 
       tema, 
-      subtema || "", 
-      microtema || "", 
+      subtema !== undefined ? subtema : (actual ? actual.subtema : ""), 
+      microtema !== undefined ? microtema : (actual ? actual.microtema : ""), 
       especialidad || tema, 
-      difficulty !== undefined ? parseFloat(difficulty) : 0.5, 
+      difficulty !== undefined ? parseFloat(difficulty) : (actual ? actual.difficulty : 0.5), 
       explicacion || "", 
       fuente || "", 
-      activo !== undefined ? (activo ? 1 : 0) : 1, 
-      examen_id !== undefined ? (examen_id ? parseInt(examen_id) : null) : null,
-      explicacion_correcta || "",
-      explicacion_incorrecta || "",
-      ano_examen !== undefined ? (ano_examen ? parseInt(ano_examen) : null) : null,
+      activo !== undefined ? (activo ? 1 : 0) : (actual && actual.activo !== undefined ? actual.activo : 1), 
+      finalExamenId,
+      finalExpCorrecta,
+      finalExpIncorrecta,
+      finalAnoExamen,
       preguntaId
     ]);
 
@@ -469,7 +534,19 @@ router.get("/api/admin/preguntas", autenticarToken, exigirAdmin, async (req, res
     const total = filtradas.length;
     const totalPages = Math.max(1, Math.ceil(total / limit));
     const offset = (page - 1) * limit;
-    const preguntas = filtradas.slice(offset, offset + limit);
+    const preguntas = filtradas.slice(offset, offset + limit).map(p => {
+      if ((!p.explicacion || !String(p.explicacion).trim()) && (p.explicacion_correcta || p.explicacion_incorrecta)) {
+        const bloques = [];
+        if (p.explicacion_correcta && String(p.explicacion_correcta).trim()) {
+          bloques.push(`🔬 JUSTIFICACIÓN (Por qué SÍ):\n${String(p.explicacion_correcta).trim()}`);
+        }
+        if (p.explicacion_incorrecta && String(p.explicacion_incorrecta).trim() && String(p.explicacion_incorrecta).trim() !== "No disponible.") {
+          bloques.push(`🚫 DESCARTE (Por qué NO):\n${String(p.explicacion_incorrecta).trim()}`);
+        }
+        return { ...p, explicacion: bloques.join("\n\n") };
+      }
+      return p;
+    });
 
     res.json({ preguntas, total, page, totalPages });
   } catch (error) {
