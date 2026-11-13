@@ -2211,15 +2211,15 @@
 
   <!-- MODAL EDITAR / CORREGIR PREGUNTA (FASE 2 - ADMIN) -->
   <div id="modal-corregir-pregunta" class="modal-ia-overlay">
-    <div class="modal-ia-container" style="max-width: 500px;">
-      <div class="modal-ia-header">
+    <div class="modal-ia-container" style="max-width: 540px; max-height: 90vh; display: flex; flex-direction: column;">
+      <div class="modal-ia-header" style="flex-shrink: 0;">
         <div class="modal-ia-title">
           <span style="font-size: 24px;">✏️</span>
           <h3>Corregir Pregunta Académica</h3>
         </div>
         <button id="btn-modal-corregir-cerrar" class="modal-ia-close" type="button">&times;</button>
       </div>
-      <form id="form-corregir-pregunta" style="padding: 20px; display: flex; flex-direction: column; gap: 12px;">
+      <form id="form-corregir-pregunta" style="padding: 20px; display: flex; flex-direction: column; gap: 12px; overflow-y: auto; flex: 1; min-height: 0;">
         <input type="hidden" id="modal-corregir-pregunta-id" />
         <input type="hidden" id="modal-corregir-reporte-id" />
         
@@ -2280,37 +2280,39 @@
         
         <div>
           <label style="font-size: 12px; font-weight: 600; color: var(--text-soft); text-transform: uppercase; display:block; margin-bottom:4px;">Explicación Clínica / Desglose Docente</label>
-          <textarea id="modal-corregir-explicacion" class="input" style="min-height: 50px; font-family: inherit;" placeholder="Usa 🔬 JUSTIFICACIÓN (Por qué SÍ): y 🚫 DESCARTE (Por qué NO): para visual premium" required></textarea>
+          <textarea id="modal-corregir-explicacion" class="input" style="min-height: 75px; font-family: inherit;" placeholder="Usa 🔬 JUSTIFICACIÓN (Por qué SÍ): y 🚫 DESCARTE (Por qué NO): para visual premium" required></textarea>
         </div>
         
-        <button type="submit" class="btn btn-primary" style="background: var(--warning); color: #000; font-weight: bold; width: 100%; margin-top: 4px;">💾 Guardar Cambios y Resolver Reporte</button>
+        <div style="position: sticky; bottom: -20px; background: var(--bg-modal, var(--panel-strong)); padding: 12px 0 4px 0; margin-top: 4px; border-top: 1px solid var(--border); z-index: 5;">
+          <button id="btn-submit-corregir-pregunta" type="submit" class="btn btn-primary" style="background: var(--warning); color: #000; font-weight: bold; width: 100%; justify-content: center;">💾 Guardar Cambios y Resolver Reporte</button>
+        </div>
       </form>
     </div>
-    
-    <!-- Barra de Navegación Móvil Ergonómica -->
-    <nav class="bottom-nav">
-      <button class="bottom-nav-item active" data-target="simulacros" type="button">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-        <span>Inicio</span>
-      </button>
-      <button class="bottom-nav-item" data-target="preguntas" type="button">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
-        <span>Flashcards</span>
-      </button>
-      <button class="bottom-nav-item" data-target="estadisticas" type="button">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-        <span>Progreso</span>
-      </button>
-      <button class="bottom-nav-item" data-target="historial" type="button">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        <span>Historial</span>
-      </button>
-      <button class="bottom-nav-item" data-target="errores" type="button">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-        <span>Errores</span>
-      </button>
-    </nav>
   </div>
+
+  <!-- Barra de Navegación Móvil Ergonómica -->
+  <nav class="bottom-nav">
+    <button class="bottom-nav-item active" data-target="simulacros" type="button">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span>Inicio</span>
+    </button>
+    <button class="bottom-nav-item" data-target="preguntas" type="button">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+      <span>Flashcards</span>
+    </button>
+    <button class="bottom-nav-item" data-target="estadisticas" type="button">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      <span>Progreso</span>
+    </button>
+    <button class="bottom-nav-item" data-target="historial" type="button">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      <span>Historial</span>
+    </button>
+    <button class="bottom-nav-item" data-target="errores" type="button">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      <span>Errores</span>
+    </button>
+  </nav>
 
   <!-- MODAL DE CONFIRMACIÓN DE INICIO DE EXAMEN (Fase 1) -->
   <div id="modal-confirmar-inicio" class="modal-ia-overlay">

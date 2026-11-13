@@ -2468,8 +2468,17 @@ const ui = {
       inputDificultad.value = difficulty !== undefined && difficulty !== null ? difficulty : 0.5;
     }
 
+    const btnSubmit = document.getElementById("btn-submit-corregir-pregunta");
+    if (btnSubmit) {
+      btnSubmit.textContent = esReporte
+        ? "💾 Guardar Cambios y Resolver Reporte"
+        : "💾 Guardar Cambios";
+    }
+
     // Abrir Modal
     modal.classList.add("active");
+    const formEl = document.getElementById("form-corregir-pregunta");
+    if (formEl) formEl.scrollTop = 0;
   },
 
   async cargarExamenesAdministrador() {
